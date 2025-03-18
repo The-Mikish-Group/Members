@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+    <div class="col-12 mt-0">
+        <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+    </div>
+</div>
+
+@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+{
+    // User is signed in and has the necessary roles
+}
+else
+{
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+        <div class="card shadow p-4" style="max-width: 400px;">
+            <div class="card-body text-center">
+                <p class="card-text pb-2">This is the secure site of Oaks-Village.com.</p>
+                <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </div>
+        </div>
+    </div>
+}

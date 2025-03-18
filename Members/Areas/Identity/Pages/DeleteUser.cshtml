@@ -1,0 +1,48 @@
+﻿@page
+@model Members.Areas.Identity.Pages.DeleteUserModel
+@{
+    ViewData["Title"] = "Delete Member";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/DeleteUser";
+    ViewData["OGTitle"] = "Delete Member";
+    ViewData["OGDescription"] = "Oaks-Village Delete Member";
+    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/DeleteUser";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+    <div class="col-12 mt-0">
+        <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 shadow rounded m-2 bg-gold-light">
+                <h1 class="text-center text-gold-darker mb-4">
+                    <i class="bi bi-person-x-fill"></i> @ViewData["Title"]
+                </h1>
+
+                <p class="pb-1 text-center text-gold-darker">Are you sure you want to delete the user:</p>
+                <p class="text-center"><strong>"@Model.UserName"</strong></p>
+
+                <form method="post" class="d-flex justify-content-center gap-2 my-3">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                    <a asp-page="./Users" class="btn btn-sm btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+﻿@page
+@model Members.Areas.Identity.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-2 mx-0 mb-2 shadow rounded bg-gold-light">
+            <form id="profile-form" method="post">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-gear-fill"></i> @ViewData["Title"]
+                </h2>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Username" class="form-control" disabled placeholder=" " />
+                    <label asp-for="Username" class="form-label">Username</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.FullName" class="form-control" id="Input_FullName" placeholder=" " />
+                    <label asp-for="Input.FullName" class="form-label">Full Name</label>
+                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Phone Number" />
+                    <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                </div>
+                <div>
+                    <button id="update-profile-button" type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-check-lg"></i> Save
+                    </button>
+                    <a href="~/" class="btn btn-sm btn-danger">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+        <partial name="_StatusMessage" for="StatusMessage" />
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const fullNameInput = document.getElementById('Input_FullName');
+
+            phoneNumberInput.addEventListener('input', function () {
+                let inputValue = this.value.replace(/\D/g, '');
+                if (inputValue.length > 10) {
+                    inputValue = inputValue.substring(0, 10);
+                }
+                if (inputValue.length > 0) {
+                    let formattedValue = '';
+                    if (inputValue.length > 0 && inputValue.length < 4) {
+                        formattedValue = inputValue;
+                    } else if (inputValue.length > 3 && inputValue.length < 7) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
+                    } else if (inputValue.length > 6) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
+                    }
+                    this.value = formattedValue;
+                }
+            });
+
+            if (fullNameInput) {
+                fullNameInput.addEventListener('input', function () {
+                    let inputValue = this.value;
+                    let words = inputValue.split(' ');
+                    let capitalizedWords = words.map(word => {
+                        if (word.length > 0) {
+                            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                        }
+                        return word;
+                    });
+                    this.value = capitalizedWords.join(' ');
+                });
+            }
+        });
+    </script>
+}

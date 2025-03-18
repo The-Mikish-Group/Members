@@ -1,0 +1,155 @@
+﻿@page
+@model Members.Areas.Identity.Pages.EditUserModel
+@using Microsoft.AspNetCore.Identity.UI.Services;
+
+@{
+    ViewData["Title"] = "Edit Member";    
+    
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/EditUser";
+    ViewData["OGTitle"] = "Edit Member";
+    ViewData["OGDescription"] = "Oaks-Village Edit Member";
+    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/EditUser";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+        
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+    <div class="col-12 mt-0">
+        <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+    </div>
+</div>
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card p-4 shadow bg-gold-light">
+                <h1 class="mb-4 text-gold-darker">
+                    <i class="bi bi-person-fill"></i> Edit Member
+                </h1>
+
+                <form method="post" id="editForm">
+                    <input type="hidden" asp-for="Input.Id" />
+                    <input type="hidden" asp-for="Input.UserName" />
+                    <input type="hidden" id="isManager" value="@User.IsInRole("Manager")" />
+                    <input type="hidden" asp-for="Input.Email" id="hiddenEmail" />
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.FullName" class="form-control" placeholder="Full Name" id="fullName" />
+                        <label asp-for="Input.FullName" class="form-label">Full Name</label>
+                        <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <span class="form-control email-display">@Model.Input.Email</span>
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                        }
+                        else
+                        {
+                            <span class="form-control email-display">@Model.Input.Email</span>
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+
+                            @* <input asp-for="Input.Email" class="form-control email-input" placeholder="Email" id="emailInput" />
+                            <label asp-for="Input.Email" class="form-label">Email</label> *@
+                        }
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input" id="emailConfirmedCheckbox" />
+                        <label class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Phone Number" />
+                        <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.NewPassword" class="form-control" placeholder="New Password" />
+                        <label asp-for="Input.NewPassword" class="form-label">Assign a New Password</label>
+                        <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-sm btn-success me-2">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                        <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" class="btn btn-sm btn-warning-reverse me-2">
+                            <i class="bi bi-person-gear"></i> Edit Roles
+                        </a>
+                        <a asp-page="./Users" class="btn btn-sm btn-danger">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('emailInput');
+            const hiddenEmail = document.getElementById('hiddenEmail');
+            const editForm = document.getElementById('editForm');
+
+            phoneNumberInput.addEventListener('input', function () {
+                let inputValue = this.value.replace(/\D/g, ''); // Remove non-digit characters
+
+                if (inputValue.length > 10) {
+                    inputValue = inputValue.substring(0, 10); // Limit to 10 digits
+                }
+
+                if (inputValue.length > 0) {
+                    let formattedValue = '';
+
+                    if (inputValue.length > 0 && inputValue.length < 4) {
+                        formattedValue = inputValue;
+                    }
+                    else if (inputValue.length > 3 && inputValue.length < 7) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
+                    }
+                    else if (inputValue.length > 6) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
+                    }
+
+                    this.value = formattedValue;
+                }
+            });
+
+            fullNameInput.addEventListener('input', function () {
+                let inputValue = this.value;
+                let words = inputValue.split(' ');
+                let capitalizedWords = words.map(word => {
+                    if (word.length > 0) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }
+                    return word;
+                });
+                this.value = capitalizedWords.join(' ');
+            });
+
+            editForm.addEventListener('submit', function () {
+                if (emailInput) {
+                    hiddenEmail.value = emailInput.value;
+                } else {
+                    hiddenEmail.value = document.querySelector('.email-display').textContent;
+                }
+            });
+        });
+    </script>
+}

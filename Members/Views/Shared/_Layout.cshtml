@@ -1,0 +1,330 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    // This Site
+    string siteURL = "https://oaks-village.com";
+
+    // Set Site Name and Description (Change as needed)
+    string description = ViewData["Description"]?.ToString() ?? "Welcome to Oaks-Village.";
+
+    // Short name appears in Nav Bar at top on Phones... can be longer like siteName.
+    string siteNameShort = "Oaks-Village";
+
+    // Overall Structure and Organization
+    string siteOrganization = "The Mikish Group";
+
+    // Set default values
+    string pageTitle = ViewData["Title"]?.ToString() ?? "Default Title";
+
+    // Page Share Settings - (shows on "PageShare" card when a link is shared)
+    string ogSite_Name = siteOrganization;
+    string ogTitle = ViewData["OGTitle"]?.ToString() ?? pageTitle;
+    string ogDescription = ViewData["OGDescription"]?.ToString() ?? description;
+    string ogURL = ViewData["OGURL"]?.ToString() ?? siteURL;
+    string canonical = ViewData["Canonical"]?.ToString() ?? "https://oaks-village.com/Info/Index";
+
+    // Default Link Share Image (Change as needed)
+    string ogImage = ViewData["OGImage"]?.ToString() ?? siteURL + "/Images/LinkImages/Oaks-Trees.png";
+    string ogImageWidth = "1000";
+    string ogImageHeight = "1000";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>@pageTitle</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="description" content="@description" />
+    <link rel="canonical" href="@canonical" />
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="lib/icons/apple-touch-icon.png">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="lib/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="lib/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="lib/icons/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="lib/icons/favicon-512x512.png">
+    <link rel="manifest" href="/lib/icons/site.webmanifest">
+
+    <meta property="fb:app_id" content="966242223397117" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:determiner" content="The" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:site_name" content="@ogSite_Name" />
+    <meta property="og:url" content="@ogURL" />
+    <meta property="og:image:url" content="@ogImage" />
+    <meta property="og:image:alt" content="Logo Image" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content=@ogImageWidth />
+    <meta property="og:image:height" content=@ogImageHeight />
+
+    <meta name="twitter:card" content="photo" />
+    <meta name="twitter:title" content="@ogTitle" />
+    <meta name="twitter:image" content="@ogImage" />
+    <meta name="twitter:image:width" content=@ogImageWidth />
+    <meta name="twitter:image:height" content=@ogImageHeight />
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" integrity="sha512-tze+o/xG0w3yxxE8xe32piisVvI/LfcEuf6LW7lFLUxhio2SfFQ9mQ0TqB0avvonmxUXT7/l8+fnWkR03u85fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="~/lib/css/site.css" asp-append-version=" true" />
+    <link rel="stylesheet" href="~/lib/css/sizes.css" asp-append-version=" true" />
+    <link rel="stylesheet" href="~/lib/css/colors.css" asp-append-version=" true" />
+    <link rel="stylesheet" href="~/lib/css/fontsize.css" asp-append-version=" true" />
+    <link rel="stylesheet" href="~/lib/css/mycards.css" asp-append-version=" true" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-gold-light px-0 position-relative">
+            <div class="d-flex flex-grow-1 ps-2">
+
+                <!-- Set to show on lg -->
+                <a style="text-decoration: none" href="/"><img src="~/Images/Svg/Logos/OaksTrees.svg" class="navbar-overhang logo" alt="logo" /></a>
+                <a style="text-decoration: none" class="nav-text nav-text-fs text-green-darker d-none d-lg-inline-block siteNameBig" href="/"><img src="~/Images/Svg/Logos/OaksVillage.svg" class="nbLogo ps-2" alt="Oaks Village Logo" /></a>
+
+                <!-- Set to show on sm -->
+                <a style="text-decoration: none" class="nav-text text-decoration-none navbar-brand navbar-text nav-text-fs text-green-darker d-lg-none d-inline-block w-100 text-center me-0 ps-5 siteNameSmall" href="/"><img alt="" class="navbar-overhang logo px-2 pb-2" /><img src="~/Images/Svg/Logos/OaksVillage.svg" class="nbLogo ms-4" alt="Oaks Village logo" /></a>
+
+                <!-- Toggle Button -->
+                <div class="text-left pe-2 pt-1">
+                    <button class="navbar-toggler pe-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse navbar-collapse flex-grow-1 text-left px-2 pt-1" id="navbarToggler">
+                <ul class="ps-4 bg-gold-light navbar-nav ms-auto flex-nowrap">
+
+                    <li class="nav-item dropdown pt-5 pt-lg-0">
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="welcomeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-house-fill"></i> Welcome
+                        </a>
+                        <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="welcomeDropdown">
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Index"><i class="bi bi-house-fill"></i> Welcome</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="About"><i class="bi bi-info-circle-fill"></i> About</a></li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Facilities"><i class="bi bi-building-fill"></i> Facilities</a></li>
+                            <li><a class="nav-link text-dark" href="~/Oaks"><i class="bi bi-images"></i> Galleries</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Contact">
+                            <i class="bi bi-envelope-fill"></i> Contact
+                        </a>
+                    </li>
+
+                    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+                    {
+                        <li class="nav-item dropdown pt-0 pt-lg-0">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-people-fill"></i> Members
+                            </a>
+                            <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="membersDropdown" style="min-width: 210px;">
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberDocuments"><i class="bi bi-file-earmark-text-fill"></i> Documents</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberDocumentsStatic"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Directory and Reports</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank"><i class="bi bi-newspaper"></i> News and Notices</a></li>
+                            </ul>
+                        </li>
+                    }
+
+                    @if (SignInManager.IsSignedIn(User))
+
+                    {
+                        <!-- Users Dropdown -->
+                        @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+
+                        {
+                            <li class="nav-item dropdown pt-0 pt-lg-0">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock-fill"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="usersDropdown">
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Users" title="Edit">
+                                            <i class="bi bi-person-gear"></i> Edit Members
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        <!-- Profile -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">
+                                <i class="bi bi-gear-fill"></i> Profile
+                            </a>
+                        </li>
+
+                        <!-- Logout -->
+                        <li class="nav-item">
+                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Info", new { area = "" })">
+                                <button type="submit" class="nav-link btn btn-sm btn-link text-dark">
+                                    <i class="bi bi-unlock-fill"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">
+                                <i class="bi bi-person-plus-fill"></i> Register
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Info", new { area = "" })">
+                                <button type="submit" class="nav-link btn btn-sm btn-link text-dark">
+                                    <i class="bi bi-lock-fill"></i> Login
+                                </button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- MainContainer -->
+    <div id="MainContainer" class="m-0 p-0">
+        <main role="main" class="m-0 p-0">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Bottom Footer Navbar Menu -->
+    <div id="footer" class="navbar navbar-dark border-top bg-gold-footer" role="contentinfo" aria-label="Site footer">
+
+        <div class="container text-right">
+            <div class="row w-100 gx-0 gx-lg-5">
+
+                <!-- Footer Column 1 -->
+                <div class="col-4">
+                    @* <h6 class="navbar-text fw-bold text-gold mb-0">Info</h6> *@
+                    <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+
+                        <!-- Welcome -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs text-nowrap " href="~/Info/">Welcome</a>
+                        </li>
+                        <!-- About Us -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs text-nowrap " href="~/Info/About">About Us</a>
+                        </li>
+
+                        <!-- Facilities -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs text-nowrap" href="~/Info/Facilities">Facilities</a>
+                        </li>
+
+                        <!-- Galleries -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs" href="~/Oaks">Galleries</a>
+                        </li>
+
+                        
+                    </ul>
+                </div>
+
+                <!-- Footer Column 2 -->
+                <div class="col-4 pe-0">
+                    @*  <h6 class="navbar-text fw-bold text-gold mb-0"> </h6> *@
+                    <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+                        
+                        <!-- Contact -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs" href="~/Info/Contact">Contact</a>
+                        </li>
+
+                        <!-- More Links -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs" href="~/Info/MoreLinks">More Links</a>
+                        </li>
+
+                       <!-- Members Area -->
+                        <li class="nav-item dropdown py-0">
+                            <a class="nav-link dropdown-toggle text-gold-darker" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Members
+                            </a>
+
+                            <ul class="dropdown-menu ps-4 py-0 bg-gold-footer border-0" aria-labelledby="membersDropdown">
+                                <li class="nav-item text-light">
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="MemberDocuments">Documents</a>
+                                </li>
+
+                                <li class="nav-item text-light">
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="MemberDocumentsStatic">Directory / Reports</a>
+                                </li>
+
+                                <li class="nav-item text-light">
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">News and Notices</a>
+                                </li>
+                            </ul>
+                        </li>                        
+                    </ul>
+                </div>
+
+                <!-- Footer Column 3 -->
+                <div class="col-4 pe-0">
+                    @* <h6 class="navbar-text fw-bold text-gold mb-0">More</h6> *@
+                    <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+
+                        
+
+                        <!-- TOS -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs text-nowrap" href="~/Info/TOS">TOS</a>
+                        </li>
+
+                        <!-- Privacy -->
+                        <li class="nav-item text-light">
+                            <a class="nav-link footer-fs" href="~/Info/Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="w-100 bg-gray text-white pt-4">
+            <p class="text-center py-2 text-white" style="font-size: 10px;"><img class="footer-logo" src="~/Images/Svg/Logos/OaksTrees.svg" />  @siteNameShort Copyright © @DateTime.Now.Year</p>
+        </div>
+    </div>
+        
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Adjust Footer -->
+    <script>
+        // Adjust the position of the footer based on actual content and footer height
+        function adjustFooterPosition() {
+            var mainContainer = document.getElementById('MainContainer');
+            var footer = document.getElementById('footer');
+
+            // Calculate the space between content, footer, and the bottom of the page
+            var spaceToBottom = window.innerHeight - mainContainer.offsetHeight - footer.offsetHeight;
+
+            // Adjust the position of the footer if the space is less than 0
+            footer.style.bottom = (spaceToBottom < 0) ? -spaceToBottom + 'px' : 'auto';
+        }
+
+        // Call the function when the page loads and when it resizes
+        window.addEventListener('load', adjustFooterPosition);
+        window.addEventListener('resize', adjustFooterPosition);
+    </script> 
+    
+</body>
+</html>

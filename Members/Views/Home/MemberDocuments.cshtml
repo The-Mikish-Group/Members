@@ -1,0 +1,96 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model List<DocumentInfo>
+
+@{
+    ViewData["Title"] = "Association Documents";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://Oaks-Village.com/Home/MembersDocuments";
+    ViewData["OGTitle"] = "HOA Association Documents";
+    ViewData["OGDescription"] = "Oaks-Village HOA Association Documents";
+    ViewData["OGURL"] = "https://Oaks-Village.com/Home/MembersDocuments";
+
+    var pageName = "Association Documents";
+    var documents = new List<DocumentInfo>
+    {
+        new() { FileName = "Welcome Letter.pdf", DisplayName = "Welcome Letter" },
+        new() { FileName = "Miscellaneous Information.pdf", DisplayName = "Miscellaneous Information" },
+        new() { FileName = "Bits and Pieces.pdf", DisplayName = "Bits and Pieces" },
+        new() { FileName = "Oaks Village Deed Restrictions.pdf", DisplayName = "Oaks Village Deed Restrictions" },
+        new() { FileName = "Architectual Standards 4th Revision.pdf", DisplayName = "Architectual Standards 4th Revision" },
+        new() { FileName = "Architectual Standards August 2024 Additions.pdf", DisplayName = "Architectual Standards August 2024 Additions" },
+        new() { FileName = "First Amendment to Covenants.pdf", DisplayName = "First Amendment to Covenants" },
+        new() { FileName = "Clubhouse Use Rules.pdf", DisplayName = "Clubhouse Use Rules" },
+        new() { FileName = "Pet Rules.pdf", DisplayName = "Pet Rules" },
+        new() { FileName = "Regulations for Generators.pdf", DisplayName = "Regulations for Generators" },
+        new() { FileName = "Assessment Fee Covers.pdf", DisplayName = "Assessment Fee Covers" }
+    };
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 mt-4 mt-md-0 text-center">
+            <img alt="Oaks Village" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+        </div>
+    </div>
+
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+    {
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-8 mt-1">
+                <h3 class="card-title text-center mb-0 text-gold-darker">@pageName</h3>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-md-6 col-lg-5 mx-2 my-2">
+                <div class="card">
+                    <div class="card-body text-start ps-3 p-3">
+                        @foreach (var document in documents)
+                        {
+                            string pdfUrl = "/identity/ViewPdf?fileName=" + document.FileName;
+                            <div class="ps-2 py-2 my-0">
+                                <a href="@pdfUrl" class="mx-1 w-100 nav-link">@document.DisplayName</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="card-text">This is the <strong>Members</strong> area of Oaks-Village.com.</p>
+                        <a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    public string returnUrl
+    {
+        get
+        {
+            if (!SignInManager.IsSignedIn(User) || !(User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+            {
+                return Context.Request.Path + Context.Request.QueryString;
+            }
+            return "";
+        }
+    }
+}

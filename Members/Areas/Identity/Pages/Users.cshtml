@@ -1,0 +1,239 @@
+﻿@page
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model Members.Areas.Identity.Pages.UsersModel
+@{
+    ViewData["Title"] = "Edit Members";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Users";
+    ViewData["OGTitle"] = "Edit Members";
+    ViewData["OGDescription"] = "Oaks-Village Edit Members";
+    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Users";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+    <div class="col-12 mt-0">
+        <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+    </div>
+</div>
+
+@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+{
+    <div class="container my-4">
+        <div class="row align-items-center mb-3">
+            <div class="col-auto d-flex align-items-center">
+                <h1 class="text-gold-darker">
+                    <i class="bi bi-people-fill"></i> Members
+                </h1>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="col-auto ms-auto d-flex align-items-center">
+                    <a asp-page="./AddUser" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Member
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <h6 class="text-gold-darker mb-1 ps-2">(Also: "No Role" and "Not Confirmed")</h6>
+            <form method="get" id="searchForm">
+                <div class="input-group">
+                    <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
+                        <i class="bi bi-x text-black"></i>
+                    </button>
+                    <input type="text" class="form-control" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
+                    <button class="btn btn-sm btn-info" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div class="mb-2">
+            <span id="userCount"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="fullname" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")">
+                                Full Name
+                                @if (Model.SortColumn == "fullname")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="email" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")">
+                                Email
+                                @if (Model.SortColumn == "email")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="emailconfirmed" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")">
+                                Email Confirmed
+                                @if (Model.SortColumn == "emailconfirmed")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="phonenumber" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")">
+                                Phone Number
+                                @if (Model.SortColumn == "phonenumber")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="roles" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")">
+                                Roles
+                                @if (Model.SortColumn == "roles")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th></th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>@user.EmailConfirmed</td>
+                            <td>@user.PhoneNumber</td>
+                            <td>
+                                @if (user.Roles != null)
+                                {
+                                    @foreach (var role in user.Roles)
+                                    {
+                                        <span>@role</span><br />
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <a asp-page="./EditUser" asp-route-id="@user.Id" class="btn btn-sm btn-primary nav-pill p-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <td>
+                                    <a asp-page="./DeleteUser" asp-route-id="@user.Id" class="btn btn-sm btn-subtle-danger p-1">
+                                        <i class="bi bi-x-circle"></i>
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center mt-4">
+        <p class="mb-1">This is an Admin area of Oaks-Village.com.</p>
+        <p class="mb-2">Please Login with Administration credentials.</p>
+        <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const searchButton = document.getElementById('searchButton');
+        const searchForm = document.getElementById('searchForm');
+        const userCountSpan = document.getElementById('userCount');
+
+        searchInput.addEventListener('input', function() {
+            clearSearch.style.display = this.value ? 'block' : 'none';
+        });
+
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            clearSearch.style.display = 'none';
+            window.location.href = window.location.pathname;
+        });
+
+        // Added event listener for Enter key
+        searchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                searchButton.click(); // Trigger the search button click
+            }
+        });
+
+        clearSearch.style.display = searchInput.value ? 'block' : 'none';
+
+        function updateUserCount() {
+            const userRows = document.querySelectorAll('table tbody tr');
+            userCountSpan.textContent = `User Count: ${userRows.length}`;
+        }
+
+        updateUserCount();
+
+        searchForm.addEventListener('submit', function() {
+            setTimeout(updateUserCount, 100);
+        });
+    </script>
+}
