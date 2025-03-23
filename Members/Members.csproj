@@ -21,7 +21,18 @@
   <ItemGroup>
     <Compile Remove="Areas\Identity\Pages\EditUsers.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\ViewPdf old.cshtml.cs" />
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />
+    <Compile Remove="Data\Migrations\20250320214235_AddUserProfileTable.cs" />
+    <Compile Remove="Data\Migrations\20250320214235_AddUserProfileTable.Designer.cs" />
+    <Compile Remove="Data\Migrations\20250320220038_UpdateUserProfileRequiredFields.cs" />
+    <Compile Remove="Data\Migrations\20250320220038_UpdateUserProfileRequiredFields.Designer.cs" />    
+    <Compile Remove="Data\Migrations\20250321002617_HOADues.cs" />
+    <Compile Remove="Data\Migrations\20250321002617_HOADues.Designer.cs" />
+    <Compile Remove="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />
     <Compile Remove="Helpers\GalleryHelper.cs" />
+    <Compile Remove="Models\HOADues.cs" />
+    <Compile Remove="Models\Plots.cs" />
     <Compile Remove="Models\xDeleteUserModel.cs" />
     <Compile Remove="Models\xEditUserModel.cs" />
     <Compile Remove="Models\xUserModel.cs" />
@@ -44,13 +55,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
     <!--<PackageReference Include="Microsoft.DotNet.MSIdentity" Version="2.0.8" />-->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="NuGet.Packaging" Version="6.13.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
@@ -81,6 +97,9 @@
     <None Update="ProtectedFiles\Directory March 2025.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ProtectedFiles\Directory.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ProtectedFiles\Miscellaneous Information.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -108,6 +127,9 @@
     <None Update="ProtectedFiles\Financial Report Jan 2025.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ProtectedFiles\Pool Rules.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ProtectedFiles\Welcome Letter.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -132,6 +154,10 @@
     <None Update="ProtectedFiles\Clubhouse Use Rules.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>

@@ -413,15 +413,15 @@ a {
 
 .btn-warning-reverse {
     color: #705103;
-    background-color: #dec383; 
-    border-color: #414042; 
+    background-color: #dec383;
+    border-color: #dec383;
 }
 
     .btn-warning-reverse:focus,
     .btn-warning-reverse:hover {
         color: #705103;
-        background-color: goldenrod;
-        border-color: #7d7e81; /* gray */
+        background-color: antiquewhite;
+        border-color: antiquewhite; /* gray */
     }
 
 .btn-option {

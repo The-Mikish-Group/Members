@@ -1,5 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
+using Members.Data;
+using Members.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -27,13 +30,15 @@ namespace Members.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly Data.ApplicationDbContext _dbContext;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -41,7 +46,16 @@ namespace Members.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            Input = new InputModel { Email = string.Empty, Password = string.Empty, ConfirmPassword = string.Empty, PhoneNumber = string.Empty, FullName = string.Empty }; // Initialize required properties to avoid CS9035 error
+            _dbContext = dbContext;
+            Input = new InputModel
+            {
+                Email = string.Empty,
+                Password = string.Empty,
+                ConfirmPassword = string.Empty,
+                PhoneNumber = string.Empty,
+                FirstName = string.Empty, // Initialize required properties to avoid CS9035 error
+                LastName = string.Empty // Initialize required properties to avoid CS9035 error
+            };
             ReturnUrl = string.Empty;
             ExternalLogins = [];
         }
@@ -55,14 +69,7 @@ namespace Members.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [Display(Name = "Full Name")]
-            public required string FullName { get; set; }
-
-            [Phone]
-            [Display(Name = "Phone Number")]
-            public string? PhoneNumber { get; set; }
-
+            // Email and Password
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -78,6 +85,50 @@ namespace Members.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public required string ConfirmPassword { get; set; }
+
+            // Name - First, Middle, and Last
+            [Required]
+            [Display(Name = "First Name")]
+            public required string FirstName { get; set; }
+
+            [Display(Name = "Middle Name")]
+            public string? MiddleName { get; set; }
+
+            [Required]
+            [Display(Name = "Last Name")]
+            public required string LastName { get; set; }
+
+            // PhoneNumber
+            [Required]
+            [Phone]
+            [Display(Name = "Phone Number")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
+            public string? PhoneNumber { get; set; }            
+
+            // Address - AddressLine1, AddressLine2, City, State, ZipCode
+            [Required]
+            [Display(Name = "Address Line 1")]
+            public string? AddressLine1 { get; set; }
+
+            [Display(Name = "Address Line 2")]
+            public string? AddressLine2 { get; set; }
+
+            [Required]
+            [Display(Name = "City")]
+            public string? City { get; set; }
+
+            [Required]
+            [Display(Name = "State")]
+            public string? State { get; set; }
+
+            [Required]
+            [Display(Name = "Zip Code")]
+            public string? ZipCode { get; set; }
+
+
+            // Plot Identifier
+            [Display(Name = "Plot")]
+            public string? Plot { get; set; }
         }
 
         public async Task OnGetAsync(string? returnUrl = null)
@@ -96,42 +147,32 @@ namespace Members.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                
-                // Set the PhoneNumber property
+
+                // Set the PhoneNumber property on the IdentityUser
                 user.PhoneNumber = Input.PhoneNumber;
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(Input.FullName))
+                    // Create a new UserProfile
+                    var userProfile = new UserProfile
                     {
-                        await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("FullName", Input.FullName));
-                    }
+                        UserId = user.Id,
+                        FirstName = Input.FirstName,
+                        MiddleName = Input.MiddleName,
+                        LastName = Input.LastName,
+                        AddressLine1 = Input.AddressLine1,
+                        AddressLine2 = Input.AddressLine2,
+                        City = Input.City,
+                        State = Input.State,
+                        ZipCode = Input.ZipCode,
+                        Plot = Input.Plot,
+                        User = user // Set the required User property
+                    };
 
-                    _logger.LogInformation("User created a new account with password.");
-
-                    // Send notification email to OaksVillage@oaks-village.com
-                    await _emailSender.SendEmailAsync(
-                        "OaksVillage@oaks-village.com",
-                        "New User Registration",
-                        $"A new user with email {Input.Email} has registered."
-                    );
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId, code, returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your email account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>." +
-                        "<p><br>A manager will still have to verify your account and that may take up to 24 hours.</p>" +
-                        "<p>Thank you from the staff at Oaks-Village.</p>");
-
+                    _dbContext.UserProfile.Add(userProfile);
+                    await _dbContext.SaveChangesAsync();
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });

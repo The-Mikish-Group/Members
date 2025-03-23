@@ -3,93 +3,241 @@
 @using Microsoft.AspNetCore.Identity.UI.Services;
 
 @{
-    ViewData["Title"] = "Edit Member";    
-    
+    ViewData["Title"] = "Edit Member";
     ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
     ViewData["Canonical"] = "https://www.oaks-village.com/Identity/EditUser";
     ViewData["OGTitle"] = "Edit Member";
     ViewData["OGDescription"] = "Oaks-Village Edit Member";
     ViewData["OGURL"] = "https://www.oaks-village.com/Identity/EditUser";
     // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
-        
 }
 
 <head>
     <title>@ViewData["Title"]</title>
+
+    <!-- Page Styles -->
+    <style>
+        .readonly-email,
+        .readonly-PhoneNumber {
+            background-color: #f0f0f0; /* Light gray */
+            cursor: not-allowed; /* Indicate it's not editable */
+            padding-right: 2.5em; /* Make space for the icon */
+            position: relative; /* Needed for absolute positioning of the icon */
+        }
+
+        .email-icon-container,
+        .phoneNumber-icon-container {
+            position: absolute;
+            top: 50%;
+            right: 0.5em;
+            transform: translateY(-50%);
+        }
+
+        .form-check-input[type=checkbox].email-confirmed-checkbox,
+        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.2em;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
+            .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked {
+                background-color: #fff; /* White background when checked */
+                border-color: #28a745; /* Green border when checked */
+            }
+
+                .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
+                .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before {
+                    content: '\2713'; /* Unicode checkmark character */
+                    display: block;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 1em;
+                    color: #28a745; /* Green checkmark */
+                }
+    </style>
+
 </head>
 
+<!-- Logo Image -->
 <div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
     <div class="col-12 mt-0">
         <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
     </div>
 </div>
 
+<!-- Content Container -->
 <div class="container my-4">
     <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+        <div class="col-lg-8 col-md-10">
             <div class="card p-4 shadow bg-gold-light">
+
+                <!-- Title -->
                 <h1 class="mb-4 text-gold-darker">
-                    <i class="bi bi-person-fill"></i> Edit Member
+                    <i class="bi bi-person-fill"></i> @ViewData["Title"]
                 </h1>
 
+                <!-- The EditUser Form -->
                 <form method="post" id="editForm">
+
+                    <!-- AntiForgery -->
+                    @Html.AntiForgeryToken()
+
+                    <!-- Hidden Fields we don't need to display -->
                     <input type="hidden" asp-for="Input.Id" />
-                    <input type="hidden" asp-for="Input.UserName" />
-                    <input type="hidden" id="isManager" value="@User.IsInRole("Manager")" />
+                    <input type="hidden" asp-for="Input.UserName" />                    
                     <input type="hidden" asp-for="Input.Email" id="hiddenEmail" />
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Input.FullName" class="form-control" placeholder="Full Name" id="fullName" />
-                        <label asp-for="Input.FullName" class="form-label">Full Name</label>
-                        <span asp-validation-for="Input.FullName" class="text-danger"></span>
-                    </div>
+                    <!-- Find out if user is a Manager -->
+                    <input type="hidden" id="isManager" value="@User.IsInRole("Manager")" />
 
+                    <!-- Email -->
                     <div class="form-floating mb-3">
-                        @if (User.IsInRole("Manager"))
-                        {
-                            <span class="form-control email-display">@Model.Input.Email</span>
-                            <label asp-for="Input.Email" class="form-label">Email</label>
-                        }
-                        else
-                        {
-                            <span class="form-control email-display">@Model.Input.Email</span>
-                            <label asp-for="Input.Email" class="form-label">Email</label>
-
-                            @* <input asp-for="Input.Email" class="form-control email-input" placeholder="Email" id="emailInput" />
-                            <label asp-for="Input.Email" class="form-label">Email</label> *@
-                        }
+                        <span class="form-control email-display readonly-email">@Model.Input.Email</span>
+                        <div class="email-icon-container" id="emailCheckIcon">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        </div>
+                        <label asp-for="Input.Email" class="form-label">Email</label>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
+                    <!-- EmailConfirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input" id="emailConfirmedCheckbox" />
+                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox" id="emailConfirmedCheckbox" />
                         <label class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
-                    </div>
+                    </div>                    
 
-                    <div class="form-floating mb-3">
+                    <!-- PhoneNumber -->
+                    <div class="form-floating mb-3">                        
+                        <div class="phoneNumber-icon-container" id="phoneNumberCheckIcon">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        </div>
                         <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Phone Number" />
                         <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
-                    <div class="form-floating mb-3">
+                    <!-- PhoneNumberConfirmed -->
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox" id="PhoneNumberConfirmedCheckbox" />
+                        <label class="form-check-label text-gold-darker" for="PhoneNumberConfirmedCheckbox">PhoneNumer Confirmed</label>
+                    </div>
+                    <hr />
+
+                    <!-- Name Row - First / Middle / Last -->
+                    <div class="row gx-1">
+
+                        <!-- FirstName -->
+                        <div class="col-md-5 form-floating mb-3">
+                            <input asp-for="Input.FirstName" class="form-control" placeholder="First Name" />
+                            <label asp-for="Input.FirstName" class="form-label">First Name</label>
+                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        </div>
+
+                        <!-- MiddleName -->
+                        <div class="col-2 form-floating mb-3">
+                            <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
+                            @* <label asp-for="Input.MiddleName" class="form-label">Middle</label> *@
+                            <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
+                        </div>
+                        
+                        <!-- LastName -->
+                        <div class="col-md-5 form-floating mb-3">
+                            <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
+                            <label asp-for="Input.LastName" class="form-label">Last Name</label>
+                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <hr />
+                        <!-- Edit Roles -->
+                        <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-warning-reverse me-2">
+                            <i class="bi bi-person-gear"></i> Edit Roles
+                        </a>
+                    <hr/>
+
+                    <!-- AddressLine1 -->
+                    <div class="col-12 form-floating mb-3">
+                        <input asp-for="Input.AddressLine1" class="form-control" placeholder="Address Line 1" />
+                        <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
+                        <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
+                    </div>
+
+                    <!-- AddressLine2 -->
+                    <div class="col-12 form-floating mb-3">
+                        <input asp-for="Input.AddressLine2" class="form-control" placeholder="Address Line 2 (Optional)" />
+                        <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Optional)</label>
+                        <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
+                    </div>
+
+                    <!-- City / State / Zipcode line -->
+                    <div class="row gx-1">
+                        <div class="col-5 form-floating mb-3">
+                            <input asp-for="Input.City" class="form-control" placeholder="City" />
+                            <label asp-for="Input.City" class="form-label">City</label>
+                            <span asp-validation-for="Input.City" class="text-danger"></span>
+                        </div>
+                        <div class="col-3 form-floating mb-3">
+                            <input asp-for="Input.State" class="form-control" placeholder="State" />
+                            <label asp-for="Input.State" class="form-label">State</label>
+                            <span asp-validation-for="Input.State" class="text-danger"></span>
+                        </div>
+                        <div class="col-4 form-floating mb-3">
+                            <input asp-for="Input.ZipCode" class="form-control" placeholder="Zip Code" />
+                            <label asp-for="Input.ZipCode" class="form-label">Zip Code</label>
+                            <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
+                        </div> 
+                    </div>
+
+                    <hr />
+
+                    <!-- Plot Identifier -->
+                    <div class="col-12 form-floating mb-4">
+                        <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
+                        <label asp-for="Input.Plot" class="form-label">Plot</label>
+                        <span asp-validation-for="Input.Plot" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    <!-- Password reset warning -->
+                    <div class="ps-4 py-0 text-danger text-center">
+                        <p>Email's this password to the Member.</p>
+                        <p><strong>Use as last resort only!</strong></p>
+                         <p>There is a Passsword reset link on the Login screen..</p>
+                    </div>
+
+                    <!-- Assign a new password -->
+                    <div class="col-12 form-floating mb-4">
                         <input asp-for="Input.NewPassword" class="form-control" placeholder="New Password" />
                         <label asp-for="Input.NewPassword" class="form-label">Assign a New Password</label>
                         <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
                     </div>
 
+                    <!-- Buttons -->
                     <div class="d-flex justify-content-center">
+
+                        <!-- Save -->
                         <button type="submit" class="btn btn-sm btn-success me-2">
                             <i class="bi bi-save"></i> Save
                         </button>
-                        <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" class="btn btn-sm btn-warning-reverse me-2">
-                            <i class="bi bi-person-gear"></i> Edit Roles
-                        </a>
-                        <a asp-page="./Users" class="btn btn-sm btn-danger">
+
+                        
+
+                        <!-- Cancel -->
+                        <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
                             <i class="bi bi-x-circle"></i> Cancel
                         </a>
 
-                        
                     </div>
                 </form>
             </div>
@@ -101,54 +249,118 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const phoneNumberInput = document.getElementById('phoneNumber');
-            const fullNameInput = document.getElementById('fullName');
-            const emailInput = document.getElementById('emailInput');
             const hiddenEmail = document.getElementById('hiddenEmail');
             const editForm = document.getElementById('editForm');
+            const emailConfirmedCheckbox = document.getElementById('emailConfirmedCheckbox');
+            const emailCheckIcon = document.getElementById('emailCheckIcon');
+            const phoneNumberInput = document.getElementById('PhoneNumber'); // Assuming the input field has this ID
+            const phoneNumberConfirmedCheckbox = document.getElementById('PhoneNumberConfirmedCheckbox');
+            const phoneNumberCheckIcon = document.getElementById('phoneNumberCheckIcon');
 
-            phoneNumberInput.addEventListener('input', function () {
-                let inputValue = this.value.replace(/\D/g, ''); // Remove non-digit characters
+            // Get references to the input fields for capitalization
+            const firstNameInput = document.getElementById('Input_FirstName');
+            const middleNameInput = document.getElementById('Input_MiddleName');
+            const lastNameInput = document.getElementById('Input_LastName');
+            const cityInput = document.getElementById('Input_City');
+            const stateInput = document.getElementById('Input_State');
 
-                if (inputValue.length > 10) {
-                    inputValue = inputValue.substring(0, 10); // Limit to 10 digits
+            // Function to toggle the visibility of the email check icon
+            function toggleEmailCheckIcon() {
+                if (emailCheckIcon && emailConfirmedCheckbox) {
+                    emailCheckIcon.style.display = emailConfirmedCheckbox.checked ? 'block' : 'none';
+                }
+            }
+
+            // Set initial visibility on page load for email
+            toggleEmailCheckIcon();
+
+            // Add event listener to the email checkbox
+            if (emailConfirmedCheckbox) {
+                emailConfirmedCheckbox.addEventListener('change', toggleEmailCheckIcon);
+            } else {
+                console.error("emailConfirmedCheckbox element not found!");
+            }
+
+            // Function to toggle the visibility of the PhoneNumber check icon
+            function togglePhoneNumberCheckIcon() {
+                if (phoneNumberCheckIcon && phoneNumberConfirmedCheckbox) {
+                    phoneNumberCheckIcon.style.display = phoneNumberConfirmedCheckbox.checked ? 'block' : 'none';
+                }
+            }
+
+            // Set initial visibility on page load for phone number
+            togglePhoneNumberCheckIcon();
+
+            // Add event listener to the phone number checkbox
+            if (phoneNumberConfirmedCheckbox) {
+                phoneNumberConfirmedCheckbox.addEventListener('change', togglePhoneNumberCheckIcon);
+            } else {
+                console.error("PhoneNumberConfirmedCheckbox element not found!");
+            }
+
+            // Control PhoneNumberConfirmed based on PhoneNumber input
+            if (phoneNumberInput && phoneNumberConfirmedCheckbox) {
+                function updatePhoneNumberConfirmedState() {
+                    const phoneNumberValue = phoneNumberInput.value.trim();
+                    phoneNumberConfirmedCheckbox.disabled = phoneNumberValue === '';
+                    if (phoneNumberValue === '') {
+                        phoneNumberConfirmedCheckbox.checked = false; // Optionally uncheck if phone is empty
+                        if (phoneNumberCheckIcon) {
+                            phoneNumberCheckIcon.style.display = 'none'; // Hide the icon if unchecked
+                        }
+                    } else {
+                        phoneNumberConfirmedCheckbox.disabled = false; // Enable if there's a value
+                    }
                 }
 
-                if (inputValue.length > 0) {
-                    let formattedValue = '';
+                // Call on page load to set initial state
+                updatePhoneNumberConfirmedState();
 
-                    if (inputValue.length > 0 && inputValue.length < 4) {
-                        formattedValue = inputValue;
-                    }
-                    else if (inputValue.length > 3 && inputValue.length < 7) {
-                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
-                    }
-                    else if (inputValue.length > 6) {
-                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
-                    }
+                // Add event listener for input changes to the phone number field
+                phoneNumberInput.addEventListener('input', updatePhoneNumberConfirmedState);
+            }
 
-                    this.value = formattedValue;
+            // Function to capitalize the first letter of a string and keep the rest as typed
+            function capitalizeFirstLetterAsTyping(input) {
+                if (input.value.length > 0) {
+                    input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1);
                 }
-            });
+            }
 
-            fullNameInput.addEventListener('input', function () {
-                let inputValue = this.value;
-                let words = inputValue.split(' ');
-                let capitalizedWords = words.map(word => {
-                    if (word.length > 0) {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                    }
-                    return word;
+            // Add event listeners to capitalize the first letter on input
+            if (firstNameInput) {
+                firstNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
                 });
-                this.value = capitalizedWords.join(' ');
-            });
+            }
+
+            if (middleNameInput) {
+                middleNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (lastNameInput) {
+                lastNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (cityInput) {
+                cityInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (stateInput) {
+                stateInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
 
             editForm.addEventListener('submit', function () {
-                if (emailInput) {
-                    hiddenEmail.value = emailInput.value;
-                } else {
-                    hiddenEmail.value = document.querySelector('.email-display').textContent;
-                }
+                // Email is now displayed in a span, so we get the text from there
+                hiddenEmail.value = document.querySelector('.email-display').textContent;
             });
         });
     </script>

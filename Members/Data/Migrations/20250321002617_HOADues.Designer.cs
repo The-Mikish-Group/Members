@@ -4,6 +4,7 @@ using Members.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Members.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250321002617_HOADues")]
+    partial class HOADues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace Members.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("HOADues", (string)null);
+                    b.ToTable("HOADues");
                 });
 
             modelBuilder.Entity("Members.Data.Plots", b =>
@@ -72,7 +75,7 @@ namespace Members.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Plots", (string)null);
+                    b.ToTable("Plots");
                 });
 
             modelBuilder.Entity("Members.Models.UserProfile", b =>
@@ -112,7 +115,7 @@ namespace Members.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("UserProfile", (string)null);
+                    b.ToTable("UserProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

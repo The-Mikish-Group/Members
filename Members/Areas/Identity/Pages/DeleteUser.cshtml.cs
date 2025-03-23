@@ -12,9 +12,12 @@ namespace Members.Areas.Identity.Pages
         [BindProperty]
         public required string Id { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTerm { get; set; }
+
         public required string UserName { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task<IActionResult> OnGetAsync(string id, string? searchTerm)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -29,11 +32,11 @@ namespace Members.Areas.Identity.Pages
 
             Id = user.Id;
             UserName = user.UserName ?? string.Empty;
-
+            SearchTerm = searchTerm; // Capture the search term
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? searchTerm)
         {
             if (string.IsNullOrEmpty(Id))
             {
@@ -50,7 +53,7 @@ namespace Members.Areas.Identity.Pages
 
             if (result.Succeeded)
             {
-                return RedirectToPage("./Users");
+                return RedirectToPage("./Users", new { SearchTerm = searchTerm }); // Redirect with search term
             }
 
             foreach (var error in result.Errors)
@@ -62,4 +65,3 @@ namespace Members.Areas.Identity.Pages
         }
     }
 }
-

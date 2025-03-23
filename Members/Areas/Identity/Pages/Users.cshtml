@@ -36,7 +36,7 @@
             @if (User.IsInRole("Admin"))
             {
                 <div class="col-auto ms-auto d-flex align-items-center">
-                    <a asp-page="./AddUser" class="btn btn-sm btn-primary">
+                    <a asp-page="./AddUser" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-primary">
                         <i class="bi bi-plus-circle"></i> New Member
                     </a>
                 </div>
@@ -65,7 +65,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="fullname" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")">
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="fullname" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
                                 Full Name
                                 @if (Model.SortColumn == "fullname")
                                 {
@@ -81,7 +81,7 @@
                             </a>
                         </th>
                         <th>
-                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="email" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")">
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="email" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
                                 Email
                                 @if (Model.SortColumn == "email")
                                 {
@@ -97,7 +97,7 @@
                             </a>
                         </th>
                         <th>
-                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="emailconfirmed" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")">
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="emailconfirmed" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
                                 Email Confirmed
                                 @if (Model.SortColumn == "emailconfirmed")
                                 {
@@ -113,7 +113,7 @@
                             </a>
                         </th>
                         <th>
-                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="phonenumber" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")">
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="phonenumber" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
                                 Phone Number
                                 @if (Model.SortColumn == "phonenumber")
                                 {
@@ -129,7 +129,7 @@
                             </a>
                         </th>
                         <th>
-                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="roles" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")">
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="roles" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
                                 Roles
                                 @if (Model.SortColumn == "roles")
                                 {
@@ -164,19 +164,21 @@
                                 {
                                     @foreach (var role in user.Roles)
                                     {
-                                        <span>@role</span><br />
+                                        <span>@role</span>
+
+                                        <br />
                                     }
                                 }
                             </td>
                             <td>
-                                <a asp-page="./EditUser" asp-route-id="@user.Id" class="btn btn-sm btn-primary nav-pill p-1">
+                                <a asp-page="./EditUser" asp-route-id="@user.Id" class="btn btn-sm btn-primary nav-pill p-1" asp-route-searchTerm="@Model.SearchTerm">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                             </td>
                             @if (User.IsInRole("Admin"))
                             {
                                 <td>
-                                    <a asp-page="./DeleteUser" asp-route-id="@user.Id" class="btn btn-sm btn-subtle-danger p-1">
+                                    <a asp-page="./DeleteUser" asp-route-id="@user.Id" class="btn btn-sm btn-subtle-danger p-1" asp-route-searchTerm="@Model.SearchTerm">
                                         <i class="bi bi-x-circle"></i>
                                     </a>
                                 </td>

@@ -36,7 +36,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Register IEmailSender and EmailService correctly
+// Register IEmailSender and EmailService
 builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddTransient<EmailService>();
 
@@ -67,6 +67,7 @@ app.MapControllerRoute(
 app.MapRazorPages()
     .WithStaticAssets();
 
+// Create the Roles if they have been deleted.
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -81,6 +82,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Create the Administrator Account if it has been deleted.
+// ADMIN_EMAIL and ADMIN_PASSWORD are variables stored in "Environment Variables"
+// on the Dev computer and same with the Hosting service except harder to find.
 using (var scope = app.Services.CreateScope())
 {
     var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
@@ -103,7 +107,6 @@ using (var scope = app.Services.CreateScope())
         };
 
         await UserManager.CreateAsync(user, ADMIN_PASSWORD);
-
         await UserManager.AddToRoleAsync(user, "Admin");
     }
 }

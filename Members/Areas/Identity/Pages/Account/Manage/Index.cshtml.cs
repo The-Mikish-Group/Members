@@ -5,15 +5,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq;
+using Members.Data; // Make sure this namespace is correct for your DbContext
+using Members.Models; // Make sure this namespace is correct for your UserProfile model
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel(
         UserManager<IdentityUser> userManager,
-        SignInManager<IdentityUser> signInManager) : PageModel
+        SignInManager<IdentityUser> signInManager,
+        ApplicationDbContext dbContext) : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly SignInManager<IdentityUser> _signInManager = signInManager;
+        private readonly ApplicationDbContext _dbContext = dbContext;
 
         public string? Username { get; set; }
 
@@ -24,30 +28,67 @@ namespace Members.Areas.Identity.Pages.Account.Manage
         public required InputModel Input { get; set; }
 
         public class InputModel
-        {
+        {            
             [Phone]
             [Display(Name = "Phone Number")]
-            [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid format; try ### ###-###")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
 
             [Required]
-            [Display(Name = "Full Name")]
-            public required string FullName { get; set; } // Add FullName property
+            [Display(Name = "First Name")]
+            public required string FirstName { get; set; }
+
+            [Display(Name = "Middle Name")]
+            public string? MiddleName { get; set; }
+
+            [Required]
+            [Display(Name = "Last Name")]
+            public required string LastName { get; set; }
+
+            [Required]
+            [Display(Name = "Address Line 1")]
+            public string? AddressLine1 { get; set; }
+
+            [Display(Name = "Address Line 2")]
+            public string? AddressLine2 { get; set; }
+
+            [Required]
+            [Display(Name = "City")]
+            public string? City { get; set; }
+
+            [Required]
+            [Display(Name = "State")]
+            public string? State { get; set; }
+
+            [Required]
+            [Display(Name = "State")]
+            public string? ZipCode { get; set; }
+
+            [Display(Name = "Plot")]
+            public string? Plot { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            var claims = await _userManager.GetClaimsAsync(user);
-            var fullNameClaim = claims.FirstOrDefault(c => c.Type == "FullName");
+
+            var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
 
             Username = userName;
 
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
-                FullName = fullNameClaim?.Value ?? string.Empty // Load FullName claim with null check
+                FirstName = userProfile?.FirstName ?? string.Empty,
+                MiddleName = userProfile?.MiddleName,
+                LastName = userProfile?.LastName ?? string.Empty,
+                AddressLine1 = userProfile?.AddressLine1,
+                AddressLine2 = userProfile?.AddressLine2,
+                City = userProfile?.City,
+                State = userProfile?.State,
+                ZipCode = userProfile?.ZipCode,
+                Plot = userProfile?.Plot
             };
         }
 
@@ -88,23 +129,28 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            // Update FullName claim
-            var fullNameClaim = new System.Security.Claims.Claim("FullName", Input.FullName ?? string.Empty);
-            var existingFullNameClaim = await _userManager.GetClaimsAsync(user);
-            var oldFullName = existingFullNameClaim.FirstOrDefault(c => c.Type == "FullName");
+            // Update UserProfile
+            var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
+            if (userProfile == null)
+            {
+                userProfile = new UserProfile { UserId = user.Id, User = user };
+                _dbContext.UserProfile.Add(userProfile);
+            }
 
-            if (oldFullName != null)
-            {
-                await _userManager.ReplaceClaimAsync(user, oldFullName, fullNameClaim);
-            }
-            else
-            {
-                await _userManager.AddClaimAsync(user, fullNameClaim);
-            }
+            userProfile.FirstName = Input.FirstName;
+            userProfile.MiddleName = Input.MiddleName;
+            userProfile.LastName = Input.LastName;
+            userProfile.AddressLine1 = Input.AddressLine1;
+            userProfile.AddressLine2 = Input.AddressLine2;
+            userProfile.City = Input.City;
+            userProfile.State = Input.State;
+            userProfile.ZipCode = Input.ZipCode;
+            userProfile.Plot = Input.Plot;
+
+            await _dbContext.SaveChangesAsync();
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "" +
-                "Your profile has been updated";
+            StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }
     }

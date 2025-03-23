@@ -1,15 +1,14 @@
 ﻿@page
 @model Members.Areas.Identity.Pages.AddUserModel
+
 @{
     ViewData["Title"] = "Add New Member";
-
     ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
     ViewData["Canonical"] = "https://www.oaks-village.com/Identity/AddUser";
     ViewData["OGTitle"] = "Add New Member";
     ViewData["OGDescription"] = "Oaks-Village Add New Member";
     ViewData["OGURL"] = "https://www.oaks-village.com/Identity/AddUser";
     // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
-
 }
 
 <head>
@@ -23,49 +22,104 @@
 </div>
 
 <div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+     <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
             <div class="card shadow rounded p-2 bg-gold-light">
                 <form method="post">
                     <h1 class="mb-4 text-gold-darker">
                         <i class="bi bi-person-fill"></i> Add a New Member
                     </h1>
                     <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
-
                     <div class="form-floating mb-2">
-                        <input asp-for="Input.FullName" class="form-control" id="fullName" />
-                        <label asp-for="Input.FullName" class="form-label">Full Name</label>
-                        <span asp-validation-for="Input.FullName" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating mb-2">
-                        <input asp-for="Input.Email" class="form-control" />
+                        <input asp-for="Input.Email" class="form-control" placeholder="Email" />
                         <label asp-for="Input.Email" class="form-label">Email</label>
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
-
                     <div class="form-check mb-2">
-                        <input asp-for="Input.EmailConfirmed" class="form-check-input" />
-                        <label asp-for="Input.EmailConfirmed" class="form-check-label text-gold-darker">Email Confirmed</label>
+                        <input asp-for="Input.EmailConfirmed" class="form-check-input" id="emailConfirmedCheckbox" />
+                        <label asp-for="Input.EmailConfirmed" class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
-
                     <div class="form-floating mb-2">
-                        <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" />
+                        <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Phone Number" />
                         <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
+                    <div class="form-check mb-2">
+                        <input asp-for="Input.PhoneNumberConfirmed" class="form-check-input" id="phoneNumberConfirmedCheckbox" />
+                        <label asp-for="Input.PhoneNumberConfirmed" class="form-check-label text-gold-darker" for="phoneNumberConfirmedCheckbox">Phone Number Confirmed</label>
+                    </div>
+                    <div class="row gx-1">
+                        <div class="col-5 form-floating mb-2">
+                            <input asp-for="Input.FirstName" class="form-control" placeholder="First Name" />
+                            <label asp-for="Input.FirstName" class="form-label">First Name</label>
+                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-2 form-floating mb-2">
+                            <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
+                            @* <label asp-for="Input.MiddleName" class="form-label">Middle</label> *@
+                            <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
+                        </div>
+                        <div class="col-5 form-floating mb-2">
+                            <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
+                            <label asp-for="Input.LastName" class="form-label">Last Name</label>
+                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                        </div>
+                    </div>
 
                     <div class="form-floating mb-2">
-                        <input asp-for="Input.Password" class="form-control" type="password" />
-                        <label asp-for="Input.Password" class="form-label">Password</label>
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder="Birthday" />
+                        <label asp-for="Input.Birthday" class="form-label">Birthday</label>
+                        <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    <div class="col-12 form-floating mb-2">
+                        <input asp-for="Input.AddressLine1" class="form-control" placeholder="Address Line 1" />
+                        <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
+                        <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 form-floating mb-2">
+                        <input asp-for="Input.AddressLine2" class="form-control" placeholder="Address Line 2 (Optional)" />
+                        <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Optional)</label>
+                        <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
+                    </div>
+                    <div class="row gx-1">
+                        <div class="col-5 form-floating mb-2">
+                            <input asp-for="Input.City" class="form-control" placeholder="City" />
+                            <label asp-for="Input.City" class="form-label">City</label>
+                            <span asp-validation-for="Input.City" class="text-danger"></span>
+                        </div>
+                        <div class="col-3 form-floating mb-2">
+                            <input asp-for="Input.State" class="form-control" placeholder="State" />
+                            <label asp-for="Input.State" class="form-label">State</label>
+                            <span asp-validation-for="Input.State" class="text-danger"></span>
+                        </div>
+                        <div class="col-4 form-floating mb-2">
+                            <input asp-for="Input.ZipCode" class="form-control" placeholder="Zip Code" />
+                            <label asp-for="Input.ZipCode" class="form-label">Zip Code</label>
+                            <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="form-floating mb-2">
+                        <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
+                        <label asp-for="Input.Plot" class="form-label">Plot</label>
+                        <span asp-validation-for="Input.Plot" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+                    <div class="text-center text-danger mb-4">
+                        <p>The user will be sent an email with a link to *Create* their password.</p>
                     </div>
 
                     <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-sm btn-primary me-2">
                             <i class="bi bi-save"></i> Save
                         </button>
-                        <a asp-page="./Users" class="btn btn-sm btn-danger">
+                        <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
                             <i class="bi bi-x-circle"></i> Cancel
                         </a>
                     </div>
@@ -76,45 +130,53 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const phoneNumberInput = document.getElementById('phoneNumber');
-            const fullNameInput = document.getElementById('fullName');
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const phoneNumberInput = document.getElementById('phoneNumber');
+                const firstNameInput = document.querySelector('input[name="Input.FirstName"]');
+                const middleNameInput = document.querySelector('input[name="Input.MiddleName"]');
+                const lastNameInput = document.querySelector('input[name="Input.LastName"]');
 
-            phoneNumberInput.addEventListener('input', function () {
-                let inputValue = this.value.replace(/\D/g, ''); // Remove non-digit characters
+                phoneNumberInput.addEventListener('input', function () {
+                    let inputValue = this.value.replace(/\D/g, ''); // Remove non-digit characters
 
-                if (inputValue.length > 10) {
-                    inputValue = inputValue.substring(0, 10); // Limit to 10 digits
-                }
-
-                if (inputValue.length > 0) {
-                    let formattedValue = '';
-
-                    if (inputValue.length > 0 && inputValue.length < 4) {
-                        formattedValue = inputValue;
-                    } else if (inputValue.length > 3 && inputValue.length < 7) {
-                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
-                    } else if (inputValue.length > 6) {
-                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
+                    if (inputValue.length > 10) {
+                        inputValue = inputValue.substring(0, 10); // Limit to 10 digits
                     }
 
-                    this.value = formattedValue;
-                }
-            });
+                    if (inputValue.length > 0) {
+                        let formattedValue = '';
 
-            fullNameInput.addEventListener('input', function () {
-                let inputValue = this.value;
-                let words = inputValue.split(' ');
-                let capitalizedWords = words.map(word => {
-                    if (word.length > 0) {
-                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                        if (inputValue.length > 0 && inputValue.length < 4) {
+                            formattedValue = inputValue;
+                        } else if (inputValue.length > 3 && inputValue.length < 7) {
+                            formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
+                        } else if (inputValue.length > 6) {
+                            formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
+                        }
+
+                        this.value = formattedValue;
                     }
-                    return word;
                 });
-                this.value = capitalizedWords.join(' ');
+
+                function capitalizeInput(inputElement) {
+                    inputElement.addEventListener('input', function () {
+                        let inputValue = this.value;
+                        let words = inputValue.split(' ');
+                        let capitalizedWords = words.map(word => {
+                            if (word.length > 0) {
+                                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            }
+                            return word;
+                        });
+                        this.value = capitalizedWords.join(' ');
+                    });
+                }
+
+                capitalizeInput(firstNameInput);
+                capitalizeInput(middleNameInput);
+                capitalizeInput(lastNameInput);
             });
-        });
-    </script>
+        </script>
 }

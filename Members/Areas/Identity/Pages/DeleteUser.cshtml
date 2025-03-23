@@ -37,8 +37,9 @@
                     <input type="hidden" asp-for="Id" />
                     <button type="submit" class="btn btn-sm btn-danger">
                         <i class="bi bi-trash"></i> Delete
-                    </button>
-                    <a asp-page="./Users" class="btn btn-sm btn-secondary">
+                    </button>                    
+
+                    <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
                         <i class="bi bi-x-circle"></i> Cancel
                     </a>
                 </form>

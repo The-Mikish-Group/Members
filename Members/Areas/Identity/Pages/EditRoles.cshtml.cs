@@ -1,99 +1,3 @@
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.AspNetCore.Mvc.RazorPages;
-//using System.Collections.Generic;
-//using System.Threading.Tasks;
-
-//namespace Members.Areas.Identity.Pages
-//{
-//    public class EditRolesModel(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : PageModel
-//    {
-//        private readonly UserManager<IdentityUser> _userManager = userManager;
-//        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-
-//        [BindProperty]
-//        public required string UserId { get; set; }
-//        public required string UserName { get; set; }
-
-//        public List<RoleCheckBox> AllRoles { get; set; } = [];
-
-//        public async Task<IActionResult> OnGetAsync(string id)
-//        {
-//            if (!User.IsInRole("Admin") && !User.IsInRole("Manager"))
-//            {
-//                return Forbid();
-//            }
-
-//            if (string.IsNullOrEmpty(id))
-//            {
-//                return NotFound();
-//            }
-
-//            var user = await _userManager.FindByIdAsync(id);
-//            if (user == null)
-//            {
-//                return NotFound();
-//            }
-
-//            UserId = user.Id;
-//            UserName = user.UserName ?? string.Empty; // Fix for CS8601
-
-//            var roles = _roleManager.Roles;
-//            foreach (var role in roles)
-//            {
-//                var roleCheckBox = new RoleCheckBox
-//                {
-//                    Value = role.Id,
-//                    Text = role.Name ?? string.Empty, // Fix for CS8601
-//                    Selected = role.Name != null && await _userManager.IsInRoleAsync(user, role.Name) // Fix for CS8604
-//                };
-//                AllRoles.Add(roleCheckBox);
-//            }
-
-//            return Page();
-//        }
-
-//        public async Task<IActionResult> OnPostAsync()
-//        {
-//            if (!User.IsInRole("Admin") && !User.IsInRole("Manager"))
-//            {
-//                return Forbid();
-//            }
-
-//            var user = await _userManager.FindByIdAsync(UserId);
-//            if (user == null)
-//            {
-//                return NotFound();
-//            }
-
-//            var currentRoles = await _userManager.GetRolesAsync(user);
-
-//            foreach (var role in AllRoles)
-//            {
-//                if (role.Selected && !currentRoles.Contains(role.Text))
-//                {
-//                    await _userManager.AddToRoleAsync(user, role.Text);
-//                }
-//                else if (!role.Selected && currentRoles.Contains(role.Text))
-//                {
-//                    await _userManager.RemoveFromRoleAsync(user, role.Text);
-//                }
-//            }
-
-//            return RedirectToPage("./Users");
-//        }
-
-//        public class RoleCheckBox
-//        {
-//            public required string Value { get; set; }
-//            public required string Text { get; set; }
-//            public bool Selected { get; set; }
-//        }
-//    }
-//}
-
-
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -119,6 +23,9 @@ namespace Members.Areas.Identity.Pages
         [BindProperty]
         public List<RoleViewModel> AllRoles { get; set; } = [];
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTerm { get; set; }
+
         public class RoleViewModel
         {
             public required string Value { get; set; }
@@ -126,7 +33,7 @@ namespace Members.Areas.Identity.Pages
             public bool Selected { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task<IActionResult> OnGetAsync(string id, string? searchTerm)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -141,6 +48,7 @@ namespace Members.Areas.Identity.Pages
 
             UserId = user.Id;
             UserName = user.UserName ?? string.Empty;
+            SearchTerm = searchTerm;
 
             var roles = await _roleManager.Roles.ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -163,7 +71,7 @@ namespace Members.Areas.Identity.Pages
                 return NotFound();
             }
 
-            var originalRoles = await _userManager.GetRolesAsync(user); // Get original roles
+            var originalRoles = await _userManager.GetRolesAsync(user);
             var selectedRoles = AllRoles?.Where(r => r.Selected).Select(r => r.Value ?? string.Empty).ToList() ?? [];
 
             await _userManager.RemoveFromRolesAsync(user, originalRoles);
@@ -184,7 +92,8 @@ namespace Members.Areas.Identity.Pages
                 }
             }
 
-            return RedirectToPage("./Users");
+            // Redirect back to the EditUser page, passing the id and searchTerm
+            return RedirectToPage("./EditUser", new { id = UserId, SearchTerm });
         }
     }
 }

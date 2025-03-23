@@ -1,9 +1,13 @@
+using Azure;
+using Members.Data;
+using Members.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,47 +19,98 @@ namespace Members.Areas.Identity.Pages
         private readonly IUserStore<IdentityUser> _userStore;
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IEmailSender _emailSender; // Add this line
+        private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _dbContext;
 
-        public AddUserModel(UserManager<IdentityUser> userManager, IUserStore<IdentityUser> userStore, RoleManager<IdentityRole> roleManager, IEmailSender emailSender) // Add emailSender parameter
+        public AddUserModel(
+            UserManager<IdentityUser> userManager,
+            IUserStore<IdentityUser> userStore,
+            RoleManager<IdentityRole> roleManager,
+            IEmailSender emailSender,
+            ApplicationDbContext dbContext
+            )
         {
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _roleManager = roleManager;
-            _emailSender = emailSender; // Initialize _emailSender
+            _emailSender = emailSender;
+            _dbContext = dbContext;
         }
 
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel
         {
-            FullName = string.Empty, // Initialize FullName to avoid CS9035 error
-            Email = string.Empty,
-            Password = string.Empty
+            FirstName = string.Empty,
+            MiddleName = string.Empty,
+            LastName = string.Empty,
+            Birthday = null, // Initialize Birthday
+            AddressLine1 = string.Empty,
+            AddressLine2 = string.Empty,
+            City = string.Empty,
+            State = string.Empty,
+            ZipCode = string.Empty,
+            Plot = string.Empty,
+            Email = string.Empty
         };
 
         public class InputModel
         {
+            [BindProperty(SupportsGet = true)]
+            public string? SearchTerm { get; set; }
             public bool EmailConfirmed { get; set; } = false;
 
             [Required]
-            [Display(Name = "FullName")]
-            public required string FullName { get; set; }
+            [Display(Name = "FirstName")]
+            public required string FirstName { get; set; }
+
+            [Display(Name = "MiddleName")]
+            public string? MiddleName { get; set; }
+
+            [Required]
+            [Display(Name = "LastName")]
+            public required string LastName { get; set; }
+
+            [Display(Name = "Birthday")]
+            [DataType(DataType.Date)]
+            public DateTime? Birthday { get; set; }
+
+            [Required]
+            [Display(Name = "AddressLine1")]
+            public required string AddressLine1 { get; set; }
+
+            [Display(Name = "AddressLine2")]
+            public string? AddressLine2 { get; set; }
+
+            [Required]
+            [Display(Name = "City")]
+            public required string City { get; set; }
+
+            [Required]
+            [Display(Name = "State")]
+            public required string State { get; set; }
+
+            [Required]
+            [Display(Name = "ZipCode")]
+            public required string ZipCode { get; set; }
+
+
+            [Display(Name = "Plot")]
+            public required string Plot { get; set; }
 
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public required string Email { get; set; }
 
+            [Required]
             [Phone]
             [Display(Name = "Phone Number")]
-            [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid format; try ### ###-###")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
 
-            [Required]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public required string Password { get; set; }
+            [Display(Name = "Phone Number Confirmed")]
+            public bool PhoneNumberConfirmed { get; set; } = false;
         }
 
         public void OnGet()
@@ -68,56 +123,70 @@ namespace Members.Areas.Identity.Pages
             {
                 var user = CreateUser();
 
-                // Set UserName to Email
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-                // Set PhoneNumber
                 user.PhoneNumber = Input.PhoneNumber;
+                user.EmailConfirmed = Input.EmailConfirmed;
+                user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed; // Set PhoneNumberConfirmed
 
-                // Set EmailConfirmed
-                user.EmailConfirmed = Input.EmailConfirmed; // Added this line
+                // Create the user without an initial password
+                var result = await _userManager.CreateAsync(user);
 
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded && !string.IsNullOrEmpty(Input.Password))
+                if (result.Succeeded)
                 {
+                    // Generate password reset token
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var passwordResult = await _userManager.ResetPasswordAsync(user, token, Input.Password);
 
-                    if (passwordResult.Succeeded)
+                    // Construct the reset password link
+                    var callbackUrl = Url.Page(
+                        "/Account/ResetPassword",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = user.Id, code = token },
+                        protocol: Request.Scheme);
+
+                    // Check if callbackUrl is not null before proceeding
+                    if (callbackUrl != null)
                     {
+                        // Send the email with the reset link
                         await _emailSender.SendEmailAsync(
                             Input.Email,
-                            "Your New Password",
-                            $"Your email is: {Input.Email} and your new Password is: {Input.Password}"
+                            "Create Your Password",
+                            $"Please create your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."
                         );
                     }
                     else
                     {
-                        foreach (var error in passwordResult.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
+                        // Log an error or handle the case where the URL could not be generated
+                        ModelState.AddModelError(string.Empty, "Error generating password reset link.");
                         return Page();
                     }
-                }
 
-                if (result.Succeeded)
-                {
-                    if (!string.IsNullOrEmpty(Input.FullName))
+                    var userProfile = new UserProfile
                     {
-                        await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("FullName", Input.FullName));
-                    }
+                        UserId = user.Id,
+                        FirstName = Input.FirstName,
+                        MiddleName = Input.MiddleName,
+                        LastName = Input.LastName,
+                        Birthday = Input.Birthday, // Add Birthday to UserProfile
+                        AddressLine1 = Input.AddressLine1,
+                        AddressLine2 = Input.AddressLine2,
+                        ZipCode = Input.ZipCode,
+                        Plot = Input.Plot,
+                        City = Input.City,
+                        State = Input.State,
+                        User = user
+                    };
 
-                    // Role Management (Optional)
+                    _dbContext.UserProfile.Add(userProfile);
+                    await _dbContext.SaveChangesAsync();
+
                     if (!await _roleManager.RoleExistsAsync("Member"))
                     {
                         await _roleManager.CreateAsync(new IdentityRole("Member"));
                     }
                     await _userManager.AddToRoleAsync(user, "Member");
 
-                    return RedirectToPage("./Users"); // Redirect to your users list page
+                    return RedirectToPage("./Users", new { Input.SearchTerm });
                 }
                 else
                 {
