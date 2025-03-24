@@ -69,17 +69,19 @@
 </head>
 
 <!-- Logo Image -->
-<div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+<partial name="_OaksTreesLogo" />
+
+@* <div class="container row m-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
     <div class="col-12 mt-0">
         <img alt="" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
     </div>
-</div>
+</div> *@
 
 <!-- Content Container -->
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card p-4 shadow bg-gold-light">
+            <div class="card p-2 shadow bg-gold-light">
 
                 <!-- Title -->
                 <h1 class="mb-4 text-gold-darker">
@@ -137,7 +139,7 @@
                     <div class="row gx-1">
 
                         <!-- FirstName -->
-                        <div class="col-md-5 form-floating mb-3">
+                        <div class="col-5 form-floating mb-3">
                             <input asp-for="Input.FirstName" class="form-control" placeholder="First Name" />
                             <label asp-for="Input.FirstName" class="form-label">First Name</label>
                             <span asp-validation-for="Input.FirstName" class="text-danger"></span>
@@ -151,26 +153,20 @@
                         </div>
                         
                         <!-- LastName -->
-                        <div class="col-md-5 form-floating mb-3">
+                        <div class="col-5 form-floating mb-3">
                             <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
                             <label asp-for="Input.LastName" class="form-label">Last Name</label>
                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
                         </div>
-                    </div>
+                    </div>                   
 
                     <!-- Birthday -->
                     <div class="col-5 form-floating mb-2">
                         <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
                         <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
                         <span asp-validation-for="Input.Birthday" class="text-danger"></span>
-                    </div>
-                    <hr />
-
-                    <!-- Edit Roles -->
-                    <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-warning-reverse me-2">
-                        <i class="bi bi-person-gear"></i> Edit Roles
-                    </a>
-
+                    </div> 
+                    
                     <hr/>
 
                     <!-- AddressLine1 -->
@@ -217,6 +213,33 @@
 
                     <hr />
 
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-center">
+
+                        <!-- Save -->
+                        <button type="submit" class="btn btn-sm btn-success me-2">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+
+                        <!-- Edit Roles -->                       
+                        <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-warning-reverse me-2">
+                            <i class="bi bi-person-gear"></i> Roles
+                        </a>
+                       
+                        <!-- Delete Member -->
+                        <a asp-page="./DeleteUser" asp-route-id="@Model.Input.Id" class="btn btn-sm btn-subtle-danger me-2" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                            <i class="bi bi-x-circle"></i> Delete
+                        </a>
+
+                        <!-- Cancel -->
+                        <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+
+                    </div>
+
+                    <hr />
+
                     <!-- Password reset warning -->
                     <div class="ps-4 pt-0 pb-4 text-danger text-center">
                         <p class="fs-3"><strong>Use as last resort only!</strong></p>
@@ -232,23 +255,7 @@
                         <label asp-for="Input.NewPassword" class="form-label">Assign a New Password</label>
                         <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
                     </div>
-
-                    <!-- Buttons -->
-                    <div class="d-flex justify-content-center">
-
-                        <!-- Save -->
-                        <button type="submit" class="btn btn-sm btn-success me-2">
-                            <i class="bi bi-save"></i> Save
-                        </button>
-
-                        
-
-                        <!-- Cancel -->
-                        <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </a>
-
-                    </div>
+                    
                 </form>
             </div>
         </div>

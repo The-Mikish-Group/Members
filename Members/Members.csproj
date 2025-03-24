@@ -46,7 +46,10 @@
     <Content Remove="Views\Shared\_LoginPartial.cshtml" />
     <Content Remove="wwwroot\Images\Svg\Logos\OaksTrees1.ai" />
     <Content Remove="wwwroot\Images\Svg\Logos\OaksTrees1.svg" />
+    <Content Remove="wwwroot\lib\css\colors1.css" />
     <Content Remove="wwwroot\lib\css\companyfrontend.css" />
+    <Content Remove="wwwroot\lib\css\fontsize1.css" />
+    <Content Remove="wwwroot\lib\css\site1.css" />
     <Content Remove="wwwroot\test.pdf" />
   </ItemGroup>
 
