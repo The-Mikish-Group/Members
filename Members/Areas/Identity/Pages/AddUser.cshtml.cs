@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,13 +25,15 @@ namespace Members.Areas.Identity.Pages
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailSender _emailSender;
         private readonly ApplicationDbContext _dbContext;
+        private readonly ILogger<AddUserModel> _logger;
 
         public AddUserModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             RoleManager<IdentityRole> roleManager,
             IEmailSender emailSender,
-            ApplicationDbContext dbContext
+            ApplicationDbContext dbContext,
+            ILogger<AddUserModel> logger
             )
         {
             _userManager = userManager;
@@ -36,6 +42,7 @@ namespace Members.Areas.Identity.Pages
             _roleManager = roleManager;
             _emailSender = emailSender;
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -44,7 +51,7 @@ namespace Members.Areas.Identity.Pages
             FirstName = string.Empty,
             MiddleName = string.Empty,
             LastName = string.Empty,
-            Birthday = null, // Initialize Birthday
+            Birthday = null,
             AddressLine1 = string.Empty,
             AddressLine2 = string.Empty,
             City = string.Empty,
@@ -94,9 +101,8 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "ZipCode")]
             public required string ZipCode { get; set; }
 
-
             [Display(Name = "Plot")]
-            public required string Plot { get; set; }
+            public string? Plot { get; set; }
 
             [Required]
             [EmailAddress]
@@ -134,29 +140,52 @@ namespace Members.Areas.Identity.Pages
 
                 if (result.Succeeded)
                 {
-                    // Generate password reset token
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    _logger.LogInformation($"Successfully created user with ID: {user.Id} and Email: {user.Email}");
 
-                    // Construct the reset password link
-                    var callbackUrl = Url.Page(
-                        "/Account/ResetPassword",
+                    // Construct the Forgot Password link with returnUrl to Login page
+                    var forgotPasswordUrl = Url.Page(
+                        "/Account/ForgotPassword",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = token },
+                        values: new { area = "Identity", returnUrl = "/Account/Login" },
                         protocol: Request.Scheme);
 
-                    // Check if callbackUrl is not null before proceeding
-                    if (callbackUrl != null)
+                    _logger.LogDebug($"Generated Forgot Password URL for user {user.Id}: {forgotPasswordUrl}");
+
+                    // Check if forgotPasswordUrl is not null before proceeding
+                    if (forgotPasswordUrl != null)
                     {
-                        // Send the email with the reset link
+                        // For more information on how to enable account confirmation and password reset please
+                        // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                        //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        //var callbackUrl = Url.Page(
+                        //    "/Account/AddUser",
+                        //    pageHandler: null,
+                        //    values: new { area = "Identity", code },
+                        //    protocol: Request.Scheme);
+                        //if (callbackUrl == null)
+                        //{
+                        //    _logger.LogError($"Failed to generate callback URL for user {user.Id}.");
+                        //    ModelState.AddModelError(string.Empty, "Error generating password reset link.");
+                        //    return Page();
+                        //}
+                        //await _emailSender.SendEmailAsync(
+                        //    Input.Email,
+                        //    "Reset Password",
+                        //    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        //_logger.LogInformation($"Attempting to send 'Add User' email to: {Input.Email}");
+
+                        // Send the email with the Forgot Password link
                         await _emailSender.SendEmailAsync(
                             Input.Email,
-                            "Create Your Password",
-                            $"Please create your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>."
+                            "Welcome to Oaks-Village HOA!",
+                            $"An account has been created for you.<br><br>Please click the following link to set your password: <a href='{HtmlEncoder.Default.Encode(forgotPasswordUrl)}'>Set Your Password</a>.<br /><br />After setting your password, you will be redirected to the login page.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
                         );
+                        _logger.LogInformation($"'Forgot Password' email sent successfully to: {Input.Email}");
                     }
                     else
                     {
-                        // Log an error or handle the case where the URL could not be generated
+                        _logger.LogError($"Error generating 'Forgot Password' link for user {user.Id}.");
                         ModelState.AddModelError(string.Empty, "Error generating password reset link.");
                         return Page();
                     }
@@ -167,7 +196,7 @@ namespace Members.Areas.Identity.Pages
                         FirstName = Input.FirstName,
                         MiddleName = Input.MiddleName,
                         LastName = Input.LastName,
-                        Birthday = Input.Birthday, // Add Birthday to UserProfile
+                        Birthday = Input.Birthday,
                         AddressLine1 = Input.AddressLine1,
                         AddressLine2 = Input.AddressLine2,
                         ZipCode = Input.ZipCode,
@@ -179,17 +208,21 @@ namespace Members.Areas.Identity.Pages
 
                     _dbContext.UserProfile.Add(userProfile);
                     await _dbContext.SaveChangesAsync();
+                    _logger.LogInformation($"UserProfile created for user {user.Id}.");
 
                     if (!await _roleManager.RoleExistsAsync("Member"))
                     {
                         await _roleManager.CreateAsync(new IdentityRole("Member"));
+                        _logger.LogInformation("Created 'Member' role.");
                     }
                     await _userManager.AddToRoleAsync(user, "Member");
+                    _logger.LogInformation($"User {user.Id} added to 'Member' role.");
 
                     return RedirectToPage("./Users", new { Input.SearchTerm });
                 }
                 else
                 {
+                    _logger.LogError($"Failed to create user with email {Input.Email}. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);

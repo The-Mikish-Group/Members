@@ -98,12 +98,17 @@ namespace Members.Areas.Identity.Pages.Account
             [Display(Name = "Last Name")]
             public required string LastName { get; set; }
 
+            // Birthday
+            [Display(Name = "Birthday")]
+            [DataType(DataType.Date)]
+            public DateTime? Birthday { get; set; }
+
             // PhoneNumber
             [Required]
             [Phone]
             [Display(Name = "Phone Number")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
-            public string? PhoneNumber { get; set; }            
+            public string? PhoneNumber { get; set; }
 
             // Address - AddressLine1, AddressLine2, City, State, ZipCode
             [Required]
@@ -124,7 +129,6 @@ namespace Members.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
-
 
             // Plot Identifier
             [Display(Name = "Plot")]
@@ -162,6 +166,7 @@ namespace Members.Areas.Identity.Pages.Account
                         FirstName = Input.FirstName,
                         MiddleName = Input.MiddleName,
                         LastName = Input.LastName,
+                        Birthday = Input.Birthday,
                         AddressLine1 = Input.AddressLine1,
                         AddressLine2 = Input.AddressLine2,
                         City = Input.City,
@@ -173,8 +178,47 @@ namespace Members.Areas.Identity.Pages.Account
 
                     _dbContext.UserProfile.Add(userProfile);
                     await _dbContext.SaveChangesAsync();
+
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
+
+                        // Send notification email to OaksVillage@oaks-village.com
+                        await _emailSender.SendEmailAsync(
+                            "OaksVillage@oaks-village.com",
+                            "New User Registration",
+                            $"{Input.FirstName} {Input.MiddleName} {Input.LastName} with email {Input.Email} has registered."
+                        );
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        string? callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId, code, returnUrl },
+                            protocol: Request.Scheme);
+
+                        // Check if callbackUrl is not null before proceeding
+                        if (callbackUrl != null)
+                        {
+                            // Send the email with the reset link
+                            await _emailSender.SendEmailAsync(
+                                Input.Email,
+                                "Confirm Your Email Address",
+                                $"Please confirm your <strong>email address</strong> by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>." +
+                                "<br /><br /><br /> After <strong>email confirmation</strong> your new account will be reviewed by the managers." +
+                                "<br /><br />That review could take up to 24 hours so please be patient. <br/><br/>When approved, you will receive a <strong>'Welcome Email'</strong>. We are " +
+                                "a small volunteer staff, so please be patient." +
+                                "<br /><br />Thank you from the team at <strong>Oaks-Village HOA<strong>."
+                            );
+                        }
+                        else
+                        {
+                            // Log an error or handle the case where the URL could not be generated
+                            ModelState.AddModelError(string.Empty, "Error generating password reset link.");
+                            return Page();
+                        }
+
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     }
                     else

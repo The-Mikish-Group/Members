@@ -5,87 +5,144 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
+<!-- Profile Edit -->
 <div class="row">
     <div class="col-md-8">
+
+        <!-- Status Message -->
+        <partial name="_StatusMessage" for="StatusMessage" />
+
         <div class="card p-2 mx-0 mb-2 shadow rounded bg-gold-light">
+
+            <!-- Form -->
             <form id="profile-form" method="post">
+
+                <!-- Page Title -->
                 <h2 class="text-center mb-4">
                     <i class="bi bi-gear-fill"></i> @ViewData["Title"]
                 </h2>
+
+                <!-- Validation Summary -->
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                <!-- UserName -->
                 <div class="form-floating mb-3">
                     <input asp-for="Username" class="form-control" disabled placeholder=" " />
                     <label asp-for="Username" class="form-label">Username</label>
                 </div>
+
+                <!-- PnoneNumber -->
                 <div class="form-floating mb-3">
                     <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Phone Number" />
                     <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
                     <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                 </div>
+
+                <!-- Names First, Middle, Last -->
                 <div class="row gx-1">
+
+                    <!-- FistName-->
                     <div class="col-5 form-floating mb-2">
                         <input asp-for="Input.FirstName" class="form-control" placeholder=" " />
                         <label asp-for="Input.FirstName" class="form-label">First Name</label>
                         <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                     </div>
+
+                    <!-- MiddleName -->
                     <div class="col-2 form-floating mb-3">
                         <div class="form-floating mb-2">
                             <input asp-for="Input.MiddleName" class="form-control" placeholder=" " />
-                            @* <label asp-for="Input.MiddleName" class="form-label">?</label> *@
+                            <label asp-for="Input.MiddleName" class="form-label">M</label>
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
                     </div>
+
+                    <!-- LastName -->
                     <div class="col-5 form-floating mb-2">
                         <input asp-for="Input.LastName" class="form-control" placeholder=" " />
                         <label asp-for="Input.LastName" class="form-label">Last Name</label>
                         <span asp-validation-for="Input.LastName" class="text-danger"></span>
                     </div>
                 </div>
+
+                <!-- Birthday -->
+                <div class="col-5 form-floating mb-2">
+                    <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                    <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
+                    <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <!-- AddressLine1 -->
                 <div class="form-floating mb-3">
                     <input asp-for="Input.AddressLine1" class="form-control" placeholder=" " />
                     <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
                     <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
                 </div>
 
+                <!-- AddressLine2 -->
                 <div class="form-floating mb-3">
                     <input asp-for="Input.AddressLine2" class="form-control" placeholder=" " />
                     <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Optional)</label>
                     <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                 </div>
+
+                <!-- City, State, and ZipCode  Line -->
                 <div class="row gx-1">
+
+                    <!-- City -->
                     <div class="col-5 form-floating mb-3">
                         <input asp-for="Input.City" class="form-control" placeholder=" " />
                         <label asp-for="Input.City" class="form-label">City</label>
                         <span asp-validation-for="Input.City" class="text-danger"></span>
                     </div>
+
+                    <!-- State -->
                     <div class="col-3 form-floating mb-3">
                         <input asp-for="Input.State" class="form-control" placeholder=" " />
                         <label asp-for="Input.State" class="form-label">State</label>
                         <span asp-validation-for="Input.State" class="text-danger"></span>
                     </div>
+
+                    <!-- ZipCode -->
                     <div class="col-4 form-floating mb-3">
                         <input asp-for="Input.ZipCode" class="form-control" placeholder=" " />
                         <label asp-for="Input.ZipCode" class="form-label">ZipCode</label>
                         <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                     </div>
+
                 </div>
+
+                <hr />
+
+                <!-- Plot Identifier -->
                 <div class="form-floating mb-3">
                     <input asp-for="Input.Plot" class="form-control" placeholder=" " />
-                    <label asp-for="Input.Plot" class="form-label">Plot (Optional)</label>
+                    <label asp-for="Input.Plot" class="form-label">Plot</label>
                     <span asp-validation-for="Input.Plot" class="text-danger"></span>
-                </div>                
+                </div>
+                
+                <hr />
+
                 <div>
+
+                    <!-- Save Button -->
                     <button id="update-profile-button" type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-check-lg"></i> Save
                     </button>
+
+                    <!-- Cancel Button -->
                     <a href="~/" class="btn btn-sm btn-danger">
                         <i class="bi bi-x-circle"></i> Cancel
                     </a>
+
                 </div>
+
             </form>
-        </div>
-        <partial name="_StatusMessage" for="StatusMessage" />
+
+        </div>        
+
     </div>
 </div>
 
@@ -94,15 +151,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const phoneNumberInput = document.getElementById('phoneNumber');
-            // const fullNameInput = document.getElementById('Input_FullName'); // Removed
+            const firstNameInput = document.querySelector('input[name="Input.FirstName"]');
+            const middleNameInput = document.querySelector('input[name="Input.MiddleName"]');
+            const lastNameInput = document.querySelector('input[name="Input.LastName"]');
 
             phoneNumberInput.addEventListener('input', function () {
                 let inputValue = this.value.replace(/\D/g, '');
+
                 if (inputValue.length > 10) {
                     inputValue = inputValue.substring(0, 10);
                 }
+
                 if (inputValue.length > 0) {
                     let formattedValue = '';
+
                     if (inputValue.length > 0 && inputValue.length < 4) {
                         formattedValue = inputValue;
                     } else if (inputValue.length > 3 && inputValue.length < 7) {
@@ -110,11 +172,28 @@
                     } else if (inputValue.length > 6) {
                         formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
                     }
+
                     this.value = formattedValue;
                 }
             });
 
-            // Removed fullNameInput event listener
+            function capitalizeInput(inputElement) {
+                inputElement.addEventListener('input', function () {
+                    let inputValue = this.value;
+                    let words = inputValue.split(' ');
+                    let capitalizedWords = words.map(word => {
+                        if (word.length > 0) {
+                            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                        }
+                        return word;
+                    });
+                    this.value = capitalizedWords.join(' ');
+                });
+            }
+
+            capitalizeInput(firstNameInput);
+            capitalizeInput(middleNameInput);
+            capitalizeInput(lastNameInput);
         });
     </script>
 }

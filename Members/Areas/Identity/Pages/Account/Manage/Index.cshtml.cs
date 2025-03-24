@@ -45,6 +45,10 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Last Name")]
             public required string LastName { get; set; }
 
+            [Display(Name = "Birthday")]
+            [DataType(DataType.Date)]
+            public string? Birthday { get; set; }
+
             [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
@@ -82,7 +86,8 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 PhoneNumber = phoneNumber,
                 FirstName = userProfile?.FirstName ?? string.Empty,
                 MiddleName = userProfile?.MiddleName,
-                LastName = userProfile?.LastName ?? string.Empty,
+                LastName = userProfile?.LastName ?? string.Empty,                
+                Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
                 AddressLine1 = userProfile?.AddressLine1,
                 AddressLine2 = userProfile?.AddressLine2,
                 City = userProfile?.City,
@@ -140,6 +145,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             userProfile.FirstName = Input.FirstName;
             userProfile.MiddleName = Input.MiddleName;
             userProfile.LastName = Input.LastName;
+            userProfile.Birthday = string.IsNullOrEmpty(Input.Birthday) ? (DateTime?)null : DateTime.Parse(Input.Birthday);
             userProfile.AddressLine1 = Input.AddressLine1;
             userProfile.AddressLine2 = Input.AddressLine2;
             userProfile.City = Input.City;
@@ -148,8 +154,8 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             userProfile.Plot = Input.Plot;
 
             await _dbContext.SaveChangesAsync();
-
             await _signInManager.RefreshSignInAsync(user);
+
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }

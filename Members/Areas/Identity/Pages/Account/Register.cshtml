@@ -42,56 +42,71 @@
                             <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
                             <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                         </div>
-                        <div class="row gx-3">
-                            <div class="col-md-5 form-floating mb-3">
-                                <input asp-for="Input.FirstName" class="form-control" autocomplete="given-name" aria-required="true" placeholder="First Name" />
+                        <div class="row gx-1">
+                            <div class="col-5 form-floating mb-2">
+                                <input asp-for="Input.FirstName" class="form-control" placeholder="First Name" />
                                 <label asp-for="Input.FirstName" class="form-label">First Name</label>
                                 <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                             </div>
-                            <div class="col-md-2 form-floating mb-3">
-                                <input asp-for="Input.MiddleName" class="form-control" autocomplete="additional-name" placeholder="Middle Name (Optional)" />
-                                @* <label asp-for="Input.MiddleName" class="form-label">Middle</label> *@
+                            <div class="col-2 form-floating mb-2">
+                                <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
+                                <label asp-for="Input.MiddleName" class="form-label">M</label>
                                 <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                             </div>
-                            <div class="col-md-5 form-floating mb-3">
-                                <input asp-for="Input.LastName" class="form-control" autocomplete="family-name" aria-required="true" placeholder="Last Name" />
+                            <div class="col-5 form-floating mb-2">
+                                <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
                                 <label asp-for="Input.LastName" class="form-label">Last Name</label>
                                 <span asp-validation-for="Input.LastName" class="text-danger"></span>
                             </div>
-                        </div>                          
-                        <div class="form-floating mb-3">
+                        </div>
+
+                        <!-- Birthday -->
+                        <div class="col-5 form-floating mb-2">
+                            <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                            <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
+                            <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+
+                        <div class="col-12 form-floating mb-2">
                             <input asp-for="Input.AddressLine1" class="form-control" placeholder="Address Line 1" />
                             <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
                             <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
                         </div>
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.AddressLine2" class="form-control" placeholder="Address Line 2" />
-                            <label asp-for="Input.AddressLine2" class="form-label">Address Line 2</label>
+                        <div class="col-12 form-floating mb-2">
+                            <input asp-for="Input.AddressLine2" class="form-control" placeholder="Address Line 2 (Optional)" />
+                            <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Optional)</label>
                             <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                         </div>
-                        <div class="row gx-3">
-                            <div class="col-5 form-floating mb-3">
+                        <div class="row gx-1">
+                            <div class="col-5 form-floating mb-2">
                                 <input asp-for="Input.City" class="form-control" placeholder="City" />
                                 <label asp-for="Input.City" class="form-label">City</label>
                                 <span asp-validation-for="Input.City" class="text-danger"></span>
                             </div>
-                            <div class="col-3 form-floating mb-3">
+                            <div class="col-3 form-floating mb-2">
                                 <input asp-for="Input.State" class="form-control" placeholder="State" />
                                 <label asp-for="Input.State" class="form-label">State</label>
                                 <span asp-validation-for="Input.State" class="text-danger"></span>
                             </div>
-                            <div class="col-4 form-floating mb-3">
+                            <div class="col-4 form-floating mb-2">
                                 <input asp-for="Input.ZipCode" class="form-control" placeholder="Zip Code" />
-                                <label asp-for="Input.ZipCode" class="form-label">Zip</label>
+                                <label asp-for="Input.ZipCode" class="form-label">Zip Code</label>
                                 <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="form-floating mb-3">
+
+                        <hr />
+
+                        <div class="form-floating mb-2">
                             <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
                             <label asp-for="Input.Plot" class="form-label">Plot</label>
                             <span asp-validation-for="Input.Plot" class="text-danger"></span>
                         </div>
+
                         <hr/>
+
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                             <label asp-for="Input.Password" class="form-label">Password</label>

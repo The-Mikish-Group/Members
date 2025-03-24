@@ -157,12 +157,20 @@
                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
                         </div>
                     </div>
-                    
+
+                    <!-- Birthday -->
+                    <div class="col-5 form-floating mb-2">
+                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                        <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
+                        <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                    </div>
                     <hr />
-                        <!-- Edit Roles -->
-                        <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-warning-reverse me-2">
-                            <i class="bi bi-person-gear"></i> Edit Roles
-                        </a>
+
+                    <!-- Edit Roles -->
+                    <a asp-page="./EditRoles" asp-route-id="@Model.Input.Id" asp-route-searchTerm="@Model.SearchTerm" class="btn btn-sm btn-warning-reverse me-2">
+                        <i class="bi bi-person-gear"></i> Edit Roles
+                    </a>
+
                     <hr/>
 
                     <!-- AddressLine1 -->
@@ -211,9 +219,10 @@
 
                     <!-- Password reset warning -->
                     <div class="ps-4 py-0 text-danger text-center">
-                        <p>Email's this password to the Member.</p>
                         <p><strong>Use as last resort only!</strong></p>
-                         <p>There is a Passsword reset link on the Login screen..</p>
+                        <p>This will Email this password to the Member in plain text.</p>                        
+                         <p>There is a "Forget Your Password" link on the Login screen; it is preferred to direct the member to that <a href="https:\\oaks-village.com\identity\account\login">Login</a>.
+                             .</p>
                     </div>
 
                     <!-- Assign a new password -->

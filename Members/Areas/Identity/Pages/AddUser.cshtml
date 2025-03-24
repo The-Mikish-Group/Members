@@ -56,7 +56,7 @@
                         </div>
                         <div class="col-2 form-floating mb-2">
                             <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
-                            @* <label asp-for="Input.MiddleName" class="form-label">Middle</label> *@
+                            <label asp-for="Input.MiddleName" class="form-label">*</label>
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
                         <div class="col-5 form-floating mb-2">
@@ -66,9 +66,10 @@
                         </div>
                     </div>
 
-                    <div class="form-floating mb-2">
-                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder="Birthday" />
-                        <label asp-for="Input.Birthday" class="form-label">Birthday</label>
+                    <!-- Birthday -->
+                    <div class="col-5 form-floating mb-2">
+                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                        <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
                         <span asp-validation-for="Input.Birthday" class="text-danger"></span>
                     </div>
 
@@ -139,10 +140,10 @@
                 const lastNameInput = document.querySelector('input[name="Input.LastName"]');
 
                 phoneNumberInput.addEventListener('input', function () {
-                    let inputValue = this.value.replace(/\D/g, ''); // Remove non-digit characters
+                    let inputValue = this.value.replace(/\D/g, ''); 
 
                     if (inputValue.length > 10) {
-                        inputValue = inputValue.substring(0, 10); // Limit to 10 digits
+                        inputValue = inputValue.substring(0, 10); 
                     }
 
                     if (inputValue.length > 0) {

@@ -74,23 +74,28 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "Last Name")]
             public required string LastName { get; set; }
 
+            // Birthday
+            [Display(Name = "Birthday")]
+            [DataType(DataType.Date)]
+            public DateTime? Birthday { get; set; }
+
             // Address - AddressLine1, AddressLine2, City, State, ZipCode
-            [Required]
+            // [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
 
             [Display(Name = "Address Line 2")]
             public string? AddressLine2 { get; set; }
 
-            [Required]
+            // [Required]
             [Display(Name = "City")]
             public string? City { get; set; }
 
-            [Required]
+            // [Required]
             [Display(Name = "State")]
             public string? State { get; set; }
 
-            [Required]
+            // [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
 
@@ -119,6 +124,7 @@ namespace Members.Areas.Identity.Pages
                 FirstName = userProfile?.FirstName ?? string.Empty,
                 MiddleName = userProfile?.MiddleName,
                 LastName = userProfile?.LastName ?? string.Empty,
+                Birthday = userProfile?.Birthday,
                 AddressLine1 = userProfile?.AddressLine1 ?? string.Empty,
                 AddressLine2 = userProfile?.AddressLine2,
                 City = userProfile?.City ?? string.Empty,
@@ -178,6 +184,7 @@ namespace Members.Areas.Identity.Pages
                 userProfile.FirstName = Input.FirstName;
                 userProfile.MiddleName = Input.MiddleName;
                 userProfile.LastName = Input.LastName;
+                userProfile.Birthday = Input.Birthday;
                 userProfile.AddressLine1 = Input.AddressLine1;
                 userProfile.AddressLine2 = Input.AddressLine2;
                 userProfile.City = Input.City;
