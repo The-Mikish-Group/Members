@@ -58,7 +58,8 @@ namespace Members.Areas.Identity.Pages
             State = string.Empty,
             ZipCode = string.Empty,
             Plot = string.Empty,
-            Email = string.Empty
+            Email = string.Empty,
+            EmailConfirmed = true // Set EmailConfirmed to true by default
         };
 
         public class InputModel
@@ -121,10 +122,25 @@ namespace Members.Areas.Identity.Pages
 
         public void OnGet()
         {
+            if (string.IsNullOrEmpty(Input.City))
+            {
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.State))
+            {
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.ZipCode))
+            {
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Set EmailConfirmed to true before saving
+            Input.EmailConfirmed = true;
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -140,55 +156,31 @@ namespace Members.Areas.Identity.Pages
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation($"Successfully created user with ID: {user.Id} and Email: {user.Email}");
+                    _logger.LogInformation("Successfully created user with ID: {UserId} and Email: {Email}", user.Id, user.Email);
 
-                    // Construct the Forgot Password link with returnUrl to Login page
-                    var forgotPasswordUrl = Url.Page(
-                        "/Account/ForgotPassword",
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ResetPassword", // Corrected from /Account/AddUser
                         pageHandler: null,
-                        values: new { area = "Identity", returnUrl = "/Account/Login" },
+                        values: new { area = "Identity", userId = user.Id, code },
                         protocol: Request.Scheme);
 
-                    _logger.LogDebug($"Generated Forgot Password URL for user {user.Id}: {forgotPasswordUrl}");
-
-                    // Check if forgotPasswordUrl is not null before proceeding
-                    if (forgotPasswordUrl != null)
+                    if (callbackUrl == null)
                     {
-                        // For more information on how to enable account confirmation and password reset please
-                        // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                        //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                        //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        //var callbackUrl = Url.Page(
-                        //    "/Account/AddUser",
-                        //    pageHandler: null,
-                        //    values: new { area = "Identity", code },
-                        //    protocol: Request.Scheme);
-                        //if (callbackUrl == null)
-                        //{
-                        //    _logger.LogError($"Failed to generate callback URL for user {user.Id}.");
-                        //    ModelState.AddModelError(string.Empty, "Error generating password reset link.");
-                        //    return Page();
-                        //}
-                        //await _emailSender.SendEmailAsync(
-                        //    Input.Email,
-                        //    "Reset Password",
-                        //    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                        //_logger.LogInformation($"Attempting to send 'Add User' email to: {Input.Email}");
-
-                        // Send the email with the Forgot Password link
-                        await _emailSender.SendEmailAsync(
-                            Input.Email,
-                            "Welcome to Oaks-Village HOA!",
-                            $"An account has been created for you.<br><br>Please click the following link to set your password: <a href='{HtmlEncoder.Default.Encode(forgotPasswordUrl)}'>Set Your Password</a>.<br /><br />After setting your password, you will be redirected to the login page.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
-                        );
-                        _logger.LogInformation($"'Forgot Password' email sent successfully to: {Input.Email}");
-                    }
-                    else
-                    {
-                        _logger.LogError($"Error generating 'Forgot Password' link for user {user.Id}.");
+                        _logger.LogError("Failed to generate callback URL for user {UserId}.", user.Id);
                         ModelState.AddModelError(string.Empty, "Error generating password reset link.");
                         return Page();
                     }
+                    _logger.LogDebug("Generated password reset token for user {UserId}: {Code}", user.Id, code);
+                    _logger.LogDebug("Generated callback URL for user {UserId}: {CallbackUrl}", user.Id, callbackUrl);
+
+                    await _emailSender.SendEmailAsync(
+                        Input.Email,
+                        "Create Your Password",
+                        $"An account has been created on your behalf.<br><br>Please create your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
+                    );
+                    _logger.LogInformation("Attempting to send 'Create Your Password' email to: {Email}", Input.Email);
 
                     var userProfile = new UserProfile
                     {
@@ -208,7 +200,7 @@ namespace Members.Areas.Identity.Pages
 
                     _dbContext.UserProfile.Add(userProfile);
                     await _dbContext.SaveChangesAsync();
-                    _logger.LogInformation($"UserProfile created for user {user.Id}.");
+                    _logger.LogInformation("UserProfile created for user {UserId}.", user.Id);
 
                     if (!await _roleManager.RoleExistsAsync("Member"))
                     {
@@ -216,13 +208,13 @@ namespace Members.Areas.Identity.Pages
                         _logger.LogInformation("Created 'Member' role.");
                     }
                     await _userManager.AddToRoleAsync(user, "Member");
-                    _logger.LogInformation($"User {user.Id} added to 'Member' role.");
+                    _logger.LogInformation("User {UserId} added to 'Member' role.", user.Id);
 
                     return RedirectToPage("./Users", new { Input.SearchTerm });
                 }
                 else
                 {
-                    _logger.LogError($"Failed to create user with email {Input.Email}. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    _logger.LogError("Failed to create user with email {Email}. Errors: {Errors}", Input.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);

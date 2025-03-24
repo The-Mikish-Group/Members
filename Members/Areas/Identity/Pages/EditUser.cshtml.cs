@@ -141,14 +141,30 @@ namespace Members.Areas.Identity.Pages
                 return NotFound();
             }
 
+            // Load the user based on the provided ID
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound($"Unable to load user with ID '{id}'.");
+            }
+
+            await LoadUserAsync(user);
+
+            // Apply default values from environment variables if the loaded data is empty
+            if (string.IsNullOrEmpty(Input.City))
+            {
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.State))
+            {
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.ZipCode))
+            {
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
             }
 
             SearchTerm = searchTerm; // Store the search term from the query string
-            await LoadUserAsync(user);
             return Page();
         }
 

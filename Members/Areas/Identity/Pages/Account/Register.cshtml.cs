@@ -139,102 +139,20 @@ namespace Members.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl ?? string.Empty;
             ExternalLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync())];
-        }
 
-        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
-        {
-            returnUrl ??= Url.Content("~/");
-            ExternalLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync())];
-            if (ModelState.IsValid)
+            // Apply default values from environment variables if the Input properties are empty
+            if (string.IsNullOrEmpty(Input.City))
             {
-                var user = CreateUser();
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-                // Set the PhoneNumber property on the IdentityUser
-                user.PhoneNumber = Input.PhoneNumber;
-
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
-                {
-                    // Create a new UserProfile
-                    var userProfile = new UserProfile
-                    {
-                        UserId = user.Id,
-                        FirstName = Input.FirstName,
-                        MiddleName = Input.MiddleName,
-                        LastName = Input.LastName,
-                        Birthday = Input.Birthday,
-                        AddressLine1 = Input.AddressLine1,
-                        AddressLine2 = Input.AddressLine2,
-                        City = Input.City,
-                        State = Input.State,
-                        ZipCode = Input.ZipCode,
-                        Plot = Input.Plot,
-                        User = user // Set the required User property
-                    };
-
-                    _dbContext.UserProfile.Add(userProfile);
-                    await _dbContext.SaveChangesAsync();
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-
-                        // Send notification email to OaksVillage@oaks-village.com
-                        await _emailSender.SendEmailAsync(
-                            "OaksVillage@oaks-village.com",
-                            "New User Registration",
-                            $"{Input.FirstName} {Input.MiddleName} {Input.LastName} with email {Input.Email} has registered."
-                        );
-
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        string? callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId, code, returnUrl },
-                            protocol: Request.Scheme);
-
-                        // Check if callbackUrl is not null before proceeding
-                        if (callbackUrl != null)
-                        {
-                            // Send the email with the reset link
-                            await _emailSender.SendEmailAsync(
-                                Input.Email,
-                                "Confirm Your Email Address",
-                                $"Please confirm your <strong>email address</strong> by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>." +
-                                "<br /><br /><br /> After <strong>email confirmation</strong> your new account will be reviewed by the managers." +
-                                "<br /><br />That review could take up to 24 hours so please be patient. <br/><br/>When approved, you will receive a <strong>'Welcome Email'</strong>. We are " +
-                                "a small volunteer staff, so please be patient." +
-                                "<br /><br />Thank you from the team at <strong>Oaks-Village HOA<strong>."
-                            );
-                        }
-                        else
-                        {
-                            // Log an error or handle the case where the URL could not be generated
-                            ModelState.AddModelError(string.Empty, "Error generating password reset link.");
-                            return Page();
-                        }
-
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
             }
-
-            // If we got this far, something failed, redisplay form
-            return Page();
+            if (string.IsNullOrEmpty(Input.State))
+            {
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.ZipCode))
+            {
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
+            }
         }
 
         private IdentityUser CreateUser()

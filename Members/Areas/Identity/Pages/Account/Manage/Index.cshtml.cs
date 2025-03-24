@@ -28,7 +28,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
         public required InputModel Input { get; set; }
 
         public class InputModel
-        {            
+        {
             [Phone]
             [Display(Name = "Phone Number")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
@@ -65,7 +65,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             public string? State { get; set; }
 
             [Required]
-            [Display(Name = "State")]
+            [Display(Name = "Zip Code")] // Corrected the Display Name
             public string? ZipCode { get; set; }
 
             [Display(Name = "Plot")]
@@ -86,7 +86,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 PhoneNumber = phoneNumber,
                 FirstName = userProfile?.FirstName ?? string.Empty,
                 MiddleName = userProfile?.MiddleName,
-                LastName = userProfile?.LastName ?? string.Empty,                
+                LastName = userProfile?.LastName ?? string.Empty,
                 Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
                 AddressLine1 = userProfile?.AddressLine1,
                 AddressLine2 = userProfile?.AddressLine2,
@@ -106,6 +106,21 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             }
 
             await LoadAsync(user);
+
+            // Apply default values from environment variables if the loaded data is empty
+            if (string.IsNullOrEmpty(Input.City))
+            {
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.State))
+            {
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(Input.ZipCode))
+            {
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
+            }
+
             return Page();
         }
 
