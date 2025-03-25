@@ -5,9 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Members.Services;
 using Microsoft.Extensions.Logging;
+using Members.Models; // Add this to access UserProfile
 
 var builder = WebApplication.CreateBuilder(args);
 
+// *** START: Your existing builder configuration (replace this comment block) ***
 // Retrieve connection string from environment variables
 string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER")!;
 string DB_USER = Environment.GetEnvironmentVariable("DB_USER")!;
@@ -42,9 +44,11 @@ builder.Services.AddTransient<EmailService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+// *** END: Your existing builder configuration (replace this comment block) ***
 
 var app = builder.Build();
 
+// *** START: Your existing app configuration (replace this comment block) ***
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -66,6 +70,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 app.MapRazorPages()
     .WithStaticAssets();
+// *** END: Your existing app configuration (replace this comment block) ***
 
 // Create the Roles if they have been deleted.
 using (var scope = app.Services.CreateScope())
@@ -83,11 +88,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Create the Administrator Account if it has been deleted.
-// ADMIN_EMAIL and ADMIN_PASSWORD are variables stored in "Environment Variables"
-// on the Dev computer and same with the Hosting service except harder to find.
 using (var scope = app.Services.CreateScope())
 {
     var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Get the ApplicationDbContext
 
     string ADMIN_EMAIL = Environment.GetEnvironmentVariable("ADMIN_EMAIL")!;
     string ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
@@ -97,18 +101,74 @@ using (var scope = app.Services.CreateScope())
         throw new InvalidOperationException("ADMIN_EMAIL or ADMIN_PASSWORD environment variables are not set.");
     }
 
-    if (await UserManager.FindByEmailAsync(ADMIN_EMAIL) == null)
+    var adminUser = await UserManager.FindByEmailAsync(ADMIN_EMAIL);
+
+    if (adminUser == null)
     {
-        var user = new IdentityUser
+        adminUser = new IdentityUser
         {
             UserName = ADMIN_EMAIL,
             Email = ADMIN_EMAIL,
-            EmailConfirmed = true
+            EmailConfirmed = true,
+            PhoneNumber = "(217) 371-8041" // Set the Cell Phone number in AspNetUsers
         };
 
-        await UserManager.CreateAsync(user, ADMIN_PASSWORD);
-        await UserManager.AddToRoleAsync(user, "Admin");
+        var createResult = await UserManager.CreateAsync(adminUser, ADMIN_PASSWORD);
+        if (createResult.Succeeded)
+        {
+            await UserManager.AddToRoleAsync(adminUser, "Admin");
+        }
+        else
+        {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            foreach (var error in createResult.Errors)
+            {
+                logger.LogError("Error creating admin user: {Description}", error.Description);
+            }
+            throw new Exception("Failed to create admin user.");
+        }
     }
+    else
+    {
+        // Update PhoneNumber if it's not already set
+        if (string.IsNullOrEmpty(adminUser.PhoneNumber))
+        {
+            adminUser.PhoneNumber = "(217) 371-8041";
+            await UserManager.UpdateAsync(adminUser);
+        }
+    }
+
+    // Update UserProfile
+    var adminProfile = await dbContext.UserProfile.FirstOrDefaultAsync(up => up.UserId == adminUser.Id);
+
+    if (adminProfile == null)
+    {
+        adminProfile = new UserProfile
+        {
+            UserId = adminUser.Id,
+            FirstName = "*",
+            LastName = "Administrator",
+            AddressLine1 = "1042 N Brainerd",
+            City = "Avon Park",
+            State = "FL",
+            ZipCode = "33825",
+            HomePhoneNumber = "(217) 371-8041",
+            User = adminUser // Set the required User property
+        };
+        dbContext.UserProfile.Add(adminProfile);
+    }
+    else
+    {
+        adminProfile.FirstName = "*";
+        adminProfile.LastName = "Administrator";
+        adminProfile.AddressLine1 = "1042 N Brainerd";
+        adminProfile.City = "Avon Park";
+        adminProfile.State = "FL";
+        adminProfile.ZipCode = "33825";
+        // You can choose to update HomePhoneNumber here if needed
+    }
+
+    await dbContext.SaveChangesAsync();
 }
 
 Members.Helpers.ImageHelper.Initialize(app.Environment);

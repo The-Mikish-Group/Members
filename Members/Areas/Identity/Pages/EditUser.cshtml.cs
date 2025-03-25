@@ -53,14 +53,20 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "New Password")]
             public string? NewPassword { get; set; }
 
-            // PhoneNumber
+            // Cell Phone
             [Phone]
-            [Display(Name = "Phone Number")]
+            [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
-
-            // PhoneNumberConfirmed
+ 
+            // Cell Phone Confirmed
             public bool PhoneNumberConfirmed { get; set; }
+
+            // Home Phone
+            [Phone]
+            [Display(Name = "Home Phone")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
+            public string? HomePhoneNumber { get; set; }
 
             // Name - First Middle, and Last
             [Required]
@@ -106,10 +112,6 @@ namespace Members.Areas.Identity.Pages
 
         private async Task LoadUserAsync(IdentityUser user)
         {
-            var claims = await _userManager.GetClaimsAsync(user);
-            var fullNameClaim = claims.FirstOrDefault(c => c.Type == "FullName");
-            string fullNameValue = fullNameClaim?.Value ?? string.Empty;
-
             // Load UserProfile data
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
 
@@ -121,6 +123,7 @@ namespace Members.Areas.Identity.Pages
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumber = user.PhoneNumber,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+                HomePhoneNumber = userProfile?.HomePhoneNumber ?? string.Empty,
                 FirstName = userProfile?.FirstName ?? string.Empty,
                 MiddleName = userProfile?.MiddleName,
                 LastName = userProfile?.LastName ?? string.Empty,
@@ -185,7 +188,7 @@ namespace Members.Areas.Identity.Pages
                 user.UserName = Input.UserName;
                 user.Email = Input.Email;
                 user.EmailConfirmed = Input.EmailConfirmed;
-                user.PhoneNumber = Input.PhoneNumber;
+                user.PhoneNumber = Input.PhoneNumber;                
                 user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed;
 
                 var result = await _userManager.UpdateAsync(user);
@@ -207,6 +210,7 @@ namespace Members.Areas.Identity.Pages
                 userProfile.State = Input.State;
                 userProfile.ZipCode = Input.ZipCode;
                 userProfile.Plot = Input.Plot;
+                userProfile.HomePhoneNumber = Input.HomePhoneNumber;
 
                 await _dbContext.SaveChangesAsync(); // Save changes to UserProfile
 

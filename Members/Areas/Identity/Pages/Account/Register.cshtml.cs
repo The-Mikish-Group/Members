@@ -53,9 +53,19 @@ namespace Members.Areas.Identity.Pages.Account
                 Password = string.Empty,
                 ConfirmPassword = string.Empty,
                 PhoneNumber = string.Empty,
-                FirstName = string.Empty, // Initialize required properties to avoid CS9035 error
-                LastName = string.Empty // Initialize required properties to avoid CS9035 error
+                HomePhoneNumber = string.Empty,
+                FirstName = string.Empty,
+                MiddleName = string.Empty,
+                LastName = string.Empty,
+                AddressLine1 = string.Empty,
+                AddressLine2 = string.Empty,
+                City = string.Empty,
+                State = string.Empty,
+                ZipCode = string.Empty,
+                Plot = string.Empty,
+                Birthday = null
             };
+
             ReturnUrl = string.Empty;
             ExternalLogins = [];
         }
@@ -103,12 +113,18 @@ namespace Members.Areas.Identity.Pages.Account
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
 
-            // PhoneNumber
+            // Cell Phone
             [Required]
             [Phone]
-            [Display(Name = "Phone Number")]
+            [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
+
+            // Home Phone
+            [Phone]
+            [Display(Name = "Home Phone")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
+            public string? HomePhoneNumber { get; set; }
 
             // Address - AddressLine1, AddressLine2, City, State, ZipCode
             [Required]
@@ -153,6 +169,89 @@ namespace Members.Areas.Identity.Pages.Account
             {
                 Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
             }
+        }
+
+        public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
+            ExternalLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync())];
+            if (ModelState.IsValid)
+            {
+                var user = CreateUser();
+
+                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var result = await _userManager.CreateAsync(user, Input.Password);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User created a new account with password.");
+
+                    // Create UserProfile
+                    var userProfile = new UserProfile
+                    {
+                        UserId = user.Id,
+                        FirstName = Input.FirstName,
+                        MiddleName = Input.MiddleName,
+                        LastName = Input.LastName,
+                        Birthday = Input.Birthday,
+                        HomePhoneNumber = Input.HomePhoneNumber,
+                        AddressLine1 = Input.AddressLine1,
+                        AddressLine2 = Input.AddressLine2,
+                        City = Input.City,
+                        State = Input.State,
+                        ZipCode = Input.ZipCode,
+                        Plot = Input.Plot,
+                        User = user
+                    };
+
+                    _dbContext.UserProfile.Add(userProfile);
+                    await _dbContext.SaveChangesAsync();
+
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId, code, returnUrl },
+                        protocol: Request.Scheme);
+
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'><strong>clicking here</strong></a>.<br><br>"+
+                        "A staff member must now authorize your account and this could take up to <strong>24 hours</strong>. At that time, you will "+
+                        "receive a <strong>Welcome Email</strong>. Please be patient, we are a small staff of volunteers.<br><br>"+
+                        "Thank you from the <strong>Oaks Village HOA</strong>.");
+
+                    // Send notification email to OaksVillage@Oaks-village.com
+                    string emailSubject = "Notification New Member Registered";
+                    string emailBody = $"{userProfile.FirstName} {userProfile.MiddleName} {userProfile.LastName} with email {user.Email} "+
+                        "has registered and will need their Role assigned.";
+
+                    await _emailSender.SendEmailAsync(
+                        "OaksVillage@oaks-village.com",
+                        emailSubject,
+                        emailBody
+                    );
+
+                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    {
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
+                    }
+                    else
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl);
+                    }
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return Page();
         }
 
         private IdentityUser CreateUser()

@@ -35,13 +35,11 @@
 <div class="container">
 
     <!-- Logo Image -->
-    <partial name="_OaksTreesLogo" />
-
-    @* <div class="row">
-        <div class="col-12 mt-4 mt-md-0 text-center">
-            <img alt="Oaks Village" class="img-fluid" src="~/images/svg/logos/logoOaksVillage.svg" />
+    <div class="container row m-0 ps-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
+        <div class="col-12 mt-0 ps-0">
+            <partial name="_OaksTreesLogo" />
         </div>
-    </div> *@
+    </div>
 
     @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
     {

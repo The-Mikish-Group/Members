@@ -29,10 +29,18 @@ namespace Members.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+            // Cell Phone
+            [Required]
             [Phone]
-            [Display(Name = "Phone Number")]
+            [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
+
+            // Home Phone            
+            [Phone]
+            [Display(Name = "Home Phone")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
+            public string? HomePhoneNumber { get; set; }
 
             [Required]
             [Display(Name = "First Name")]
@@ -72,30 +80,31 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             public string? Plot { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+private async Task LoadAsync(IdentityUser user)
+{
+    var userName = await _userManager.GetUserNameAsync(user);
+    var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
+    var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
 
-            Username = userName;
+    Username = userName;
 
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber,
-                FirstName = userProfile?.FirstName ?? string.Empty,
-                MiddleName = userProfile?.MiddleName,
-                LastName = userProfile?.LastName ?? string.Empty,
-                Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
-                AddressLine1 = userProfile?.AddressLine1,
-                AddressLine2 = userProfile?.AddressLine2,
-                City = userProfile?.City,
-                State = userProfile?.State,
-                ZipCode = userProfile?.ZipCode,
-                Plot = userProfile?.Plot
-            };
-        }
+    Input = new InputModel
+    {
+        PhoneNumber = phoneNumber, // Add this line to load the Cell Phone number
+        FirstName = userProfile?.FirstName ?? string.Empty,
+        MiddleName = userProfile?.MiddleName,
+        LastName = userProfile?.LastName ?? string.Empty,
+        Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
+        AddressLine1 = userProfile?.AddressLine1,
+        AddressLine2 = userProfile?.AddressLine2,
+        City = userProfile?.City,
+        State = userProfile?.State,
+        ZipCode = userProfile?.ZipCode,
+        Plot = userProfile?.Plot,
+        HomePhoneNumber = userProfile?.HomePhoneNumber
+    };
+}
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -139,17 +148,31 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            bool phoneNumberUpdated = false; // Flag to track if phone number was updated successfully
+
             if (Input.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                if (setPhoneResult.Succeeded)
                 {
+                    phoneNumberUpdated = true;
+                }
+                else
+                {
+                    foreach (var error in setPhoneResult.Errors)
+                    {
+                        Console.WriteLine($"Phone Number Update Error: {error.Code} - {error.Description}");
+                    }
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
             }
+            else
+            {
+                phoneNumberUpdated = true; // If phone number wasn't changed, consider it a success
+            }
 
-            // Update UserProfile
+            // Update UserProfile (This part is independent of the PhoneNumber update)
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
             if (userProfile == null)
             {
@@ -167,6 +190,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             userProfile.State = Input.State;
             userProfile.ZipCode = Input.ZipCode;
             userProfile.Plot = Input.Plot;
+            userProfile.HomePhoneNumber = Input.HomePhoneNumber;
 
             await _dbContext.SaveChangesAsync();
             await _signInManager.RefreshSignInAsync(user);

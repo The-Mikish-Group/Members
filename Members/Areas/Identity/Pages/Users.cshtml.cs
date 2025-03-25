@@ -21,9 +21,11 @@ namespace Members.Areas.Identity.Pages
             public required string UserName { get; set; }
             public string? FullName { get; set; }
             public required string Email { get; set; }
-            public string? PhoneNumber { get; set; }
             public bool EmailConfirmed { get; set; }
+            public string? PhoneNumber { get; set; } // This will hold the IdentityUser's PhoneNumber
+            public bool PhoneNumberConfirmed { get; set; }
             public IList<string>? Roles { get; set; }
+            public string? HomePhoneNumber { get; set; } // Add this for the UserProfile's HomePhoneNumber
         }
 
         public required List<UserModel> Users { get; set; }
@@ -40,7 +42,7 @@ namespace Members.Areas.Identity.Pages
         public async Task OnGetAsync()
         {
             var users = await _userManager.Users.ToListAsync();
-            Users = [];
+            Users =[];
 
             foreach (var user in users)
             {
@@ -48,9 +50,11 @@ namespace Members.Areas.Identity.Pages
                 var roles = await _userManager.GetRolesAsync(user);
 
                 string? fullName = null;
+                string? homePhoneNumber = null; // Variable for the UserProfile's phone number
                 if (userProfile != null)
                 {
                     fullName = $"{userProfile.FirstName} {(string.IsNullOrEmpty(userProfile.MiddleName) ? "" : userProfile.MiddleName + " ")}{userProfile.LastName}".Trim();
+                    homePhoneNumber = userProfile.HomePhoneNumber; // Get the home phone number from UserProfile
                 }
 
                 Users.Add(new UserModel
@@ -58,42 +62,40 @@ namespace Members.Areas.Identity.Pages
                     Id = user.Id,
                     UserName = user.UserName ?? string.Empty,
                     Email = user.Email ?? string.Empty,
-                    PhoneNumber = user.PhoneNumber,
                     EmailConfirmed = user.EmailConfirmed,
-                    FullName = fullName ?? "No Info", // Display "No Profile" if UserProfile is missing
-                    Roles = roles
+                    PhoneNumber = user.PhoneNumber, // Get the PhoneNumber from IdentityUser
+                    PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+                    FullName = fullName ?? "No Info",
+                    Roles = roles,
+                    HomePhoneNumber = homePhoneNumber // Assign the UserProfile's phone number
                 });
             }
 
             // Search
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                // Trim leading and trailing spaces
                 SearchTerm = SearchTerm.Trim();
                 if (SearchTerm.Equals("bad", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    // EmailConfirmed and Role incomplete
                     Users = [.. Users.Where(u => (u.Roles == null || u.Roles.Count == 0) && u.EmailConfirmed == false)];
                 }
                 else if (SearchTerm.Equals("No Role", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    // Search for empty roles
                     Users = [.. Users.Where(u => u.Roles == null || u.Roles.Count == 0)];
                 }
                 else if (SearchTerm.Equals("Not Confirmed", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    // Search for unconfirmed emails
                     Users = [.. Users.Where(u => u.EmailConfirmed == false)];
                 }
                 else
                 {
-                    // General Search
                     Users = [.. Users.Where(u =>
-                        u.FullName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
-                        u.Email.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                        u.PhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true ||
-                        (u.Roles != null && u.Roles.Any(r => r.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)))
-                    )];
+                u.FullName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
+                u.Email.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) ||
+                u.PhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true || // Search IdentityUser's PhoneNumber
+                u.HomePhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true || // Search UserProfile's HomePhoneNumber
+                (u.Roles != null && u.Roles.Any(r => r.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)))
+            )];
                 }
             }
 
@@ -105,7 +107,9 @@ namespace Members.Areas.Identity.Pages
                     "fullname" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.FullName)] : [.. Users.OrderByDescending(u => u.FullName)],
                     "email" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.Email)] : [.. Users.OrderByDescending(u => u.Email)],
                     "emailconfirmed" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.EmailConfirmed)] : [.. Users.OrderByDescending(u => u.EmailConfirmed)],
-                    "phonenumber" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.PhoneNumber)] : [.. Users.OrderByDescending(u => u.PhoneNumber)],
+                    "phonenumber" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.PhoneNumber)] : [.. Users.OrderByDescending(u => u.PhoneNumber)], // Sort by IdentityUser's PhoneNumber
+                    "homephonenumber" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.HomePhoneNumber)] : [.. Users.OrderByDescending(u => u.HomePhoneNumber)], // Sort by UserProfile's HomePhoneNumber
+                    "phonenumberconfirmed" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.PhoneNumberConfirmed)] : [.. Users.OrderByDescending(u => u.PhoneNumberConfirmed)],
                     "roles" => SortOrder?.ToLower() == "asc" ? [.. Users.OrderBy(u => u.Roles?.FirstOrDefault())] : [.. Users.OrderByDescending(u => u.Roles?.FirstOrDefault())],
                     _ => [.. Users.OrderBy(u => u.FullName).ThenBy(u => u.Email)],
                 };

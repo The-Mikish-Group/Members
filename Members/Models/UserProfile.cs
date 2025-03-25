@@ -21,6 +21,7 @@ namespace Members.Models // This is crucial! Make sure it matches your Models fo
         public string? State { get; set; }
         public string? ZipCode { get; set; }
         public string? Plot { get; set; }
+        public string? HomePhoneNumber { get; set; }
         public required IdentityUser User { get; set; }
     }
 }

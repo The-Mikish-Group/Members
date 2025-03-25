@@ -90,9 +90,9 @@ namespace Members.Areas.Identity.Pages
                     {
                         await _emailSender.SendEmailAsync(
                             user.Email,
-                            "Welcome! Oaks-Village Account is Ready",
+                            "Welcome! Your Oaks-Village Account is ready to use!",
                             "You have been granted Member access and " +
-                            "can log in to https://oaks-village.com.<br /><br />Thank you from the team at <strong>Oaks-Village HOA<strong"
+                            "can log in to https://oaks-village.com.<br /><br />Thank you from the <strong>Oaks-Village HOA</strong>"
                         );
                     }
                 }
@@ -116,7 +116,7 @@ namespace Members.Areas.Identity.Pages
                         await _emailSender.SendEmailAsync(
                             user.Email,
                             "Confirm Your Email to complete your registration",
-                            $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA<strong"
+                            $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'><strong>clicking here</strong></a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
                         );
                     }
                 }
