@@ -45,6 +45,7 @@ namespace Members.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _dbContext = dbContext;
+
             Input = new InputModel
             {
                 Email = string.Empty,
@@ -179,6 +180,10 @@ namespace Members.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                // Added this line to set the PhoneNumber property of the user object
+                user.PhoneNumber = Input.PhoneNumber;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
@@ -215,15 +220,17 @@ namespace Members.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId, code, returnUrl },
                         protocol: Request.Scheme);
 
+
+                    // Send Email Confirmation Request to new Member
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'><strong>clicking here</strong></a>.<br><br>"+
-                        "A staff member must now authorize your account and this could take up to <strong>24 hours</strong>. At that time, you will "+
-                        "receive a <strong>Welcome Email</strong>. Please be patient, we are a small staff of volunteers.<br><br>"+
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'><strong>clicking here</strong></a>.<br><br>" +
+                        "A staff member must now authorize your account and this could take up to <strong>24 hours</strong>. At that time, you will " +
+                        "receive a <strong>Welcome Email</strong>. Please be patient, we are a small staff of volunteers.<br><br>" +
                         "Thank you from the <strong>Oaks Village HOA</strong>.");
 
-                    // Send notification email to OaksVillage@Oaks-village.com
+                    // Send Notification Email to OaksVillage@Oaks-village.com
                     string emailSubject = "Notification New Member Registered";
-                    string emailBody = $"{userProfile.FirstName} {userProfile.MiddleName} {userProfile.LastName} with email {user.Email} "+
+                    string emailBody = $"{userProfile.FirstName} {userProfile.MiddleName} {userProfile.LastName} with email {user.Email} " +
                         "has registered and will need their Role assigned.";
 
                     await _emailSender.SendEmailAsync(

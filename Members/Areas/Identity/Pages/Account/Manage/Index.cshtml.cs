@@ -147,30 +147,21 @@ private async Task LoadAsync(IdentityUser user)
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            bool phoneNumberUpdated = false; // Flag to track if phone number was updated successfully
+            //var phoneNumber = await _userManager.GetPhoneNumberAsync(user);           
 
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (setPhoneResult.Succeeded)
-                {
-                    phoneNumberUpdated = true;
-                }
-                else
-                {
-                    foreach (var error in setPhoneResult.Errors)
-                    {
-                        Console.WriteLine($"Phone Number Update Error: {error.Code} - {error.Description}");
-                    }
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
-            else
-            {
-                phoneNumberUpdated = true; // If phone number wasn't changed, consider it a success
-            }
+            //if (Input.PhoneNumber != phoneNumber)
+            //{
+            //    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+            //    if (!setPhoneResult.Succeeded)
+            //    {   
+            //        foreach (var error in setPhoneResult.Errors)
+            //        {
+            //            Console.WriteLine($"Phone Number Update Error: {error.Code} - {error.Description}");
+            //        }
+            //        StatusMessage = "Unexpected error when trying to set phone number.";
+            //        return RedirectToPage();
+            //    }
+            //}            
 
             // Update UserProfile (This part is independent of the PhoneNumber update)
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);

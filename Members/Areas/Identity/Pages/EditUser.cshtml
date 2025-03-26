@@ -18,51 +18,51 @@
     <style>
         .readonly-email,
         .readonly-PhoneNumber {
-            background-color: #f0f0f0; /* Light gray */
-            cursor: not-allowed; /* Indicate it's not editable */
-            padding-right: 2.5em; /* Make space for the icon */
-            position: relative; /* Needed for absolute positioning of the icon */
+        background-color: #f0f0f0; /* Light gray */
+        cursor: not-allowed; /* Indicate it's not editable */
+        padding-right: 2.5em; /* Make space for the icon */
+        position: relative; /* Needed for absolute positioning of the icon */
         }
 
         .email-icon-container,
         .phoneNumber-icon-container {
-            position: absolute;
-            top: 50%;
-            right: 0.5em;
-            transform: translateY(-50%);
+        position: absolute;
+        top: 50%;
+        right: 0.5em;
+        transform: translateY(-50%);
         }
 
         .form-check-input[type=checkbox].email-confirmed-checkbox,
         .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 1.2em;
-            height: 1.2em;
-            border: 1px solid #ccc;
-            border-radius: 0.2em;
-            outline: none;
-            cursor: pointer;
-            position: relative;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 1.2em;
+        height: 1.2em;
+        border: 1px solid #ccc;
+        border-radius: 0.2em;
+        outline: none;
+        cursor: pointer;
+        position: relative;
         }
 
-            .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
-            .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked {
-                background-color: #fff; /* White background when checked */
-                border-color: #28a745; /* Green border when checked */
-            }
+        .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
+        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked {
+        background-color: #fff; /* White background when checked */
+        border-color: #28a745; /* Green border when checked */
+        }
 
-                .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
-                .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before {
-                    content: '\2713'; /* Unicode checkmark character */
-                    display: block;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 1em;
-                    color: #28a745; /* Green checkmark */
-                }
+        .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
+        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before {
+        content: '\2713'; /* Unicode checkmark character */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1em;
+        color: #28a745; /* Green checkmark */
+        }
     </style>
 
 </head>
@@ -138,7 +138,7 @@
 
                         <div class="col-2 form-floating mb-3">
                             <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
-                            <label asp-for="Input.MiddleName" class="form-label">(M)</label>
+                            @* <label asp-for="Input.MiddleName" class="form-label">(M)</label> *@
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
 
@@ -207,9 +207,12 @@
                             <i class="bi bi-person-gear"></i> Roles
                         </a>
 
-                        <a asp-page="./DeleteUser" asp-route-id="@Model.Input.Id" class="btn btn-sm btn-subtle-danger me-2" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
-                            <i class="bi bi-x-circle"></i> Delete
-                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-page="./DeleteUser" asp-route-id="@Model.Input.Id" class="btn btn-sm btn-subtle-danger me-2" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                                <i class="bi bi-x-circle"></i> Delete
+                            </a>
+                        }
 
                         <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
                             <i class="bi bi-x-circle"></i> Cancel
@@ -222,7 +225,7 @@
                     <div class="ps-4 pt-0 pb-4 text-danger text-center">
                         <p class="fs-3"><strong>Use as last resort only!</strong></p>
                         <p>
-                            This will Email this password to the Member in plain text. There is
+                            This will Email a password to the Member in plain text. There is
                             a "Forget Your Password" link on the Login screen; it is preferred
                             to direct the member to that <a href="https:\\oaks-village.com\identity\account\login">Login</a>.
                         </p>
