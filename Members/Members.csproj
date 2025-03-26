@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Members-070a70ab-5e20-4fc2-9d64-2cd21398fd62</UserSecretsId>
+    <OutputType>Exe</OutputType>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
 
   <ItemGroup>
