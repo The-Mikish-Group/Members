@@ -1,12 +1,6 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,27 +18,27 @@ namespace Members.Areas.Identity.Pages.Account.Manage
         private readonly SignInManager<IdentityUser> _signInManager = signInManager;
         private readonly IEmailSender _emailSender = emailSender;
 
-        public string Email { get; set; }        
+        public string? Email { get; set; }
         public bool IsEmailConfirmed { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel? Input { get; set; }
 
-         public class InputModel
+        public class InputModel
         {
             [Required]
             [EmailAddress]
             [Display(Name = "New email")]
-            public string NewEmail { get; set; }
+            public string? NewEmail { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
         {
             var email = await _userManager.GetEmailAsync(user);
-            Email = email;
+            Email = email ?? string.Empty;
 
             Input = new InputModel
             {
@@ -54,7 +48,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGet()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -81,7 +75,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             }
 
             var email = await _userManager.GetEmailAsync(user);
-            if (Input.NewEmail != email)
+            if (Input?.NewEmail != null && Input.NewEmail != email)
             {
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
@@ -91,13 +85,23 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                     pageHandler: null,
                     values: new { area = "Identity", userId, email = Input.NewEmail, code },
                     protocol: Request.Scheme);
-                await _emailSender.SendEmailAsync(
-                    Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your email account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
-                return RedirectToPage();
+                // Add this null check to address the warning
+                if (callbackUrl != null)
+                {
+                    await _emailSender.SendEmailAsync(
+                        Input.NewEmail,
+                        "Confirm your email",
+                        $"Please confirm your email account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                    return RedirectToPage();
+                }
+                else
+                {
+                    StatusMessage = "Error generating confirmation link.";
+                    return Page(); // Or RedirectToPage with an error message
+                }
             }
 
             StatusMessage = "Your email is unchanged.";
@@ -120,6 +124,11 @@ namespace Members.Areas.Identity.Pages.Account.Manage
 
             var userId = await _userManager.GetUserIdAsync(user);
             var email = await _userManager.GetEmailAsync(user);
+            if (email == null)
+            {
+                StatusMessage = "Error: Email not found.";
+                return RedirectToPage();
+            }
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = Url.Page(
@@ -127,12 +136,22 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 pageHandler: null,
                 values: new { area = "Identity", userId, code },
                 protocol: Request.Scheme);
+
+            // If the user has changed their email, we need to send the confirmation link to the new email address
+            if (callbackUrl == null)
+            {
+                StatusMessage = "Error: Callback URL not found.";
+
+                return RedirectToPage();
+            }
+
+            // Send an email with this link
             await _emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>"); 
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "Verification email sent.";
             return RedirectToPage();
         }
     }

@@ -69,7 +69,7 @@
 
 <div class="container row m-0 ps-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
     <div class="col-12 mt-0 ps-0">
-        <partial name="_OaksTreesLogo" />
+        <partial name="_LargeLogo" />
     </div>
 </div>
 
@@ -102,12 +102,12 @@
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
-                    <!-- Email Confirmed  -->
+                    <!-- Email Confirmed -->
                     <div class="form-check mb-3">
                         <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox" id="emailConfirmedCheckbox" />
                         <label class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
-
+                    
                     <!-- Cell Phone -->
                     <div class="form-floating mb-3">
                         <input asp-for="Input.PhoneNumber" class="form-control readonly-PhoneNumber" id="phoneNumber" placeholder="Phone Number" />

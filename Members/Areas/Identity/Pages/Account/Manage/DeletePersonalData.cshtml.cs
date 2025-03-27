@@ -1,59 +1,29 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
-    public class DeletePersonalDataModel : PageModel
+    public class DeletePersonalDataModel(
+        UserManager<IdentityUser> userManager,
+        SignInManager<IdentityUser> signInManager,
+        ILogger<DeletePersonalDataModel> logger) : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly ILogger<DeletePersonalDataModel> _logger;
-
-        public DeletePersonalDataModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-        }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly SignInManager<IdentityUser> _signInManager = signInManager;
+        private readonly ILogger<DeletePersonalDataModel> _logger = logger;
+        
         [BindProperty]
-        public InputModel Input { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        public InputModel? Input { get; set; }
+        
         public class InputModel
-        {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+        {            
             [Required]
             [DataType(DataType.Password)]
-            public string Password { get; set; }
+            public string? Password { get; set; }
         }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         public bool RequirePassword { get; set; }
 
         public async Task<IActionResult> OnGet()
@@ -79,6 +49,12 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             RequirePassword = await _userManager.HasPasswordAsync(user);
             if (RequirePassword)
             {
+                if (Input == null || string.IsNullOrEmpty(Input.Password))
+                {
+                    ModelState.AddModelError(string.Empty, "Password is required.");
+                    return Page();
+                }
+
                 if (!await _userManager.CheckPasswordAsync(user, Input.Password))
                 {
                     ModelState.AddModelError(string.Empty, "Incorrect password.");

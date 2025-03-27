@@ -54,8 +54,17 @@
     <Content Remove="Areas\Identity\Pages\ViewPdf old.cshtml" />
     <Content Remove="Views\Home\xMembers.cshtml" />
     <Content Remove="Views\Shared\_LoginPartial.cshtml" />
+    <Content Remove="wwwroot\Images\Svg\Logos\logo oaks village.ai" />
+    <Content Remove="wwwroot\Images\Svg\Logos\LogoOaksVillage.ai" />
+    <Content Remove="wwwroot\Images\Svg\Logos\LogoOaksVillage.png" />
+    <Content Remove="wwwroot\Images\Svg\Logos\logoOaksVillage.svg" />
+    <Content Remove="wwwroot\Images\Svg\Logos\Oak Trees.ai" />
+    <Content Remove="wwwroot\Images\Svg\Logos\OaksTrees.ai" />
     <Content Remove="wwwroot\Images\Svg\Logos\OaksTrees1.ai" />
     <Content Remove="wwwroot\Images\Svg\Logos\OaksTrees1.svg" />
+    <Content Remove="wwwroot\Images\Svg\Logos\OaksVillage.ai" />
+    <Content Remove="wwwroot\Images\Svg\tree1.jpeg" />
+    <Content Remove="wwwroot\Images\Svg\ttree2.jpeg" />
     <Content Remove="wwwroot\lib\css\colors1.css" />
     <Content Remove="wwwroot\lib\css\companyfrontend.css" />
     <Content Remove="wwwroot\lib\css\fontsize1.css" />

@@ -17,29 +17,32 @@
 </head>
 
 <!-- Logo Image -->
-<div class="container row m-0 ps-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
-    <div class="col-12 mt-0 ps-0">
-        <partial name="_OaksTreesLogo" />
-    </div>
-</div>
+<partial name="_LargeLogo" />
 
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             <div class="card p-2 shadow rounded bg-gold-light">
+
+                <!-- Title -->
                 <h2 class="text-center mb-4 text-gold-darker">
                     <i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]
                 </h2>
+
                 <section>
+
+                    <!-- Log in Form -->
                     <form id="account" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
 
+                        <!-- Email -->
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                             <label asp-for="Input.Email" class="form-label">Email</label>
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-3">
                             <div class="input-group">
                                 <input asp-for="Input.Password" id="password" type="password" class="form-control" autocomplete="off" aria-required="true" placeholder="password" />
@@ -50,6 +53,7 @@
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
+                        <!-- Remember Me -->
                         <div class="form-check mb-3 text-gold-darker">
                             <input class="form-check-input" asp-for="Input.RememberMe" id="rememberMe" />
                             <label class="form-check-label" asp-for="Input.RememberMe" for="rememberMe">
@@ -57,31 +61,41 @@
                             </label>
                         </div>
 
+                        <!-- Forgot your Password -->
+                        <div class="form-floating mb-4">
+                            <a class="btn btn-sm btn-loglink border-0" asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot your password?</a>
+                        </div>
+                       
+                        <!-- Buttons -->
                         <div class="d-flex justify-content-between">
+
+                            <!-- Log in-->
                             <button id="login-submit" type="submit" class="btn btn-sm btn-success border-0 me-1">
                                 <i class="bi bi-unlock"></i> Log in
                             </button>
+
+                            <!-- Cancel -->
                             <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-danger border-0 ms-1">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>
+
                         </div>
-                        <div class="card p-2 mt-3 mb-2 shadow rounded bg-gold-footer">
+
+                        @* <div class="card p-2 mt-3 mb-2 shadow rounded bg-gold-footer">
                             <div class="row justify-content-center">
                                 <div class="col-md-auto">
                                     <div class="d-flex flex-column align-items-start">
-                                        <div class="mt-2">
+                                        <div class="mt-1">
                                             <a class="btn btn-sm btn-option border-0" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user?</a>
                                         </div>
-                                        <div class="mt-2">
-                                            <a class="btn btn-sm btn-option border-0" asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot your password?</a>
-                                        </div>
+                                        
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-option border-0" asp-page="./ResendEmailConfirmation" asp-route-returnUrl="@Model.ReturnUrl">Resend email confirmation?</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> *@
 
                     </form>
                 </section>

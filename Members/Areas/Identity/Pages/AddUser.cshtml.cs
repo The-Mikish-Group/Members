@@ -1,4 +1,5 @@
-using Azure;
+#nullable disable
+
 using Members.Data;
 using Members.Models;
 using Microsoft.AspNetCore.Identity;
@@ -6,14 +7,14 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using System;
+//using Microsoft.Extensions.Logging;
+//using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+//using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
+//using System.Threading;
+//using System.Threading.Tasks;
 
 namespace Members.Areas.Identity.Pages
 {
@@ -67,14 +68,14 @@ namespace Members.Areas.Identity.Pages
         public class InputModel
         {
             [BindProperty(SupportsGet = true)]
-            public string? SearchTerm { get; set; }
+            public string SearchTerm { get; set; }
             
             [Required]
             [Display(Name = "FirstName")]
             public required string FirstName { get; set; }
 
             [Display(Name = "MiddleName")]
-            public string? MiddleName { get; set; }
+            public string MiddleName { get; set; }
 
             [Required]
             [Display(Name = "LastName")]
@@ -93,7 +94,7 @@ namespace Members.Areas.Identity.Pages
             public required string AddressLine1 { get; set; }
 
             [Display(Name = "AddressLine2")]
-            public string? AddressLine2 { get; set; }
+            public string AddressLine2 { get; set; }
 
             [Required]
             [Display(Name = "City")]
@@ -108,7 +109,7 @@ namespace Members.Areas.Identity.Pages
             public required string ZipCode { get; set; }
 
             [Display(Name = "Plot")]
-            public string? Plot { get; set; }
+            public string Plot { get; set; }
 
             [Required]
             [EmailAddress]
@@ -122,7 +123,7 @@ namespace Members.Areas.Identity.Pages
             [Phone]
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
-            public string? PhoneNumber { get; set; }
+            public string PhoneNumber { get; set; }
 
             [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; } = false;
@@ -130,7 +131,7 @@ namespace Members.Areas.Identity.Pages
             [Phone]
             [Display(Name = "Home Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
-            public string? HomePhoneNumber { get; set; }
+            public string HomePhoneNumber { get; set; }
         }
 
         public void OnGet()

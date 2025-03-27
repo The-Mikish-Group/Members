@@ -396,18 +396,31 @@ a {
         background-color: lightgreen; /* bg-green-dark */
         border-color: #7d7e81; /* gray */
     }
-    /*  btn-danger Defaults */
-    .btn-danger {
-        color: white;
-        background-color: darkred; /* bg-red */
-        border-color: #414042; /* gray-darker */
-    }
+
+/*  btn-danger Defaults */
+.btn-danger {
+    color: white;
+    background-color: darkred; /* bg-red */
+    border-color: #414042; /* gray-darker */
+}
 
     .btn-danger:focus,
     .btn-danger:hover {
         color: white;
         background-color: red; /* bg-green-darker */
         border-color: #7d7e81; /* gray */
+    }
+
+    /* btn-subtle-danger */
+.btn-subtle-danger {
+    background-color: red; /* Very light red background */
+    border: 1px solid black; /* Very light red border */
+    color: white; /* Darker red text/icon */
+}
+
+    .btn-subtle-danger:hover {
+        background-color: crimson; /* Slightly darker hover background */
+        color: white;
     }
 
 /*  btn-warning Defaults */
@@ -449,6 +462,19 @@ a {
         background-color: #dec383;
         border-color: #7d7e81; /* gray */
     }
+
+.btn-loglink {
+    color: #705103;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+    .btn-loglink:focus,
+    .btn-loglink:hover {
+        color: #705103;
+        background-color: #dec383;        
+    }
+
 /* #endregion */
 
 /* #region Top Button */

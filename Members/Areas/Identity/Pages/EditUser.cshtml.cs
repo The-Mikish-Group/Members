@@ -2,15 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
-using System.Text.Encodings.Web;
-using System.Text;
-using Members.Data; // Assuming your DbContext is in this namespace
-using Members.Models; // Assuming your UserProfile model is in this namespace
+using Members.Data; 
+using Members.Models; 
 
 namespace Members.Areas.Identity.Pages
 {
@@ -45,7 +39,7 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "Email")]
             public required string Email { get; set; }
 
-            // EmailConfirmed
+            // Email Confirmed
             public bool EmailConfirmed { get; set; }
 
             // Password
@@ -130,12 +124,12 @@ namespace Members.Areas.Identity.Pages
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
                 HomePhoneNumber = userProfile?.HomePhoneNumber ?? string.Empty,
                 FirstName = userProfile?.FirstName ?? string.Empty,
-                MiddleName = userProfile?.MiddleName,
+                MiddleName = userProfile?.MiddleName ?? string.Empty,
                 LastName = userProfile?.LastName ?? string.Empty,
                 Birthday = userProfile?.Birthday,
                 Anniversary = userProfile?.Anniversary,
                 AddressLine1 = userProfile?.AddressLine1 ?? string.Empty,
-                AddressLine2 = userProfile?.AddressLine2,
+                AddressLine2 = userProfile?.AddressLine2 ?? string.Empty,
                 City = userProfile?.City ?? string.Empty,
                 State = userProfile?.State ?? string.Empty,
                 ZipCode = userProfile?.ZipCode ?? string.Empty,
@@ -143,7 +137,7 @@ namespace Members.Areas.Identity.Pages
             };
         }
 
-        public async Task<IActionResult> OnGetAsync(string id, string? searchTerm)
+        public async Task<IActionResult> OnGetAsync(string id, string searchTerm)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -173,7 +167,8 @@ namespace Members.Areas.Identity.Pages
                 Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
             }
 
-            SearchTerm = searchTerm; // Store the search term from the query string
+            // Store the search term from the query string
+            SearchTerm = searchTerm; 
             return Page();
         }
 
@@ -181,6 +176,14 @@ namespace Members.Areas.Identity.Pages
         {
             if (!ModelState.IsValid)
             {
+                // Something is wrong with the model state
+                foreach (var modelStateValue in ModelState.Values)
+                {
+                    foreach (var error in modelStateValue.Errors)
+                    {
+                        Console.WriteLine($"Model Error: {error.ErrorMessage}");
+                    }
+                }
                 return Page();
             }
 
@@ -188,18 +191,20 @@ namespace Members.Areas.Identity.Pages
 
             if (user != null)
             {
+                // Check if the email is already confirmed
                 bool originalEmailConfirmed = user.EmailConfirmed;
-                //bool originalPhoneNumberConfirmed = user.PhoneNumberConfirmed;
 
+                // Update the user properties
                 user.UserName = Input.UserName;
                 user.Email = Input.Email;
                 user.EmailConfirmed = Input.EmailConfirmed;
-                user.PhoneNumber = Input.PhoneNumber;                
+                user.PhoneNumber = Input.PhoneNumber;
                 user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed;
 
+                // Save changes to Users table
                 var result = await _userManager.UpdateAsync(user);
 
-                // Update UserProfile table
+                // Update the UserProfile table
                 var userProfile = await _dbContext.UserProfile.FindAsync(Input.Id);
                 if (userProfile == null)
                 {
@@ -219,23 +224,27 @@ namespace Members.Areas.Identity.Pages
                 userProfile.Plot = Input.Plot;
                 userProfile.HomePhoneNumber = Input.HomePhoneNumber;
 
-                await _dbContext.SaveChangesAsync(); // Save changes to UserProfile
+                // Save changes to UserProfile
+                await _dbContext.SaveChangesAsync();
 
+                // Send Emails
                 if (result.Succeeded && !string.IsNullOrEmpty(Input.NewPassword))
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                     var passwordResult = await _userManager.ResetPasswordAsync(user, token, Input.NewPassword);
 
+                    // Send new password in email (avoid using...  a last resort passowrd assignment)
                     if (passwordResult.Succeeded)
                     {
                         await _emailSender.SendEmailAsync(
                             Input.Email,
                             "Your New Password",
                             $"Your email is: {Input.Email} and your new Password is: {Input.NewPassword}"
-                            );
+                        );
                     }
                     else
                     {
+                        // Something didn't work with the password reset
                         foreach (var error in passwordResult.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
@@ -244,6 +253,7 @@ namespace Members.Areas.Identity.Pages
                     }
                 }
 
+                // Send email confirmation if the email was confirmed
                 if (result.Succeeded)
                 {
                     if (!originalEmailConfirmed && Input.EmailConfirmed)
@@ -262,8 +272,16 @@ namespace Members.Areas.Identity.Pages
                             $"<html><body><p>Your <strong>email account</strong> has been confirmed...</p>{approvalMessage}</body></html>"
                         );
                     }
-                    // Redirect back to the Users page, preserving the search term
-                    return RedirectToPage("./Users", new { SearchTerm = searchTerm });
+
+                    // Redirect back to the Users page, preserving the search term only if it exists
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        return RedirectToPage("./Users", new { SearchTerm = searchTerm });
+                    }
+                    else
+                    {
+                        return RedirectToPage("./Users"); // Redirect without the search term.
+                    }
                 }
 
                 foreach (var error in result.Errors)

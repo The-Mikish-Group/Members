@@ -23,7 +23,7 @@ body {
     width: 100%;
 }
 
-@media print {
+/*@media print {
     body > *:not(#print-container) {
         display: none;
     }
@@ -35,11 +35,11 @@ body {
     .print-hidden {
         display: none;
     }
-}
+}*/
 
-.print-hidden {
+/*.print-hidden {
     display: none;
-}
+}*/
 
 .image-container {
     position: relative;
@@ -94,16 +94,7 @@ html > body header {
 .nbLogo {
     height: 18px;
 }
-.btn-subtle-danger {
-    background-color: red; /* Very light red background */
-    border: 1px solid  black; /* Very light red border */
-    color: white; /* Darker red text/icon */
-}
 
-    .btn-subtle-danger:hover {
-        background-color: crimson; /* Slightly darker hover background */
-        color: white;
-    }
 
 /*    .btn-subtle-danger i {
         font-size: 1rem;

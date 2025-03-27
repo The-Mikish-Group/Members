@@ -54,14 +54,14 @@ namespace Members.Areas.Identity.Pages.Account
                 {
                     emailSubjectUser = "Welcome, your account is Confirmed.";
                     emailBodyUser = "Thank you for confirming your email address. Your account is now <strong>Active</strong>.<br>"+
-                        "You can login at https://Oaks-Village.com.<br><br>Thank you from the Oaks Village HOA.";
+                        "You can login at https://Oaks-Village.com.<br><br>Thank you from the <strong>Oaks Village HOA</strong>.";
                 }
                 else
                 {
                     emailBodyUser = "Thank you for confirming your email address. <br><br>"+
                         "A staff member must now authorize your account and this could take up to 24 hours. "+
                         "At that time, you will receive a <strong>Welcome Email</strong>. Please be patient, "+
-                        "we are a small staff of volunteers.<br><br>Thank you from the Oaks Village HOA.";
+                        "we are a small staff of volunteers.<br><br>Thank you from the <strong>Oaks Village HOA</strong>.";
                 }
 
                 // Send confirmation email to the user
