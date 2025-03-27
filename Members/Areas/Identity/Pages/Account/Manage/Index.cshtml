@@ -14,7 +14,7 @@
             <!-- Form -->
             <form id="profile-form" method="post">
 
-                <!-- Page Title -->
+                <!-- Title -->
                 <h2 class="text-center mb-4">
                     <i class="bi bi-gear-fill"></i> @ViewData["Title"]
                 </h2>
@@ -25,18 +25,23 @@
                     <label asp-for="Username" class="form-label">Username</label>
                 </div>
 
-                <!-- Cell Phone -->
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Cell Phone" />
-                    <label asp-for="Input.PhoneNumber" class="form-label">Cell Phone</label>
-                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-                </div>
+                <!-- Phone Row -->
+                <div class="row gx-1">
 
-                <!-- Home Phone -->
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.HomePhoneNumber" class="form-control" id="homephoneNumber" placeholder="Home Phone" />
-                    <label asp-for="Input.HomePhoneNumber" class="form-label">Home Phone</label>
-                    <span asp-validation-for="Input.HomePhoneNumber" class="text-danger"></span>
+                    <!-- Cell Phone -->
+                    <div class="col-6 form-floating mb-3">
+                        <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Cell Phone" />
+                        <label asp-for="Input.PhoneNumber" class="form-label">Cell Phone</label>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <!-- Home Phone -->
+                    <div class="col-6 form-floating mb-3">
+                        <input asp-for="Input.HomePhoneNumber" class="form-control" id="homephoneNumber" placeholder="Home Phone" />
+                        <label asp-for="Input.HomePhoneNumber" class="form-label">Home Phone (Opt.)</label>
+                        <span asp-validation-for="Input.HomePhoneNumber" class="text-danger"></span>
+                    </div>
+
                 </div>
 
                 <!-- Names First, Middle, Last -->
@@ -64,13 +69,26 @@
                         <label asp-for="Input.LastName" class="form-label">Last Name</label>
                         <span asp-validation-for="Input.LastName" class="text-danger"></span>
                     </div>
+
                 </div>
 
-                <!-- Birthday -->
-                <div class="col-5 form-floating mb-2">
-                    <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
-                    <label asp-for="Input.Birthday" class="form-label">Birthday (Optional)</label>
-                    <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                <!-- Dates Birthday and Anniversary -->
+                <div class="row gx-1">
+
+                    <!-- Birthday -->
+                    <div class="col-6 form-floating mb-2">
+                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                        <label asp-for="Input.Birthday" class="form-label">Birthday (Opt.)</label>
+                        <span asp-validation-for="Input.Birthday" class="text-danger"></span>
+                    </div>
+
+                    <!-- Anniversary -->
+                    <div class="col-6 form-floating mb-2">
+                        <input asp-for="Input.Anniversary" class="form-control" type="date" placeholder=" " />
+                        <label asp-for="Input.Anniversary" class="form-label">Anniversary (Opt.)</label>
+                        <span asp-validation-for="Input.Anniversary" class="text-danger"></span>
+                    </div>
+
                 </div>
 
                 <hr />
@@ -85,7 +103,7 @@
                 <!-- AddressLine2 -->
                 <div class="form-floating mb-3">
                     <input asp-for="Input.AddressLine2" class="form-control" placeholder=" " />
-                    <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Optional)</label>
+                    <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Opt.)</label>
                     <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                 </div>
 
@@ -109,7 +127,7 @@
                     <!-- ZipCode -->
                     <div class="col-4 form-floating mb-3">
                         <input asp-for="Input.ZipCode" class="form-control" placeholder=" " />
-                        <label asp-for="Input.ZipCode" class="form-label">ZipCode</label>
+                        <label asp-for="Input.ZipCode" class="form-label">Zip</label>
                         <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                     </div>
 

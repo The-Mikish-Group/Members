@@ -52,6 +52,8 @@ namespace Members.Areas.Identity.Pages
             MiddleName = string.Empty,
             LastName = string.Empty,
             Birthday = null,
+            HomePhoneNumber = null,
+            Anniversary = null,
             AddressLine1 = string.Empty,
             AddressLine2 = string.Empty,
             City = string.Empty,
@@ -59,15 +61,14 @@ namespace Members.Areas.Identity.Pages
             ZipCode = string.Empty,
             Plot = string.Empty,
             Email = string.Empty,
-            EmailConfirmed = true // Set EmailConfirmed to true by default
+            EmailConfirmed = true
         };
 
         public class InputModel
         {
             [BindProperty(SupportsGet = true)]
             public string? SearchTerm { get; set; }
-            public bool EmailConfirmed { get; set; } = false;
-
+            
             [Required]
             [Display(Name = "FirstName")]
             public required string FirstName { get; set; }
@@ -82,6 +83,10 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
+
+            [Display(Name = "Anniversary")]
+            [DataType(DataType.Date)]
+            public DateTime? Anniversary { get; set; }
 
             [Required]
             [Display(Name = "AddressLine1")]
@@ -108,16 +113,24 @@ namespace Members.Areas.Identity.Pages
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
+
             public required string Email { get; set; }
+            [Display(Name = "Email Confirmed")]
+            public bool EmailConfirmed { get; set; } = false;
 
             [Required]
             [Phone]
-            [Display(Name = "Phone Number")]
+            [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
 
-            [Display(Name = "Phone Number Confirmed")]
+            [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; } = false;
+
+            [Phone]
+            [Display(Name = "Home Phone")]
+            [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
+            public string? HomePhoneNumber { get; set; }
         }
 
         public void OnGet()
@@ -188,7 +201,9 @@ namespace Members.Areas.Identity.Pages
                         FirstName = Input.FirstName,
                         MiddleName = Input.MiddleName,
                         LastName = Input.LastName,
+                        HomePhoneNumber = Input.HomePhoneNumber,
                         Birthday = Input.Birthday,
+                        Anniversary = Input.Anniversary,
                         AddressLine1 = Input.AddressLine1,
                         AddressLine2 = Input.AddressLine2,
                         ZipCode = Input.ZipCode,

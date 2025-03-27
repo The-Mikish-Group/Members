@@ -62,7 +62,8 @@ namespace Members.Areas.Identity.Pages.Account
                 State = string.Empty,
                 ZipCode = string.Empty,
                 Plot = string.Empty,
-                Birthday = null
+                Birthday = null,
+                Anniversary = null
             };
 
             ReturnUrl = string.Empty;
@@ -111,6 +112,11 @@ namespace Members.Areas.Identity.Pages.Account
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
+
+            // Anniversary
+            [Display(Name = "Anniversary")]
+            [DataType(DataType.Date)]
+            public DateTime? Anniversary { get; set; }
 
             // Cell Phone
             [Required]
@@ -198,6 +204,7 @@ namespace Members.Areas.Identity.Pages.Account
                         MiddleName = Input.MiddleName,
                         LastName = Input.LastName,
                         Birthday = Input.Birthday,
+                        Anniversary = Input.Anniversary,
                         HomePhoneNumber = Input.HomePhoneNumber,
                         AddressLine1 = Input.AddressLine1,
                         AddressLine2 = Input.AddressLine2,

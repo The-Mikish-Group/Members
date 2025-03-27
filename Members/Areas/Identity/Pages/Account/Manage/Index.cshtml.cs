@@ -57,6 +57,10 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             [DataType(DataType.Date)]
             public string? Birthday { get; set; }
 
+            [Display(Name = "Anniversary")]
+            [DataType(DataType.Date)]
+            public string? Anniversary { get; set; }
+
             [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
@@ -96,6 +100,7 @@ private async Task LoadAsync(IdentityUser user)
         MiddleName = userProfile?.MiddleName,
         LastName = userProfile?.LastName ?? string.Empty,
         Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
+        Anniversary = userProfile?.Anniversary?.ToString("yyyy-MM-dd") ?? string.Empty,
         AddressLine1 = userProfile?.AddressLine1,
         AddressLine2 = userProfile?.AddressLine2,
         City = userProfile?.City,
@@ -145,23 +150,7 @@ private async Task LoadAsync(IdentityUser user)
             {
                 await LoadAsync(user);
                 return Page();
-            }
-
-            //var phoneNumber = await _userManager.GetPhoneNumberAsync(user);           
-
-            //if (Input.PhoneNumber != phoneNumber)
-            //{
-            //    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-            //    if (!setPhoneResult.Succeeded)
-            //    {   
-            //        foreach (var error in setPhoneResult.Errors)
-            //        {
-            //            Console.WriteLine($"Phone Number Update Error: {error.Code} - {error.Description}");
-            //        }
-            //        StatusMessage = "Unexpected error when trying to set phone number.";
-            //        return RedirectToPage();
-            //    }
-            //}            
+            }                 
 
             // Update UserProfile (This part is independent of the PhoneNumber update)
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
@@ -175,6 +164,7 @@ private async Task LoadAsync(IdentityUser user)
             userProfile.MiddleName = Input.MiddleName;
             userProfile.LastName = Input.LastName;
             userProfile.Birthday = string.IsNullOrEmpty(Input.Birthday) ? (DateTime?)null : DateTime.Parse(Input.Birthday);
+            userProfile.Anniversary = string.IsNullOrEmpty(Input.Anniversary) ? (DateTime?)null : DateTime.Parse(Input.Anniversary);
             userProfile.AddressLine1 = Input.AddressLine1;
             userProfile.AddressLine2 = Input.AddressLine2;
             userProfile.City = Input.City;

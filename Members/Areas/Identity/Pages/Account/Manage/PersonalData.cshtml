@@ -12,23 +12,23 @@
                 <i class="bi bi-person-fill"></i> @ViewData["Title"]
             </h1>
 
-            <p class="text-gold-darker">You can download or delete the personal data associated with your account.</p>
+            <p class="text-gold-darker">You can delete the personal data associated with your account.</p>
 
             <p class="pt-2 text-gold-darker">
                 <strong>Important: Deleting this data will permanently delete your account, and this action cannot be undone.</strong>
             </p>
 
             <div class="d-flex justify-content-center gap-2 mt-4">
-                <form id="download-data" asp-page="DownloadPersonalData" method="post" class="my-0">
+                @* <form id="download-data" asp-page="DownloadPersonalData" method="post" class="my-0">
                     <button class="btn btn-sm btn-primary" type="submit">
                         <i class="bi bi-download"></i> Download
                     </button>
-                </form>
+                </form> *@
 
                 <a id="delete" asp-page="DeletePersonalData" class="btn btn-sm btn-danger">
                     <i class="bi bi-trash-fill"></i> Delete
                 </a>
-                <a href="~/" class="btn btn-sm btn-danger">
+                <a href="~/" class="btn btn-sm btn-success">
                     <i class="bi bi-x-circle"></i> Cancel
                 </a>
             </div>

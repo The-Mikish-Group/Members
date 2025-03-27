@@ -85,6 +85,11 @@ namespace Members.Areas.Identity.Pages
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
 
+            // Anniversary
+            [Display(Name = "Anniversary")]
+            [DataType(DataType.Date)]
+            public DateTime? Anniversary { get; set; }
+
             // Address - AddressLine1, AddressLine2, City, State, ZipCode
             // [Required]
             [Display(Name = "Address Line 1")]
@@ -128,6 +133,7 @@ namespace Members.Areas.Identity.Pages
                 MiddleName = userProfile?.MiddleName,
                 LastName = userProfile?.LastName ?? string.Empty,
                 Birthday = userProfile?.Birthday,
+                Anniversary = userProfile?.Anniversary,
                 AddressLine1 = userProfile?.AddressLine1 ?? string.Empty,
                 AddressLine2 = userProfile?.AddressLine2,
                 City = userProfile?.City ?? string.Empty,
@@ -204,6 +210,7 @@ namespace Members.Areas.Identity.Pages
                 userProfile.MiddleName = Input.MiddleName;
                 userProfile.LastName = Input.LastName;
                 userProfile.Birthday = Input.Birthday;
+                userProfile.Anniversary = Input.Anniversary;
                 userProfile.AddressLine1 = Input.AddressLine1;
                 userProfile.AddressLine2 = Input.AddressLine2;
                 userProfile.City = Input.City;
