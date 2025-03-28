@@ -61,7 +61,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered" data-search-term="@Model.SearchTerm">
+            <table class="table table-striped table-bordered" data-search-term="@Model.SearchTerm" id="userTable">
                 <thead>
                     <tr>
                         <th>
@@ -244,14 +244,21 @@ else
             setTimeout(updateUserCount, 100);
         });
 
-        // Add click event listener to each table row
-        tableRows.forEach(row => {
-            row.addEventListener('click', function() {
-                const userId = this.dataset.userId;
-                // Retrieve the searchTerm from the table's data attribute
-                const searchTerm = userTable.dataset.searchTerm || '';
-                window.location.href = `/Identity/EditUser?id=${userId}&searchTerm=${searchTerm}`;
-            });
+        document.addEventListener('DOMContentLoaded', function () {
+            const userTable = document.getElementById('userTable'); // Assuming your table has this ID
+            if (userTable) {
+                const tableRows = userTable.querySelectorAll('tbody tr.user-row'); // Get all rows in the table body
+
+                tableRows.forEach(row => {
+                    row.addEventListener('click', function () {
+                        const userId = this.dataset.userId;
+                        const searchTerm = userTable.dataset.searchTerm || ''; // If you have search functionality
+                        const currentUrl = window.location.pathname + window.location.search;
+                        window.location.href = `/Identity/EditUser?id=${userId}&searchTerm=${searchTerm}&returnUrl=${encodeURIComponent(currentUrl)}`;
+                    });
+                });
+            }
         });
+
     </script>
 }

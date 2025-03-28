@@ -86,6 +86,7 @@
 
                     @Html.AntiForgeryToken()
 
+                    <input type="hidden" asp-for="ReturnUrl" />
                     <input type="hidden" asp-for="Input.Id" />
                     <input type="hidden" asp-for="Input.UserName" />
                     <input type="hidden" asp-for="Input.Email" id="hiddenEmail" />

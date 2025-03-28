@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Members.Data; 
-using Members.Models; 
+using Members.Data;
+using Members.Models;
 
 namespace Members.Areas.Identity.Pages
 {
@@ -16,6 +16,9 @@ namespace Members.Areas.Identity.Pages
 
         [BindProperty]
         public required InputModel Input { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
@@ -52,7 +55,7 @@ namespace Members.Areas.Identity.Pages
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
- 
+
             // Cell Phone Confirmed
             public bool PhoneNumberConfirmed { get; set; }
 
@@ -168,7 +171,7 @@ namespace Members.Areas.Identity.Pages
             }
 
             // Store the search term from the query string
-            SearchTerm = searchTerm; 
+            SearchTerm = searchTerm;
             return Page();
         }
 
@@ -176,14 +179,7 @@ namespace Members.Areas.Identity.Pages
         {
             if (!ModelState.IsValid)
             {
-                // Something is wrong with the model state
-                foreach (var modelStateValue in ModelState.Values)
-                {
-                    foreach (var error in modelStateValue.Errors)
-                    {
-                        Console.WriteLine($"Model Error: {error.ErrorMessage}");
-                    }
-                }
+                // If ModelState is not valid, redisplay the form
                 return Page();
             }
 
@@ -227,24 +223,14 @@ namespace Members.Areas.Identity.Pages
                 // Save changes to UserProfile
                 await _dbContext.SaveChangesAsync();
 
-                // Send Emails
+                // Send Emails (Password Reset and Email Confirmation)
                 if (result.Succeeded && !string.IsNullOrEmpty(Input.NewPassword))
                 {
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                     var passwordResult = await _userManager.ResetPasswordAsync(user, token, Input.NewPassword);
 
-                    // Send new password in email (avoid using...  a last resort passowrd assignment)
-                    if (passwordResult.Succeeded)
+                    if (!passwordResult.Succeeded)
                     {
-                        await _emailSender.SendEmailAsync(
-                            Input.Email,
-                            "Your New Password",
-                            $"Your email is: {Input.Email} and your new Password is: {Input.NewPassword}"
-                        );
-                    }
-                    else
-                    {
-                        // Something didn't work with the password reset
                         foreach (var error in passwordResult.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
@@ -253,44 +239,43 @@ namespace Members.Areas.Identity.Pages
                     }
                 }
 
-                // Send email confirmation if the email was confirmed
-                if (result.Succeeded)
+                if (result.Succeeded && !originalEmailConfirmed && Input.EmailConfirmed)
                 {
-                    if (!originalEmailConfirmed && Input.EmailConfirmed)
+                    var roles = await _userManager.GetRolesAsync(user);
+                    bool isMember = roles.Contains("Member");
+                    string approvalMessage = "";
+                    if (!isMember)
                     {
-                        var roles = await _userManager.GetRolesAsync(user);
-                        bool isMember = roles.Contains("Member");
-                        string approvalMessage = "";
-                        if (!isMember)
-                        {
-                            approvalMessage = "<p>Please note that we are still waiting for final Manager approval which may take up to 24 hours.</p>";
-                        }
-
-                        await _emailSender.SendEmailAsync(
-                            Input.Email,
-                            "Email Confirmed",
-                            $"<html><body><p>Your <strong>email account</strong> has been confirmed...</p>{approvalMessage}</body></html>"
-                        );
+                        approvalMessage = "<p>Please note that we are still waiting for final Manager approval which may take up to 24 hours.</p>";
                     }
 
-                    // Redirect back to the Users page, preserving the search term only if it exists
+                    await _emailSender.SendEmailAsync(
+                        Input.Email,
+                        "Email Confirmed",
+                        $"<html><body><p>Your <strong>email account</strong> has been confirmed...</p>{approvalMessage}</body></html>"
+                    );
+                }
+
+                // Corrected Redirection Logic:
+                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                {
+                    return Redirect(ReturnUrl);
+                }
+                else
+                {
+                    // If ReturnUrl is missing or invalid, fall back to the appropriate page
                     if (!string.IsNullOrEmpty(searchTerm))
                     {
-                        return RedirectToPage("./Users", new { SearchTerm = searchTerm });
+                        return RedirectToPage("./UsersGrid", new { SearchTerm = searchTerm }); // Redirect to UsersGrid with searchTerm
                     }
                     else
                     {
-                        return RedirectToPage("./Users"); // Redirect without the search term.
+                        return RedirectToPage("./UsersGrid"); // Redirect to UsersGrid without searchTerm
                     }
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            return Page();
+            return Page(); // Should not reach here in a successful scenario, but handle the case where user is not found
         }
     }
 }
