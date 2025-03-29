@@ -92,7 +92,14 @@ namespace Members.Areas.Identity.Pages
                             user.Email,
                             "Welcome! Your Oaks-Village Account is ready to use!",
                             "You have been granted Member access and " +
-                            "can log in to https://oaks-village.com.<br /><br />Thank you from the <strong>Oaks-Village HOA</strong>"
+                            "can log in to https://oaks-village.com.<br /><br />"+
+                            "If this Account was automatically generated for you, "+
+                            "Please use the <a href=https://oaks-village.com/Identity/Account/ForgotPassword><strong>Forgot your Password</strong> "+
+                            "link to create your password. <br><br>"+
+                            "You will be asked for your email address so a link to "+
+                            "complete the process can be sent to you.<br><br>" +
+                            "Thank you from the <strong>Oaks-Village HOA</strong>"
+
                         );
                     }
                 }

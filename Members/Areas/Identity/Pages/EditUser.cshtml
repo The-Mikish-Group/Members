@@ -287,153 +287,162 @@
 </div>
 
 @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const hiddenEmail = document.getElementById('hiddenEmail');
-                const editForm = document.getElementById('editForm');
-                const emailConfirmedCheckbox = document.getElementById('emailConfirmedCheckbox');
-                const emailCheckIcon = document.getElementById('emailCheckIcon');
-                const phoneNumberInput = document.getElementById('phoneNumber');
-                const homephoneNumberInput = document.getElementById('homephoneNumber');
-                const phoneNumberConfirmedCheckbox = document.getElementById('PhoneNumberConfirmedCheckbox');
-                const phoneNumberCheckIcon = document.getElementById('phoneNumberCheckIcon');
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hiddenEmail = document.getElementById('hiddenEmail');
+            const editForm = document.getElementById('editForm');
+            const emailConfirmedCheckbox = document.getElementById('emailConfirmedCheckbox');
+            const emailCheckIcon = document.getElementById('emailCheckIcon');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const homephoneNumberInput = document.getElementById('homephoneNumber');
+            const phoneNumberConfirmedCheckbox = document.getElementById('PhoneNumberConfirmedCheckbox');
+            const phoneNumberCheckIcon = document.getElementById('phoneNumberCheckIcon');
 
-                // Get references to the input fields for capitalization
-                const firstNameInput = document.getElementById('Input_FirstName');
-                const middleNameInput = document.getElementById('Input_MiddleName');
-                const lastNameInput = document.getElementById('Input_LastName');
-                const cityInput = document.getElementById('Input_City');
-                const stateInput = document.getElementById('Input_State');
+            // Get references to the input fields for capitalization
+            const firstNameInput = document.getElementById('Input_FirstName');
+            const middleNameInput = document.getElementById('Input_MiddleName');
+            const lastNameInput = document.getElementById('Input_LastName');
+            const cityInput = document.getElementById('Input_City');
+            const stateInput = document.getElementById('Input_State');
 
-                // Function to format phone number as (XXX) XXX-XXXX
-                function formatPhoneNumber(input) {
-                    const cleaned = ('' + input.value).replace(/\D/g, '');
-                    let formatted = '';
-                    if (cleaned.length > 0) {
-                        formatted = '(' + cleaned.substring(0, 3);
-                        if (cleaned.length > 3) {
-                            formatted += ') ' + cleaned.substring(3, 6);
-                        }
-                        if (cleaned.length > 6) {
-                            formatted += '-' + cleaned.substring(6, 10);
-                        }
+            // Function to format phone number as (XXX) XXX-XXXX
+            function formatPhoneNumber(input) {
+                const cleaned = ('' + input.value).replace(/\D/g, '');
+                let formatted = '';
+                if (cleaned.length > 0) {
+                    formatted = '(' + cleaned.substring(0, 3);
+                    if (cleaned.length > 3) {
+                        formatted += ') ' + cleaned.substring(3, 6);
                     }
-                    input.value = formatted;
-                }
-
-                // Add event listener to format the Cell Phone number
-                if (phoneNumberInput) {
-                    phoneNumberInput.addEventListener('input', function() {
-                        formatPhoneNumber(this);
-                    });
-                }
-
-                // Add event listener to format the Home Phone number
-                if (homephoneNumberInput) {
-                    homephoneNumberInput.addEventListener('input', function() {
-                        formatPhoneNumber(this);
-                    });
-                }
-
-                // Function to toggle the visibility of the email check icon
-                function toggleEmailCheckIcon() {
-                    if (emailCheckIcon && emailConfirmedCheckbox) {
-                        emailCheckIcon.style.display = emailConfirmedCheckbox.checked ? 'block' : 'none';
+                    if (cleaned.length > 6) {
+                        formatted += '-' + cleaned.substring(6, 10);
                     }
                 }
+                input.value = formatted;
+            }
 
-                // Set initial visibility on page load for email
-                toggleEmailCheckIcon();
-
-                // Add event listener to the email checkbox
-                if (emailConfirmedCheckbox) {
-                    emailConfirmedCheckbox.addEventListener('change', toggleEmailCheckIcon);
-                } else {
-                    console.error("emailConfirmedCheckbox element not found!");
-                }
-
-                // Function to toggle the visibility of the PhoneNumber check icon
-                function togglePhoneNumberCheckIcon() {
-                    if (phoneNumberCheckIcon && phoneNumberConfirmedCheckbox) {
-                        phoneNumberCheckIcon.style.display = phoneNumberConfirmedCheckbox.checked ? 'block' : 'none';
-                    }
-                }
-
-                // Set initial visibility on page load for phone number
-                togglePhoneNumberCheckIcon();
-
-                // Add event listener to the phone number checkbox
-                if (phoneNumberConfirmedCheckbox) {
-                    phoneNumberConfirmedCheckbox.addEventListener('change', togglePhoneNumberCheckIcon);
-                } else {
-                    console.error("PhoneNumberConfirmedCheckbox element not found!");
-                }
-
-                // Control PhoneNumberConfirmed based on PhoneNumber input
-                if (phoneNumberInput && phoneNumberConfirmedCheckbox) {
-                    function updatePhoneNumberConfirmedState() {
-                        const phoneNumberValue = phoneNumberInput.value.trim().replace(/\D/g, '');
-                        phoneNumberConfirmedCheckbox.disabled = phoneNumberValue === '';
-                        if (phoneNumberValue === '') {
-                            phoneNumberConfirmedCheckbox.checked = false; // Optionally uncheck if phone is empty
-                            if (phoneNumberCheckIcon) {
-                                phoneNumberCheckIcon.style.display = 'none'; // Hide the icon if unchecked
-                            }
-                        } else {
-                            phoneNumberConfirmedCheckbox.disabled = false; // Enable if there's a value
-                        }
-                    }
-
-                    // Call on page load to set initial state
-                    updatePhoneNumberConfirmedState();
-
-                    // Add event listener for input changes to the phone number field
-                    phoneNumberInput.addEventListener('input', updatePhoneNumberConfirmedState);
-                }
-
-                // Function to capitalize the first letter of a string and keep the rest as typed
-                function capitalizeFirstLetterAsTyping(input) {
-                    if (input.value.length > 0) {
-                        input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1);
-                    }
-                }
-
-                // Add event listeners to capitalize the first letter on input
-                if (firstNameInput) {
-                    firstNameInput.addEventListener('input', function() {
-                        capitalizeFirstLetterAsTyping(this);
-                    });
-                }
-
-                if (middleNameInput) {
-                    middleNameInput.addEventListener('input', function() {
-                        capitalizeFirstLetterAsTyping(this);
-                    });
-                }
-
-                if (lastNameInput) {
-                    lastNameInput.addEventListener('input', function() {
-                        capitalizeFirstLetterAsTyping(this);
-                    });
-                }
-
-                if (cityInput) {
-                    cityInput.addEventListener('input', function() {
-                        capitalizeFirstLetterAsTyping(this);
-                    });
-                }
-
-                if (stateInput) {
-                    stateInput.addEventListener('input', function() {
-                        capitalizeFirstLetterAsTyping(this);
-                    });
-                }
-
-                editForm.addEventListener('submit', function () {
-                    // Email is now displayed in a span, so we get the text from there
-                    hiddenEmail.value = document.querySelector('.email-display').textContent;
+            // Add event listener to format the Cell Phone number on input and paste
+            if (phoneNumberInput) {
+                phoneNumberInput.addEventListener('input', function() {
+                    formatPhoneNumber(this);
                 });
+                phoneNumberInput.addEventListener('paste', function() {
+                    // Use setTimeout to format after the paste operation completes
+                    setTimeout(() => formatPhoneNumber(this), 0);
+                });
+            }
+
+            // Add event listener to format the Home Phone number on input and paste
+            if (homephoneNumberInput) {
+                homephoneNumberInput.addEventListener('input', function() {
+                    formatPhoneNumber(this);
+                });
+                homephoneNumberInput.addEventListener('paste', function() {
+                    // Use setTimeout to format after the paste operation completes
+                    setTimeout(() => formatPhoneNumber(this), 0);
+                });
+            }
+
+            // Function to toggle the visibility of the email check icon
+            function toggleEmailCheckIcon() {
+                if (emailCheckIcon && emailConfirmedCheckbox) {
+                    emailCheckIcon.style.display = emailConfirmedCheckbox.checked ? 'block' : 'none';
+                }
+            }
+
+            // Set initial visibility on page load for email
+            toggleEmailCheckIcon();
+
+            // Add event listener to the email checkbox
+            if (emailConfirmedCheckbox) {
+                emailConfirmedCheckbox.addEventListener('change', toggleEmailCheckIcon);
+            } else {
+                console.error("emailConfirmedCheckbox element not found!");
+            }
+
+            // Function to toggle the visibility of the PhoneNumber check icon
+            function togglePhoneNumberCheckIcon() {
+                if (phoneNumberCheckIcon && phoneNumberConfirmedCheckbox) {
+                    phoneNumberCheckIcon.style.display = phoneNumberConfirmedCheckbox.checked ? 'block' : 'none';
+                }
+            }
+
+            // Set initial visibility on page load for phone number
+            togglePhoneNumberCheckIcon();
+
+            // Add event listener to the phone number checkbox
+            if (phoneNumberConfirmedCheckbox) {
+                phoneNumberConfirmedCheckbox.addEventListener('change', togglePhoneNumberCheckIcon);
+            } else {
+                console.error("PhoneNumberConfirmedCheckbox element not found!");
+            }
+
+            // Control PhoneNumberConfirmed based on PhoneNumber input
+            if (phoneNumberInput && phoneNumberConfirmedCheckbox) {
+                function updatePhoneNumberConfirmedState() {
+                    const phoneNumberValue = phoneNumberInput.value.trim().replace(/\D/g, '');
+                    phoneNumberConfirmedCheckbox.disabled = phoneNumberValue === '';
+                    if (phoneNumberValue === '') {
+                        phoneNumberConfirmedCheckbox.checked = false; // Optionally uncheck if phone is empty
+                        if (phoneNumberCheckIcon) {
+                            phoneNumberCheckIcon.style.display = 'none'; // Hide the icon if unchecked
+                        }
+                    } else {
+                        phoneNumberConfirmedCheckbox.disabled = false; // Enable if there's a value
+                    }
+                }
+
+                // Call on page load to set initial state
+                updatePhoneNumberConfirmedState();
+
+                // Add event listener for input changes to the phone number field
+                phoneNumberInput.addEventListener('input', updatePhoneNumberConfirmedState);
+            }
+
+            // Function to capitalize the first letter of a string and keep the rest as typed
+            function capitalizeFirstLetterAsTyping(input) {
+                if (input.value.length > 0) {
+                    input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1);
+                }
+            }
+
+            // Add event listeners to capitalize the first letter on input
+            if (firstNameInput) {
+                firstNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (middleNameInput) {
+                middleNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (lastNameInput) {
+                lastNameInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (cityInput) {
+                cityInput.addEventListener('input', function() {
+                    capitalizeFirstLetterAsTyping(this);
+                });
+            }
+
+            if (stateInput) {
+                stateInput.addEventListener('input', function() {
+                    // Limit to two characters and convert to uppercase for state
+                    this.value = this.value.substring(0, 2).toUpperCase();
+                });
+            }
+
+            editForm.addEventListener('submit', function () {
+                // Email is now displayed in a span, so we get the text from there
+                hiddenEmail.value = document.querySelector('.email-display').textContent;
             });
-        </script>
+        });
+    </script>
 }

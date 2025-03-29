@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Members.Areas.Identity.Pages
 {
-    public class UsersGridModel(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext) : PageModel
+    
+    public class MembersGridModel(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext) : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ApplicationDbContext _dbContext = dbContext;
-
         public class UserModel
         {
             public required string Id { get; set; }
@@ -24,9 +24,9 @@ namespace Members.Areas.Identity.Pages
             public required string Email { get; set; }
             public bool EmailConfirmed { get; set; }
             public string? PhoneNumber { get; set; }
-            public bool PhoneNumberConfirmed { get; set; }           
+            public bool PhoneNumberConfirmed { get; set; }
             public string? HomePhoneNumber { get; set; }
-            public string? FirstName { get; set; } 
+            public string? FirstName { get; set; }
             public string? MiddleName { get; set; }
             public string? LastName { get; set; }
             public string? AddressLine1 { get; set; }
@@ -73,7 +73,7 @@ namespace Members.Areas.Identity.Pages
                 string? birthday = null;
                 string? anniversary = null;
                 string? homePhoneNumber = null;
-               
+
                 if (userProfile != null)
                 {
                     fullName = $"{userProfile.FirstName} {(string.IsNullOrEmpty(userProfile.MiddleName) ? "" : userProfile.MiddleName + " ")}{userProfile.LastName}".Trim();
@@ -88,7 +88,7 @@ namespace Members.Areas.Identity.Pages
                     zipCode = userProfile.ZipCode;
                     plot = userProfile.Plot;
                     birthday = userProfile.Birthday?.ToString("yyyy-MM-dd");
-                    anniversary = userProfile.Anniversary?.ToString("yyyy-MM-dd");                    
+                    anniversary = userProfile.Anniversary?.ToString("yyyy-MM-dd");
                 }
 
                 Users.Add(new UserModel
@@ -98,7 +98,7 @@ namespace Members.Areas.Identity.Pages
                     Email = user.Email ?? string.Empty,
                     EmailConfirmed = user.EmailConfirmed,
                     PhoneNumber = user.PhoneNumber, // Get the PhoneNumber from IdentityUser
-                    PhoneNumberConfirmed = user.PhoneNumberConfirmed,                    
+                    PhoneNumberConfirmed = user.PhoneNumberConfirmed,
                     Roles = roles,
                     FullName = fullName ?? "No Info",
                     FirstName = firstName,
@@ -136,8 +136,8 @@ namespace Members.Areas.Identity.Pages
                     Users = [.. Users.Where(u =>
                         u.UserName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.Email.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                        u.PhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true || 
-                        u.HomePhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true || 
+                        u.PhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true ||
+                        u.HomePhoneNumber?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) == true ||
                         u.FullName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.FirstName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.MiddleName?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
@@ -149,11 +149,13 @@ namespace Members.Areas.Identity.Pages
                         u.ZipCode?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.Plot?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.Birthday?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
-                        u.Anniversary?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||                                              
+                        u.Anniversary?.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase) == true ||
                         u.Roles != null && u.Roles.Any(r => r.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
                     )];
                 }
             }
+
+
 
             // Sorting
             if (!string.IsNullOrEmpty(SortColumn))

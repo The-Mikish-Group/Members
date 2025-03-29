@@ -9,7 +9,6 @@ using Members.Models; // Add this to access UserProfile
 
 var builder = WebApplication.CreateBuilder(args);
 
-// *** START: Your existing builder configuration (replace this comment block) ***
 // Retrieve connection string from environment variables
 string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER")!;
 string DB_USER = Environment.GetEnvironmentVariable("DB_USER")!;
@@ -41,14 +40,13 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 // Register IEmailSender and EmailService
 builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddTransient<EmailService>();
-
+builder.Services.AddScoped<UserService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 // *** END: Your existing builder configuration (replace this comment block) ***
 
 var app = builder.Build();
 
-// *** START: Your existing app configuration (replace this comment block) ***
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -70,7 +68,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 app.MapRazorPages()
     .WithStaticAssets();
-// *** END: Your existing app configuration (replace this comment block) ***
+
 
 // Create the Roles if they have been deleted.
 using (var scope = app.Services.CreateScope())
@@ -153,7 +151,7 @@ using (var scope = app.Services.CreateScope())
             State = "FL",
             ZipCode = "33825",
             HomePhoneNumber = "(217) 371-8041",
-            User = adminUser // Set the required User property
+            User = adminUser 
         };
         dbContext.UserProfile.Add(adminProfile);
     }
