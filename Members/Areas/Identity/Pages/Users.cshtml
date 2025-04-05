@@ -160,6 +160,22 @@
                                 }
                             </a>
                         </th>
+                        <th>
+                            <a class="nav-link" asp-page="./Users" asp-route-sortcolumn="lastlogin" asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastlogin" ? "desc" : "asc")" asp-route-searchterm="@Model.SearchTerm">
+                                Last Login
+                                @if (Model.SortColumn == "lastlogin")
+                                {
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        @Html.Raw("&#9650;")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw("&#9660;")
+                                    }
+                                }
+                            </a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -186,6 +202,9 @@
                                         <br />
                                     }
                                 }
+                            </td>
+                            <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                                @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC") <!-- Optional: Display UTC as fallback -->
                             </td>
                         </tr>
                     }
@@ -258,6 +277,20 @@ else
                     });
                 });
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const lastLoginElements = document.querySelectorAll('.local-login-time');
+
+            lastLoginElements.forEach(function (element) {
+                const utcTimeString = element.getAttribute('data-utc-time');
+                if (utcTimeString) {
+                    const utcDate = new Date(utcTimeString);
+                    element.textContent = utcDate.toLocaleString(); // Formats to the user's local time
+                } else {
+                    element.textContent = 'Never'; // Or any other default text
+                }
+            });
         });
 
     </script>

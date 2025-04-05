@@ -1,19 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+using Members.Data; // Add using for ApplicationDbContext
+using Members.Models; // Add using for UserProfile
 
 namespace Members.Areas.Identity.Pages.Account
 {
-    public class LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger) : PageModel
+    public class LoginModel(
+        SignInManager<IdentityUser> signInManager,
+        ILogger<LoginModel> logger,
+        UserManager<IdentityUser> userManager, // Inject UserManager
+        ApplicationDbContext dbContext) : PageModel // Inject ApplicationDbContext
     {
         private readonly SignInManager<IdentityUser> _signInManager = signInManager;
         private readonly ILogger<LoginModel> _logger = logger;
+        private readonly UserManager<IdentityUser> _userManager = userManager; // Inject UserManager
+        private readonly ApplicationDbContext _dbContext = dbContext; // Inject ApplicationDbContext
 
         [BindProperty]
         public required InputModel Input { get; set; }
@@ -65,6 +70,27 @@ namespace Members.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // Get the logged-in user
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if (user != null)
+                    {
+                        // Find the corresponding UserProfile
+                        var userProfile = await _dbContext.UserProfile
+                            .FindAsync(user.Id); // Assuming UserId is the primary key in UserProfile
+
+                        if (userProfile != null)
+                        {
+                            // Update the LastLogin field
+                            userProfile.LastLogin = DateTime.UtcNow;
+                            await _dbContext.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            _logger.LogWarning("UserProfile not found for user");
+                            // Consider if you want to create a UserProfile here if it doesn't exist
+                        }
+                    }
 
                     // Use returnUrl if provided, otherwise default to Info/Index
                     if (Url.IsLocalUrl(returnUrl))

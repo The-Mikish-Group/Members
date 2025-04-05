@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
@@ -16,7 +13,7 @@ namespace Members.Areas.Identity.Pages
     {
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-        private readonly IEmailSender _emailSender = emailSender; // Add this field
+        private readonly IEmailSender _emailSender = emailSender;
 
         [BindProperty]
         public required string UserId { get; set; }

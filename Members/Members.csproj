@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Identity\Pages\EditRoles.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\EditUsers.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\ViewPdf old.cshtml.cs" />
     <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />
@@ -50,6 +51,7 @@
 
   <ItemGroup>
     <Content Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
+    <Content Remove="Areas\Identity\Pages\EditRoles.cshtml" />
     <Content Remove="Areas\Identity\Pages\EditUsers.cshtml" />
     <Content Remove="Areas\Identity\Pages\ViewPdf old.cshtml" />
     <Content Remove="Views\Home\xMembers.cshtml" />
@@ -117,64 +119,64 @@
 
   <ItemGroup>
     <None Update="ProtectedFiles\Directory March 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Directory.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Miscellaneous Information.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Agenda 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Bits and Pieces.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Assessment Fee Covers.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Budget Report 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Directory Jan 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Minutes 2025-02-19.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Financial Report Feb 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Financial Report Jan 2025.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Pool Rules.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Welcome Letter.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\First Amendment to Covenants.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Architectual Standards August 2024 Additions.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Oaks Village Deed Restrictions.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Architectual Standards 4th Revision.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Pet Rules.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Regulations for Generators.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Clubhouse Use Rules.pdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

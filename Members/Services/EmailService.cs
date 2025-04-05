@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
@@ -57,11 +58,11 @@ namespace Members.Services
             {
                 using var client = new SmtpClient(_smtpHost, _smtpPort);
                 client.Credentials = new NetworkCredential(_smtpUser, _smtpPassword);
-                //client.EnableSsl = _enableSsl;
+                client.EnableSsl = _enableSsl;
 
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(_smtpUser),
+                    From = new MailAddress(_smtpUser),   
                     Subject = subject,
                     Body = htmlMessage,
                     IsBodyHtml = true

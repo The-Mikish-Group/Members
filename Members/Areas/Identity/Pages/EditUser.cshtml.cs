@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5,12 +6,22 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Members.Data;
 using Members.Models;
+//using Microsoft.AspNetCore.Routing;
+//using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+//using Mono.TextTemplating;
+//using System.Reflection.Emit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Members.Areas.Identity.Pages
 {
-    public class EditUserModel(UserManager<IdentityUser> userManager, IEmailSender emailSender, ApplicationDbContext dbContext) : PageModel
+    public class EditUserModel(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender, ApplicationDbContext dbContext) : PageModel
     {
+        
         private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IEmailSender _emailSender = emailSender;
         private readonly ApplicationDbContext _dbContext = dbContext;
 
@@ -23,7 +34,18 @@ namespace Members.Areas.Identity.Pages
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
-        public required string StatusMessage { get; set; }
+
+        public required string StatusMessage { get; set; }        
+
+        [BindProperty]
+        public List<RoleViewModel> AllRoles { get; set; } = [];    
+
+        public class RoleViewModel
+        {
+            public required string Value { get; set; }
+            public required string Text { get; set; }
+            public bool Selected { get; set; }
+        }
 
         public class InputModel
         {
@@ -110,6 +132,9 @@ namespace Members.Areas.Identity.Pages
             // Plot Identifier.
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
+
+            public bool ModelState {get; set; }
+
         }
 
         private async Task LoadUserAsync(IdentityUser user)
@@ -172,17 +197,21 @@ namespace Members.Areas.Identity.Pages
 
             // Store the search term from the query string
             SearchTerm = searchTerm;
+
+            var roles = await _roleManager.Roles.ToListAsync();
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            AllRoles = roles.Select(role => new RoleViewModel
+            {
+                Value = role.Name ?? string.Empty,
+                Text = role.Name ?? string.Empty,
+                Selected = userRoles.Contains(role.Name ?? string.Empty)
+            }).ToList();
+
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync(string? searchTerm)
         {
-            if (!ModelState.IsValid)
-            {
-                // If ModelState is not valid, redisplay the form
-                return Page();
-            }
-
             var user = await _userManager.FindByIdAsync(Input.Id);
 
             if (user != null)
@@ -222,60 +251,107 @@ namespace Members.Areas.Identity.Pages
 
                 // Save changes to UserProfile
                 await _dbContext.SaveChangesAsync();
+            }
 
-                // Send Emails (Password Reset and Email Confirmation)
-                if (result.Succeeded && !string.IsNullOrEmpty(Input.NewPassword))
+            // Update User Roles
+            user = await _userManager.FindByIdAsync(Input.Id);
+            if (user != null)
+            {
+                var originalRoles = await _userManager.GetRolesAsync(user);
+
+                var selectedRoles = AllRoles?.Where(r => r.Selected).Select(r => r.Value ?? string.Empty).ToList() ?? [];
+
+                await _userManager.RemoveFromRolesAsync(user, originalRoles);
+                var addRolesResult = await _userManager.AddToRolesAsync(user, selectedRoles);
+
+                if (!addRolesResult.Succeeded)
                 {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var passwordResult = await _userManager.ResetPasswordAsync(user, token, Input.NewPassword);
-
-                    if (!passwordResult.Succeeded)
+                    foreach (var error in addRolesResult.Errors)
                     {
-                        foreach (var error in passwordResult.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    await PopulateUserDataAndRoles(user);
+                    return Page(); // Stay on the Edit page with errors
+                }
+
+                // --- Integrated Email Sending Logic Here ---
+                if (user.EmailConfirmed && selectedRoles.Contains("Member") && !originalRoles.Contains("Member"))
+                {
+                    if (!string.IsNullOrEmpty(user.Email))
+                    {
+                        await _emailSender.SendEmailAsync(
+                            user.Email,
+                            "Welcome! Your Oaks-Village Account is ready to use!",
+                            "You have been granted Member access and " +
+                            "can log in to https://oaks-village.com.<br /><br /><br />" +
+                            "If this Account was automatically generated for you, " +
+                            "Please use the <a href=https://oaks-village.com/Identity/Account/ForgotPassword></strong>Forgot your Password</strong> " +
+                            "link to create your password. <br><br>" +
+                            "You will be asked for your email address so a link to " +
+                            "complete the process can be sent to you.<br><br>" +
+                            "Thank you from the <strong>Oaks-Village HOA</strong>"
+                        );
+                    }
+                }
+                else if (!user.EmailConfirmed && selectedRoles.Contains("Member") && !originalRoles.Contains("Member"))
+                {
+                    if (!string.IsNullOrEmpty(user.Email))
+                    {
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId, code },
+                            protocol: Request.Scheme);
+
+                        if (callbackUrl != null)
                         {
-                            ModelState.AddModelError(string.Empty, error.Description);
+                            await _emailSender.SendEmailAsync(
+                                user.Email,
+                                "Confirm Your Email to complete your registration",
+                                $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'><strong>clicking here</strong></a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
+                            );
                         }
-                        return Page();
                     }
                 }
 
-                if (result.Succeeded && !originalEmailConfirmed && Input.EmailConfirmed)
-                {
-                    var roles = await _userManager.GetRolesAsync(user);
-                    bool isMember = roles.Contains("Member");
-                    string approvalMessage = "";
-                    if (!isMember)
-                    {
-                        approvalMessage = "<p>Please note that we are still waiting for final Manager approval which may take up to 24 hours.</p>";
-                    }
-
-                    await _emailSender.SendEmailAsync(
-                        Input.Email,
-                        "Email Confirmed",
-                        $"<html><body><p>Your <strong>email account</strong> has been confirmed...</p>{approvalMessage}</body></html>"
-                    );
-                }
-
-                // Corrected Redirection Logic:
+                // Redirection Logic:
                 if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                 {
                     return Redirect(ReturnUrl);
+
                 }
                 else
                 {
                     // If ReturnUrl is missing or invalid, fall back to the appropriate page
                     if (!string.IsNullOrEmpty(searchTerm))
                     {
-                        return RedirectToPage("./UsersGrid", new { SearchTerm = searchTerm }); // Redirect to UsersGrid with searchTerm
+                        return RedirectToPage("./Users", new { SearchTerm = searchTerm }); // Redirect to UsersGrid with searchTerm
                     }
                     else
                     {
-                        return RedirectToPage("./UsersGrid"); // Redirect to UsersGrid without searchTerm
+                        return RedirectToPage("./Users"); // Redirect to UsersGrid without searchTerm
                     }
                 }
             }
 
-            return Page(); // Should not reach here in a successful scenario, but handle the case where user is not found
+            //return NotFound($"Unable to load user with ID '{Input.Id}'.");
+            return Page();
+        }
+        
+        private async Task PopulateUserDataAndRoles(IdentityUser user)
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            AllRoles = [.. roles.Select(role => new RoleViewModel
+            {
+                Value = role.Name ?? string.Empty,
+                Text = role.Name ?? string.Empty,
+                Selected = userRoles.Contains(role.Name ?? string.Empty)
+            })];
         }
     }
 }
