@@ -277,7 +277,7 @@ namespace Members.Areas.Identity.Pages.Account
                                 "    </ul>" +
                                 "    <p style=\"margin-bottom: 1em;\">Please log in to the administration panel to review the new member's profile and assign the appropriate role.</p>" +
                                 "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                "    <p style=\"margin-top: 0;\">Oaks-Village HOA System</p>" +
+                                "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                 "</body>" +
                                 "</html>";
 
