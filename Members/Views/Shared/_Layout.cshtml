@@ -136,8 +136,10 @@
                                 <i class="bi bi-people-fill"></i> Members
                             </a>
                             <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="membersDropdown" style="min-width: 210px;">
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberDocuments"><i class="bi bi-file-earmark-text-fill"></i> Documents</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberDocumentsStatic"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Directory and Reports</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Directory"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Directory</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Documents"><i class="bi bi-file-earmark-text-fill"></i> Documents</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Financials"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Financials</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Minutes"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Minutes</a></li>
                                 <li><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank"><i class="bi bi-newspaper"></i> News and Notices</a></li>
                             </ul>
                         </li>
@@ -273,12 +275,21 @@
                             </a>
 
                             <ul class="dropdown-menu ps-4 py-0 bg-gold-footer border-0" aria-labelledby="membersDropdown">
+
                                 <li class="nav-item text-light">
-                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="MemberDocuments">Documents</a>
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="Directory">Directory</a>
                                 </li>
 
                                 <li class="nav-item text-light">
-                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="MemberDocumentsStatic">Directory / Reports</a>
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="Documents">Documents</a>
+                                </li>
+
+                                <li class="nav-item text-light">
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="Financials">Financials</a>
+                                </li>
+                                
+                                <li class="nav-item text-light">
+                                    <a class="nav-link nav-link-footer-fs" asp-area="" asp-controller="Home" asp-action="Minutes">Minutes</a>
                                 </li>
 
                                 <li class="nav-item text-light">

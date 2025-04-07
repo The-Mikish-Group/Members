@@ -201,12 +201,12 @@ namespace Members.Areas.Identity.Pages
             var roles = await _roleManager.Roles.ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            AllRoles = roles.Select(role => new RoleViewModel
+            AllRoles = [.. roles.Select(role => new RoleViewModel
             {
                 Value = role.Name ?? string.Empty,
                 Text = role.Name ?? string.Empty,
                 Selected = userRoles.Contains(role.Name ?? string.Empty)
-            }).ToList();
+            })];
 
             return Page();
         }
@@ -281,15 +281,32 @@ namespace Members.Areas.Identity.Pages
                     {
                         await _emailSender.SendEmailAsync(
                             user.Email,
-                            "Welcome! Your Oaks-Village Account is ready to use!",
-                            "You have been granted Member access and " +
-                            "can log in to https://oaks-village.com.<br /><br /><br />" +
-                            "If this Account was automatically generated for you, " +
-                            "Please use the <a href=https://oaks-village.com/Identity/Account/ForgotPassword></strong>Forgot your Password</strong> " +
-                            "link to create your password. <br><br>" +
-                            "You will be asked for your email address so a link to " +
-                            "complete the process can be sent to you.<br><br>" +
-                            "Thank you from the <strong>Oaks-Village HOA</strong>"
+                            "Welcome to Oaks-Village HOA - Your Account is Ready",
+                            "<!DOCTYPE html>" +
+                            "<html lang=\"en\">" +
+                            "<head>" +
+                            "    <meta charset=\"UTF-8\">" +
+                            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                            "    <title>Welcome to Oaks-Village HOA</title>" +
+                            "</head>" +
+                            "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                            "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                            "    <p style=\"margin-bottom: 1em;\">Welcome! Your Oaks-Village account has been created and is ready for you to access.</p>" +
+                            "    <p style=\"margin-bottom: 1em;\">You have been granted Member access and can log in to the HOA community portal at <a href=\"https://oaks-village.com\" style=\"color: #007bff; text-decoration: none;\">https://oaks-village.com</a>.</p>" +
+                            "    <div style=\"margin-bottom: 2em; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;\">" +
+                            "        <strong style=\"font-size: 1.1em;\">Important Note:</strong> If this account was automatically generated for you, please click the link below to create your password:" +
+                            "        <p style=\"margin-top: 1em;\">" +
+                            "            <a href=\"https://oaks-village.com/Identity/Account/ForgotPassword\" style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                            "                Click Here to Create Your Password" +
+                            "            </a>" +
+                            "        </p>" +
+                            "    </div>" +
+                            "    <p style=\"margin-bottom: 1em;\">You will be directed to enter your email address, and a password reset link will be sent to you. This process ensures the security of your account and verifies your email address, preventing unauthorized password creation attempts.</p>" +
+                            "    <p style=\"margin-bottom: 1em;\">Thank you for being a part of the Oaks-Village Homeowners Association.</p>" +
+                            "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
+                            "    <p style=\"margin-top: 0;\">The Oaks-Village HOA</p>" +
+                            "</body>" +
+                            "</html>"
                         );
                     }
                 }
@@ -310,9 +327,32 @@ namespace Members.Areas.Identity.Pages
                         {
                             await _emailSender.SendEmailAsync(
                                 user.Email,
-                                "Confirm Your Email to complete your registration",
-                                $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'><strong>clicking here</strong></a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
+                                "Please Confirm Your Email Address - Oaks-Village HOA Registration",
+                                $"<!DOCTYPE html>" +
+                                "<html lang=\"en\">" +
+                                "<head>" +
+                                "    <meta charset=\"UTF-8\">" +
+                                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                                "    <title>Confirm Your Email - Oaks-Village HOA</title>" +
+                                "</head>" +
+                                "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                                "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                                "    <p style=\"margin-bottom: 1em;\">Thank you for registering with the Oaks-Village Homeowners Association!</p>" +
+                                "    <p style=\"margin-bottom: 1em;\">To complete your registration and activate your account, please confirm your email address by clicking the button below:</p>" +
+                                "    <div style=\"margin: 2em 0;\">" +
+                                $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                                "            Confirm Your Email Address" +
+                                "        </a>" +
+                                "    </div>" +
+                                "    <p style=\"margin-bottom: 1em;\">By confirming your email, you help us ensure the security of your account and allow us to send you important updates and community information.</p>" +
+                                "    <p style=\"margin-bottom: 1em;\">If you did not register for an account with Oaks-Village HOA, please disregard this email.</p>" +
+                                "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
+                                "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
+                                "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                "</body>" +
+                                "</html>"
                             );
+
                         }
                     }
                 }

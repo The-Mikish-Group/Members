@@ -16,16 +16,10 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace Members.Areas.Identity.Pages.Account
 {
-    public class ForgotPasswordModel : PageModel
+    public class ForgotPasswordModel(UserManager<IdentityUser> userManager, IEmailSender emailSender) : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IEmailSender _emailSender;
-
-        public ForgotPasswordModel(UserManager<IdentityUser> userManager, IEmailSender emailSender)
-        {
-            _userManager = userManager;
-            _emailSender = emailSender;
-        }
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly IEmailSender _emailSender = emailSender;
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -59,9 +53,7 @@ namespace Members.Areas.Identity.Pages.Account
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
-
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
+               
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
@@ -72,8 +64,29 @@ namespace Members.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Oaks-Village HOA - Reset Your Password",
+                    $"<!DOCTYPE html>" +
+                    "<html lang=\"en\">" +
+                    "<head>" +
+                    "    <meta charset=\"UTF-8\">" +
+                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                    "    <title>Reset Your Password - Oaks-Village HOA</title>" +
+                    "</head>" +
+                    "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                    "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                    "    <p style=\"margin-bottom: 1em;\">You are receiving this email because you requested to reset your password for your Oaks-Village HOA account.</p>" +
+                    "    <p style=\"margin-bottom: 1em;\">Please click the button below to reset your password:</p>" +
+                    "    <div style=\"margin: 2em 0;\">" +
+                    $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                    "            Reset Your Password" +
+                    "        </a>" +
+                    "    </div>" +
+                    "    <p style=\"margin-bottom: 1em;\">This password reset link is valid for a limited time. If you did not request a password reset, you can ignore this email. Your password will not be changed.</p>" +
+                    "    <p style=\"margin-bottom: 0;\">Thank you,</p>" +
+                    "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                    "</body>" +
+                    "</html>"
+                );
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

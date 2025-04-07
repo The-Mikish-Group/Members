@@ -118,70 +118,73 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ProtectedFiles\Agenda 2025.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Architectual Standards 4th Revision.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Architectual Standards August 2024 Additions.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Assessment Fee Covers.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Bits and Pieces.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Budget Report 2025.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Clubhouse Use Rules.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Directory Jan 2025.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="ProtectedFiles\Directory March 2025.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Directory.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Miscellaneous Information.pdf">
+    <None Update="ProtectedFiles\Financial Report 01-2025.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Agenda 2025.pdf">
+    <None Update="ProtectedFiles\Financial Report 02-2025.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Bits and Pieces.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Assessment Fee Covers.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Budget Report 2025.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Directory Jan 2025.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Minutes 2025-02-19.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Financial Report Feb 2025.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Financial Report Jan 2025.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Pool Rules.pdf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="ProtectedFiles\Welcome Letter.pdf">
+    <None Update="ProtectedFiles\Financial Report 03-2025.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\First Amendment to Covenants.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Architectual Standards August 2024 Additions.pdf">
+    <None Update="ProtectedFiles\Minutes 2025-02-19.pdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="ProtectedFiles\Miscellaneous Information.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Oaks Village Deed Restrictions.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Architectual Standards 4th Revision.pdf">
+    <None Update="ProtectedFiles\Pet Rules.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Pet Rules.pdf">
+    <None Update="ProtectedFiles\Pool Rules.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="ProtectedFiles\Regulations for Generators.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="ProtectedFiles\Clubhouse Use Rules.pdf">
+    <None Update="ProtectedFiles\Welcome Letter.pdf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>

@@ -24,18 +24,34 @@ public class HomeController(ILogger<HomeController> logger) : Controller
     }
 
     [Authorize(Roles = "Admin,Manager,Member")]
-    public IActionResult MemberDocuments()
+    public IActionResult Directory()
     {
 
-        ViewBag.Message = "Member Documents";
+        ViewBag.Message = "Directory";
         return View();
     }
 
     [Authorize(Roles = "Admin,Manager,Member")]
-    public IActionResult MemberDocumentsStatic()
+    public IActionResult Documents()
     {
 
-        ViewBag.Message = "Member Documents Static";
+        ViewBag.Message = "Documents";
+        return View();
+    }
+
+    [Authorize(Roles = "Admin,Manager,Member")]
+    public IActionResult Financials()
+    {
+
+        ViewBag.Message = "Financials";
+        return View();
+    }
+
+    [Authorize(Roles = "Admin,Manager,Member")]
+    public IActionResult Minutes()
+    {
+
+        ViewBag.Message = "Minutes";
         return View();
     }
 

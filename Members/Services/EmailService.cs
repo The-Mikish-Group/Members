@@ -62,7 +62,7 @@ namespace Members.Services
 
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(_smtpUser),   
+                    From = new MailAddress(_smtpUser),
                     Subject = subject,
                     Body = htmlMessage,
                     IsBodyHtml = true
@@ -73,12 +73,12 @@ namespace Members.Services
             }
             catch (SmtpException ex)
             {
-                _logger.LogError($"SMTP Error: {ex.Message}");
+                _logger.LogError("SMTP Error: {Message}", ex.Message);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error: {ex.Message}");
+                _logger.LogError("Error: {Message}", ex.Message);
                 throw;
             }
         }

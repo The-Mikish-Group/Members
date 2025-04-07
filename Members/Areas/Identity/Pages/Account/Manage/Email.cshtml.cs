@@ -91,8 +91,29 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 {
                     await _emailSender.SendEmailAsync(
                         Input.NewEmail,
-                        "Confirm your email",
-                        $"Please confirm your email account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        "Oaks-Village HOA - Confirm Your Email Address Change",
+                        $"<!DOCTYPE html>" +
+                        "<html lang=\"en\">" +
+                        "<head>" +
+                        "    <meta charset=\"UTF-8\">" +
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                        "    <title>Confirm Your New Email - Oaks-Village HOA</title>" +
+                        "</head>" +
+                        "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                        "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                        "    <p style=\"margin-bottom: 1em;\">You are receiving this email because you requested to change the email address associated with your Oaks-Village HOA account.</p>" +
+                        "    <p style=\"margin-bottom: 1em;\">Please confirm your new email address by clicking the button below:</p>" +
+                        "    <div style=\"margin: 2em 0;\">" +
+                        $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                        "            Confirm Email Address Change" +
+                        "        </a>" +
+                        "    </div>" +
+                        "    <p style=\"margin-bottom: 1em;\">This email confirmation link is valid for a limited time. If you did not request to change your email address, you can ignore this email. Your email address will not be updated.</p>" +
+                        "    <p style=\"margin-bottom: 0;\">Thank you,</p>" +
+                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        "</body>" +
+                        "</html>"
+                    );
 
                     StatusMessage = "Confirmation link to change email sent. Please check your email.";
                     return RedirectToPage();
@@ -148,8 +169,29 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             // Send an email with this link
             await _emailSender.SendEmailAsync(
                 email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>");
+                "Oaks-Village HOA - Verify Your Email Address",
+                $"<!DOCTYPE html>" +
+                "<html lang=\"en\">" +
+                "<head>" +
+                "    <meta charset=\"UTF-8\">" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                "    <title>Verify Your Email - Oaks-Village HOA</title>" +
+                "</head>" +
+                "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                "    <p style=\"margin-bottom: 1em;\">Thank you for registering with the Oaks-Village Homeowners Association!</p>" +
+                "    <p style=\"margin-bottom: 1em;\">Please verify your email address to activate your account by clicking the button below:</p>" +
+                "    <div style=\"margin: 2em 0;\">" +
+                $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                "            Verify Your Email Address" +
+                "        </a>" +
+                "    </div>" +
+                "    <p style=\"margin-bottom: 1em;\">This email verification link is valid for a limited time. If you did not register for an account with Oaks-Village HOA, you can disregard this email.</p>" +
+                "    <p style=\"margin-bottom: 0;\">Thank you,</p>" +
+                "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                "</body>" +
+                "</html>"
+            );
 
             StatusMessage = "Verification email sent.";
             return RedirectToPage();

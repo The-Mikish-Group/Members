@@ -52,11 +52,38 @@ namespace Members.Areas.Identity.Pages.Account
                 pageHandler: null,
                 values: new { userId, code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                Input.Email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}'>clicking here</a>.");
 
+            if (string.IsNullOrEmpty(callbackUrl))
+            {
+                await _emailSender.SendEmailAsync(
+                    Input.Email,
+                    "Reminder: Confirm Your Oaks-Village HOA Account",
+                    $"<!DOCTYPE html>" +
+                    "<html lang=\"en\">" +
+                    "<head>" +
+                    "    <meta charset=\"UTF-8\">" +
+                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                    "    <title>Reminder: Confirm Your Email - Oaks-Village HOA</title>" +
+                    "</head>" +
+                    "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                    "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                    "    <p style=\"margin-bottom: 1em;\">We noticed you haven't confirmed your email address for your Oaks-Village Homeowners Association account yet. To activate your account, please click the button below:</p>" +
+                    "    <div style=\"margin: 2em 0;\">" +
+                    $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? string.Empty)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                    "            Confirm Your Email Address" +
+                    "        </a>" +
+                    "    </div>" +
+                    "    <p style=\"margin-bottom: 1em;\">Please click the link to verify your email and complete your registration. This step is important to ensure you receive important updates and can access all features of the portal.</p>" +
+                    "    <p style=\"margin-bottom: 1em;\">If you have already confirmed your email, you can disregard this message.</p>" +
+                    "    <p style=\"margin-bottom: 0;\">Thank you,</p>" +
+                    "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                    "</body>" +
+                    "</html>"
+                );
+                ModelState.AddModelError(string.Empty, "Verification email sent.");
+                return Page();
+            };
+            
             ModelState.AddModelError(string.Empty, "Verification email sent.");
             return Page();
         }

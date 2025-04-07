@@ -4,26 +4,21 @@
 @model List<DocumentInfo>
 
 @{
-    ViewData["Title"] = "Directory and Reports";
+    ViewData["Title"] = "Directory";
 
     ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
     ViewData["Canonical"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
-    ViewData["OGTitle"] = "HOA Directory and Reports";
-    ViewData["OGDescription"] = "Oaks-Village HOA Directory and Reports";
+    ViewData["OGTitle"] = "HOA Directory";
+    ViewData["OGDescription"] = "Oaks-Village HOA Directory";
     ViewData["OGURL"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
     // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
 
     var returnUrl = Url.Action("Members", "Home", new { area = "" });
 
-    var pageName = "Directory and Reports";
+    var pageName = "Directory";
     var documents = new List<DocumentInfo>
         {
-            new() { FileName = "Directory.pdf", DisplayName = "The Directory" },
-            new() { FileName = "Budget Report 2025.pdf", DisplayName = "Budget Report 2025" },
-            new() { FileName = "Financial Report Jan 2025.pdf", DisplayName = "Financial Report Jan 2025" },
-            new() { FileName = "Financial Report Feb 2025.pdf", DisplayName = "Financial Report Feb 2025" },
-            new() { FileName = "Agenda 2025.pdf", DisplayName = "Agenda 2025" },
-            new() { FileName = "Minutes 2025-02-19.pdf", DisplayName = "Minutes 2025-02-19" }
+            new() { FileName = "Directory.pdf", DisplayName = "The Directory" },            
         };   
    
 }

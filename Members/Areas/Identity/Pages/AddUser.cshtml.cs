@@ -191,8 +191,30 @@ namespace Members.Areas.Identity.Pages
 
                     await _emailSender.SendEmailAsync(
                         Input.Email,
-                        "Create Your Password",
-                        $"An account has been created on your behalf.<br><br>Please create your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.<br /><br />Thank you from the team at <strong>Oaks-Village HOA</strong>"
+                        "Welcome to Oaks-Village HOA - Create Your Password",
+                        "<!DOCTYPE html>" +
+                        "<html lang=\"en\">" +
+                        "<head>" +
+                        "    <meta charset=\"UTF-8\">" +
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                        "    <title>Create Your Password - Oaks-Village HOA</title>" +
+                        "</head>" +
+                        "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
+                        "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
+                        "    <p style=\"margin-bottom: 1em;\">Welcome to the Oaks-Village Homeowners Association!</p>" +
+                        "    <p style=\"margin-bottom: 1em;\">An account has been created on your behalf. To access your account, please create your password by clicking the button below:</p>" +
+                        "    <div style=\"margin: 2em 0;\">" +
+                        $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
+                        "            Create Your Password" +
+                        "        </a>" +
+                        "    </div>" +
+                        "    <p style=\"margin-bottom: 1em;\">This step is necessary to confirm your email address and ensure the security of your account. It also prevents unauthorized individuals from setting a password for your account.</p>" +
+                        "    <p style=\"margin-bottom: 1em;\">Once you create your password, you will be able to log in to the Oaks-Village HOA community portal at <a href=\"https://oaks-village.com\" style=\"color: #007bff; text-decoration: none;\">https://oaks-village.com</a>.</p>" +
+                        "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
+                        "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
+                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        "</body>" +
+                        "</html>"
                     );
                     _logger.LogInformation("Attempting to send 'Create Your Password' email to: {Email}", Input.Email);
 

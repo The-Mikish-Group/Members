@@ -1,0 +1,73 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model List<DocumentInfo>
+
+@{
+    ViewData["Title"] = "Directory and Reports";
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
+    ViewData["OGTitle"] = "HOA Directory and Reports";
+    ViewData["OGDescription"] = "Oaks-Village HOA Directory and Reports";
+    ViewData["OGURL"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+    var returnUrl = Url.Action("Members", "Home", new { area = "" });
+    var pageName = "Minutes";
+}
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container">
+    <partial name="_LargeLogo" />
+
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+    {
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-8 mt-1">
+                <h3 class="card-title text-center mb-0 text-gold-darker">@pageName</h3>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-md-6 col-lg-5 mx-2 my-2">
+                <div class="card">
+                    <div class="card-body text-start ps-3 p-3" id="minutesList">
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="card-text">This is the <strong>Members</strong> area of Oaks-Village.com.</p>
+                        <a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.get('@Url.Action("GetMinutesFiles", "File")', function (data) {
+                var html = '';
+                $.each(data, function (i, document) {
+                    var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                    html += '<div class="ps-2 py-2 my-0">';
+                    html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + document.displayName + '</a>';
+                    html += '</div>';
+                });
+                $('#minutesList').html(html);
+            });
+        });
+    </script>
+}
