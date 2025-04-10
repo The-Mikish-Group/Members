@@ -57,7 +57,7 @@ namespace Members.Areas.Identity.Pages.Account
             {
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reminder: Confirm Your Oaks-Village HOA Account",
+                    "Reminder: Confirm Your Oaks-Village HOA Email",
                     $"<!DOCTYPE html>" +
                     "<html lang=\"en\">" +
                     "<head>" +

@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.IO;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Linq;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Members.Models;
 
 namespace Members.Controllers
@@ -56,20 +60,22 @@ namespace Members.Controllers
         {
             if (!Directory.Exists(_protectedFilesPath))
             {
-                _logger.LogError("Protected files directory not found: {Path}", _protectedFilesPath);
+                const string errorMessage = "Protected files directory not found: {Path}";
+                _logger.LogError(errorMessage, _protectedFilesPath);
                 return Json(new List<DocumentInfo>());
             }
 
             var files = Directory.GetFiles(_protectedFilesPath)
                                  .Where(file => Path.GetFileName(file).StartsWith("Budget") || Path.GetFileName(file).StartsWith("Financial"))
+                                 .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.OrdinalIgnoreCase)) // Ensure only PDF files are listed
                                  .OrderBy(Path.GetFileName)
                                  .Select(filePath => new DocumentInfo
                                  {
                                      FileName = Path.GetFileName(filePath),
                                      DisplayName = Path.GetFileNameWithoutExtension(filePath)
-                                                        .Replace("Budget Report", "Budget Report")
-                                                        .Replace("Financial Report", "Financial Report")
-                                                        .Trim()
+                                                          .Replace("Budget Report", "Budget Report")
+                                                          .Replace("Financial Report", "Financial Report")
+                                                          .Trim()
                                  })
                                  .ToList();
 
@@ -81,24 +87,96 @@ namespace Members.Controllers
         {
             if (!Directory.Exists(_protectedFilesPath))
             {
-                _logger.LogError("Protected files directory not found: {Path}", _protectedFilesPath);
+                const string errorMessage = "Protected files directory not found: {Path}";
+                _logger.LogError(errorMessage, _protectedFilesPath);
                 return Json(new List<DocumentInfo>());
             }
 
             var files = Directory.GetFiles(_protectedFilesPath)
                                  .Where(file => Path.GetFileName(file).StartsWith("Minutes") || Path.GetFileName(file).StartsWith("Agenda"))
+                                 .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.InvariantCultureIgnoreCase)) // Ensure only PDF files are listed
                                  .OrderBy(Path.GetFileName)
                                  .Select(filePath => new DocumentInfo
                                  {
                                      FileName = Path.GetFileName(filePath),
                                      DisplayName = Path.GetFileNameWithoutExtension(filePath)
-                                                        .Replace("Minutes", "Minutes")
-                                                        .Replace("Agenda", "Agenda")
-                                                        .Trim()
+                                                          .Replace("Minutes", "Minutes")
+                                                          .Replace("Agenda", "Agenda")
+                                                          .Trim()
                                  })
                                  .ToList();
 
             return Json(files);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        public IActionResult UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            if (!file.FileName.ToLowerInvariant().EndsWith(".pdf"))
+            {
+                return BadRequest("Only PDF files are allowed.");
+            }
+
+            var fileName = Path.GetFileName(file.FileName);
+
+            if (fileName.StartsWith("Minutes"))
+            {
+                // Regex to match "Minutes YEAR-MM-DD.pdf"
+                string minutesPattern = @"^Minutes\s\d{4}-\d{2}-\d{2}\.pdf$";
+                if (!Regex.IsMatch(fileName, minutesPattern))
+                {
+                    return BadRequest("Minutes file name must follow the format: Minutes YYYY-MM-DD.pdf (e.g., Minutes 2023-12-31.pdf)");
+                }
+            }
+            else if (fileName.StartsWith("Agenda"))
+            {
+                // For now, we'll keep the simpler check for Agenda, but you can add a specific format if needed later.
+            }
+            else if (fileName.StartsWith("Financial Report"))
+            {
+                // Regex to match "Financial Report YYYY-MM.pdf"
+                string financialPattern = @"^Financial Report\s\d{4}-\d{2}\.pdf$";
+                if (!Regex.IsMatch(fileName, financialPattern))
+                {
+                    return BadRequest("Financial Report file name must follow the format: Financial Report YYYY-MM.pdf (e.g., Financial Report 2024-03.pdf)");
+                }
+            }
+            else if (fileName.StartsWith("Budget Report"))
+            {
+                // Regex to match "Budget Report YYYY.pdf"
+                string budgetPattern = @"^Budget Report\s\d{4}\.pdf$";
+                if (!Regex.IsMatch(fileName, budgetPattern))
+                {
+                    return BadRequest("Budget Report file name must follow the format: Budget Report YYYY.pdf (e.g., Budget Report 2025.pdf)");
+                }
+            }
+            else
+            {
+                return BadRequest("File name must start with 'Agenda', 'Minutes', 'Financial Report', or 'Budget Report'.");
+            }
+
+            var filePath = GetFilePath(fileName);
+
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+                return Ok("File uploaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                const string errorMessage = "Error uploading file '{FileName}': {ErrorMessage}";
+                _logger.LogError(errorMessage, fileName, ex.Message);
+                return StatusCode(500, $"Error uploading file: {ex.Message}");
+            }
         }
     }
 }

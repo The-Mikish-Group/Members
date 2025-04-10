@@ -29,6 +29,7 @@
                 <h3 class="card-title text-center mb-0 text-gold-darker">@pageName</h3>
             </div>
         </div>
+
         <div class="row justify-content-center mt-1 mb-3 g-3">
             <div class="col-md-6 col-lg-5 mx-2 my-2">
                 <div class="card">
@@ -37,6 +38,28 @@
                 </div>
             </div>
         </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <div class="row justify-content-center mt-2 mb-3 g-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Upload New File</h5>
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="file" class="form-label">Select PDF File:</label>
+                                    <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                                <button type="button" class="btn btn-sm btn-secondary">Cancel</button>
+                            </form>
+                            <div id="uploadStatus" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     }
     else
     {
@@ -58,6 +81,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Load existing minutes files
             $.get('@Url.Action("GetMinutesFiles", "File")', function (data) {
                 var html = '';
                 $.each(data, function (i, document) {
@@ -67,6 +91,106 @@
                     html += '</div>';
                 });
                 $('#minutesList').html(html);
+            });
+
+            // Handle file input change for live validation
+            $('#file').on('change', function () {
+                var fileName = $(this).val().split('\\').pop(); // Get the file name
+                var isValid = false;
+                var errorMessage = '';
+
+                if (!fileName.toLowerCase().endsWith('.pdf')) {
+                    errorMessage = 'Please select a PDF file.';
+                } else if (fileName.startsWith('Minutes')) {
+                    const minutesPattern = /^Minutes\s\d{4}-\d{2}-\d{2}\.pdf$/;
+                    if (!minutesPattern.test(fileName)) {
+                        errorMessage = 'Minutes file name must follow the format: Minutes-MM-DD.pdf (e.g., Minutes 2025-04-09.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else if (!fileName.startsWith('Agenda')) {
+                    errorMessage = 'File name must start with "Agenda" (e.g., Agenda 2025-04-09.pdf) or "Minutes" followed by the date (e.g., Minutes 2025-04-09.pdf).';
+                } else {
+                    isValid = true; // For Agenda files, we are keeping the simpler check for now
+                }
+
+                if (!isValid) {
+                    $('#uploadStatus').html('<div class="alert alert-warning">' + errorMessage + '</div>');
+                    // Optionally clear the file input - you can remove this here as the Cancel button will handle it
+                    // $(this).val('');
+                } else {
+                    $('#uploadStatus').html(''); // Clear any previous messages
+                }
+            });
+
+            // Handle Cancel button click
+            $('#uploadForm button[type="button"]').on('click', function() {
+                $('#file').val(''); // Clear the file input
+                $('#uploadStatus').html(''); // Clear any previous status messages
+            });
+
+            // Handle file upload
+            $('#uploadForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var fileInput = $('#file')[0];
+
+                // Check if a valid file is selected again before submitting
+                if (fileInput.files.length === 0) {
+                    $('#uploadStatus').html('<div class="alert alert-danger">Please select a file to upload.</div>');
+                    return;
+                }
+
+                var fileName = fileInput.files[0].name;
+                var isValid = false;
+                var errorMessage = '';
+
+                if (!fileName.toLowerCase().endsWith('.pdf')) {
+                    errorMessage = 'Please select a PDF file.';
+                } else if (fileName.startsWith('Minutes')) {
+                    const minutesPattern = /^Minutes\s\d{4}-\d{2}-\d{2}\.pdf$/;
+                    if (!minutesPattern.test(fileName)) {
+                        errorMessage = 'Minutes file name must follow the format: Minutes-MM-DD.pdf (e.g., Minutes 2025-04-09.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else if (!fileName.startsWith('Agenda')) {
+                    errorMessage = 'File name must start with "Agenda" (e.g., Agenda 2025-04-09.pdf) or "Minutes" followed by the date (e.g., Minutes 2025-04-09.pdf).';
+                } else {
+                    isValid = true; // For Agenda files
+                }
+
+                if (!isValid) {
+                    $('#uploadStatus').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                    return;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadFile", "File")',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#uploadStatus').html('<div class="alert alert-success">' + response + '</div>');
+                        // Reload the file list after successful upload
+                        $.get('@Url.Action("GetMinutesFiles", "File")', function (data) {
+                            var html = '';
+                            $.each(data, function (i, document) {
+                                var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                                html += '<div class="ps-2 py-2 my-0">';
+                                html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + document.displayName + '</a>';
+                                html += '</div>';
+                            });
+                            $('#minutesList').html(html);
+                        });
+                        // Optionally clear the form
+                        $('#uploadForm')[0].reset();
+                    },
+                    error: function (error) {
+                        $('#uploadStatus').html('<div class="alert alert-danger">' + error.responseText + '</div>');
+                    }
+                });
             });
         });
     </script>

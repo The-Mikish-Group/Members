@@ -5,13 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Members.Areas.Identity.Pages
 {
-    
+   
     public class MembersGridModel(UserManager<IdentityUser> userManager, ApplicationDbContext dbContext) : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager = userManager;

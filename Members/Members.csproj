@@ -19,18 +19,15 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot\lib\bootstrap\**" />
-    <Compile Remove="wwwroot\lib\pdfjs\**" />
     <Content Remove="wwwroot\lib\bootstrap\**" />
-    <Content Remove="wwwroot\lib\pdfjs\**" />
     <EmbeddedResource Remove="wwwroot\lib\bootstrap\**" />
-    <EmbeddedResource Remove="wwwroot\lib\pdfjs\**" />
     <None Remove="wwwroot\lib\bootstrap\**" />
-    <None Remove="wwwroot\lib\pdfjs\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Areas\Identity\Pages\EditRoles.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\EditUsers.cshtml.cs" />
+    <Compile Remove="Areas\Identity\Pages\SMTPtester.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\ViewPdf old.cshtml.cs" />
     <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />
     <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />
@@ -53,6 +50,7 @@
     <Content Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
     <Content Remove="Areas\Identity\Pages\EditRoles.cshtml" />
     <Content Remove="Areas\Identity\Pages\EditUsers.cshtml" />
+    <Content Remove="Areas\Identity\Pages\SMTPtester.cshtml" />
     <Content Remove="Areas\Identity\Pages\ViewPdf old.cshtml" />
     <Content Remove="Views\Home\xMembers.cshtml" />
     <Content Remove="Views\Shared\_LoginPartial.cshtml" />
@@ -94,6 +92,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="NuGet.Packaging" Version="6.13.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+    <PackageReference Include="System.Security.Permissions" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>

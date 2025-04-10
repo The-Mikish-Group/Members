@@ -1,0 +1,103 @@
+﻿@page
+@using System.IO
+@model Members.Areas.Identity.Pages.Admin.AdminFilesModel
+@using Microsoft.AspNetCore.Identity.UI.Services;
+@{
+    ViewData["Title"] = "PDF File Management";
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @Model.MessageType">@Model.Message</div>
+}
+
+<head>
+    <title>@ViewData["Title"]</title>   
+</head>
+
+<partial name="_LargeLogo" />
+
+<div class="container mY-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card p-2 mb-3 shadow bg-gold-footer">
+
+                <h2 class="mb-4 text-gold-darker">
+                    <i class="bi bi-file-pdf-fill"></i> Add PDF Files
+                </h2>
+
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                    <div class="mb-3">
+                        <label for="uploadFile" class="form-label">Select File:</label>
+                        <input type="file" class="form-control" id="uploadFile" name="uploadFile" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                </form>
+
+                <hr />
+
+                <h2 class="mt-4 mb-2">
+                    <i class="bi bi-file-pdf-fill"></i> Existing Files
+                </h2>
+
+                @if (Model.Files.Any())
+                {
+                <form method="post" id=AdminFiles>
+
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger">Delete Selected</button>
+                    </div>
+                    <ul class="list-group">
+                            @foreach (var file in Model.Files)
+                            {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="flex-grow-1">@file</span>
+                                <div>
+                                        <button type="button" asp-page-handler="Rename" asp-route-oldFileName="@file" class="btn btn-sm btn-outline-secondary me-2">Rename</button>
+                                    <input type="checkbox" name="selectedFiles" value="@file" class="form-check-input" />
+                                </div>
+                            </li>
+                            <li class="list-group-item d-none" id="rename-@file">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
+                                    <button type="submit" asp-page-handler="UpdateRename" asp-route-oldFileName="@file" class="btn btn-sm btn-primary">Update Rename</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
+                                </div>
+                            </li>
+                            }
+                    </ul>
+                </form>
+                }
+                else
+                {
+                <p>No files found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-outline-secondary').on('click', function () {
+                console.log('Rename button clicked');
+                var listItem = $(this).closest('li.list-group-item');
+                var fileNameSpan = listItem.find('span');
+                var fileName = fileNameSpan.text();
+                console.log('Filename:', fileName);
+                var renameInputListItem = listItem.next('li.list-group-item'); // Select the next list item
+                console.log('Rename Input Element:', renameInputListItem);
+                renameInputListItem.removeClass('d-none');
+                $(this).hide();
+            });
+
+            $('.cancel-rename').on('click', function () {
+                var fileName = $(this).data('file');
+                var renameInputListItem = $(this).closest('li.list-group-item');
+                renameInputListItem.addClass('d-none');
+                $('li.list-group-item:has(span:contains("' + fileName + '")) button.btn-outline-secondary').show();
+            });
+        });
+    </script>
+}

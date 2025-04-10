@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -170,7 +172,7 @@ namespace Members.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= new UrlHelper(new ActionContext(HttpContext, new RouteData(), new PageActionDescriptor())).Content("~/");
             ExternalLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync())];
             if (ModelState.IsValid)
             {
@@ -213,12 +215,12 @@ namespace Members.Areas.Identity.Pages.Account
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    // Replace the problematic line with the following code to fix both errors:
                     var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId, code, returnUrl },
-                        protocol: Request.Scheme);
-
+                    "/Account/ConfirmEmail",
+                    pageHandler: null,
+                    values: new { area = "Identity", userId, code, returnUrl },
+                    protocol: Request.Scheme);
 
                     // Send Email Confirmation Request to new Member
                     await _emailSender.SendEmailAsync(
