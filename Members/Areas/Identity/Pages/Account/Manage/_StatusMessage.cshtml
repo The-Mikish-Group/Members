@@ -3,8 +3,7 @@
 @if (!String.IsNullOrEmpty(Model))
 {
     var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
-    var cardColor = Model.StartsWith("Error") ? "bg-danger text-white" : "bg-success text-white"; // Set card color
-    @* var cardSize = Model.Length > 50 ? "col-md-8 col-lg-6" : "col-md-6 col-lg-4"; // Adjust card size based on message length *@
+    var cardColor = Model.StartsWith("Error") ? "bg-danger text-white" : "bg-success text-white"; // Set card color    
     var cardSize = Model.Length > 50 ? "col-12" : "col-12"; // Adjust card size based on message length
 
     <div class="row justify-content-center">

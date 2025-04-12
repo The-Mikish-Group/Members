@@ -324,26 +324,6 @@ a {
         color: #8e774d; /* text-gold */
     }
 
-/* chalk-link */
-/*.chalk-link {
-    text-decoration: none;
-    border-bottom: 2px dotted #b1b2b3;
-    color: white;
-}
-
-    .chalk-link:hover,
-    .chalk-link:active,
-    .chalk-link:focus {
-        color: #80b24d;
-    }*/
-
-/* chalk-link-selected */
-/*.chalk-link-selected {
-    text-decoration: none;
-    border-bottom: 2px dotted #80b24d;
-    color: #80b24d;
-}*/
-
 /* nav-link */
 .nav-link {
     color: saddlebrown;
@@ -369,6 +349,14 @@ a {
         color: white; 
         background-color: lightgreen;
     }
+
+.list-group .even-row {
+    background-color: #f8f9fa; /* Light gray for even rows */
+}
+
+.list-group .odd-row {
+    background-color: #e9ecef; /* Slightly darker gray for odd rows */
+}
 
 /*  btn-primary Defaults */
 .btn-primary {
@@ -397,6 +385,24 @@ a {
         border-color: #7d7e81; /* gray */
     }
 
+/*  btn-Upload Defaults */
+.btn-upload {
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    border-color: transparent;
+    background-color: #f0f0f4;
+    color: black;
+}
+
+    .btn-upload:focus,
+    .btn-upload:hover {
+        border-bottom-left-radius: 0px;
+        border-top-left-radius: 0px;
+        border-color:transparent;
+        color: darkgreen;
+        background-color: lightgreen
+    }
+
 /*  btn-danger Defaults */
 .btn-danger {
     color: white;
@@ -411,7 +417,7 @@ a {
         border-color: #7d7e81; /* gray */
     }
 
-    /* btn-subtle-danger */
+/* btn-subtle-danger */
 .btn-subtle-danger {
     background-color: red; /* Very light red background */
     border: 1px solid black; /* Very light red border */

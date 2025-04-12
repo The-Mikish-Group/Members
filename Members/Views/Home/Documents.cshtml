@@ -10,7 +10,6 @@
     ViewData["OGTitle"] = "HOA Documents";
     ViewData["OGDescription"] = "Oaks-Village HOA Documents";
     ViewData["OGURL"] = "https://Oaks-Village.com/Home/Documents";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
 
     var returnUrl = Url.Action("Members", "Home", new { area = "" });
     var pageName = "Documents";
@@ -48,7 +47,6 @@
                             <h5 class="card-title"><i class="bi bi-filetype-pdf me-2"></i> Upload a New PDF File</h5>
                             <form id="uploadForm" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    @* <label for="file" class="form-label">Select PDF File:</label> *@
                                     <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-primary">Upload</button>

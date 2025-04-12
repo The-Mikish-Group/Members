@@ -31,58 +31,37 @@ body {
 }
 
 .upload-file-input {
-    padding-right: 50px; /* Adjust based on button width */
-    border-right: none; /* Remove the right border of the input */
+   /* border-right: solid;
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;*/
+   
 }
 
 .upload-button {
-    position: absolute;
-    top: 1px; /* Try a small offset from the top */
-    right: 0; /* Align to the right edge */
-    /* transform: translateY(-50%); */ /* Remove vertical centering */
-    border-radius: 0.375rem; /* Match the input's border-radius */
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 0.25rem 0.75rem; /* Slightly reduce padding */
-    font-size: 0.875rem; /* Match the input's font size */
-    height: calc(100% - 2.5px); /* Try this height calculation again */
-    border: 1px solid #ced4da; /* Add a border to the button */
-    border-left: none; /* Remove the left border of the button */
-    background-color: #0d6efd; /* Match primary button background */
-    color: white; /* Match primary button text color */
-    display: flex;
+    /*border-radius: 0.375rem;*/
+    position: static;
+    transform: none;
+    height: 100%; 
+    margin-left: -40px;
+    display: flex; 
     align-items: center;
     justify-content: center;
-    line-height: 1; /* Try setting line-height */
+    padding: 0.35rem 0.75rem;
+    font-size: 0.875rem;
+    /*border: 1px solid #ced4da;*/
+    background-color: transparent;
+    /*color: white;*/
+    line-height: 1.5;
 }
 
     .upload-button:hover {
-        background-color: #0b5ed7; /* Darker shade for hover effect */
+        background-color: transparent;
         color: white;
     }
 
     .upload-button i {
-        font-size: 1rem; /* Adjust icon size if needed */
+        font-size: 1rem;
     }
-
-
-/*@media print {
-    body > *:not(#print-container) {
-        display: none;
-    }
-
-    #print-container {
-        display: block;
-    }
-
-    .print-hidden {
-        display: none;
-    }
-}*/
-
-/*.print-hidden {
-    display: none;
-}*/
 
 .image-container {
     position: relative;

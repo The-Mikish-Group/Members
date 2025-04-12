@@ -82,6 +82,31 @@ namespace Members.Controllers
             return Json(files);
         }
 
+        // New action to get the list of Directory files
+        public IActionResult GetDirectoryFiles()
+        {
+            if (!Directory.Exists(_protectedFilesPath))
+            {
+                const string errorMessage = "Protected files directory not found: {Path}";
+                _logger.LogError(errorMessage, _protectedFilesPath);
+                return Json(new List<DocumentInfo>());
+            }
+
+            var files = Directory.GetFiles(_protectedFilesPath)
+                                    .Select(filePath => new DocumentInfo
+                                    {
+                                        FileName = Path.GetFileName(filePath),
+                                        DisplayName = Path.GetFileName(filePath)
+                                                            .Replace("Directory-", "") // Simplified Substring
+                                                            .Replace(".pdf", "")
+                                                            .Trim() // Remove "Directory-" prefix and extension
+                                    })
+                                    .Where(doc => !string.IsNullOrEmpty(doc.FileName) && doc.FileName.StartsWith("Directory", StringComparison.OrdinalIgnoreCase) && doc.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                    .OrderBy(doc => doc.FileName)
+                                    .ToList();
+
+            return Json(files);
+        }
         // New action to get the list of Minutes files
         public IActionResult GetMinutesFiles()
         {

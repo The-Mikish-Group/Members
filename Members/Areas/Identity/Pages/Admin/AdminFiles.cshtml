@@ -8,7 +8,6 @@
 
 <div class="text-center mt-4 mb-2">
     <h3><i class="bi bi-shield-lock-fill ms-2"></i> @ViewData["Title"]</h3>
-
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -16,66 +15,75 @@
     <div class="alert @Model.MessageType">@Model.Message</div>
 }
 
-<div class="row mx-0">
-    <div class="col-md-8 mx-auto mb-2 my-0">
+<div class="row mx-0 p-0">
+    <div class="col-md-8 mx-auto p-2 mb-2 my-0">
+    
+        <div class="card m-sm-0 p-0 shadow rounded bg-gold-light">
+            <div class="card-body m-1 p-0">
 
-        <div class="text-center my-2">
-            <h5><i class="bi bi-upload me-2 mb-2"></i> Upload a New PDF File</h5>
-        </div>
-
-        <div class="text-start">
-            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-                <div class="mb-3 position-relative">
-                    <div class="d-flex align-items-center">
-                        <input type="file" class="form-control flex-grow-1 upload-file-input" id="uploadFile" name="uploadFile" required>
-                        <button type="submit" class="btn btn-primary upload-button"><i class="bi bi-upload"></i></button>
-                    </div>
+                <div class="text-center my-2">
+                    <h5><i class="bi bi-upload me-2 mb-2"></i> Upload a New PDF File</h5>
                 </div>
-            </form>
-        </div>
-    </div>
 
-    <div class="col-md-8 mx-auto my-0">
-        <div class="text-center mb-2">
-            <h5><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Existing Files</h5>
-        </div>
+                <div class="text-start">
+                    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                        <div class="mb-3 position-relative">
+                            <div class="d-flex align-items-center">
+                                <input type="file" class="form-control flex-grow-1 upload-file-input" id="uploadFile" name="uploadFile" required>
+                                <button type="submit" class="btn btn-upload upload-button"><i class="bi bi-upload"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-        @if (Model.Files.Any())
-        {
-            <div class="text-start">
-                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
-                    <ul class="list-group">
-                        @foreach (var file in Model.Files)
-                        {
-                            <li class="list-group-item">
-                                <div class="row align-items-center">
-                                    <div class="col-8 col-md-9 d-flex align-items-center">
-                                        <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
-                                    </div>
-                                    <div class="col-4 col-md-3 d-flex align-items-center justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 show-rename-input" data-filename="@file">Rename</button>
-                                        <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-outline-danger delete-button" data-filename="@file">X</button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="list-group-item d-none" id="rename-@file">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
-                                    <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Update Rename</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                </form>
+                <div class="text-center mb-2">
+                    <h5><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Existing Files</h5>
+                </div>
+
+                @if (Model.Files.Any())
+                {
+                    <div class="text-start">
+                        <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
+                            <ul class="list-group">
+                                @{
+                                    var fileIndex = 0;
+                                }
+                                @foreach (var file in Model.Files)
+                                {
+                                    var rowClass = fileIndex % 2 == 0 ? "even-row" : "odd-row";
+                                    <li class="list-group-item @rowClass">
+                                        <div class="row align-items-center">
+                                            <div class="col-8 col-md-9 d-flex align-items-center">
+                                                <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                                            </div>
+                                            <div class="col-4 col-md-3 d-flex align-items-center justify-content-end">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary me-2 show-rename-input" data-filename="@file">Rename</button>
+                                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-outline-danger delete-button" data-filename="@file">X</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-none" id="rename-@file">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
+                                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Update Rename</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
+                                        </div>
+                                    </li>
+                                    fileIndex++;
+                                }
+                            </ul>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <p>No files found.</p>
+                }
             </div>
-        }
-        else
-        {
-            <p>No files found.</p>
-        }
+        </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script>

@@ -10,7 +10,6 @@
     ViewData["OGTitle"] = "HOA Directory and Reports";
     ViewData["OGDescription"] = "Oaks-Village HOA Directory and Reports";
     ViewData["OGURL"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
 
     var returnUrl = Url.Action("Members", "Home", new { area = "" });
     var pageName = "Minutes";
@@ -47,8 +46,7 @@
                         <div class="card-body">
                             <h5 class="card-title"><i class="bi bi-filetype-pdf me-2"></i> Upload a New PDF File</h5>
                             <form id="uploadForm" enctype="multipart/form-data">
-                                <div class="mb-3">
-                                    @* <label for="file" class="form-label">Select PDF File:</label> *@
+                                <div class="mb-3">                                    
                                     <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-primary">Upload</button>
@@ -111,15 +109,13 @@
                 } else if (!fileName.startsWith('Agenda')) {
                     errorMessage = 'File name must start with "Agenda" (e.g., Agenda 2025.pdf) or "Minutes" followed by this date format (e.g., Minutes 2025-04-09.pdf).';
                 } else {
-                    isValid = true; // For Agenda files, we are keeping the simpler check for now
+                    isValid = true; 
                 }
 
                 if (!isValid) {
-                    $('#uploadStatus').html('<div class="alert alert-warning">' + errorMessage + '</div>');
-                    // Optionally clear the file input - you can remove this here as the Cancel button will handle it
-                    // $(this).val('');
+                    $('#uploadStatus').html('<div class="alert alert-warning">' + errorMessage + '</div>');                    
                 } else {
-                    $('#uploadStatus').html(''); // Clear any previous messages
+                    $('#uploadStatus').html('');
                 }
             });
 
