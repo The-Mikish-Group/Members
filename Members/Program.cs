@@ -68,107 +68,108 @@ app.MapControllerRoute(
 app.MapRazorPages()
     .WithStaticAssets();
 
-// Create the Roles if they have been deleted.
-//using (var scope = app.Services.CreateScope())
-//{
-//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//Create the Roles if they have been deleted.
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roles = { "Admin", "Member", "Manager" };
 
-//    var roles = new[] { "Admin", "Manager", "Member" };
-//    foreach (var role in roles)
-//    {
-//        if (!await roleManager.RoleExistsAsync(role))
-//        {
-//            await roleManager.CreateAsync(new IdentityRole(role));
-//        }
-//    }
-//}
+    foreach (var roleName in roles)
+    {
+        var roleExist = await roleManager.RoleExistsAsync(roleName);
+        if (!roleExist)
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+}
 
 // Create the Administrator Account if it has been deleted.
-//using (var scope = app.Services.CreateScope())
-//{
-//    var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-//    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Get the ApplicationDbContext
+using (var scope = app.Services.CreateScope())
+{
+    var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Get the ApplicationDbContext
 
-//    string ADMIN_EMAIL = Environment.GetEnvironmentVariable("ADMIN_EMAIL")!;
-//    string ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
+    string ADMIN_EMAIL = Environment.GetEnvironmentVariable("ADMIN_EMAIL")!;
+    string ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
 
-//    if (string.IsNullOrEmpty(ADMIN_EMAIL) || string.IsNullOrEmpty(ADMIN_PASSWORD))
-//    {
-//        throw new InvalidOperationException("ADMIN_EMAIL or ADMIN_PASSWORD environment variables are not set.");
-//    }
+    if (string.IsNullOrEmpty(ADMIN_EMAIL) || string.IsNullOrEmpty(ADMIN_PASSWORD))
+    {
+        throw new InvalidOperationException("ADMIN_EMAIL or ADMIN_PASSWORD environment variables are not set.");
+    }
 
-//    var adminUser = await UserManager.FindByEmailAsync(ADMIN_EMAIL);
+    var adminUser = await UserManager.FindByEmailAsync(ADMIN_EMAIL);
 
-//    if (adminUser == null)
-//    {
-//        adminUser = new IdentityUser
-//        {
-//            UserName = ADMIN_EMAIL,
-//            Email = ADMIN_EMAIL,
-//            EmailConfirmed = true,
-//            PhoneNumber = "(217) 371-8041" // Set the Cell Phone number in AspNetUsers
-//        };
+    if (adminUser == null)
+    {
+        adminUser = new IdentityUser
+        {
+            UserName = ADMIN_EMAIL,
+            Email = ADMIN_EMAIL,
+            EmailConfirmed = true,
+            PhoneNumber = "(217) 371-8041" // Set the Cell Phone number in AspNetUsers
+        };
 
-//        var createResult = await UserManager.CreateAsync(adminUser, ADMIN_PASSWORD);
-//        if (createResult.Succeeded)
-//        {
-//            await UserManager.AddToRoleAsync(adminUser, "Admin");
-            
-//            // Update PhoneNumber if it's not already set
-//            if (string.IsNullOrEmpty(adminUser.PhoneNumber))
-//            {
-//                adminUser.PhoneNumber = "(217) 371-8041";
-//                await UserManager.UpdateAsync(adminUser);
-//            }
+        var createResult = await UserManager.CreateAsync(adminUser, ADMIN_PASSWORD);
+        if (createResult.Succeeded)
+        {
+            await UserManager.AddToRoleAsync(adminUser, "Admin");
 
-//            // Update UserProfile
-//            var adminProfile = await dbContext.UserProfile.FirstOrDefaultAsync(up => up.UserId == adminUser.Id);
+            // Update PhoneNumber if it's not already set
+            if (string.IsNullOrEmpty(adminUser.PhoneNumber))
+            {
+                adminUser.PhoneNumber = "(217) 371-8041";
+                await UserManager.UpdateAsync(adminUser);
+            }
 
-//            if (adminProfile == null)
-//            {
-//                adminProfile = new UserProfile
-//                {
-//                    UserId = adminUser.Id,
-//                    FirstName = "*",
-//                    LastName = "Administrator",
-//                    AddressLine1 = "1042 N Brainerd",
-//                    City = "Avon Park",
-//                    State = "FL",
-//                    ZipCode = "33825",
-//                    HomePhoneNumber = "(217) 371-8041",
-//                    User = adminUser 
-//                };
-//                dbContext.UserProfile.Add(adminProfile);
-//            }
-//            else
-//            {
-//                adminProfile.FirstName = "*";
-//                adminProfile.LastName = "Administrator";
-//                adminProfile.AddressLine1 = "1042 N Brainerd";
-//                adminProfile.City = "Avon Park";
-//                adminProfile.State = "FL";
-//                adminProfile.ZipCode = "33825";
-//                // You can choose to update HomePhoneNumber here if needed
-//            }
+            // Update UserProfile
+            var adminProfile = await dbContext.UserProfile.FirstOrDefaultAsync(up => up.UserId == adminUser.Id);
 
-//            await dbContext.SaveChangesAsync();
+            if (adminProfile == null)
+            {
+                adminProfile = new UserProfile
+                {
+                    UserId = adminUser.Id,
+                    FirstName = "An",
+                    LastName = "Administrator",
+                    AddressLine1 = "1042 N Brainerd",
+                    City = "Avon Park",
+                    State = "FL",
+                    ZipCode = "33825",
+                    HomePhoneNumber = "(123) 456-7890",
+                    User = adminUser
+                };
+                dbContext.UserProfile.Add(adminProfile);
+            }
+            else
+            {
+                adminProfile.FirstName = "An";
+                adminProfile.LastName = "Administrator";
+                adminProfile.AddressLine1 = "1042 N Brainerd";
+                adminProfile.City = "Avon Park";
+                adminProfile.State = "FL";
+                adminProfile.ZipCode = "33825";
+                // You can choose to update HomePhoneNumber here if needed
+            }
 
-//        }
-//        else
-//        {
-//            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-//            foreach (var error in createResult.Errors)
-//            {
-//                logger.LogError("Error creating admin user: {Description}", error.Description);
-//            }
-//            throw new Exception("Failed to create admin user.");
-//        }
-//    }
-//    else
-//    {
-//        // Do Nothing!
-//    }
-//}
+            await dbContext.SaveChangesAsync();
+
+        }
+        else
+        {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            foreach (var error in createResult.Errors)
+            {
+                logger.LogError("Error creating admin user: {Description}", error.Description);
+            }
+            throw new Exception("Failed to create admin user.");
+        }
+    }
+    else
+    {
+        // Do Nothing!
+    }
+}
 
 Members.Helpers.ImageHelper.Initialize(app.Environment);
 

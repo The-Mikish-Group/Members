@@ -26,7 +26,7 @@
     {
         <div class="row justify-content-center mt-1 mb-3 g-3">
             <div class="col-8 mt-1">
-                <h3 class="card-title text-center mb-0 text-gold-darker">@pageName</h3>
+                <h3 class="card-title text-center mb-0 text-gold-darker"><i class="bi bi-filetype-pdf me-2"></i> @pageName</h3>
             </div>
         </div>
 
@@ -45,10 +45,10 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Upload New File</h5>
+                            <h5 class="card-title"><i class="bi bi-filetype-pdf me-2"></i> Upload a New PDF File</h5>
                             <form id="uploadForm" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label for="file" class="form-label">Select PDF File:</label>
+                                    @* <label for="file" class="form-label">Select PDF File:</label> *@
                                     <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-primary">Upload</button>
