@@ -21,19 +21,19 @@ namespace Members.Areas.Identity.Pages.Admin
         private readonly IWebHostEnvironment _environment;
 
         [BindProperty]
-        public List<string> SelectedFiles { get; set; } = [];
+        public List<string> SelectedFiles { get; set; } = []; // Initialize to avoid null
 
         [BindProperty]
-        public IFormFile? UploadFile { get; set; }
+        public IFormFile UploadFile { get; set; } = null!; // Use null-forgiving operator as it will be set later
 
-        [BindProperty]
+        //[BindProperty]
         public string? NewFileName { get; set; }
 
-        public List<string> Files { get; set; } = [];
+        public List<string?> Files { get; set; } = []; // Initialize to avoid null
 
         public string? Message { get; set; }
 
-        public string MessageType { get; set; } = "alert-info";
+        public string? MessageType { get; set; } = "alert-info";
 
         public AdminFilesModel(IWebHostEnvironment environment, ILogger<AdminFilesModel> logger)
         {
@@ -45,9 +45,45 @@ namespace Members.Areas.Identity.Pages.Admin
         public async Task OnGetAsync()
         {
             Files = await Task.Run(() => Directory.GetFiles(_protectedFilesPath)
-                                             .Select(fileName => Path.GetFileName(fileName)!)
-                                             .OrderBy(f => f)
-                                             .ToList());
+                                                .Select(fileName => (string?)Path.GetFileName(fileName))
+                                                .OrderBy(f => f)
+                                                .ToList());
+            _logger.LogInformation($"WorkingAdminPage - _privateFilesPath: {_protectedFilesPath}");
+        }
+
+        public async Task<IActionResult> OnPostDeleteSingleAsync(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                Message = "Error: File name for deletion is missing.";
+                MessageType = "alert-danger";
+                return RedirectToPage();
+            }
+
+            var filePath = Path.Combine(_protectedFilesPath, fileName);
+
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    await Task.Run(() => System.IO.File.Delete(filePath));
+                    _logger.LogInformation("Admin deleted file: {FileName}", fileName);
+                    Message = $"File '{fileName}' deleted successfully.";
+                    MessageType = "alert-success";
+                }
+                else
+                {
+                    Message = $"Error: File '{fileName}' not found.";
+                    MessageType = "alert-danger";
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = $"Error deleting file '{fileName}': {ex.Message}";
+                MessageType = "alert-danger";
+            }
+
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteAsync()
@@ -84,24 +120,18 @@ namespace Members.Areas.Identity.Pages.Admin
             return RedirectToPage();
         }
 
-        public IActionResult OnPostRename()
-        {
-            return Page();
-        }
+        // We can remove the OnPostRename method as the initial action is handled by JavaScript
 
         public async Task<IActionResult> OnPostUpdateRenameAsync(string oldFileName, string newFileName)
         {
             if (string.IsNullOrEmpty(oldFileName) || string.IsNullOrEmpty(newFileName))
             {
-                Message = "Both old and new file names must be provided.";
-                MessageType = "alert-warning";
-                return Page();
+                return new JsonResult(false); // Indicate failure
             }
 
             var oldPath = Path.Combine(_protectedFilesPath, oldFileName);
-            var fileExtension = ".pdf";
+            var fileExtension = ".pdf"; // Assuming .pdf extension
 
-            // Ensure the new file name has the .pdf extension if it doesn't already
             if (!newFileName.ToLower().EndsWith(fileExtension))
             {
                 newFileName += fileExtension;
@@ -113,57 +143,66 @@ namespace Members.Areas.Identity.Pages.Admin
             {
                 try
                 {
-                    // Use Task.Run to perform the file operation asynchronously
                     await Task.Run(() => System.IO.File.Move(oldPath, newPath));
-                    Message = $"File '{oldFileName}' successfully renamed to '{newFileName}'.";
-                    MessageType = "alert-success";
+                    return new JsonResult(true); // Indicate success
                 }
                 catch (Exception ex)
                 {
-                    Message = $"Error renaming file: {ex.Message}";
-                    MessageType = "alert-danger";
+                    _logger.LogError("Error renaming file {OldFile} to {NewFile}: {ErrorMessage}", oldFileName, newFileName, ex.Message);
+                    return new JsonResult(false); // Indicate failure
                 }
             }
             else
             {
-                Message = $"Error: File '{oldFileName}' not found.";
-                MessageType = "alert-danger";
+                return new JsonResult(false); // Indicate failure - old file not found
             }
-
-            return RedirectToPage("./AdminFiles");
         }
+
         public async Task<IActionResult> OnPostUploadAsync()
         {
-            if (UploadFile != null && UploadFile.Length > 0)
+            if (!ModelState.IsValid)
             {
-                var fileName = Path.GetFileName(UploadFile.FileName);
-                var filePath = Path.Combine(_protectedFilesPath, fileName);
+                Message = "Please correct the errors in the form."; // Fixed the incorrect reference to 'Model'
+                MessageType = "alert-warning";
+                return Page();
+            }
 
-                try
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files[0];
+                if (file != null && file.Length > 0)
                 {
-                    await Task.Run(async () =>
+                    try
                     {
-                        using var stream = new FileStream(filePath, FileMode.Create);
-                        await UploadFile.CopyToAsync(stream);
-                    });
-                    _logger.LogInformation("Admin uploaded file: {FileName}", fileName); // Fixed CA2254
-                    Message = $"File '{fileName}' uploaded successfully.";
-                    MessageType = "alert-success";
-                    return RedirectToPage();
+                        var filePath = Path.Combine(_protectedFilesPath, file.FileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+
+                        Message = "File uploaded successfully."; 
+                        MessageType = "alert-success";
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error uploading file");
+                        Message = "Error uploading file. Please try again."; // Fixed the incorrect reference to 'Model'
+                        MessageType = "alert-danger";
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Message = $"Error uploading file '{fileName}': {ex.Message}";
-                    MessageType = "alert-danger";
+                    Message = "Please select a file to upload."; // Fixed the incorrect reference to 'Model'
+                    MessageType = "alert-warning";
                 }
             }
             else
             {
-                Message = "Please select a file to upload.";
+                Message = "No file was selected for upload."; // Fixed the incorrect reference to 'Model'
                 MessageType = "alert-warning";
             }
 
-            return Page();
+            return RedirectToPage();
         }
     }
 }

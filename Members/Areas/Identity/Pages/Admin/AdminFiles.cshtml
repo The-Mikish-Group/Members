@@ -1,93 +1,90 @@
 ﻿@page
 @using System.IO
 @model Members.Areas.Identity.Pages.Admin.AdminFilesModel
-@using Microsoft.AspNetCore.Identity.UI.Services;
+
 @{
-    ViewData["Title"] = "PDF File Management";
+    ViewData["Title"] = "Admin PDF File Management";
 }
+
+<div class="text-center mt-4 mb-2">
+    <h3><i class="bi bi-shield-lock-fill ms-2"></i> @ViewData["Title"]</h3>
+
+</div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
 {
     <div class="alert @Model.MessageType">@Model.Message</div>
 }
 
-<head>
-    <title>@ViewData["Title"]</title>   
-</head>
+<div class="row mx-0">
+    <div class="col-md-8 mx-auto mb-2 my-0">
 
-<partial name="_LargeLogo" />
-
-<div class="container mY-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card p-2 mb-3 shadow bg-gold-footer">
-
-                <h2 class="mb-4 text-gold-darker">
-                    <i class="bi bi-file-pdf-fill"></i> Add PDF Files
-                </h2>
-
-                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-                    <div class="mb-3">
-                        <label for="uploadFile" class="form-label">Select File:</label>
-                        <input type="file" class="form-control" id="uploadFile" name="uploadFile" required>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-primary">Upload</button>
-                </form>
-
-                <hr />
-
-                <h2 class="mt-4 mb-2">
-                    <i class="bi bi-file-pdf-fill"></i> Existing Files
-                </h2>
-
-                @if (Model.Files.Any())
-                {
-                <form method="post" id=AdminFiles>
-
-                    <div class="d-flex justify-content-end mb-3">
-                        <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger">Delete Selected</button>
-                    </div>
-                    <ul class="list-group">
-                            @foreach (var file in Model.Files)
-                            {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="flex-grow-1">@file</span>
-                                <div>
-                                        <button type="button" asp-page-handler="Rename" asp-route-oldFileName="@file" class="btn btn-sm btn-outline-secondary me-2">Rename</button>
-                                    <input type="checkbox" name="selectedFiles" value="@file" class="form-check-input" />
-                                </div>
-                            </li>
-                            <li class="list-group-item d-none" id="rename-@file">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
-                                    <button type="submit" asp-page-handler="UpdateRename" asp-route-oldFileName="@file" class="btn btn-sm btn-primary">Update Rename</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
-                                </div>
-                            </li>
-                            }
-                    </ul>
-                </form>
-                }
-                else
-                {
-                <p>No files found.</p>
-                }
-            </div>
+        <div class="text-center my-2">
+            <h5><i class="bi bi-upload me-2 mb-2"></i> Upload New PDF File</h5>
         </div>
+
+        <div class="text-start">
+            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                <div class="mb-3 position-relative">                  
+                    <div class="d-flex align-items-center">
+                        <input type="file" class="form-control flex-grow-1 upload-file-input" id="uploadFile" name="uploadFile" required>
+                        <button type="submit" class="btn btn-primary upload-button"><i class="bi bi-upload"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8 mx-auto my-0">
+        <div class="text-center mb-2">
+            <h5><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Existing Files</h5>
+        </div>
+
+        @if (Model.Files.Any())
+        {
+            <div class="text-start">
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
+                <ul class="list-group">
+                    @foreach (var file in Model.Files)
+                    {
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-8 col-md-9 d-flex align-items-center">
+                                    <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                                </div>
+                                <div class="col-4 col-md-3 d-flex align-items-center justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary me-2 show-rename-input" data-filename="@file">Rename</button>
+                                    <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-outline-danger delete-button" data-filename="@file">X</button>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-none" id="rename-@file">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
+                                <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Update Rename</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </form>
+            </div>
+        }
+        else
+        {
+            <p>No files found.</p>
+        }
     </div>
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.btn-outline-secondary').on('click', function () {
-                console.log('Rename button clicked');
+            $('.show-rename-input').on('click', function () {
                 var listItem = $(this).closest('li.list-group-item');
                 var fileNameSpan = listItem.find('span');
                 var fileName = fileNameSpan.text();
-                console.log('Filename:', fileName);
                 var renameInputListItem = listItem.next('li.list-group-item'); // Select the next list item
-                console.log('Rename Input Element:', renameInputListItem);
                 renameInputListItem.removeClass('d-none');
                 $(this).hide();
             });
@@ -96,7 +93,62 @@
                 var fileName = $(this).data('file');
                 var renameInputListItem = $(this).closest('li.list-group-item');
                 renameInputListItem.addClass('d-none');
-                $('li.list-group-item:has(span:contains("' + fileName + '")) button.btn-outline-secondary').show();
+                $(this).closest('li.list-group-item').find('div button.show-rename-input').show();
+            });
+
+            // Handle the click event of the "Update Rename" button directly
+            $('.update-rename-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                var oldFileName = $(this).data('oldfilename');
+                var renameInputListItem = $(this).closest('.list-group-item'); // This should be the rename input li
+                var newFileNameInput = renameInputListItem.find('input[name="newFileName"]');
+                var newFileName = newFileNameInput.val();
+                if (!oldFileName || !newFileName) {
+                    alert('Both old and new file names must be provided.');
+                    return;
+                }
+
+                var url = `/Identity/Admin/AdminFiles?handler=UpdateRename&oldFileName=${encodeURIComponent(oldFileName)}`;
+
+                // Create form data
+                var formData = new FormData();
+                formData.append('newFileName', newFileName);
+
+                // Submit the form data using AJAX
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false, // Required for FormData
+                    processData: false, // Required for FormData
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (data) {
+                        if (data) {
+                            location.reload(); // Reload the page to show updated list and messages
+                        } else {
+                            alert('Error renaming file.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error renaming file:", error);
+                        alert('An error occurred while renaming the file.');
+                    }
+                });
+            });
+
+            // Handle the click event of the "X" (Delete) button with confirmation
+            $('.delete-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission of this button
+                var fileName = $(this).data('filename');
+                if (confirm('Are you sure you want to delete the file "' + fileName + '"?')) {
+                    // If the user confirms, submit the form to the DeleteSingle handler
+                    var form = document.getElementById('AdminFiles');
+                    form.action = '?handler=DeleteSingle&fileName=' + encodeURIComponent(fileName);
+                    form.method = 'post';
+                    form.submit();
+                }
             });
         });
     </script>

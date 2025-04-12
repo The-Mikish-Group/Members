@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Identity\Pages\Admin\Documents.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\EditRoles.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\EditUsers.cshtml.cs" />
     <Compile Remove="Areas\Identity\Pages\SMTPtester.cshtml.cs" />
@@ -48,11 +49,13 @@
 
   <ItemGroup>
     <Content Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Admin\Documents.cshtml" />
     <Content Remove="Areas\Identity\Pages\EditRoles.cshtml" />
     <Content Remove="Areas\Identity\Pages\EditUsers.cshtml" />
     <Content Remove="Areas\Identity\Pages\SMTPtester.cshtml" />
     <Content Remove="Areas\Identity\Pages\ViewPdf old.cshtml" />
     <Content Remove="Views\Home\xMembers.cshtml" />
+    <Content Remove="Views\Home\xxxDocuments.cshtml" />
     <Content Remove="Views\Shared\_LoginPartial.cshtml" />
     <Content Remove="wwwroot\Images\Svg\Logos\logo oaks village.ai" />
     <Content Remove="wwwroot\Images\Svg\Logos\LogoOaksVillage.ai" />

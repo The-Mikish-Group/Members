@@ -12,7 +12,7 @@ using Members.Models;
 
 namespace Members.Controllers
 {
-    public class FileController : Controller
+    public partial class FileController : Controller // Make the class partial
     {
         private readonly string _protectedFilesPath;
         private readonly ILogger<FileController> _logger;
@@ -66,18 +66,18 @@ namespace Members.Controllers
             }
 
             var files = Directory.GetFiles(_protectedFilesPath)
-                                 .Where(file => Path.GetFileName(file).StartsWith("Budget") || Path.GetFileName(file).StartsWith("Financial"))
-                                 .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.OrdinalIgnoreCase)) // Ensure only PDF files are listed
-                                 .OrderBy(Path.GetFileName)
-                                 .Select(filePath => new DocumentInfo
-                                 {
-                                     FileName = Path.GetFileName(filePath),
-                                     DisplayName = Path.GetFileNameWithoutExtension(filePath)
-                                                          .Replace("Budget Report", "Budget Report")
-                                                          .Replace("Financial Report", "Financial Report")
-                                                          .Trim()
-                                 })
-                                 .ToList();
+                                    .Where(file => Path.GetFileName(file).StartsWith("Budget") || Path.GetFileName(file).StartsWith("Financial"))
+                                    .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.OrdinalIgnoreCase)) // Ensure only PDF files are listed
+                                    .OrderBy(Path.GetFileName)
+                                    .Select(filePath => new DocumentInfo
+                                    {
+                                        FileName = Path.GetFileName(filePath),
+                                        DisplayName = Path.GetFileNameWithoutExtension(filePath)
+                                                                                    .Replace("Budget Report", "Budget Report")
+                                                                                    .Replace("Financial Report", "Financial Report")
+                                                                                    .Trim()
+                                    })
+                                    .ToList();
 
             return Json(files);
         }
@@ -93,18 +93,42 @@ namespace Members.Controllers
             }
 
             var files = Directory.GetFiles(_protectedFilesPath)
-                                 .Where(file => Path.GetFileName(file).StartsWith("Minutes") || Path.GetFileName(file).StartsWith("Agenda"))
-                                 .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.InvariantCultureIgnoreCase)) // Ensure only PDF files are listed
-                                 .OrderBy(Path.GetFileName)
-                                 .Select(filePath => new DocumentInfo
-                                 {
-                                     FileName = Path.GetFileName(filePath),
-                                     DisplayName = Path.GetFileNameWithoutExtension(filePath)
-                                                          .Replace("Minutes", "Minutes")
-                                                          .Replace("Agenda", "Agenda")
-                                                          .Trim()
-                                 })
-                                 .ToList();
+                                    .Where(file => Path.GetFileName(file).StartsWith("Minutes") || Path.GetFileName(file).StartsWith("Agenda"))
+                                    .Where(file => Path.GetExtension(file).Equals(".pdf", StringComparison.InvariantCultureIgnoreCase)) // Ensure only PDF files are listed
+                                    .OrderBy(Path.GetFileName)
+                                    .Select(filePath => new DocumentInfo
+                                    {
+                                        FileName = Path.GetFileName(filePath),
+                                        DisplayName = Path.GetFileNameWithoutExtension(filePath)
+                                                                                    .Replace("Minutes", "Minutes")
+                                                                                    .Replace("Agenda", "Agenda")
+                                                                                    .Trim()
+                                    })
+                                    .ToList();
+
+            return Json(files);
+        }
+
+        // New action to get the list of Documents files
+        public IActionResult GetDocumentsFiles()
+        {
+            if (!Directory.Exists(_protectedFilesPath))
+            {
+                const string errorMessage = "Protected files directory not found: {Path}";
+                _logger.LogError(errorMessage, _protectedFilesPath);
+                return Json(new List<DocumentInfo>());
+            }
+
+            var files = Directory.GetFiles(_protectedFilesPath)
+                                    .Select(Path.GetFileName)
+                                    .Where(fileName => !string.IsNullOrEmpty(fileName) && DocumentFileNameRegex().IsMatch(fileName))
+                                    .OrderBy(fileName => fileName)
+                                    .Select(fileName => new DocumentInfo
+                                    {
+                                        FileName = fileName,
+                                        DisplayName = fileName // We will format this in the view
+                                    })
+                                    .ToList();
 
             return Json(files);
         }
@@ -131,7 +155,7 @@ namespace Members.Controllers
                 string minutesPattern = @"^Minutes\s\d{4}-\d{2}-\d{2}\.pdf$";
                 if (!Regex.IsMatch(fileName, minutesPattern))
                 {
-                    return BadRequest("Minutes file name must follow the format: Minutes YYYY-MM-DD.pdf (e.g., Minutes 2023-12-31.pdf)");
+                    return BadRequest("Minutes file name must follow the format: Minutes YEAR-MM-DD.pdf (e.g., Minutes 2023-12-31.pdf)");
                 }
             }
             else if (fileName.StartsWith("Agenda"))
@@ -140,25 +164,25 @@ namespace Members.Controllers
             }
             else if (fileName.StartsWith("Financial Report"))
             {
-                // Regex to match "Financial Report YYYY-MM.pdf"
+                // Regex to match "Financial Report YEAR-MM.pdf"
                 string financialPattern = @"^Financial Report\s\d{4}-\d{2}\.pdf$";
                 if (!Regex.IsMatch(fileName, financialPattern))
                 {
-                    return BadRequest("Financial Report file name must follow the format: Financial Report YYYY-MM.pdf (e.g., Financial Report 2024-03.pdf)");
+                    return BadRequest("Financial Report file name must follow the format: Financial Report YEAR-MM.pdf (e.g., Financial Report 2024-03.pdf)");
                 }
             }
             else if (fileName.StartsWith("Budget Report"))
             {
-                // Regex to match "Budget Report YYYY.pdf"
+                // Regex to match "Budget Report YEAR.pdf"
                 string budgetPattern = @"^Budget Report\s\d{4}\.pdf$";
                 if (!Regex.IsMatch(fileName, budgetPattern))
                 {
-                    return BadRequest("Budget Report file name must follow the format: Budget Report YYYY.pdf (e.g., Budget Report 2025.pdf)");
+                    return BadRequest("Budget Report file name must follow the format: Budget Report YEAR.pdf (e.g., Budget Report 2025.pdf)");
                 }
             }
-            else
+            else if (!DocumentFileNameRegex().IsMatch(fileName)) // Validate for document filename format on upload
             {
-                return BadRequest("File name must start with 'Agenda', 'Minutes', 'Financial Report', or 'Budget Report'.");
+                return BadRequest("Document file name must start with '###-' followed by the filename and end with '.pdf' (e.g., 001-MyDocument.pdf).");
             }
 
             var filePath = GetFilePath(fileName);
@@ -178,5 +202,8 @@ namespace Members.Controllers
                 return StatusCode(500, $"Error uploading file: {ex.Message}");
             }
         }
+
+        [GeneratedRegex(@"^\d{3}-.*\.pdf$", RegexOptions.IgnoreCase)]
+        private static partial Regex DocumentFileNameRegex();
     }
 }
