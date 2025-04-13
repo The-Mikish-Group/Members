@@ -21,7 +21,7 @@
         <div class="card m-sm-0 p-0 shadow rounded bg-gold-light">
             <div class="card-body m-1 p-0">
 
-                <div class="text-center my-2">
+                <div class="text-center mt-2 mb-4">
                     <h5><i class="bi bi-upload me-2 mb-2"></i> Upload a New PDF File</h5>
                 </div>
 
@@ -36,45 +36,54 @@
                     </form>
                 </div>
 
-                <div class="text-center mb-2">
+                <div class="text-center mb-0">
                     <h5><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Existing Files</h5>
                 </div>
-
-                @if (Model.Files.Any())
-                {
-                    <div class="text-start">
-                        <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
-                            <ul class="list-group">
-                                @{
-                                    var fileIndex = 0;
-                                }
-                                @foreach (var file in Model.Files)
-                                {
-                                    var rowClass = fileIndex % 2 == 0 ? "even-row" : "odd-row";
-                                    <li class="list-group-item @rowClass">
-                                        <div class="row align-items-center">
-                                            <div class="col-8 col-md-9 d-flex align-items-center">
-                                                <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
-                                            </div>
-                                            <div class="col-4 col-md-3 d-flex align-items-center justify-content-end">
-                                                <button type="button" class="btn btn-sm btn-outline-secondary me-2 show-rename-input" data-filename="@file">Rename</button>
-                                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-outline-danger delete-button" data-filename="@file">X</button>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-none" id="rename-@file">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
-                                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Update Rename</button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Cancel</button>
-                                        </div>
-                                    </li>
-                                    fileIndex++;
-                                }
-                            </ul>
-                        </form>
+                <div class="row">
+                    <div class="col-md-6 text-start">
+                        <p class="ps-2">Rename</p>
                     </div>
+                    <div class="col-md-6 text-end">
+                        <p class="pe-2">Delete</p>
+                    </div>
+                </div>
+               @if (Model.Files.Any())
+{
+    <div class="text-start">
+        <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
+            <ul class="list-group">
+                @{
+                    var fileIndex = 0;
                 }
+                @foreach (var file in Model.Files)
+                {
+                    var rowClass = fileIndex % 2 == 0 ? "even-row" : "odd-row";
+                    <li class="list-group-item @rowClass">
+                        <div class="row align-items-center">
+                            <div class="col-auto me-2">
+                                <button type="button" class="btn-link btn btn-sm btn-rename" data-filename="@file"><i class="bi bi-pencil-square"></i></button>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                            </div>
+                            <div class="col-auto d-flex align-items-center justify-content-end">
+                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-delete delete-button" data-filename="@file">X</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-none" id="rename-@file">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
+                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Rename</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Return</button>
+                        </div>
+                    </li>
+                    fileIndex++;
+                }
+            </ul>
+        </form>
+    </div>
+}
                 else
                 {
                     <p>No files found.</p>
@@ -88,7 +97,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.show-rename-input').on('click', function () {
+            $('.btn-rename').on('click', function () {
                 var listItem = $(this).closest('li.list-group-item');
                 var fileNameSpan = listItem.find('span');
                 var fileName = fileNameSpan.text();
@@ -105,7 +114,7 @@
                 // Target the previous list item (which contains the original file info and the Rename button)
                 var originalListItem = renameInputListItem.prev('li.list-group-item');
                 // Find the Rename button within that previous list item and show it
-                originalListItem.find('div button.show-rename-input').show();
+                originalListItem.find('div button.btn-rename').show(); // Updated selector here as well
             });
 
             // Handle the click event of the "Update Rename" button directly

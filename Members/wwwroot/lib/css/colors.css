@@ -403,6 +403,36 @@ a {
         background-color: lightgreen
     }
 
+
+/*  btn-rename Defaults */
+.btn-rename {
+    border-color: transparent;
+    background-color: transparent;
+    color: black;
+}
+
+    .btn-rename:focus,
+    .btn-rename:hover {        
+        border-color: transparent;
+        color: darkgreen;
+        background-color: lightgreen
+    }
+
+
+/*  btn-delete Defaults */
+.btn-delete {    
+    border-color: transparent;
+    background-color: transparent;
+    color:darkred;
+}
+
+    .btn-delete:focus,
+    .btn-delete:hover {
+        border-color: transparent;
+        color: darkred;
+        background-color: lightpink
+    }
+
 /*  btn-danger Defaults */
 .btn-danger {
     color: white;
