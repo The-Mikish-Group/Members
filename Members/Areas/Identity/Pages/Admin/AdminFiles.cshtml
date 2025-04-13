@@ -7,7 +7,7 @@
 }
 
 <div class="text-center mt-4 mb-2">
-    <h3><i class="bi bi-shield-lock-fill ms-2"></i> @ViewData["Title"]</h3>
+    <h3><i class="bi bi-shield-lock-fill ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -22,7 +22,7 @@
             <div class="card-body m-1 p-0">
 
                 <div class="text-center mt-2 mb-4">
-                    <h5><i class="bi bi-upload me-2 mb-2"></i> Upload a New PDF File</h5>
+                    <h5 class="text-gold-darker"><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Upload a New PDF File</h5>
                 </div>
 
                 <div class="text-start">
@@ -37,14 +37,16 @@
                 </div>
 
                 <div class="text-center mb-0">
-                    <h5><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Existing Files</h5>
+                    <h5>
+                        <i class="bi bi-file-earmark-pdf-fill me-2 mb-2 text-gold-darker"></i> Edit an Existing PDF File
+                        </h5>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 text-start">
-                        <p class="ps-2">Rename</p>
+                    <div class="col-6 text-start">
+                        <p class="ps-2 text-gold-darker"><strong>Rename</strong></p>
                     </div>
-                    <div class="col-md-6 text-end">
-                        <p class="pe-2">Delete</p>
+                    <div class="col-6 text-end">
+                        <p class="pe-2 text-gold-darker"><strong>Delete</strong></p>
                     </div>
                 </div>
                @if (Model.Files.Any())
@@ -64,7 +66,7 @@
                                 <button type="button" class="btn-link btn btn-sm btn-rename" data-filename="@file"><i class="bi bi-pencil-square"></i></button>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span class="flex-grow-1 d-block" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                                <span class="flex-grow-1 d-block  text-gold-darker" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
                             </div>
                             <div class="col-auto d-flex align-items-center justify-content-end">
                                 <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-sm btn-delete delete-button" data-filename="@file">X</button>
@@ -73,9 +75,13 @@
                     </li>
                     <li class="list-group-item d-none" id="rename-@file">
                         <div class="input-group">
-                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name (without extension)">
-                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">Rename</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">Return</button>
+                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name">
+                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">
+                                <i class="bi bi-pencil-fill"></i> <span class="d-none d-lg-inline">Rename</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">
+                                <i class="bi bi-arrow-return-left"></i> <span class="d-none d-lg-inline">Cancel</span>
+                            </button>
                         </div>
                     </li>
                     fileIndex++;
@@ -93,7 +99,6 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -104,6 +109,10 @@
                 var renameInputListItem = listItem.next('li.list-group-item'); // Select the next list item
                 renameInputListItem.removeClass('d-none');
                 $(this).hide();
+
+                // Find the input field and set focus to it
+                var newFileNameInput = renameInputListItem.find('input[name="newFileName"]');
+                newFileNameInput.focus();
             });
 
             $('.cancel-rename').on('click', function () {

@@ -48,7 +48,7 @@
             <form method="get" id="searchForm">
                 <div class="input-group">
                     <button class="btn btn-sm btn-info" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
-                    <input type="text" class="form-control" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
+                    <input type="text" class="form-control text-gold-darker" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
                     <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
                         <i class="bi bi-x text-black"></i>
                     </button>
@@ -181,7 +181,7 @@
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
-                        <tr class="user-row" data-user-id="@user.Id">
+                        <tr class="user-row text-gold-darker" data-user-id="@user.Id">
                             <td>@user.FullName</td>
                             <td>@user.Email</td>
                             <td>@if (user.EmailConfirmed)
@@ -216,8 +216,8 @@
 else
 {
     <div class="text-center mt-4">
-        <p class="mb-1">This is an Admin area of Oaks-Village.com.</p>
-        <p class="mb-2">Please Login with Administration credentials.</p>
+        <p class="mb-1 text-gold-darker">This is an Admin area of Oaks-Village.com.</p>
+        <p class="mb-2 text-gold-darker">Please Login with Administration credentials.</p>
         <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </div>
 }
@@ -229,8 +229,8 @@ else
         const searchButton = document.getElementById('searchButton');
         const searchForm = document.getElementById('searchForm');
         const userCountSpan = document.getElementById('userCount');
-        const tableRows = document.querySelectorAll('.table tbody tr.user-row'); // Select the clickable rows
-        const userTable = document.querySelector('.table'); // Get the table element
+        const tableRows = document.querySelectorAll('.table tbody tr.user-row');
+        const userTable = document.querySelector('.table');
 
         searchInput.addEventListener('input', function() {
             clearSearch.style.display = this.value ? 'block' : 'none';
@@ -264,14 +264,14 @@ else
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            const userTable = document.getElementById('userTable'); // Assuming your table has this ID
+            const userTable = document.getElementById('userTable');
             if (userTable) {
-                const tableRows = userTable.querySelectorAll('tbody tr.user-row'); // Get all rows in the table body
+                const tableRows = userTable.querySelectorAll('tbody tr.user-row');
 
                 tableRows.forEach(row => {
                     row.addEventListener('click', function () {
                         const userId = this.dataset.userId;
-                        const searchTerm = userTable.dataset.searchTerm || ''; // If you have search functionality
+                        const searchTerm = userTable.dataset.searchTerm || ''; 
                         const currentUrl = window.location.pathname + window.location.search;
                         window.location.href = `/Identity/EditUser?id=${userId}&searchTerm=${searchTerm}&returnUrl=${encodeURIComponent(currentUrl)}`;
                     });
@@ -286,9 +286,9 @@ else
                 const utcTimeString = element.getAttribute('data-utc-time');
                 if (utcTimeString) {
                     const utcDate = new Date(utcTimeString);
-                    element.textContent = utcDate.toLocaleString(); // Formats to the user's local time
+                    element.textContent = utcDate.toLocaleString();
                 } else {
-                    element.textContent = 'Never'; // Or any other default text
+                    element.textContent = 'Never';
                 }
             });
         });
