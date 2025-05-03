@@ -1,0 +1,36 @@
+﻿@inject SignInManager<IdentityUser> SignInManager
+@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<!-- Logo Image -->
+<partial name="_LargeLogo" />
+
+<h1 class="text-center text-gold-darker pb-2">Manage your account</h1>
+
+<div class="container text-center ps-0 mb-2">
+    <div class="row gx-0 gy-0 justify-content-center">
+        <div class="col-md-3 pe-0">
+            <ul class="nav nav-pills flex-column ms-3 me-0 mb-2 text-start">
+                <li class="nav-item mb-1"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a></li>
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a></li>
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a></li>
+                <!-- <li class="nav-item my-1"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData"><i class="bi bi-file-earmark-person-fill"></i> Personal data</a></li> -->
+            </ul>
+        </div>
+        <div class="container col-md-9 pe-0">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

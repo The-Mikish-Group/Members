@@ -1,0 +1,187 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model List<DocumentInfo>
+
+@{
+    ViewData["Title"] = "Documents";
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://Oaks-Village.com/Home/MembersDocumentsStatic";
+    ViewData["OGTitle"] = "HOA Documents";
+    ViewData["OGDescription"] = "Oaks-Village HOA Documents";
+    ViewData["OGURL"] = "https://Oaks-Village.com/Home/Documents";
+
+    var returnUrl = Url.Action("Members", "Home", new { area = "" });
+    var pageName = "Documents";
+}
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container">
+    <partial name="_LargeLogo" />
+
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+    {
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-8 mt-1">
+                <h3 class="card-title text-center mb-0 text-gold-darker"><i class="bi bi-filetype-pdf me-2"></i> @pageName</h3>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-md-6 col-lg-5 mx-2 my-2">
+                <div class="card">
+                    <div class="card-body text-start ps-3 p-3" id="documentsList">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <div class="row justify-content-center mt-2 mb-3 g-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-filetype-pdf me-2"></i> Upload a New PDF File</h5>
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                                <button type="button" class="btn btn-sm btn-secondary">Cancel</button>
+                            </form>
+                            <div id="uploadStatus" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        } -->
+    }
+    else
+    {
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="card-text">This is the <strong>Members</strong> area of Oaks-Village.com.</p>
+                        <a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+        <script>
+            $(document).ready(function () {
+                // Load existing documents files
+                $.get('@Url.Action("GetDocumentsFiles", "File")', function (data) {
+                    var html = '';
+                    $.each(data, function (i, document) {
+                        var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                        var displayName = document.displayName.substring(4); // Remove the first four characters (e.g., "001-")
+                        if (displayName.toLowerCase().endsWith('.pdf')) {
+                            displayName = displayName.substring(0, displayName.length - 4); // Remove the ".pdf" extension
+                        }
+                        html += '<div class="ps-2 py-2 my-0">';
+                        html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + displayName + '</a>';
+                        html += '</div>';
+                    });
+                    $('#documentsList').html(html);
+                });
+
+                // Handle file input change for live validation
+                $('#file').on('change', function () {
+                    var fileName = $(this).val().split('\\').pop(); // Get the file name
+                    var isValid = true; // Assume valid initially
+                    var errorMessage = '';
+
+                    if (!fileName.toLowerCase().endsWith('.pdf')) {
+                        isValid = false;
+                        errorMessage = 'Please select a PDF file.';
+                    } else if (!/^\d{3}-/.test(fileName)) {
+                        isValid = false;
+                        errorMessage = 'File name must start with "###-" (e.g., 001-MyDocument.pdf).';
+                    }
+
+                    if (!isValid) {
+                        $('#uploadStatus').html('<div class="alert alert-warning">' + errorMessage + '</div>');
+                    } else {
+                        $('#uploadStatus').html(''); // Clear any previous messages
+                    }
+                });
+
+                // Handle Cancel button click
+                $('#uploadForm button[type="button"]').on('click', function() {
+                    $('#file').val(''); // Clear the file input
+                    $('#uploadStatus').html(''); // Clear any previous status messages
+                });
+
+                // Handle file upload
+                $('#uploadForm').on('submit', function (e) {
+                    e.preventDefault();
+                    var formData = new FormData(this);
+                    var fileInput = $('#file')[0];
+
+                    // Check if a valid file is selected again before submitting
+                    if (fileInput.files.length === 0) {
+                        $('#uploadStatus').html('<div class="alert alert-danger">Please select a file to upload.</div>');
+                        return;
+                    }
+
+                    var fileName = fileInput.files[0].name;
+                    var isValid = true; // Assume valid initially
+                    var errorMessage = '';
+
+                    if (!fileName.toLowerCase().endsWith('.pdf')) {
+                        isValid = false;
+                        errorMessage = 'Please select a PDF file.';
+                    } else if (!/^\d{3}-/.test(fileName)) {
+                        isValid = false;
+                        errorMessage = 'File name must start with "###-" (e.g., 001-MyDocument.pdf).';
+                    }
+
+                    if (!isValid) {
+                        $('#uploadStatus').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                        return;
+                    }
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("UploadFile", "File")',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            $('#uploadStatus').html('<div class="alert alert-success">' + response + '</div>');
+                            // Reload the file list after successful upload
+                            $.get('@Url.Action("GetDocumentsFiles", "File")', function (data) {
+                                var html = '';
+                                $.each(data, function (i, document) {
+                                    var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                                    var displayName = document.displayName.substring(4); // Remove the first four characters (e.g., "001-")
+                                    if (displayName.toLowerCase().endsWith('.pdf')) {
+                                        displayName = displayName.substring(0, displayName.length - 4); // Remove the ".pdf" extension
+                                    }
+                                    html += '<div class="ps-2 py-2 my-0">';
+                                    html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + displayName + '</a>';
+                                    html += '</div>';
+                                });
+                                $('#documentsList').html(html);
+                            });
+                            // Optionally clear the form
+                            $('#uploadForm')[0].reset();
+                        },
+                        error: function (error) {
+                            $('#uploadStatus').html('<div class="alert alert-danger">' + error.responseText + '</div>');
+                        }
+                    });
+                });
+            });
+        </script>
+}

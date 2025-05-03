@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-Members-c16f0045-8487-43aa-a4f5-70bcca044e60</UserSecretsId>
+    <Platforms>AnyCPU;x64</Platforms>
+    <SatelliteAssembliesInclude />
+    <PublishTrimmed>False</PublishTrimmed>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Pdf\**" />
+    <Compile Remove="Views\Image\**" />
+    <Content Remove="Pdf\**" />
+    <Content Remove="Views\Image\**" />
+    <EmbeddedResource Remove="Pdf\**" />
+    <EmbeddedResource Remove="Views\Image\**" />
+    <None Remove="Pdf\**" />
+    <None Remove="Views\Image\**" />
+  </ItemGroup>
+
+  <ItemGroup>       
+    <Compile Remove="Controllers\ImageController.cs" />       
+    <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
+    <Compile Remove="Controllers\PdfGenerationControllerBackup.cs" />       
+    <Compile Remove="Controllers\PdfGenerationControllerx.cs" />       
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />       
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />       
+    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].cs" />       
+    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].Designer.cs" />       
+    <Compile Remove="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />       
+    <Compile Remove="Models\GalleryViewModels.cs" />       
+    <Compile Remove="Models\ImportFile.cs" />       
+    <Compile Remove="Models\UserWithProfileViewItem.cs" />       
+    <Compile Remove="Services\UserService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Properties\serviceDependencies.local.json.user" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="Syncfusion.Licensing" Version="29.1.40" />
+    <PackageReference Include="Syncfusion.Pdf.Imaging.NET" Version="29.1.40" />
+    <PackageReference Include="Syncfusion.Pdf.NET" Version="29.1.40" />
+    <PackageReference Include="System.Security.Permissions" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="Views\Shared\NewFolder\" />
+  </ItemGroup>
+
+</Project>

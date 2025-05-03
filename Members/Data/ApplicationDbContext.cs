@@ -1,0 +1,28 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Members.Models;
+
+namespace Members.Data
+{
+
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
+    {
+        
+
+        public DbSet<UserProfile> UserProfile { get; set; }       
+
+        public DbSet<PDFCategory> PDFCategories { get; set; }
+        public DbSet<CategoryFile> CategoryFiles { get; set; }
+        public DbSet<Members.Models.File> Files { get; set; }
+
+        // ... other DbSets
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);            
+            
+        }
+    }
+
+}
+

@@ -1,0 +1,227 @@
+﻿@model List<Members.Models.UserProfile>
+@* This view is used to generate the HTML content that will be converted to a PDF by DinkToPdf *@
+@{
+    // No layout page is needed for a PDF HTML template
+    Layout = null;
+    // Determine the number of users
+    var userCount = Model?.Count ?? 0;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    @* <title>Member Directory</title> *@
+    <style>
+    /* Define CSS styles for the PDF layout */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px; /* Add some margin around the content */
+    }
+
+   /* h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    } */
+
+    /* Style for the table */
+    table {
+        width: 100%; /* Make the table take the full width */
+        border-collapse: collapse; /* Remove space between table cells */
+         /* Optional: Add a small top margin to the table if needed */
+         margin-top: 10px;
+    }
+
+    /* Style for table cells (the columns) */
+    td {
+        width: 50%; /* Make each column take 50% of the table width */
+        padding: 5px 15px 5px 0; /* Top, Right, Bottom, Left padding. Adjust bottom for row spacing */
+        vertical-align: top; /* Align content to the top of the cell */
+         /* Remove internal padding from the .member-entry-table div if td padding is sufficient */
+    }
+
+    /* Add some left padding to the second column and adjust right padding */
+    td:nth-child(2) {
+        padding-left: 15px;
+        padding-right: 0; /* Remove right padding from the last cell in a row */
+    }
+
+    /* Style for each individual member entry within a table cell */
+    .member-entry-table {
+        /* Use margin-bottom here for spacing BETWEEN entries within a single column */
+         margin-bottom: 15px; /* Add space below each entry */
+         /* Removed padding-bottom, using margin-bottom instead for better control */
+         /* padding-bottom: 0; */
+
+        /* Attempt to prevent entries from breaking across pages */
+        page-break-inside: avoid;
+         /* Use more robust break properties if page-break-inside is inconsistent */
+         /* break-inside: avoid-page; */
+         /* For columns in a table (less common use case), break-inside: avoid-column; could also be tried */
+
+        display: block; /* Ensure the div is treated as a block element */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
+
+    /* Remove margin-bottom from the last entry in each column to avoid extra space at the end */
+    td .member-entry-table:last-child {
+        margin-bottom: 0;
+    }
+
+
+    /* Style for the member's name */
+    .member-name-table {
+        font-weight: bold;
+        margin-bottom: 5px; /* Space after the name */
+    }
+
+    /* Style for other details */
+    .member-details-table div {
+        margin-bottom: 2px; /* Small space between detail lines */
+        word-wrap: break-word; /* Ensure long words break to prevent overflow */
+    }
+
+     /* Add specific styles for page breaks before each table row (tr) */
+     /* This might be too aggressive, but can help diagnose break issues */
+     /* tr { page-break-before: always; } */
+
+      /* A more common approach is to ensure a break after a certain element if needed */
+      /* Forcing a page break BEFORE the start of a new table row might help with vertical alignment/overlap issues */
+      /* However, this can lead to blank spaces if the previous content doesn't fill the page */
+       tr {
+           page-break-inside: avoid; /* Try to keep the row content together */
+           /* page-break-after: auto; */ /* Allow page breaks after rows if needed */
+       }
+
+       /* Potentially target the member entry divs to force breaks if they are too tall */
+       /* This is an advanced technique and might require calculating content height */
+       /* .member-entry-table { height: auto; } */ /* Ensure height is determined by content */
+
+</style>
+</head>
+<body>
+    @* <h1>Member Directory</h1> *@
+
+    @* Use a table to create two columns *@
+    <table>
+        @if (Model != null)
+        {
+            @* Loop through users, creating a row for every two users *@
+            @for (int i = 0; i < userCount; i += 2)
+            {
+                @* Added a check to ensure the row should render if there's at least one user left *@
+                 @if (i < userCount)
+                 {
+                    <tr>
+                        @* First column *@
+                        <td>
+                            @* Check if the current user index is within bounds *@
+                            @if (i < userCount)
+                            {
+                                var userProfile1 = Model[i];
+                                @* HTML structure for the first member entry in the row *@
+                                <div class="member-entry-table">
+                                    <div class="member-name-table">
+                                         @* Handle potential null/empty MiddleName *@
+                                         @(userProfile1.FirstName) @(!string.IsNullOrEmpty(userProfile1.MiddleName) ? userProfile1.MiddleName + " " : "")@(userProfile1.LastName)
+                                    </div>
+                                    <div class="member-details-table">
+                                         @* Optional: Only display address lines if they have data *@
+                                        @if (!string.IsNullOrEmpty(userProfile1.AddressLine1))
+                                        {
+                                            <div>@userProfile1.AddressLine1</div>
+                                        }
+                                         @if (!string.IsNullOrEmpty(userProfile1.AddressLine2))
+                                        {
+                                            <div>@userProfile1.AddressLine2</div>
+                                        }
+                                         @* Combine City, State, Zip - check if any are present *@
+                                        @{
+                                            var cityStateZip1 = $"{userProfile1.City}, {userProfile1.State} {userProfile1.ZipCode}".TrimEnd(',', ' ');
+                                        }
+                                        @if (!string.IsNullOrEmpty(cityStateZip1.Replace(",", "").Replace(" ", ""))) @* Simple check if combined string is not effectively empty *
+                                        {
+                                             <div>@cityStateZip1</div>
+                                        }
+                                        @* Display phone/email only if present *@
+                                         @if (!string.IsNullOrEmpty(userProfile1.User?.PhoneNumber))
+                                        {
+                                            <div>Phone: @userProfile1.User.PhoneNumber</div>
+                                        }
+                                         @if (!string.IsNullOrEmpty(userProfile1.HomePhoneNumber))
+                                        {
+                                            <div>Home Phone: @userProfile1.HomePhoneNumber</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(userProfile1.User?.Email))
+                                        {
+                                            <div>Email: @userProfile1.User.Email</div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </td>
+
+                        @* Second column *@
+                        <td>
+                            @* Check if there is a second user for this row *@
+                            @if (i + 1 < userCount)
+                            {
+                                var userProfile2 = Model[i + 1];
+                                @* HTML structure for the second member entry in the row *@
+                                <div class="member-entry-table">
+                                    <div class="member-name-table">
+                                         @* Handle potential null/empty MiddleName *@
+                                         @(userProfile2.FirstName) @(!string.IsNullOrEmpty(userProfile2.MiddleName) ? userProfile2.MiddleName + " " : "")@(userProfile2.LastName)
+                                    </div>
+                                    <div class="member-details-table">
+                                         @* Optional: Only display address lines if they have data *@
+                                        @if (!string.IsNullOrEmpty(userProfile2.AddressLine1))
+                                        {
+                                            <div>@userProfile2.AddressLine1</div>
+                                        }
+                                         @if (!string.IsNullOrEmpty(userProfile2.AddressLine2))
+                                        {
+                                            <div>@userProfile2.AddressLine2</div>
+                                        }
+                                        @* Combine City, State, Zip - check if any are present *@
+                                        @{
+                                            var cityStateZip2 = $"{userProfile2.City}, {userProfile2.State} {userProfile2.ZipCode}".TrimEnd(',', ' ');
+                                        }
+                                        @if (!string.IsNullOrEmpty(cityStateZip2.Replace(",", "").Replace(" ", ""))) @* Simple check if combined string is not effectively empty *
+                                        {
+                                             <div>@cityStateZip2</div>
+                                        }
+                                        @* Display phone/email only if present *@
+                                         @if (!string.IsNullOrEmpty(userProfile2.User?.PhoneNumber))
+                                        {
+                                            <div>Phone: @userProfile2.User.PhoneNumber</div>
+                                        }
+                                         @if (!string.IsNullOrEmpty(userProfile2.HomePhoneNumber))
+                                        {
+                                            <div>Home Phone: @userProfile2.HomePhoneNumber</div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(userProfile2.User?.Email))
+                                        {
+                                            <div>Email: @userProfile2.User.Email</div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                             @* Else block for the second column if there's an odd number of users *@
+                            else
+                            {
+                                @* If there's an odd number of users, the last cell in the last row will be empty *@
+                                @* Optionally add a placeholder or leave empty. An empty div might still take up space depending on CSS *@
+                                <div class="member-entry-table empty-cell">
+                                    @* Add non-breaking space or leave empty. CSS might still apply margin/padding *@
+                                    &nbsp;
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                 }
+            }
+        }
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model List<DocumentInfo>
+
+@{
+    ViewData["Title"] = "Financial Reports";
+    ViewData["Description"] = "View the financial reports for Oaks-Village.";
+    ViewData["Canonical"] = "https://Oaks-Village.com/Home/FinancialReportsStatic";
+    ViewData["OGTitle"] = "Oaks-Village Financial Reports";
+    ViewData["OGDescription"] = "Oaks-Village Financial Reports";
+    ViewData["OGURL"] = "https://Oaks-Village.com/Home/FinancialReportsStatic";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+    var returnUrl = Url.Action("Members", "Home", new { area = "" });
+    var pageName = "Financial Reports";
+}
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container">
+    <partial name="_LargeLogo" />
+
+    @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Member") || User.IsInRole("Admin") || User.IsInRole("Manager")))
+    {
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-8 mt-1">
+                <h3 class="card-title text-center mb-0 text-gold-darker"><i class="bi bi-filetype-pdf me-2"></i> @pageName</h3>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-1 mb-3 g-3">
+            <div class="col-md-6 col-lg-5 mx-2 my-2">
+                <div class="card">
+                    <div class="card-body text-start ps-3 p-3" id="financialList">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <div class="row justify-content-center mt-2 mb-3 g-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-filetype-pdf me-2"></i> Upload a New Financial or Budget Report</h5>
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary">Upload</button>
+                                <button type="button" class="btn btn-sm btn-secondary">Cancel</button>
+                            </form>
+                            <div id="uploadStatus" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="card-text">This is the <strong>Members</strong> area of Oaks-Village.com.</p>
+                        <a class="btn btn-sm btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Load existing Budget and Financial files
+            $.get('@Url.Action("GetBudgetFinancialFiles", "File")', function (data) {
+                var html = '';
+                $.each(data, function (i, document) {
+                    var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                    html += '<div class="ps-2 py-2 my-0">';
+                    html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + document.displayName + '</a>';
+                    html += '</div>';
+                });
+                $('#financialList').html(html);
+            });
+
+            // Handle file input change for live validation
+            $('#file').on('change', function () {
+                var fileName = $(this).val().split('\\').pop(); // Get the file name
+                var isValid = false;
+                var errorMessage = '';
+
+                if (!fileName.toLowerCase().endsWith('.pdf')) {
+                    errorMessage = 'Please select a PDF file.';
+                } else if (fileName.startsWith('Financial Report')) {
+                    const financialPattern = /^Financial Report\s\d{4}-\d{2}\.pdf$/;
+                    if (!financialPattern.test(fileName)) {
+                        errorMessage = 'Financial Report file name must follow the format: Financial Report YYYY-MM.pdf (e.g., Financial Report 2025-04.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else if (fileName.startsWith('Budget Report')) {
+                    const budgetPattern = /^Budget Report\s\d{4}\.pdf$/;
+                    if (!budgetPattern.test(fileName)) {
+                        errorMessage = 'Budget Report file name must follow the format: Budget Report YYYY.pdf (e.g., Budget Report 2026.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else {
+                    errorMessage = 'File name must start with "Budget Report" followed by the year (e.g., Budget Report 2026.pdf) or "Financial Report" followed by the year and month (e.g., Financial Report 2025-04.pdf).';
+                }
+
+                if (!isValid) {
+                    $('#uploadStatus').html('<div class="alert alert-warning">' + errorMessage + '</div>');
+                    $(this).val('');
+                } else {
+                    $('#uploadStatus').html('');
+                }
+            });
+
+            // Handle Cancel button click
+            $('#uploadForm button[type="button"]').on('click', function() {
+                $('#file').val('');
+                $('#uploadStatus').html('');
+            });
+
+            // Handle file upload
+            $('#uploadForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                var fileInput = $('#file')[0];
+
+                if (fileInput.files.length === 0) {
+                    $('#uploadStatus').html('<div class="alert alert-danger">Please select a file to upload.</div>');
+                    return;
+                }
+
+                var fileName = fileInput.files[0].name;
+                var isValid = false;
+                var errorMessage = '';
+
+                if (!fileName.toLowerCase().endsWith('.pdf')) {
+                    errorMessage = 'Please select a PDF file.';
+                } else if (fileName.startsWith('Financial Report')) {
+                    const financialPattern = /^Financial Report\s\d{4}-\d{2}\.pdf$/;
+                    if (!financialPattern.test(fileName)) {
+                        errorMessage = 'Financial Report file name must follow the format: Financial Report YYYY-MM.pdf (e.g., Financial Report 2025-04.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else if (fileName.startsWith('Budget Report')) {
+                    const budgetPattern = /^Budget Report\s\d{4}\.pdf$/;
+                    if (!budgetPattern.test(fileName)) {
+                        errorMessage = 'Budget Report file name must follow the format: Budget Report YYYY.pdf (e.g., Budget Report 2026.pdf)';
+                    } else {
+                        isValid = true;
+                    }
+                } else {
+                    errorMessage = 'File name must start with "Budget Report" followed by the year (e.g., Budget Report 2026.pdf) or "Financial Report" followed by the year and month (e.g., Financial Report 2025-04.pdf).';
+                }
+
+                if (!isValid) {
+                    $('#uploadStatus').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                    return;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadFile", "File")',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#uploadStatus').html('<div class="alert alert-success">' + response + '</div>');
+                        $.get('@Url.Action("GetBudgetFinancialFiles", "File")', function (data) {
+                            var html = '';
+                            $.each(data, function (i, document) {
+                                var pdfUrl = '/identity/ViewPdf?fileName=' + document.fileName;
+                                html += '<div class="ps-2 py-2 my-0">';
+                                html += '<a href="' + pdfUrl + '" class="mx-1 w-100 nav-link">' + document.displayName + '</a>';
+                                html += '</div>';
+                            });
+                            $('#financialList').html(html);
+                        });
+                        $('#uploadForm')[0].reset();
+                    },
+                    error: function (error) {
+                        $('#uploadStatus').html('<div class="alert alert-danger">' + error.responseText + '</div>');
+                    }
+                });
+            });
+        });
+    </script>
+}

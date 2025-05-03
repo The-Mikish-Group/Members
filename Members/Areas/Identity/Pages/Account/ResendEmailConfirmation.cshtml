@@ -1,0 +1,72 @@
+﻿@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Send email confirmation";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Account/ResendEmailConfirmation";
+    ViewData["OGTitle"] = "Resend email confirmation";
+    ViewData["OGDescription"] = "Oaks-Village Resend email confirm";
+    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Account/ResendEmailConfirmation";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Logo Image -->
+<partial name="_LargeLogo" />
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow rounded m-0 p-0 bg-Card-Menu">
+                <div class="card-body p-2">
+
+                    <!-- Title -->
+                    <h1 class="text-center mb-4 text-gold-darker">
+                        <i class="bi bi-envelope-check-fill"></i> @ViewData["Title"]
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <h4 class="text-center mb-2 text-gold-darker">Enter email address:</h4>
+
+                    <!-- Resend Email Confirmation Form -->
+                    <form method="post">
+
+                        <!-- Alert -->
+                        <div asp-validation-summary="All" class="text-danger text-center xmb-3" role="alert"></div>
+
+                        <!-- Email field -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+
+                            <!-- Send -->
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-arrow-clockwise"></i> Send
+                            </button>
+
+                            <!-- Home -->
+                            <a href="~/" class="btn btn-sm btn-success">
+                                <i class="bi bi-house-fill"></i> Home
+                            </a>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

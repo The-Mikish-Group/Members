@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Gallery";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://Oaks-Village.com/Shared/Gallery";
+    ViewData["OGTitle"] = "Gallery";
+    ViewData["OGDescription"] = "Oaks-Village Gallery";
+    ViewData["OGURL"] = "https://Oaks-Village.com/Shared/Gallery";
+
+    var galleriesFolder = "Gallery";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Shared";
+
+    // galleryFolder
+    var galleryFolder = currentController.Replace("slide", "", StringComparison.OrdinalIgnoreCase)
+                                          .Replace("combo", "", StringComparison.OrdinalIgnoreCase);
+    // galleryType
+    var galleryType = currentController.Contains("slide", StringComparison.OrdinalIgnoreCase) ? "Slideshows" :
+                      currentController.Contains("combo", StringComparison.OrdinalIgnoreCase) ? "Galleries" : "Galleries";
+    galleryType ??= "Galleries";
+
+    // folders
+    var foldersPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot/{galleriesFolder}/{galleryFolder}");
+    var folders = Directory.GetDirectories(foldersPath)
+                                     .Where(folder => !System.IO.Path.GetFileName(folder).StartsWith("_"))
+                                     .Select(folder => System.IO.Path.GetFileName(folder))
+                                     .ToList();
+
+    var backgroundImage = $"{galleriesFolder}/{galleryFolder}/background.webp";
+    var imageExtensions = new[] { ".jpg", ".png", ".webp" };
+    foreach (var extension in imageExtensions)
+    {
+        var imagePath = $"{galleriesFolder}/{galleryFolder}/background{extension}";
+        if (System.IO.File.Exists(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath)))
+        {
+            backgroundImage = imagePath;
+            break;
+        }
+    }
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="text-center mt-3 mb-1">
+    <h2 class="text-gold">
+        @galleryFolder @galleryType
+    </h2>
+</div>
+
+<div class="container row gy-2 mt-2 mx-auto">
+    <div class="container justify-content-center row gx-1 gx-lg-4 gy-2 my-2 p-2">
+
+        <div class="col-2 pt-0 mb-1">
+            <div class="d-flex align-items-center mb-3">
+                <a class="btn btn-sm btn-danger me-2 d-flex align-items-center justify-content-center" href="~/" style="height: 50px; padding: 10px 15px; border: 1px solid black;">
+                    <img alt="" class="back-button-image-size" style="max-height: 100%;" src="~/images/svg/buttons/back-white.svg">
+                </a>
+            </div>
+        </div>
+
+        <div class="col-8 menu-item ps-3">
+            <div class="row flex-grow-1 g-2">
+                @foreach (var folder in folders)
+                {
+                    <div class="col-6 col-lg-3 menu-item" data-view-name="@folder">
+                        <div id="@folder" class="bg-gold-light text-center p-0 border border-dark rounded">
+                            <a id="@folder-link" class="menu-link text-dark d-flex align-items-center justify-content-center" asp-controller="@currentController" asp-action="Gallery" asp-route-viewName="@folder"
+                               style="height: 50px; padding: 10px 15px; border: 1px solid black; background-color: #dec383">@folder</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+</div>

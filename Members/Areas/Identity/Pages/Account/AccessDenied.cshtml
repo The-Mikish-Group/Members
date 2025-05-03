@@ -1,0 +1,32 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+
+    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Account/AccessDenied";
+    ViewData["OGTitle"] = "Access denied";
+    ViewData["OGDescription"] = "Oaks-Village Access denied";
+    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Account/AccessDenied";
+    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow rounded p-4 bg-Card-Menu">
+                <div class="card-body text-center">
+                    <h1 class="text-danger mb-4">@ViewData["Title"]</h1>
+                    <p class="text-danger mb-4">You do not have access to this resource.</p>
+
+                    <a href="/" class="btn btn-sm btn-secondary"><i class="bi bi-house-fill"></i> Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
