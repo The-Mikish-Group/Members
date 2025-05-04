@@ -196,67 +196,113 @@ public class PdfGenerationController : Controller // Inherit from Controller
             {
                 PdfPage page = document.Pages.Add();
                 PdfGraphics graphics = page.Graphics;
+
                 PdfFont regularFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
-                PdfFont boldFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Bold);
+                PdfFont boldFont = new PdfStandardFont(PdfFontFamily.Helvetica, 13, PdfFontStyle.Bold); // Keep for user names
+                PdfFont boldHeadingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 15, PdfFontStyle.Bold);
+                PdfFont HeadingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 15);
+                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12); // Regular footer font
+                                                                                       // Define a bold font specifically for the footer page numbers
+                PdfFont boldFooterFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Bold); // Bold footer font
+
                 PdfBrush brush = PdfBrushes.Black;
 
-                // Reduced margin for less space at top/bottom and sides
-                float margin = 20;
+                // Define margins (adjust as needed)
+                float horizontalMargin = 20; // Keep left/right margin at 40
+                float verticalMargin = 20; // Reduce top/bottom margin to 20
 
                 PdfStringFormat format = new() { WordWrap = PdfWordWrapType.Word };
 
                 // This defines the main content area rectangle
-                RectangleF bounds = new(margin, margin, page.GetClientSize().Width - (2 * margin), page.GetClientSize().Height - (2 * margin));
+                Syncfusion.Drawing.RectangleF bounds = new(horizontalMargin, verticalMargin, page.GetClientSize().Width - (2 * horizontalMargin), page.GetClientSize().Height - (2 * verticalMargin));
 
                 int numberOfColumns = 2;
-                float columnSpacing = margin / 2;
+                float columnSpacing = horizontalMargin / 2;
                 float columnWidth = (bounds.Width - (columnSpacing)) / numberOfColumns;
 
                 // Initial currentY is set for drawing the main title area with a reduced top margin
-                float titleTopPosition = margin / 2; // Position the top of the title block closer to the top edge
-                float currentY = titleTopPosition; // This will be the starting Y for both the image and the text
-                
+                float titleTopPosition = verticalMargin; // Position the top of the title block at the top vertical margin
+
                 float currentX = bounds.Left;
                 int currentColumn = 0;
 
-                PdfFont titleFont = new PdfStandardFont(PdfFontFamily.Helvetica, 13 /*PdfFontStyle.Bold*/);
+                //PdfFont headingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 13 /*PdfFontStyle.Bold*/);
 
-                // --- Title Area Drawing ---
+                // --- Image Loading (Load once outside the page loop) ---
+                PdfImage? logoInstance = null;
+                string logoPath = Path.Combine(_environment.WebRootPath, "Images", "LinkImages", "Oaks-trees.png");
+                if (System.IO.File.Exists(logoPath))
+                {
+                    try
+                    {
+                        using (FileStream imageStream = new(logoPath, FileMode.Open, FileAccess.Read))
+                        {
+                            logoInstance = PdfImage.FromStream(imageStream);
+                        }
+                        _logger.LogInformation("Logo image loaded successfully from {Path}", logoPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error loading logo image from {Path}: {ErrorMessage}", logoPath, ex.Message);
+                        // Continue without logo if loading fails
+                        logoInstance = null;
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Logo image not found at {Path}. PDF will be generated without logo.", logoPath);
+                }
+                // --- End Image Loading ---
+
                 float logoWidth = 30; // Declare logoWidth here
                 float logoHeight = 30; // Declare logoHeight here
+                float spacingBetweenLogoAndText = 5; // Space between the logo and the title text
 
-                // --- Image Loading and Drawing ---
-                using (FileStream imageStream = new("wwwroot\\Images\\LinkImages\\Oaks-trees.png", FileMode.Open, FileAccess.Read))
+
+                // --- Draw Heading and Logo on the FIRST Page ---
+                // Restored to original first page heading logic
+                string firstPageHeadingText = "Oaks Village Homeowners Association Directory " + DateTime.Now.ToString("MM/yyyy");
+                SizeF firstPageHeadingSize = boldHeadingFont.MeasureString(firstPageHeadingText);
+
+                // Calculate the total width of the logo + spacing + text for centering
+                float firstPageHeadingBlockWidth = (logoInstance != null ? logoWidth + spacingBetweenLogoAndText : 0) + firstPageHeadingSize.Width;
+
+                // Calculate the X position to center the entire block (logo + text) within the bounds
+                float firstPageBlockX = bounds.Left + (bounds.Width - firstPageHeadingBlockWidth) / 2;
+
+                // Calculate the X position for the logo within the centered block
+                float firstPageLogoX = firstPageBlockX;
+
+                // Calculate the X position for the text within the centered block
+                float firstPageTextX = firstPageBlockX + (logoInstance != null ? logoWidth + spacingBetweenLogoAndText : 0);
+
+
+                // Draw the logo on the first page if loaded
+                if (logoInstance != null)
                 {
-                    PdfImage logoInstance = PdfImage.FromStream(imageStream); // Create an instance of the image
-
-                    // Draw the image at the currentY (aligning its top with the top of the title area)
-                    graphics.DrawImage(logoInstance, bounds.Left, currentY - 10, logoWidth, logoHeight);
+                    // Position the logo to align its top with the heading text's vertical center
+                    float logoY = titleTopPosition + (boldFont.Height - logoHeight) / 2;
+                    graphics.DrawImage(logoInstance, firstPageLogoX, logoY, logoWidth, logoHeight);
                 }
 
-                // Calculate the X position for the title text, considering the logo and some spacing
-                float spacingBetweenLogoAndText = 5; // Space between the logo and the title text
-                float titleX = bounds.Left + logoWidth + spacingBetweenLogoAndText;
+                // Draw the heading text on the first page
+                graphics.DrawString(firstPageHeadingText, boldHeadingFont, brush, new PointF(firstPageTextX, titleTopPosition));
 
-                graphics.DrawString("Oaks Village Homeowners Association Directory " + DateTime.Now.ToString("MM/yyyy"), titleFont, brush, new Syncfusion.Drawing.PointF(titleX, currentY));
+                // Calculate the starting Y position for the content blocks after the heading on the first page
+                float contentStartY = titleTopPosition + Math.Max(logoInstance != null ? logoHeight : 0, boldHeadingFont.Height) + verticalMargin;
+                float currentY = contentStartY; // Set initial currentY to the content start positio
 
-                float bottomOfImage = currentY + logoHeight;
-                float bottomOfText = currentY + titleFont.Height;
-
-                float bottomOfTitleBlock = Math.Max(bottomOfImage, bottomOfText);
-
-                // Add the desired space below the title block
-                float spaceBelowTitle = margin / 2; // Reduced space below the title
-                currentY = bottomOfTitleBlock + spaceBelowTitle;
-
-                // --- End of Title Block Drawing and Spacing ---
-
+                // --- Iterate through user data and add to the PDF ---
                 foreach (UserProfile userProfile in userProfilesWithUsers)
                 {
+                    // Construct the full name including middle name with correct spacing
                     string middleName = string.IsNullOrEmpty(userProfile.MiddleName) ? " " : $" {userProfile.MiddleName} ";
                     string nameLine = $"{userProfile.FirstName}{middleName}{userProfile.LastName}";
-                    SizeF nameSize = boldFont.MeasureString(nameLine, columnWidth, format);
-                    
+
+                    // Measure the height of the full name line in bold
+                    SizeF fullNameSize = boldFont.MeasureString(nameLine, columnWidth, format);
+
+                    // Calculate height of remaining data WITHOUT Plot
                     StringBuilder remainingUserDataCheck = new();
                     if (!string.IsNullOrEmpty(userProfile.AddressLine1)) remainingUserDataCheck.AppendLine(userProfile.AddressLine1);
                     if (!string.IsNullOrEmpty(userProfile.AddressLine2)) remainingUserDataCheck.AppendLine(userProfile.AddressLine2);
@@ -264,51 +310,85 @@ public class PdfGenerationController : Controller // Inherit from Controller
                     if (!string.IsNullOrEmpty(userProfile.User?.PhoneNumber)) remainingUserDataCheck.AppendLine($"Cell Phone: {userProfile.User.PhoneNumber}");
                     if (!string.IsNullOrEmpty(userProfile.HomePhoneNumber)) remainingUserDataCheck.AppendLine($"Home Phone: {userProfile.HomePhoneNumber}");
                     if (!string.IsNullOrEmpty(userProfile.User?.Email)) remainingUserDataCheck.AppendLine($"Email: {userProfile.User.Email}");
+                    if (userProfile.Birthday.HasValue) remainingUserDataCheck.AppendLine($"Birthday: {userProfile.Birthday.Value.ToShortDateString()}");
+                    if (userProfile.Anniversary.HasValue) remainingUserDataCheck.AppendLine($"Anniversary: {userProfile.Anniversary.Value.ToShortDateString()}");
 
-                    if (userProfile.Birthday.HasValue)
-                    {
-                        var month = userProfile.Birthday.Value.ToString("MMMM");
-                        var dayWithSuffix = GetDayWithSuffix(userProfile.Birthday.Value);
-                        var birthdayString = $"{month} {dayWithSuffix}";
-                        remainingUserDataCheck.AppendLine($"Birthday: {birthdayString}");
-                    }
+                    SizeF remainingTextSizeCheck = regularFont.MeasureString(remainingUserDataCheck.ToString(), columnWidth, format);
 
-                    if (userProfile.Anniversary.HasValue)
-                    {
-                        var month = userProfile.Anniversary.Value.ToString("MMMM");
-                        var dayWithSuffix = GetDayWithSuffix(userProfile.Anniversary.Value);
-                        var birthdayString = $"{month} {dayWithSuffix}";
-                        remainingUserDataCheck.AppendLine($"Anniversary: {birthdayString}");
-                    }
+                    float totalBlockHeight = fullNameSize.Height + remainingTextSizeCheck.Height;
 
-                   SizeF remainingTextSizeCheck = regularFont.MeasureString(remainingUserDataCheck.ToString(), columnWidth, format);
 
-                    float totalBlockHeight = nameSize.Height + remainingTextSizeCheck.Height;
-
-                    if (currentY + totalBlockHeight + (margin / 4) > bounds.Bottom)
+                    // Check if the current block fits in the current column
+                    if (currentY + totalBlockHeight + (verticalMargin / 2) > bounds.Bottom)
                     {
                         currentColumn++;
                         if (currentColumn < numberOfColumns)
                         {
+                            // Move to the next column on the same page
                             currentX = bounds.Left + (currentColumn * (columnWidth + columnSpacing));
-                            currentY = bounds.Top + titleFont.MeasureString("(\"OAKS VILLAGE HOMEOWNERS ASSOCIATION DIRECTORY - \" + DateTime.Now.ToString(\"MM/yyyy\")").Height + margin;
+                            currentY = contentStartY;
                         }
                         else
                         {
+                            // Move to a new page
                             page = document.Pages.Add();
                             graphics = page.Graphics;
                             currentX = bounds.Left;
                             currentY = bounds.Top;
                             currentColumn = 0;
 
-                            float continuedTitleX = bounds.Left + (bounds.Width - titleFont.MeasureString("Member Directory (Continued)").Width) / 2;
-                            graphics.DrawString("Member Directory (Continued)", titleFont, brush, new Syncfusion.Drawing.PointF(continuedTitleX, currentY));
-                            currentY += titleFont.MeasureString("Member Directory (Continued)").Height + margin;
+                            // --- Draw Heading and Logo on SUBSEQUENT Pages ---
+                            // Separate the heading text and the date for subsequent pages
+
+                            // MODIFIED: Removed trailing space from bold text and added leading space to continued text
+                            string boldContinuedHeadingText = "HOA Member Directory";
+                            Syncfusion.Drawing.SizeF boldContinuedHeadingTextSize = boldHeadingFont.MeasureString(boldContinuedHeadingText);
+
+                            // MODIFIED: Added a single space before (Continued)
+                            string continuedHeadingText = " (Continued)";
+                            Syncfusion.Drawing.SizeF continuedHeadingTextSize = regularFont.MeasureString(continuedHeadingText);
+
+
+                            // Calculate the total width of the logo + spacing + static text + date text for centering
+                            float continuedHeadingBlockWidth = (logoInstance != null ? logoWidth + spacingBetweenLogoAndText : 0) + boldContinuedHeadingTextSize.Width + continuedHeadingTextSize.Width;
+
+                            // Calculate the X position to center the entire block (logo + text) within the bounds
+                            float continuedBlockX = bounds.Left + (bounds.Width - continuedHeadingBlockWidth) / 2;
+
+                            // Calculate the X position for the logo within the centered block
+                            float continuedLogoX = continuedBlockX;
+
+                            // Calculate the X position for the static text within the centered block
+                            float boldContinuedHeadingTextX = continuedBlockX + (logoInstance != null ? logoWidth + spacingBetweenLogoAndText : 0);
+
+                            // Calculate the X position for the 'Continue' text after the static text
+                            float continuedHeadingTextX = boldContinuedHeadingTextX + boldContinuedHeadingTextSize.Width;
+
+
+                            // Draw the logo on the new page if loaded
+                            if (logoInstance != null)
+                            {
+                                // Position the logo to align its top with the heading text's vertical center (using boldHeadingFont height)
+                                float logoY = titleTopPosition + (boldHeadingFont.Height - logoHeight) / 2;
+                                graphics.DrawImage(logoInstance, continuedLogoX, logoY, logoWidth, logoHeight);
+                            }
+
+                            // Draw the static heading text on the new page using the bold heading font
+                            graphics.DrawString(boldContinuedHeadingText, boldHeadingFont, brush, new PointF(boldContinuedHeadingTextX, titleTopPosition)); // Use boldHeadingFont
+
+                            // Draw the Continue text on the new page using the regular font
+                            graphics.DrawString(continuedHeadingText, HeadingFont, brush, new PointF(continuedHeadingTextX, titleTopPosition)); // Use regularFont
+
+
+                            // Move currentY below the heading block (using the maximum height of logo or text)
+                            float bottomOfContinuedHeadingBlock = titleTopPosition + Math.Max(logoInstance != null ? logoHeight : 0, boldHeadingFont.Height); // Use boldHeadingFont.Height
+                            currentY = bottomOfContinuedHeadingBlock + verticalMargin; // Add vertical margin below the heading
+                                                                                       // --- End Draw Heading and Logo on SUBSEQUENT Pages ---
                         }
                     }
 
-                    graphics.DrawString(nameLine, boldFont, brush, new Syncfusion.Drawing.RectangleF(currentX, currentY, columnWidth, nameSize.Height), format);
-                    currentY += nameSize.Height;
+                    graphics.DrawString(nameLine, boldFont, brush, new Syncfusion.Drawing.RectangleF(currentX, currentY, columnWidth, fullNameSize.Height), format);
+                    currentY += fullNameSize.Height;
 
                     StringBuilder remainingUserData = new();
                     if (!string.IsNullOrEmpty(userProfile.AddressLine1)) remainingUserData.AppendLine(userProfile.AddressLine1);
@@ -317,7 +397,6 @@ public class PdfGenerationController : Controller // Inherit from Controller
                     if (!string.IsNullOrEmpty(userProfile.User?.PhoneNumber)) remainingUserData.AppendLine($"Cell Phone: {userProfile.User.PhoneNumber}");
                     if (!string.IsNullOrEmpty(userProfile.HomePhoneNumber)) remainingUserData.AppendLine($"Home Phone: {userProfile.HomePhoneNumber}");
                     if (!string.IsNullOrEmpty(userProfile.User?.Email)) remainingUserData.AppendLine($"Email: {userProfile.User.Email}");
-                    
                     if (userProfile.Birthday.HasValue)
                     {
                         var month = userProfile.Birthday.Value.ToString("MMMM");
@@ -325,7 +404,6 @@ public class PdfGenerationController : Controller // Inherit from Controller
                         var birthdayString = $"{month} {dayWithSuffix}";
                         remainingUserData.AppendLine($"Birthday: {birthdayString}");
                     }
-
                     if (userProfile.Anniversary.HasValue)
                     {
                         var month = userProfile.Anniversary.Value.ToString("MMMM");
@@ -333,35 +411,60 @@ public class PdfGenerationController : Controller // Inherit from Controller
                         var birthdayString = $"{month} {dayWithSuffix}";
                         remainingUserData.AppendLine($"Anniversary: {birthdayString}");
                     }
-                   
-                    // Removed Plot line: if (!string.IsNullOrEmpty(userProfile.Plot)) remainingUserData.AppendLine($"Plot: {userProfile.Plot}");
 
                     Syncfusion.Drawing.SizeF remainingTextSize = regularFont.MeasureString(remainingUserData.ToString(), columnWidth, format);
                     graphics.DrawString(remainingUserData.ToString(), regularFont, brush, new Syncfusion.Drawing.RectangleF(currentX, currentY, columnWidth, remainingTextSize.Height), format);
 
-                    currentY += remainingTextSize.Height + (margin / 4);
+                    // MODIFIED: Increased verticalMargin for spacing after user block
+                    currentY += remainingTextSize.Height + (verticalMargin / 2); // Increased spacing here
                 }
 
-                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 9);
-                PdfStringFormat footerFormat = new()
-                {
-                    // footerFormat.Alignment = Syncfusion.Pdf.Graphics.PdfStringAlignment.Right; // Commented out as requested
-                    LineAlignment = PdfVerticalAlignment.Bottom
-                };
+                //footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 9); // Keep original font definition
+                PdfStringFormat footerFormat = new PdfStringFormat();
 
-                //string currentDate = DateTime.Now.ToString("MMMM dd,yyyy");
+                // Restored PdfTextAlignment
+                footerFormat.Alignment = PdfTextAlignment.Right; // Keep right alignment for footer
+                footerFormat.LineAlignment = PdfVerticalAlignment.Bottom;
+
+                string currentDate = DateTime.Now.ToString("MMMM dd,yyyy");
 
                 for (int i = 0; i < document.Pages.Count; i++)
                 {
                     PdfPage currentPage = document.Pages[i];
                     PdfGraphics currentPageGraphics = currentPage.Graphics;
-                    Syncfusion.Drawing.RectangleF footerBounds = new(margin, 0, currentPage.GetClientSize().Width - (2 * margin), currentPage.GetClientSize().Height - (margin / 2));
 
-                    string footerText = $"Page {i + 1}";
+                    // Define footer bounds using horizontal and vertical margins
+                    Syncfusion.Drawing.RectangleF footerBounds = new(horizontalMargin, currentPage.GetClientSize().Height - verticalMargin, currentPage.GetClientSize().Width - (2 * horizontalMargin), verticalMargin);
 
-                    currentPageGraphics.DrawString(footerText, boldFont, brush, footerBounds, footerFormat);
+                    // Separate footer parts
+                    string footerDateText = currentDate;
+                    // Restored original spacing and text for footer
+                    string footerPageStaticText = "  Page: " + (i + 1).ToString();
+
+
+                    // Measure the size of each part using the correct font
+                    SizeF footerDateSize = footerFont.MeasureString(footerDateText); // Use regular footer font
+                    SizeF footerPageStaticSize = boldFooterFont.MeasureString(footerPageStaticText); // Use bold footer font
+
+
+                    // Calculate the total width of the footer text parts
+                    float totalFooterTextWidth = footerDateSize.Width + footerPageStaticSize.Width;
+
+                    // Calculate the starting X position for the footer text to be right-aligned within the bounds
+                    float footerTextStartX = footerBounds.Left + footerBounds.Width - totalFooterTextWidth;
+
+                    // Draw the date part (regular font)
+                    currentPageGraphics.DrawString(footerDateText, footerFont, brush, new PointF(footerTextStartX, footerBounds.Top));
+
+                    // Draw the static " - Page " part (regular font) after the date
+                    float footerPageStaticX = footerTextStartX + footerDateSize.Width;
+                    currentPageGraphics.DrawString(footerPageStaticText, boldFooterFont, brush, new PointF(footerPageStaticX, footerBounds.Top));
+
                 }
 
+                // --- End of PDF Generation ---
+
+                // Save the document to a MemoryStream
                 using MemoryStream stream = new();
                 document.Save(stream);
                 pdfBytes = stream.ToArray();
