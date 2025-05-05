@@ -9,7 +9,7 @@ namespace Members.Controllers
 {
     public class InfoController(EmailService emailService) : Controller
     {
-        private readonly EmailService _emailService = emailService; // Add this field
+        private readonly EmailService _emailService = emailService; 
 
         public IActionResult Index()
         {

@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>       
+    <Compile Remove="Controllers\AdminController.cs" />       
     <Compile Remove="Controllers\ImageController.cs" />       
     <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
     <Compile Remove="Controllers\PdfGenerationControllerBackup.cs" />       
@@ -55,6 +56,34 @@
 
   <ItemGroup>
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ProtectedFiles\Agenda_2025.pdf" />
+    <None Remove="ProtectedFiles\Architectural Standards 4th Revision.pdf" />
+    <None Remove="ProtectedFiles\Architectural Standards August 2024 Additions.pdf" />
+    <None Remove="ProtectedFiles\Assessment Fee Covers.pdf" />
+    <None Remove="ProtectedFiles\Bits and Pieces.pdf" />
+    <None Remove="ProtectedFiles\Budget Report 2025.pdf" />
+    <None Remove="ProtectedFiles\Clubhouse Use Rules.pdf" />
+    <None Remove="ProtectedFiles\Current April 27th.pdf" />
+    <None Remove="ProtectedFiles\Directory 4-29-2025.pdf" />
+    <None Remove="ProtectedFiles\Directory 4-30-2025.pdf" />
+    <None Remove="ProtectedFiles\Directory 5-2025.pdf" />
+    <None Remove="ProtectedFiles\Directory.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 01-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 02-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 03-2025.pdf" />
+    <None Remove="ProtectedFiles\First Amendment to Covenants.pdf" />
+    <None Remove="ProtectedFiles\Minutes Feb-19-2025.pdf" />
+    <None Remove="ProtectedFiles\Miscellaneous Information.pdf" />
+    <None Remove="ProtectedFiles\Oaks Village Deed Restrictions.pdf" />
+    <None Remove="ProtectedFiles\Official Directory.pdf" />
+    <None Remove="ProtectedFiles\Paying Assessment Fee.pdf" />
+    <None Remove="ProtectedFiles\Pet Rules.pdf" />
+    <None Remove="ProtectedFiles\Pool Rules.pdf" />
+    <None Remove="ProtectedFiles\Regulations for Generators.pdf" />
+    <None Remove="ProtectedFiles\Welcome Letter.pdf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,7 +109,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Views\Shared\NewFolder\" />
+    <Folder Include="ProtectedFiles\" />
   </ItemGroup>
 
 </Project>

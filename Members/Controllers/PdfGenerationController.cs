@@ -555,8 +555,8 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 TempData["SuccessMessage"] = $"New Directory PDF file '{databaseFileName}' saved successfully.";
             }
 
-            _logger.LogInformation("Redirecting to Admin/ManageCategoryFiles for category {CategoryId}", model.CategoryId);
-            return RedirectToAction("ManageCategoryFiles", "Admin", new { categoryId = model.CategoryId });
+            _logger.LogInformation("Redirecting to PdfCategory/ManageCategoryFiles for category {CategoryId}", model.CategoryId);
+            return RedirectToAction("ManageCategoryFiles", "PdfCategory", new { categoryId = model.CategoryId });
 
         }
         catch (Exception ex)

@@ -16,12 +16,12 @@ using System.Collections.Generic;
 
 namespace Members.Controllers
 {
-    [Authorize(Roles = "Manager, Admin")]
+    [Authorize(Roles = "Admin")]
     public class PdfCategoryController(IWebHostEnvironment environment, ILogger<PdfCategoryController> logger, ApplicationDbContext context /*, UserManager<IdentityUser> userManager, UserService userService*/) : Controller
     {
         private readonly IWebHostEnvironment _environment = environment;
         private readonly ILogger<PdfCategoryController> _logger = logger;
-        private readonly ApplicationDbContext _context = context;        
+        private readonly ApplicationDbContext _context = context;
 
         // Define the base path for protected files as a readonly field for consistency
         private readonly string _protectedFilesBasePath = Path.Combine(environment.ContentRootPath, "ProtectedFiles");
@@ -49,7 +49,7 @@ namespace Members.Controllers
                 // Ensure the protected files directory exists before proceeding
                 if (!Directory.Exists(_protectedFilesBasePath)) // Use the readonly field
                 {
-                    _logger.LogError("Protected files directory not found for cleanup: {Path}", _protectedFilesBasePath);                    
+                    _logger.LogError("Protected files directory not found for cleanup: {Path}", _protectedFilesBasePath);
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Members.Controllers
                         else
                         {
                             // Add valid file entries to the 'files' collection to be displayed in the view
-                            ((List<CategoryFile>)files).Add(file);
+                            files.Add(file);
                         }
                     }
                 }
@@ -138,7 +138,7 @@ namespace Members.Controllers
             return View("Categories", categories);
         }
 
-        // POST: PdfCategory/DeleteCategoryConfirmed
+        // POST: DeleteCategoryConfirmed
         [HttpPost]
         public async Task<IActionResult> DeleteCategoryConfirmed(int id)
         {
@@ -266,7 +266,8 @@ namespace Members.Controllers
                 newFileName += ".pdf";
             }
 
-            var categoryFile = await _context.CategoryFiles.FindAsync(renameFileId);            
+            var categoryFile = await _context.CategoryFiles.FindAsync(renameFileId);
+
             if (categoryFile == null)
             {
                 return NotFound();
@@ -318,11 +319,15 @@ namespace Members.Controllers
                 if (category == null)
                 {
                     _logger.LogWarning("Upload failed: Category with ID {CategoryId} not found.", categoryId);
-                    return NotFound("Category not found.");
+                    // Use TempData to show a user-friendly message on redirect
+                    TempData["ErrorMessage"] = "Error: Category not found.";
+                    // Redirect back to the appropriate page, maybe the category list or a general error page
+                    return RedirectToAction("Index", "Admin"); // Assuming an Admin Index action lists categories
                 }
 
                 // Ensure the target directory exists before saving
-                var protectedFilesPath = Path.Combine(_environment.ContentRootPath, "ProtectedFiles"); // Using the readonly field
+                // Assuming _environment.ContentRootPath and "ProtectedFiles" are correctly defined elsewhere
+                var protectedFilesPath = Path.Combine(_environment.ContentRootPath, "ProtectedFiles");
                 if (!Directory.Exists(protectedFilesPath))
                 {
                     try
@@ -333,7 +338,8 @@ namespace Members.Controllers
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Upload failed: Error creating ProtectedFiles directory: {ErrorMessage}", ex.Message);
-                        return StatusCode(500, "Error creating necessary directory.");
+                        TempData["ErrorMessage"] = "Error creating necessary directory on the server.";
+                        return RedirectToAction("ManageCategoryFiles", new { categoryId }); // Redirect back on error
                     }
                 }
 
@@ -346,60 +352,85 @@ namespace Members.Controllers
                 // Ensure the sanitized file name ends with .pdf (assuming all uploaded files are PDFs)
                 if (!sanitizedFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    sanitizedFileName += ".pdf";
+                    // Optionally log a warning or error if a non-PDF is uploaded, depending on desired strictness
+                    _logger.LogWarning("Upload attempted for non-PDF file: {FileName}", originalFileName);
+                    TempData["ErrorMessage"] = "Only PDF files are allowed for upload.";
+                    return RedirectToAction("ManageCategoryFiles", new { categoryId }); // Redirect back
                 }
 
-                // Check if a file with the same sanitized name already exists in the target folder
+                // Construct the full file path
                 var filePath = Path.Combine(protectedFilesPath, sanitizedFileName);
-                if (System.IO.File.Exists(filePath))
-                {
-                    _logger.LogWarning("Upload failed: File with name {FileName} already exists at {FilePath}", sanitizedFileName, filePath);
-                    return BadRequest($"A file named '{sanitizedFileName}' already exists on the server. Please rename your file or delete the existing one.");
-                }
+
+                // --- Removed the file existence check to allow overwriting ---
+                //if (System.IO.File.Exists(filePath))
+                //{
+                //    _logger.LogWarning("Upload failed: File with name {FileName} already exists at {FilePath}", sanitizedFileName, filePath);
+                //    return BadRequest($"A file named '{sanitizedFileName}' already exists on the server. Please rename your file or delete the existing one.");
+                //}
+                // --- End Removed Section ---
+
                 try
                 {
                     // Save the file to the server using the sanitized name
+                    // FileMode.Create will overwrite the file if it already exists
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    _logger.LogInformation("File uploaded and saved successfully to {FilePath}", filePath);
+                    _logger.LogInformation("File uploaded and saved (or overwritten) successfully to {FilePath}", filePath);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Upload failed: Error saving file to {FilePath}: {ErrorMessage}", filePath, ex.Message);
-                    return StatusCode(500, "Error saving file on the server.");
+                    TempData["ErrorMessage"] = "Error saving file on the server.";
+                    return RedirectToAction("ManageCategoryFiles", new { categoryId }); // Redirect back on error
                 }
 
-                // Create a new CategoryFile record and associate it with the category
-                var categoryFile = new CategoryFile
-                {
-                    CategoryID = categoryId,
-                    FileName = sanitizedFileName, // Store the sanitized filename
-                    SortOrder = sortOrder,
-                    PDFCategory = category // Assign the fetched category entity
-                };
+                // Check if a database entry for this file already exists in this category
+                var existingCategoryFile = await _context.CategoryFiles
+                                                        .FirstOrDefaultAsync(cf => cf.CategoryID == categoryId && cf.FileName == sanitizedFileName);
 
-                _context.CategoryFiles.Add(categoryFile);
+                if (existingCategoryFile != null)
+                {
+                    // If entry exists, update its sort order (or other properties if needed)
+                    existingCategoryFile.SortOrder = sortOrder;
+                    _logger.LogInformation("Database entry updated for existing file {FileName} in category {CategoryId}.", sanitizedFileName, categoryId);
+                }
+                else
+                {
+                    // If entry does not exist, create a new one
+                    var categoryFile = new CategoryFile
+                    {
+                        CategoryID = categoryId,
+                        FileName = sanitizedFileName, // Store the sanitized filename
+                        SortOrder = sortOrder,
+                        PDFCategory = category // Assign the fetched category entity
+                    };
+                    _context.CategoryFiles.Add(categoryFile);
+                    _logger.LogInformation("New database entry created for uploaded file {FileName} in category {CategoryId}.", sanitizedFileName, categoryId);
+                }
+
                 try
                 {
-                    await _context.SaveChangesAsync(); // Use SaveChangesAsync
-                    _logger.LogInformation("Database entry created for uploaded file {FileName} in category {CategoryId}.", sanitizedFileName, categoryId);
+                    await _context.SaveChangesAsync(); // Save changes (either add new or update existing)
+                    TempData["SuccessMessage"] = $"File '{sanitizedFileName}' uploaded and saved successfully.";
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Upload failed: Error saving database entry for file {FileName}: {ErrorMessage}", sanitizedFileName, ex.Message);
                     // The file was saved, but the DB entry failed. Consider deleting the saved file here.
                     // try { System.IO.File.Delete(filePath); } catch { _logger.LogError("Failed to delete physical file {FilePath} after DB save failure.", filePath); }
-                    return StatusCode(500, "Error saving file information to database.");
+                    TempData["ErrorMessage"] = "Error saving file information to database.";
                 }
 
+                // Redirect back to the ManageCategoryFiles page for this category
                 return RedirectToAction("ManageCategoryFiles", new { categoryId });
             }
 
-            // If no file was selected, or an error occurred, redirect back to the page
+            // If no file was selected, or an error occurred before file processing
             _logger.LogWarning("Upload failed: No file selected or file was empty.");
-            // Optionally add a TempData error message here
+            TempData["WarningMessage"] = "No file selected for upload."; // Add a user-friendly message
+                                                                         // Redirect back to the page
             return RedirectToAction("ManageCategoryFiles", new { categoryId });
         }
 
@@ -407,6 +438,7 @@ namespace Members.Controllers
         public async Task<IActionResult> UpdateFileSortOrder(int renameFileId, int newSortOrder)
         {
             var categoryFile = await _context.CategoryFiles.FindAsync(renameFileId); // Use FindAsync
+
             if (categoryFile == null)
             {
                 _logger.LogWarning("Sort order update failed: File entry with ID {FileId} not found.", renameFileId);
@@ -436,12 +468,14 @@ namespace Members.Controllers
                                     .Where(f => f.CategoryID == categoryId)
                                     .MaxAsync(f => (int?)f.SortOrder); // Use MaxAsync and (int?)
 
+
             // If maxSortOrder is null (no files yet), the next sort order is 1. Otherwise, it's the max + 1.
             int nextSortOrder = (maxSortOrder ?? 0) + 1;
 
             return Json(nextSortOrder);
         }
-               
+
+        // Made async as it calls an async method (implicitly by EF Core internally with ToList)
         public async Task<IActionResult> CategoryFilesPartial(int categoryId)
         {
             var categoryFiles = await _context.CategoryFiles // Use await and ToListAsync

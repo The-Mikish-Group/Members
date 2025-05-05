@@ -68,7 +68,7 @@
                                     <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
                                     <td class="text-gold-darker">@item.SortOrder</td>
                                     <td class="delete-cell text-end py-0">
-                                        <form method="post" class="d-inline d-flex justify-content-end w-100" action="/Admin/DeleteCategoryConfirmed/@item.CategoryID">
+                                        <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
                                             <button type="submit" class="btn btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -108,7 +108,7 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-secondary" href="/Admin/ManageCategoryFiles">
+                <a class="btn btn-secondary" href="/PdfCategory/ManageCategoryFiles">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>

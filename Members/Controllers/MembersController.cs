@@ -1,6 +1,4 @@
-﻿// Create a new file: Controllers/MembersController.cs
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Members.Data; 
