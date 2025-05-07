@@ -42,7 +42,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace Members.Controllers;
 
-[Authorize(Roles = "Manager,Admin")]
+[Authorize(Roles = "Admin,Manager")]
 public class PdfGenerationController : Controller // Inherit from Controller
 {
     // Injected dependencies for database access, environment info, logging, user management, AND View Rendering (keep if RenderViewToStringAsync is used elsewhere)

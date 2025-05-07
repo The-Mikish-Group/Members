@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace Members.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     public class PdfCategoryController(IWebHostEnvironment environment, ILogger<PdfCategoryController> logger, ApplicationDbContext context /*, UserManager<IdentityUser> userManager, UserService userService*/) : Controller
     {
         private readonly IWebHostEnvironment _environment = environment;
