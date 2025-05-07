@@ -30,18 +30,23 @@
     <Compile Remove="Pdf\**" />
     <Compile Remove="Views\Admin\**" />
     <Compile Remove="Views\Image\**" />
+    <Compile Remove="wwwroot\js\ej2\**" />
     <Content Remove="Pdf\**" />
     <Content Remove="Views\Admin\**" />
     <Content Remove="Views\Image\**" />
+    <Content Remove="wwwroot\js\ej2\**" />
     <EmbeddedResource Remove="Pdf\**" />
     <EmbeddedResource Remove="Views\Admin\**" />
     <EmbeddedResource Remove="Views\Image\**" />
+    <EmbeddedResource Remove="wwwroot\js\ej2\**" />
     <None Remove="Pdf\**" />
     <None Remove="Views\Admin\**" />
     <None Remove="Views\Image\**" />
+    <None Remove="wwwroot\js\ej2\**" />
   </ItemGroup>
 
   <ItemGroup>       
+    <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
     <Compile Remove="Controllers\AdminController.cs" />       
     <Compile Remove="Controllers\ImageController.cs" />       
     <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
@@ -61,6 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
     <Content Remove="Views\Home\Directory.cshtml" />
     <Content Remove="Views\Home\Documents.cshtml" />
     <Content Remove="Views\Home\Financials.cshtml" />
