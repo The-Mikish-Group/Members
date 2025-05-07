@@ -71,7 +71,7 @@ namespace Members.Areas.Identity.Pages.Account
                     "    </div>" +
                     "    <p style=\"margin-bottom: 1em;\">This password reset link is valid for a limited time. If you did not request a password reset, you can ignore this email. Your password will not be changed.</p>" +
                     "    <p style=\"margin-bottom: 0;\">Thank you,</p>" +
-                    "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                    "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                     "</body>" +
                     "</html>"
                 );

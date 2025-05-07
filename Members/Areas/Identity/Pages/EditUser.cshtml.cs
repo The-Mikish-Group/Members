@@ -344,7 +344,7 @@ namespace Members.Areas.Identity.Pages
                                 "    <p style=\"margin-bottom: 1em;\">If you did not register for an account with Oaks-Village HOA, please disregard this email.</p>" +
                                 "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
                                 "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                                "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                 "</body>" +
                                 "</html>"
                             );

@@ -196,7 +196,7 @@
             var newCategoryName = $('#editCategoryName_' + categoryId).val();
             var newSortOrder = $('#editSortOrder_' + categoryId).val();
 
-            var url = '@Url.Action("EditCategory", "Admin")';
+            var url = '@Url.Action("EditCategory", "PdfCategory")';
 
             // Include Request Verification Token for security
             var token = $('input[name="__RequestVerificationToken"]').val();

@@ -84,37 +84,3 @@ namespace Members.Services
         }
     }
 }
-
-//using Microsoft.AspNetCore.Identity.UI.Services;
-//using System.Net;
-//using System.Net.Mail;
-//using System.Threading.Tasks;
-
-//namespace Members.Services
-//{
-//    public class EmailService(string smtpHost, int smtpPort, string smtpUser, string smtpPass) : IEmailSender
-//    {
-//        private readonly string _smtpHost = smtpHost;
-//        private readonly int _smtpPort = smtpPort;
-//        private readonly string _smtpUser = smtpUser;
-//        private readonly string _smtpPass = smtpPass;
-
-//        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-//        {
-//            using var client = new SmtpClient(_smtpHost, _smtpPort);
-//            client.Credentials = new NetworkCredential(_smtpUser, _smtpPass);
-//            client.EnableSsl = false;
-
-//            var mailMessage = new MailMessage
-//            {
-//                From = new MailAddress(_smtpUser),
-//                Subject = subject,
-//                Body = htmlMessage,
-//                IsBodyHtml = true
-//            };
-//            mailMessage.To.Add(email);
-
-//            await client.SendMailAsync(mailMessage);
-//        }
-//    }
-//}

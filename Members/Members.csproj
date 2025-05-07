@@ -28,12 +28,16 @@
 
   <ItemGroup>
     <Compile Remove="Pdf\**" />
+    <Compile Remove="Views\Admin\**" />
     <Compile Remove="Views\Image\**" />
     <Content Remove="Pdf\**" />
+    <Content Remove="Views\Admin\**" />
     <Content Remove="Views\Image\**" />
     <EmbeddedResource Remove="Pdf\**" />
+    <EmbeddedResource Remove="Views\Admin\**" />
     <EmbeddedResource Remove="Views\Image\**" />
     <None Remove="Pdf\**" />
+    <None Remove="Views\Admin\**" />
     <None Remove="Views\Image\**" />
   </ItemGroup>
 
@@ -48,6 +52,8 @@
     <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].cs" />       
     <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].Designer.cs" />       
     <Compile Remove="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />       
+    <Compile Remove="Helpers\GalleryHelper.cs" />       
+    <Compile Remove="Helpers\ImageDisplayHelper.cs" />       
     <Compile Remove="Models\GalleryViewModels.cs" />       
     <Compile Remove="Models\ImportFile.cs" />       
     <Compile Remove="Models\UserWithProfileViewItem.cs" />       
@@ -55,7 +61,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Home\Directory.cshtml" />
+    <Content Remove="Views\Home\Documents.cshtml" />
+    <Content Remove="Views\Home\Financials.cshtml" />
+    <Content Remove="Views\Home\Minutes.cshtml" />
+    <Content Remove="Views\Home\Privacy.cshtml" />
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
+    <Content Remove="wwwroot\Images\LinkImages\LogoOaksVillage.png" />
+    <Content Remove="wwwroot\Images\LinkImages\Oaks-Trees.png" />
+    <Content Remove="wwwroot\Images\LinkImages\OaksTrees-old.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -108,6 +122,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Identity\Pages\Admin\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="ProtectedFiles\" />
   </ItemGroup>

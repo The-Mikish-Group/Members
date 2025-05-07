@@ -322,7 +322,7 @@ namespace Members.Controllers
                     // Use TempData to show a user-friendly message on redirect
                     TempData["ErrorMessage"] = "Error: Category not found.";
                     // Redirect back to the appropriate page, maybe the category list or a general error page
-                    return RedirectToAction("Index", "Admin"); // Assuming an Admin Index action lists categories
+                    return RedirectToAction("Index", "PdfCategory"); 
                 }
 
                 // Ensure the target directory exists before saving
@@ -347,7 +347,7 @@ namespace Members.Controllers
                 // Sanitize the filename to prevent invalid characters
                 var sanitizedFileName = Path.GetInvalidFileNameChars()
                                         .Aggregate(originalFileName, (current, c) => current.Replace(c.ToString(), "_"));
-                sanitizedFileName = sanitizedFileName.Replace(" ", "_"); // Replace spaces with underscores
+                //sanitizedFileName = sanitizedFileName.Replace(" ", "_"); // Replace spaces with underscores
 
                 // Ensure the sanitized file name ends with .pdf (assuming all uploaded files are PDFs)
                 if (!sanitizedFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
@@ -467,7 +467,6 @@ namespace Members.Controllers
             var maxSortOrder = await _context.CategoryFiles
                                     .Where(f => f.CategoryID == categoryId)
                                     .MaxAsync(f => (int?)f.SortOrder); // Use MaxAsync and (int?)
-
 
             // If maxSortOrder is null (no files yet), the next sort order is 1. Otherwise, it's the max + 1.
             int nextSortOrder = (maxSortOrder ?? 0) + 1;

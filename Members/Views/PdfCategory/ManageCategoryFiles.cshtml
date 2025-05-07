@@ -359,12 +359,12 @@ else
             // Determine which server action to call based on whether the filename changed
             if (oldFileName !== newFileNameWithExtension) {
                 // Filename has changed, call the rename action
-                url = '@Url.Action("RenameFileInCategory", "Admin")';
+                url = '@Url.Action("RenameFileInCategory", "PdfCategory")';
                 formData.append("oldFileName", oldFileName); // Send old name
                 formData.append("newFileName", newFileNameWithExtension); // Send new name
             } else {
                 // Filename is the same, call the update sort order action
-                url = '@Url.Action("UpdateFileSortOrder", "Admin")';
+                url = '@Url.Action("UpdateFileSortOrder", "PdfCategory")';
                 // The UpdateFileSortOrder action likely only requires fileId and newSortOrder,
                 // which are already in the formData.
             }
@@ -399,7 +399,7 @@ else
                 // Handle successful response
                 console.log('Request successful:', message);
                 // Reload the page to show the updated file list and order
-                window.location.href = '@Url.Action("ManageCategoryFiles", "Admin")' + (currentCategoryId ? '?categoryId=' + currentCategoryId : '');
+                window.location.href = '@Url.Action("ManageCategoryFiles", "PdfCategory")' + (currentCategoryId ? '?categoryId=' + currentCategoryId : '');
 
                 // Alternatively, instead of reloading, you could hide the modal and update the table row directly
                 // var renameModal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
@@ -448,7 +448,7 @@ else
                  if (selectedCategoryId) {
                       categoryLabel.text('Current Category:');
                       // Fetch the next sort order for the upload form if a category is selected
-                      $.get('@Url.Action("GetNextSortOrder", "Admin")', { categoryId: selectedCategoryId }, function (data) {
+                      $.get('@Url.Action("GetNextSortOrder", "PdfCategory")', { categoryId: selectedCategoryId }, function (data) {
                           $('#sortOrder').val(data);
                       }).fail(function(jqXHR, textStatus, errorThrown) {
                           console.error("Error fetching next sort order:", textStatus, errorThrown);

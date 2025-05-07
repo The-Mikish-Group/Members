@@ -1,12 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Welcome to Oaks-Village";
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
 
-    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
-    ViewData["Canonical"] = "https://Oaks-Village.com/Info/index";
-    ViewData["OGTitle"] = "Welcome to Oaks-Village";
+    ViewData["Title"] = "Welcome to Oaks-Village";
+    ViewData["Canonical"] = siteURL + "/Info/index";
     ViewData["OGDescription"] = "Explore our community and learn more about us.";
-    ViewData["OGURL"] = "https://Oaks-Village.com/Info/Index";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
+
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
 }
 
 <!-- View -->

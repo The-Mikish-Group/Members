@@ -1,20 +1,14 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-
-@{
-   // siteName
-   string siteName = HttpContextAccessor?.HttpContext?.Request?.Host != null
-   ? System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(HttpContextAccessor.HttpContext.Request.Host.ToString().Split('.')[0])
-   : "Site";
+﻿@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
 
     ViewData["Title"] = "TOS";
+    ViewData["Canonical"] = siteURL + "/Info/TOS";
+    ViewData["OGDescription"] = "Explore our community and learn more about us.";
 
-    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
-    ViewData["Canonical"] = "https://Oaks-Village.com/Info/TOS";
-    ViewData["OGTitle"] = "Terms of Service";
-    ViewData["OGDescription"] = "Oaks-Village Terms of Service.";
-    ViewData["OGURL"] = "https://Oaks-Village.com/Info/TOS";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
-
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
 }
 
 <!-- View -->

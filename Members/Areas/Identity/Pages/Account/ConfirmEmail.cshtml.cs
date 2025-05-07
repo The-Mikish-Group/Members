@@ -69,7 +69,7 @@ namespace Members.Areas.Identity.Pages.Account
                       "    <p style=\"margin-bottom: 1em;\">You can log in to the community portal at <a href=\"https://Oaks-Village.com\" style=\"color: #007bff; text-decoration: none;\">https://Oaks-Village.com</a>.</p>" +
                       "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
                       "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                      "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                      "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                       "</body>" +
                       "</html>"; ;
                 }
@@ -90,7 +90,7 @@ namespace Members.Areas.Identity.Pages.Account
                         "    <p style=\"margin-bottom: 1em;\">Once your account has been authorized, you will receive a separate <strong style=\"font-weight: bold;\">Welcome Email</strong> with login instructions. Please be patient as we are a small team of volunteers.</p>" +
                         "    <p style=\"margin-bottom: 0;\">Thank you for your understanding.</p>" +
                         "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                         "</body>" +
                         "</html>";
                 }
@@ -136,7 +136,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    </ul>" +
                                          "    <p style=\"margin-bottom: 1em;\">The user's email address has been verified, and their account is now live with Member access.</p>" +
                                          "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                          "</body>" +
                                          "</html>";
                     }
@@ -159,7 +159,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    </ul>" +
                                          "    <p style=\"margin-bottom: 1em;\">The user with the email address above has confirmed their email. Please review their account and assign the 'Member' role as appropriate.</p>" +
                                          "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                          "</body>" +
                                          "</html>";
                     }

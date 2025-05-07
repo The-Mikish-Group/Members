@@ -96,7 +96,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
             _logger.LogError("Directory category not found for PDF generation.");
             TempData["ErrorMessage"] = "The 'Directory' category was not found in the database. Please ensure it exists to generate the directory PDF.";
             // Redirect the user to the category management page or a specific error view
-            return RedirectToAction("ManageCategories", "Admin"); // Example: Redirect to AdminController.ManageCategories
+            return RedirectToAction("ManageCategories", "PdfCategory"); // Example: Redirect to AdminController.ManageCategories
         }
 
         // Calculate the next suggested sort order specifically for the "Directory" category
@@ -230,7 +230,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
 
                 // --- Image Loading (Load once outside the page loop) ---
                 PdfImage? logoInstance = null;
-                string logoPath = Path.Combine(_environment.WebRootPath, "Images", "LinkImages", "Oaks-trees.png");
+                string logoPath = Path.Combine(_environment.WebRootPath, "Images", "LinkImages", "SmallLogo.png");
                 if (System.IO.File.Exists(logoPath))
                 {
                     try
@@ -258,10 +258,9 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 float logoHeight = 30; // Declare logoHeight here
                 float spacingBetweenLogoAndText = 5; // Space between the logo and the title text
 
-
                 // --- Draw Heading and Logo on the FIRST Page ---
                 // Restored to original first page heading logic
-                string firstPageHeadingText = "Oaks Village Homeowners Association Directory " + DateTime.Now.ToString("MM/yyyy");
+                string firstPageHeadingText = "Oaks Village Homeowners Association Directory";
                 SizeF firstPageHeadingSize = boldHeadingFont.MeasureString(firstPageHeadingText);
 
                 // Calculate the total width of the logo + spacing + text for centering
@@ -338,13 +337,10 @@ public class PdfGenerationController : Controller // Inherit from Controller
                             currentColumn = 0;
 
                             // --- Draw Heading and Logo on SUBSEQUENT Pages ---
-                            // Separate the heading text and the date for subsequent pages
-
-                            // MODIFIED: Removed trailing space from bold text and added leading space to continued text
+                            // Separate the heading text and the date for subsequent pages                            
                             string boldContinuedHeadingText = "HOA Member Directory";
                             Syncfusion.Drawing.SizeF boldContinuedHeadingTextSize = boldHeadingFont.MeasureString(boldContinuedHeadingText);
-
-                            // MODIFIED: Added a single space before (Continued)
+                            
                             string continuedHeadingText = " (Continued)";
                             Syncfusion.Drawing.SizeF continuedHeadingTextSize = regularFont.MeasureString(continuedHeadingText);
 
@@ -364,7 +360,6 @@ public class PdfGenerationController : Controller // Inherit from Controller
                             // Calculate the X position for the 'Continue' text after the static text
                             float continuedHeadingTextX = boldContinuedHeadingTextX + boldContinuedHeadingTextSize.Width;
 
-
                             // Draw the logo on the new page if loaded
                             if (logoInstance != null)
                             {
@@ -383,7 +378,8 @@ public class PdfGenerationController : Controller // Inherit from Controller
                             // Move currentY below the heading block (using the maximum height of logo or text)
                             float bottomOfContinuedHeadingBlock = titleTopPosition + Math.Max(logoInstance != null ? logoHeight : 0, boldHeadingFont.Height); // Use boldHeadingFont.Height
                             currentY = bottomOfContinuedHeadingBlock + verticalMargin; // Add vertical margin below the heading
-                                                                                       // --- End Draw Heading and Logo on SUBSEQUENT Pages ---
+
+                            // --- End Draw Heading and Logo on SUBSEQUENT Pages ---
                         }
                     }
 

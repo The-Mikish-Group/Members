@@ -245,7 +245,7 @@ namespace Members.Areas.Identity.Pages.Account
                         "    <p style=\"margin-bottom: 1em;\">Please note that a staff member must now authorize your account, and this process could take up to <strong>24 hours</strong>. At that time, you will receive a <strong>Welcome Email</strong>. We appreciate your patience as we are a small team of volunteers.</p>" +
                         "    <p style=\"margin-bottom: 0;\">Thank you for your understanding.</p>" +
                         "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                         "</body>" +
                         "</html>"
                     );
@@ -279,7 +279,7 @@ namespace Members.Areas.Identity.Pages.Account
                                 "    </ul>" +
                                 "    <p style=\"margin-bottom: 1em;\">Please log in to the administration panel to review the new member's profile and assign the appropriate role.</p>" +
                                 "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                 "</body>" +
                                 "</html>";
 

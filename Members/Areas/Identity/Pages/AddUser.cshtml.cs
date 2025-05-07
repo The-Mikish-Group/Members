@@ -207,7 +207,7 @@ namespace Members.Areas.Identity.Pages
                         "    <p style=\"margin-bottom: 1em;\">Once you create your password, you will be able to log in to the Oaks-Village HOA community portal at <a href=\"https://oaks-village.com\" style=\"color: #007bff; text-decoration: none;\">https://oaks-village.com</a>.</p>" +
                         "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
                         "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/Oaks-Trees.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                         "</body>" +
                         "</html>"
                     );
