@@ -2,14 +2,6 @@
 @model RegisterConfirmationModel
 @{
     ViewData["Title"] = "Register Confirmation";
-
-    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
-    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Account/RegisterConfirmation";
-    ViewData["OGTitle"] = "Register Confirmation";
-    ViewData["OGDescription"] = "Oaks-Village Register Confirmation";
-    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Account/RegisterConfirmation";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
-
 }
 
 <head>
@@ -41,7 +33,7 @@
                         </p>
                         
                         <p class="pb-4 text-gold-darker">
-                            (The email(s) will come from OaksVillage@Oaks-Village.com.)
+                            (The email(s) will come from @Environment.GetEnvironmentVariable("SMTP_USERNAME") + ".")
                         </p>
                         <p class="text-gold-darker pb-3">
                             <strong>3. Finally,</strong> you will recieve a <strong>Welcome Email</strong> telling you that you're ready to login. Again, this step may take 24 hours,

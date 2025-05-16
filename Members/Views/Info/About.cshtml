@@ -4,7 +4,7 @@
 
     ViewData["Title"] = "About Us";
     ViewData["Canonical"] = siteURL + "/Info/About";
-    ViewData["OGDescription"] = "Discover the beautiful community of Oaks-Village.";
+    ViewData["OGDescription"] = "Discover the beautiful community of " + siteName + ".";
 
     ViewData["Description"] = ViewData["Title"] + " " + siteName;
     ViewData["OGTitle"] = ViewData["Title"];
@@ -16,8 +16,8 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<!-- Logo Image -->
-<partial name="_LargeLogo" />
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
 
 <div class="container row m-0 pt-0 pt-lg-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto">
 
@@ -37,8 +37,7 @@
             <br /><br />
             When Growing Tree Foundation, Inc. purchased Oaks Village in 2008, Greg De La Piedra and his wife Eunice came 
             to Oaks Village to serve as the property managers. In 2013 Oaks Village transitioned from being a life-lease 
-            rental based property to an owners association. Today Oaks Village Home Owners Association, Inc. includes 25 
-            different owners.
+            rental based property to an owners association.
             <br /><br />
             In 2016, Growing Tree Foundation sold most of its remaining improved lots and 18 unimproved lots to Roger Gurganus 
             and Chad Pritchett. Roger and Chad created Oaks Village, Inc. and jointly they are the majority owners of the units 

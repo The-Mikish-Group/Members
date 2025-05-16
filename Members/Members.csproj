@@ -47,6 +47,7 @@
 
   <ItemGroup>       
     <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\UsersGrid.cshtml.cs" />       
     <Compile Remove="Controllers\AdminController.cs" />       
     <Compile Remove="Controllers\ImageController.cs" />       
     <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
@@ -67,18 +68,22 @@
 
   <ItemGroup>
     <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
+    <Content Remove="Areas\Identity\Pages\UsersGrid.cshtml" />
     <Content Remove="Views\Home\Directory.cshtml" />
     <Content Remove="Views\Home\Documents.cshtml" />
     <Content Remove="Views\Home\Financials.cshtml" />
     <Content Remove="Views\Home\Minutes.cshtml" />
     <Content Remove="Views\Home\Privacy.cshtml" />
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
+    <Content Remove="Views\Shared\_LoginPartial.cshtml" />
     <Content Remove="wwwroot\Images\LinkImages\LogoOaksVillage.png" />
     <Content Remove="wwwroot\Images\LinkImages\Oaks-Trees.png" />
     <Content Remove="wwwroot\Images\LinkImages\OaksTrees-old.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Identity\Pages\EditUser.cshtml.cs_save" />
+    <None Remove="Areas\Identity\Pages\EditUser.cshtml_Save" />
     <None Remove="ProtectedFiles\Agenda_2025.pdf" />
     <None Remove="ProtectedFiles\Architectural Standards 4th Revision.pdf" />
     <None Remove="ProtectedFiles\Architectural Standards August 2024 Additions.pdf" />
@@ -86,14 +91,12 @@
     <None Remove="ProtectedFiles\Bits and Pieces.pdf" />
     <None Remove="ProtectedFiles\Budget Report 2025.pdf" />
     <None Remove="ProtectedFiles\Clubhouse Use Rules.pdf" />
-    <None Remove="ProtectedFiles\Current April 27th.pdf" />
-    <None Remove="ProtectedFiles\Directory 4-29-2025.pdf" />
-    <None Remove="ProtectedFiles\Directory 4-30-2025.pdf" />
     <None Remove="ProtectedFiles\Directory 5-2025.pdf" />
     <None Remove="ProtectedFiles\Directory.pdf" />
     <None Remove="ProtectedFiles\Financial Report 01-2025.pdf" />
     <None Remove="ProtectedFiles\Financial Report 02-2025.pdf" />
     <None Remove="ProtectedFiles\Financial Report 03-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 04-2025.pdf" />
     <None Remove="ProtectedFiles\First Amendment to Covenants.pdf" />
     <None Remove="ProtectedFiles\Minutes Feb-19-2025.pdf" />
     <None Remove="ProtectedFiles\Miscellaneous Information.pdf" />
@@ -128,7 +131,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Identity\Pages\Admin\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="ProtectedFiles\" />
   </ItemGroup>

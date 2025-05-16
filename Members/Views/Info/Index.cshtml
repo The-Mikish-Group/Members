@@ -2,7 +2,7 @@
     string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
     string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
 
-    ViewData["Title"] = "Welcome to Oaks-Village";
+    ViewData["Title"] = "Welcome to " +  siteName + ".";
     ViewData["Canonical"] = siteURL + "/Info/index";
     ViewData["OGDescription"] = "Explore our community and learn more about us.";
 
@@ -16,8 +16,8 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<!-- Logo Image -->
-<partial name="_LargeLogo" />    
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />    
 
 <div class="container row m-0 pb-0 pb-lg-2 gx-0 gy-2 gy-lg-3 mx-auto text-center">
 

@@ -10,384 +10,450 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Linq;
+using System.Net;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using TempDataAttribute = Microsoft.AspNetCore.Mvc.TempDataAttribute;
+
 
 namespace Members.Areas.Identity.Pages
 {
     public class EditUserModel(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender, ApplicationDbContext dbContext) : PageModel
     {
-        
+
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IEmailSender _emailSender = emailSender;
         private readonly ApplicationDbContext _dbContext = dbContext;
 
         [BindProperty]
-        public required InputModel Input { get; set; }
+        public InputModel Input { get; set; } = new InputModel();
 
+        // This property will capture the full return URL from the query string
+        // It's also marked for binding on POST
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? ShowExtraFields { get; set; }
 
-        public required string StatusMessage { get; set; }        
+        [TempData] // Use TempData to display status messages after redirect
+        public string? StatusMessage { get; set; }
 
-        [BindProperty]
-        public List<RoleViewModel> AllRoles { get; set; } = [];    
+        [BindProperty] // Bind on POST to get selected roles from the form
+        public List<RoleViewModel> AllRoles { get; set; } = [];
 
         public class RoleViewModel
         {
             public required string Value { get; set; }
-            public required string Text { get; set; }
+            public string? Text { get; set; }
             public bool Selected { get; set; }
         }
 
         public class InputModel
         {
+            public string? Id { get; set; }
 
-            // The User ID
-            public required string Id { get; set; }
-
-            // Username (should be the same as email)
-            [Required]
             [Display(Name = "Username")]
-            public required string UserName { get; set; }
+            public string? UserName { get; set; }
 
-            // Email
-            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
-            public required string Email { get; set; }
+            public string? Email { get; set; }
 
-            // Email Confirmed
+            [Display(Name = "Email Confirmed")]
             public bool EmailConfirmed { get; set; }
 
-            // Password
             [DataType(DataType.Password)]
             [Display(Name = "New Password")]
             public string? NewPassword { get; set; }
 
-            // Cell Phone
             [Phone]
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
 
-            // Cell Phone Confirmed
+            [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; }
 
-            // Home Phone
             [Phone]
             [Display(Name = "Home Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? HomePhoneNumber { get; set; }
 
-            // Name - First Middle, and Last
             [Required]
             [Display(Name = "First Name")]
-            public required string FirstName { get; set; }
+            public string? FirstName { get; set; }
 
             [Display(Name = "Middle Name")]
             public string? MiddleName { get; set; }
 
             [Required]
             [Display(Name = "Last Name")]
-            public required string LastName { get; set; }
+            public string? LastName { get; set; }
 
-            // Birthday
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
 
-            // Anniversary
             [Display(Name = "Anniversary")]
             [DataType(DataType.Date)]
             public DateTime? Anniversary { get; set; }
 
-            // Address - AddressLine1, AddressLine2, City, State, ZipCode
-            // [Required]
+            [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
 
             [Display(Name = "Address Line 2")]
             public string? AddressLine2 { get; set; }
 
-            // [Required]
+            [Required]
             [Display(Name = "City")]
             public string? City { get; set; }
 
-            // [Required]
+            [Required]
             [Display(Name = "State")]
             public string? State { get; set; }
 
-            // [Required]
+            [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
 
-            // Plot Identifier.
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
-
-            public bool ModelState {get; set; }
-
         }
 
         private async Task LoadUserAsync(IdentityUser user)
         {
-            // Load UserProfile data
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
 
             Input = new InputModel
             {
                 Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
+                UserName = user.UserName,
+                Email = user.Email,
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumber = user.PhoneNumber,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-                HomePhoneNumber = userProfile?.HomePhoneNumber ?? string.Empty,
-                FirstName = userProfile?.FirstName ?? string.Empty,
-                MiddleName = userProfile?.MiddleName ?? string.Empty,
-                LastName = userProfile?.LastName ?? string.Empty,
+                HomePhoneNumber = userProfile?.HomePhoneNumber,
+                FirstName = userProfile?.FirstName,
+                MiddleName = userProfile?.MiddleName,
+                LastName = userProfile?.LastName,
                 Birthday = userProfile?.Birthday,
                 Anniversary = userProfile?.Anniversary,
-                AddressLine1 = userProfile?.AddressLine1 ?? string.Empty,
-                AddressLine2 = userProfile?.AddressLine2 ?? string.Empty,
-                City = userProfile?.City ?? string.Empty,
-                State = userProfile?.State ?? string.Empty,
-                ZipCode = userProfile?.ZipCode ?? string.Empty,
-                Plot = userProfile?.Plot ?? string.Empty
+                AddressLine1 = userProfile?.AddressLine1,
+                AddressLine2 = userProfile?.AddressLine2,
+                City = userProfile?.City,
+                State = userProfile?.State,
+                ZipCode = userProfile?.ZipCode,
+                Plot = userProfile?.Plot
             };
+
+            await PopulateRoleViewModelsAsync(user);
         }
 
-        public async Task<IActionResult> OnGetAsync(string id, string searchTerm)
+        private async Task PopulateRoleViewModelsAsync(IdentityUser user)
         {
-            if (string.IsNullOrEmpty(id))
+            var roles = await _roleManager.Roles.ToListAsync();
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            AllRoles = [.. roles.Select(role => new RoleViewModel
             {
-                return NotFound();
+                Value = role.Name ?? string.Empty,
+                Text = role.Name ?? string.Empty,
+                Selected = userRoles.Contains(role.Name ?? string.Empty)
+            }).OrderBy(r => r.Text)];
+        }
+
+        public async Task<IActionResult> OnGetAsync(string id, string? returnUrl) 
+        {
+            // Optionally capture SearchTerm and ShowExtraFields from returnUrl if needed for display
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                var uri = new Uri("http://dummyurl" + returnUrl); // Use a dummy base URI for parsing
+                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+                if (queryParameters.TryGetValue("SearchTerm", out var searchTermValue))
+                {
+                    SearchTerm = searchTermValue.ToString();
+                }
+                if (queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue))
+                {
+                    ShowExtraFields = showExtraFieldsValue.ToString();
+                }
             }
 
-            // Load the user based on the provided ID
+            if (string.IsNullOrEmpty(id))
+            {
+                StatusMessage = "Error: User ID is missing.";
+                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                {
+                    return Redirect(ReturnUrl);
+                }
+                return RedirectToPage("./Users");
+            }
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{id}'.");
+                StatusMessage = $"Error: Unable to load user with ID '{id}'.";
+                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                {
+                    return Redirect(ReturnUrl);
+                }
+                return RedirectToPage("./Users");
             }
 
             await LoadUserAsync(user);
 
-            // Apply default values from environment variables if the loaded data is empty
-            if (string.IsNullOrEmpty(Input.City))
-            {
-                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
-            }
-            if (string.IsNullOrEmpty(Input.State))
-            {
-                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
-            }
-            if (string.IsNullOrEmpty(Input.ZipCode))
-            {
-                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
-            }
-
-            // Store the search term from the query string
-            SearchTerm = searchTerm;
-
-            var roles = await _roleManager.Roles.ToListAsync();
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            AllRoles = [.. roles.Select(role => new RoleViewModel
-            {
-                Value = role.Name ?? string.Empty,
-                Text = role.Name ?? string.Empty,
-                Selected = userRoles.Contains(role.Name ?? string.Empty)
-            })];
+            Input.City ??= Environment.GetEnvironmentVariable("DEFAULT_CITY");
+            Input.State ??= Environment.GetEnvironmentVariable("DEFAULT_STATE");
+            Input.ZipCode ??= Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE");
 
             return Page();
         }
-        public async Task<IActionResult> OnPostAsync(string? searchTerm)
+
+        public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.FindByIdAsync(Input.Id);
-
-            if (user != null)
+            var userOnPost = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
+            if (userOnPost != null)
             {
-                // Check if the email is already confirmed
-                bool originalEmailConfirmed = user.EmailConfirmed;
-
-                // Update the user properties
-                user.UserName = Input.UserName;
-                user.Email = Input.Email;
-                user.EmailConfirmed = Input.EmailConfirmed;
-                user.PhoneNumber = Input.PhoneNumber;
-                user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed;
-
-                // Save changes to Users table
-                var result = await _userManager.UpdateAsync(user);
-
-                // Update the UserProfile table
-                var userProfile = await _dbContext.UserProfile.FindAsync(Input.Id);
-                if (userProfile == null)
-                {
-                    userProfile = new UserProfile { UserId = Input.Id, User = user };
-                    _dbContext.UserProfile.Add(userProfile);
-                }
-                userProfile.FirstName = Input.FirstName;
-                userProfile.MiddleName = Input.MiddleName;
-                userProfile.LastName = Input.LastName;
-                userProfile.Birthday = Input.Birthday;
-                userProfile.Anniversary = Input.Anniversary;
-                userProfile.AddressLine1 = Input.AddressLine1;
-                userProfile.AddressLine2 = Input.AddressLine2;
-                userProfile.City = Input.City;
-                userProfile.State = Input.State;
-                userProfile.ZipCode = Input.ZipCode;
-                userProfile.Plot = Input.Plot;
-                userProfile.HomePhoneNumber = Input.HomePhoneNumber;
-
-                // Save changes to UserProfile
-                await _dbContext.SaveChangesAsync();
+                await PopulateRoleViewModelsAsync(userOnPost);
             }
 
-            // Update User Roles
-            user = await _userManager.FindByIdAsync(Input.Id);
-            if (user != null)
+            if (!ModelState.IsValid)
             {
-                var originalRoles = await _userManager.GetRolesAsync(user);
+                StatusMessage = "Error: Please fix the validation errors.";
+                return Page();
+            }
 
-                var selectedRoles = AllRoles?.Where(r => r.Selected).Select(r => r.Value ?? string.Empty).ToList() ?? [];
+            var user = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
 
-                await _userManager.RemoveFromRolesAsync(user, originalRoles);
-                var addRolesResult = await _userManager.AddToRolesAsync(user, selectedRoles);
-
-                if (!addRolesResult.Succeeded)
-                {
-                    foreach (var error in addRolesResult.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    await PopulateUserDataAndRoles(user);
-                    return Page(); // Stay on the Edit page with errors
-                }
-
-                // --- Integrated Email Sending Logic Here ---
-                if (user.EmailConfirmed && selectedRoles.Contains("Member") && !originalRoles.Contains("Member"))
-                {
-                    if (!string.IsNullOrEmpty(user.Email))
-                    {
-                        await _emailSender.SendEmailAsync(
-                            user.Email,
-                            "Welcome to Oaks-Village HOA - Your Account is Ready",
-                            "<!DOCTYPE html>" +
-                            "<html lang=\"en\">" +
-                            "<head>" +
-                            "    <meta charset=\"UTF-8\">" +
-                            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                            "    <title>Welcome to Oaks-Village HOA</title>" +
-                            "</head>" +
-                            "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
-                            "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
-                            "    <p style=\"margin-bottom: 1em;\">Welcome! Your Oaks-Village account has been created and is ready for you to access.</p>" +
-                            "    <p style=\"margin-bottom: 1em;\">You have been granted Member access and can log in to the HOA community portal at <a href=\"https://oaks-village.com\" style=\"color: #007bff; text-decoration: none;\">https://oaks-village.com</a>.</p>" +
-                            "    <div style=\"margin-bottom: 2em; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;\">" +
-                            "        <strong style=\"font-size: 1.1em;\">Important Note:</strong> If this account was automatically generated for you, please click the link below to create your password:" +
-                            "        <p style=\"margin-top: 1em;\">" +
-                            "            <a href=\"https://oaks-village.com/Identity/Account/ForgotPassword\" style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
-                            "                Click Here to Create Your Password" +
-                            "            </a>" +
-                            "        </p>" +
-                            "    </div>" +
-                            "    <p style=\"margin-bottom: 1em;\">You will be directed to enter your email address, and a password reset link will be sent to you. This process ensures the security of your account and verifies your email address, preventing unauthorized password creation attempts.</p>" +
-                            "    <p style=\"margin-bottom: 1em;\">Thank you for being a part of the Oaks-Village Homeowners Association.</p>" +
-                            "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                            "    <p style=\"margin-top: 0;\">The Oaks-Village HOA</p>" +
-                            "</body>" +
-                            "</html>"
-                        );
-                    }
-                }
-                else if (!user.EmailConfirmed && selectedRoles.Contains("Member") && !originalRoles.Contains("Member"))
-                {
-                    if (!string.IsNullOrEmpty(user.Email))
-                    {
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId, code },
-                            protocol: Request.Scheme);
-
-                        if (callbackUrl != null)
-                        {
-                            await _emailSender.SendEmailAsync(
-                                user.Email,
-                                "Please Confirm Your Email Address - Oaks-Village HOA Registration",
-                                $"<!DOCTYPE html>" +
-                                "<html lang=\"en\">" +
-                                "<head>" +
-                                "    <meta charset=\"UTF-8\">" +
-                                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                                "    <title>Confirm Your Email - Oaks-Village HOA</title>" +
-                                "</head>" +
-                                "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
-                                "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
-                                "    <p style=\"margin-bottom: 1em;\">Thank you for registering with the Oaks-Village Homeowners Association!</p>" +
-                                "    <p style=\"margin-bottom: 1em;\">To complete your registration and activate your account, please confirm your email address by clicking the button below:</p>" +
-                                "    <div style=\"margin: 2em 0;\">" +
-                                $"        <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style=\"background-color:#007bff;color:#fff;padding:10px 15px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;\">" +
-                                "            Confirm Your Email Address" +
-                                "        </a>" +
-                                "    </div>" +
-                                "    <p style=\"margin-bottom: 1em;\">By confirming your email, you help us ensure the security of your account and allow us to send you important updates and community information.</p>" +
-                                "    <p style=\"margin-bottom: 1em;\">If you did not register for an account with Oaks-Village HOA, please disregard this email.</p>" +
-                                "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
-                                "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                                "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
-                                "</body>" +
-                                "</html>"
-                            );
-
-                        }
-                    }
-                }
-
-                // Redirection Logic:
+            if (user == null)
+            {
+                StatusMessage = $"Error: Unable to find user with ID '{Input.Id}' to update.";
                 if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                 {
                     return Redirect(ReturnUrl);
+                }
+                return RedirectToPage("./Users");
+            }                      
 
-                }
-                else
+            user.UserName = Input.UserName;
+            user.Email = Input.Email;
+            user.EmailConfirmed = Input.EmailConfirmed;
+            user.PhoneNumber = Input.PhoneNumber;
+            user.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
                 {
-                    // If ReturnUrl is missing or invalid, fall back to the appropriate page
-                    if (!string.IsNullOrEmpty(searchTerm))
-                    {
-                        return RedirectToPage("./Users", new { SearchTerm = searchTerm }); // Redirect to UsersGrid with searchTerm
-                    }
-                    else
-                    {
-                        return RedirectToPage("./Users"); // Redirect to UsersGrid without searchTerm
-                    }
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
+                    
+                StatusMessage = "Error: User update failed.";
+                return Page();
             }
 
-            //return NotFound($"Unable to load user with ID '{Input.Id}'.");
-            return Page();
-        }
-        
-        private async Task PopulateUserDataAndRoles(IdentityUser user)
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            AllRoles = [.. roles.Select(role => new RoleViewModel
+            var userProfile = await _dbContext.UserProfile.FindAsync(Input.Id);
+            if (userProfile == null)
             {
-                Value = role.Name ?? string.Empty,
-                Text = role.Name ?? string.Empty,
-                Selected = userRoles.Contains(role.Name ?? string.Empty)
-            })];
+                userProfile = new UserProfile { UserId = Input.Id ?? string.Empty, User = user };
+                _dbContext.UserProfile.Add(userProfile);
+            }
+            userProfile.FirstName = Input.FirstName;
+            userProfile.MiddleName = Input.MiddleName;
+            userProfile.LastName = Input.LastName;
+            userProfile.Birthday = Input.Birthday;
+            userProfile.Anniversary = Input.Anniversary;
+            userProfile.AddressLine1 = Input.AddressLine1;
+            userProfile.AddressLine2 = Input.AddressLine2;
+            userProfile.City = Input.City;
+            userProfile.State = Input.State;
+            userProfile.ZipCode = Input.ZipCode;
+            userProfile.Plot = Input.Plot;
+            userProfile.HomePhoneNumber = Input.HomePhoneNumber;
+
+            await _dbContext.SaveChangesAsync();
+            StatusMessage = "User updated successfully.";
+
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                // Parse the ReturnUrl to extract query parameters
+                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
+                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+                // Extract PageNumber, PageSize, and SearchTerm
+                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
+                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
+                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
+                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
+
+                int? pageNumber = null;
+                if (int.TryParse(pageNumberValue, out int pn))
+                {
+                    pageNumber = pn;
+                }
+
+                int? pageSize = null;
+                if (int.TryParse(pageSizeValue, out int ps))
+                {
+                    pageSize = ps;
+                }
+
+                string? extractedSearchTerm = searchTermValue.ToString();
+                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
+
+                // Redirect to the Users page with the extracted parameters
+                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+            }
+            else
+            {
+                // Fallback: Redirect to the default Users page if ReturnUrl is invalid or missing
+                return RedirectToPage("./Users");
+            }
+        }
+
+        public IActionResult OnPostCancel()
+        {
+            StatusMessage = "User Cancelled.";
+
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                // Parse the ReturnUrl to extract query parameters
+                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
+                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+                // Extract PageNumber, PageSize, and SearchTerm
+                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
+                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
+                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
+                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
+
+                int? pageNumber = null;
+                if (int.TryParse(pageNumberValue, out int pn))
+                {
+                    pageNumber = pn;
+                }
+
+                int? pageSize = null;
+                if (int.TryParse(pageSizeValue, out int ps))
+                {
+                    pageSize = ps;
+                }
+
+                string? extractedSearchTerm = searchTermValue.ToString();
+                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
+
+                // Redirect to the Users page with the extracted parameters
+                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+            }
+            else
+            {
+                // Fallback: Redirect to the default Users page if ReturnUrl is invalid or missing
+                return RedirectToPage("./Users");
+            }
+        }        
+
+        public async Task<IActionResult> OnPostDeleteAsync()
+        {
+            // Find the user to delete using the Id from the bound Input model
+            var userToDelete = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
+
+            if (userToDelete == null)
+            {
+                StatusMessage = $"Error: Unable to find user with ID '{Input.Id}' to delete.";
+                // On error after post, if ReturnUrl is valid, go back there. Otherwise, base Users.
+                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                {
+                    return Redirect(ReturnUrl);
+                }
+                return RedirectToPage("./Users");
+            }
+
+            // Prevent deleting the currently logged-in user (optional but recommended)
+            // var currentUser = await _userManager.GetUserAsync(User);
+            // if (userToDelete.Id == currentUser.Id)
+            // {
+            //     StatusMessage = "Error: You cannot delete your own account.";
+            //      if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            //     {
+            //         return Redirect(ReturnUrl);
+            //     }
+            //     return RedirectToPage("./Users");
+            // }
+
+            // Delete the user
+            var result = await _userManager.DeleteAsync(userToDelete);
+
+            if (!result.Succeeded)
+            {
+                // If deletion fails, add errors to ModelState and return to the page
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                // Need to repopulate the user and roles if returning to the page on error
+                var userOnPost = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
+                if (userOnPost != null)
+                {
+                    await LoadUserAsync(userOnPost); // Load user data and roles
+                }
+                StatusMessage = "Error: User deletion failed.";
+                return Page(); // Stay on the Edit page with errors
+            }
+
+            // Optional: Delete the associated UserProfile as well
+            var userProfileToDelete = await _dbContext.UserProfile.FindAsync(userToDelete.Id);
+            if (userProfileToDelete != null)
+            {
+                _dbContext.UserProfile.Remove(userProfileToDelete);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            StatusMessage = $"User '{userToDelete.UserName}' deleted successfully.";
+
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                // Parse the ReturnUrl to extract query parameters
+                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
+                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
+
+                // Extract PageNumber, PageSize, and SearchTerm
+                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
+                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
+                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
+                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
+
+                int? pageNumber = null;
+                if (int.TryParse(pageNumberValue, out int pn))
+                {
+                    pageNumber = pn;
+                }
+
+                int? pageSize = null;
+                if (int.TryParse(pageSizeValue, out int ps))
+                {
+                    pageSize = ps;
+                }
+
+                string? extractedSearchTerm = searchTermValue.ToString();
+                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
+
+                // Redirect to the Users page with the extracted parameters
+                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+            }
+            else
+            {
+                // Fallback: Redirect to the default Users page if ReturnUrl is invalid or missing
+                return RedirectToPage("./Users");
+            }
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Members.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Oaks-Village HOA - Reset Your Password",
+                    Environment.GetEnvironmentVariable("SITE_NAME") + " - Reset Your Password",
                     $"<!DOCTYPE html>" +
                     "<html lang=\"en\">" +
                     "<head>" +

@@ -4,6 +4,8 @@
 @inject SignInManager<IdentityUser> SignInManager
 @{
     ViewData["Title"] = "Members Grid";
+
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
 }
 
 <head>
@@ -11,7 +13,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 </head>
 
-<partial name="_LargeLogo" />
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
 
 @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
 {
@@ -90,7 +93,7 @@
 else
 {
     <div class="text-center mt-4">
-        <p class="mb-1">This is an Admin area of Oaks-Village.com.</p>
+        <p class="mb-1">This is an Admin area of @siteName.</p>
         <p class="mb-2">Please Login with Administration credentials.</p>
         <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </div>

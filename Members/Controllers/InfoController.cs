@@ -13,8 +13,11 @@ namespace Members.Controllers
 
         public IActionResult Index()
         {
+            string siteName = Environment.GetEnvironmentVariable("SITE_NAME") ?? "Site";
+
+            // Set the default view name and message
             ViewBag.Message = "Home";
-            ViewData["ViewName"] = "Oaks-Village";
+            ViewData["ViewName"] = siteName;
             return View();
         }
 
@@ -33,12 +36,13 @@ namespace Members.Controllers
                 // Likely a bot, ignore.
                 return View("Index");
             }
-
             try
             {
+                string siteEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? string.Empty;
+                
                 // Use EmailService to send the email
                 await _emailService.SendEmailAsync(
-                    "OaksVillage@oaks-village.com", // To address
+                    siteEmail, // To address
                     $"Contact Form: {Subject}", // Subject
                     $"Name: {Name}\nEmail: {Email}\nMessage: {Message}\nReply to: {Email}" // Body
                 );

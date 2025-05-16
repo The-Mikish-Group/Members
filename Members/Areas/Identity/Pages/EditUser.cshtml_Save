@@ -1,8 +1,6 @@
 ﻿@page
 @model Members.Areas.Identity.Pages.EditUserModel
 @using Microsoft.AspNetCore.Identity.UI.Services;
-@* Add using Microsoft.AspNetCore.Mvc.TagHelpers; if not already implicitly included *@
-
 
 @{
     ViewData["Title"] = "Edit Member";
@@ -146,6 +144,7 @@
 
                         <div class="col-2 form-floating mb-3">
                             <input asp-for="Input.MiddleName" class="form-control" placeholder="Middle" />
+                            <!-- <label asp-for="Input.MiddleName" class="form-label">(M)</label> -->
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
 
@@ -225,37 +224,29 @@
                     <hr />
 
                     <div class="d-flex justify-content-center mt-3">
-                       
-                        <!-- Save Button -->
-                        <button type="submit" class="btn btn-sm btn-success me-2">
-                            <i class="bi bi-save"></i> Save
-                        </button>
-
-                        <!-- Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl -->
+                        @* Adjust margin-top as needed *@
+                        @* Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl *@
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
                            asp-route-returnUrl="@Model.ReturnUrl"
-                           class="btn btn-sm btn-info me-2">
-                            <i class="bi bi-tags"></i> Roles
-                        </a>
+                           class="btn btn-info me-2">
+                            @* Added me-2 for spacing *@
+                            <i class="bi bi-tags"></i> Manage Roles
+                        </a>                        
 
-                        <!-- Admin Protection on Delete Button -->
+                        @* Admin Protection on Delete Button *@
                         @if (User.IsInRole("Admin"))
                         {
-                            <!-- Delete Button -->                            
+                            @* Delete Button *@
                             <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2" id="confirmDeleteButton">
                                 <i class="bi bi-x-circle"></i> Delete
                             </button>
                         }
-
-                        <!-- Cancel Button -->
+                        @* Cancel Button *@
                         <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
                             <i class="bi bi-x-circle"></i> Cancel
                         </button>
-
-                    </div>
-
-                    
+                    </div>                    
                 </form>
             </div>
         </div>
@@ -445,6 +436,7 @@
                      }
                  }
             });
+
 
             // Admin role lockout logic remains the same
             if (roleCheckboxes && isManager) {

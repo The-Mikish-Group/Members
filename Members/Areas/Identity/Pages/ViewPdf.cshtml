@@ -1,12 +1,10 @@
 ﻿@page
 @model Members.Areas.Identity.Pages.ViewPdfModel
 @{
-    ViewData["Title"] = "View PDF";
-    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
-    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Account/ViewPdf";
-    ViewData["OGTitle"] = "View Pdf";
-    ViewData["OGDescription"] = "Oaks-Village View Pdf";
-    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Account/ViewPdf";
+    ViewData["Title"] = "View PDF";    
+
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+
 }
 
 @if (Model.IsAuthorized)
@@ -102,7 +100,7 @@ else
         <div class="col-md-8 col-lg-6">
             <div class="card">
                 <div class="card-body text-center">
-                    <p class="card-text">This is the <strong>Members</strong> area of Oaks-Village.com.</p>
+                    <p class="card-text">This is the <strong>Members</strong> area of @siteName.</p>
                     <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
                         <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>

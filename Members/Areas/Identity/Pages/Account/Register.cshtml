@@ -1,27 +1,24 @@
 ﻿@page
 @model RegisterModel
 @{
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+
     ViewData["Title"] = "Register";
 
-    ViewData["Description"] = "Discover the beautiful community of Oaks-Village.";
-    ViewData["Canonical"] = "https://www.oaks-village.com/Identity/Account/Register";
-    ViewData["OGTitle"] = "Register";
-    ViewData["OGDescription"] = "Oaks-Village Register";
-    ViewData["OGURL"] = "https://www.oaks-village.com/Identity/Account/Register";
-    // ViewData["OGImage"] = "https://Oaks-Village.com/Images/LinkImages/SpecificPageImage.png"; //Optional
-
+    ViewData["Description"] = "Discover the beautiful community of " + siteName + ".";
+    ViewData["Canonical"] = siteURL + "/Identity/Account/Register";
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGDescription"] = siteName + " " + ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
 }
 
 <head>
     <title>@ViewData["Title"]</title>
 </head>
 
-<!-- Big Logo Display -->
-<div class="container row m-0 ps-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto text-center">
-    <div class="col-12 mt-0 ps-0">
-        <partial name="_LargeLogo" />
-    </div>
-</div>
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
 
 <!-- Container -->
 <div class="container my-4">
