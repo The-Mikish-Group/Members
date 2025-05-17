@@ -378,16 +378,19 @@ namespace Members.Areas.Identity.Pages
             }
 
             // Prevent deleting the currently logged-in user (optional but recommended)
-            // var currentUser = await _userManager.GetUserAsync(User);
-            // if (userToDelete.Id == currentUser.Id)
-            // {
-            //     StatusMessage = "Error: You cannot delete your own account.";
-            //      if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
-            //     {
-            //         return Redirect(ReturnUrl);
-            //     }
-            //     return RedirectToPage("./Users");
-            // }
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser != null)
+            {
+                if (userToDelete.Id == currentUser.Id)
+                {
+                    StatusMessage = "Error: You cannot delete your own account.";
+                    if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                    {
+                        return Redirect(ReturnUrl);
+                    }
+                    return RedirectToPage("./Users");
+                }
+            }
 
             // Delete the user
             var result = await _userManager.DeleteAsync(userToDelete);
@@ -409,7 +412,7 @@ namespace Members.Areas.Identity.Pages
                 return Page(); // Stay on the Edit page with errors
             }
 
-            // Optional: Delete the associated UserProfile as well
+            // Delete the associated UserProfile as well
             var userProfileToDelete = await _dbContext.UserProfile.FindAsync(userToDelete.Id);
             if (userProfileToDelete != null)
             {

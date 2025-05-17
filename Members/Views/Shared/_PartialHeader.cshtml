@@ -91,10 +91,10 @@
                                 @{
                                     // Fetch the non-empty categories directly in the layout
                                     var dynamicCategories = DbContext.PDFCategories
-                                    .Where(c => c.CategoryFiles.Any()) // Only include categories with files
-                                    .OrderBy(c => c.SortOrder)        // Order categories
+                                    .Where(c => c.CategoryFiles.Any()) 
+                                    .OrderBy(c => c.SortOrder)
                                     .ThenBy(c => c.CategoryName)
-                                    .ToList(); // Execute the query
+                                    .ToList();
 
                                     // Check if any categories were found
                                     if (dynamicCategories != null && dynamicCategories.Any())
