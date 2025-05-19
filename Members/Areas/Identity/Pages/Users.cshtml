@@ -417,7 +417,7 @@
                         }
                         </tr>
                 </thead>
-                <tbody>
+                <tbody id="userTableBody">
                     @foreach (var user in Model.Users)
                     {
                        <tr class="user-row text-gold-darker" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
@@ -491,7 +491,7 @@
             }
         }
 
-        <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation" id="paginationNav">
             <ul class="pagination justify-content-center">
                 <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
                     <a class="page-link" asp-page="./Users"
@@ -550,19 +550,42 @@ else
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const tableContainer = document.getElementById('usersTableContainer'); // Get the table container
+            // Select elements at the top level of DOMContentLoaded.
+            // Use 'let' for elements that might be replaced or re-referenced.
             const searchInput = document.getElementById('searchInput');
             const clearSearch = document.getElementById('clearSearch');
-            const searchButton = document.getElementById('searchButton');
+            const searchButton = document.getElementById('searchButton'); // Still needed for explicit click/Enter
             const searchForm = document.getElementById('searchForm');
-            const userTable = document.getElementById('userTable'); // Use the ID
+            const userTable = document.getElementById('userTable'); // Ensure your <table> has this ID
+            const tableContainer = document.getElementById('usersTableContainer'); // Get the table container for scroll
             const showExtraFieldsCheckbox = document.getElementById('showExtraFieldsCheckbox');
             const showExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+            // These elements will be replaced by AJAX updates
+            // Select them at the top level if they exist initially
+            // Use 'let' as their reference will change after replacement
+            // Now we can select the initial tbody by its new ID
+            let userTableBody = document.getElementById('userTableBody'); // Select initial tbody by ID
+            let paginationNavContainer = document.getElementById('paginationNav'); // Select initial pagination nav by ID
+            let userCountSpan = document.getElementById('userCount'); // Select initial user count span by ID
+
+
+            // Get hidden inputs for current state - these should be present in the initial HTML
+            // Use 'let' as their values will be updated frequently
+            let pageNumberInput = document.querySelector('input[name="PageNumber"]');
+            let pageSizeInput = document.querySelector('input[name="PageSize"]');
+            let sortColumnInput = document.querySelector('input[name="SortColumn"]');
+            let sortOrderInput = document.querySelector('input[name="SortOrder"]');
+            let searchTermInput = document.querySelector('input[name="SearchTerm"]');
+
+
+            // --- Function Definitions (Define all functions here before any calls or listeners) ---
 
             // Function to save scroll position
             function saveScrollPosition() {
                 if (tableContainer) {
                     sessionStorage.setItem('usersTableScrollLeft', tableContainer.scrollLeft);
+                    console.log("Saved scroll position:", tableContainer.scrollLeft);
                 }
             }
 
@@ -572,85 +595,852 @@ else
                     const savedScrollLeft = sessionStorage.getItem('usersTableScrollLeft');
                     if (savedScrollLeft !== null) {
                         tableContainer.scrollLeft = parseInt(savedScrollLeft, 10);
-                        // Optionally clear the stored value after restoring
-                        // sessionStorage.removeItem('usersTableScrollLeft'); // Removing this line keeps the scroll position on subsequent partial reloads like clicking a row for edit.
+                        console.log("Restored scroll position:", tableContainer.scrollLeft);
                     }
                 }
             }
 
-            // --- Save scroll position before navigation/form submission ---
-
-            // Save scroll position before submitting the search form (either by button or Enter key)
-            if (searchForm) {
-                 searchForm.addEventListener('submit', saveScrollPosition);
+            // Helper function to debounce inputs
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
             }
 
-            // Save scroll position before navigating via sorting links
-            const sortLinks = document.querySelectorAll('#userTable thead a.nav-link');
-            sortLinks.forEach(link => {
-                link.addEventListener('click', saveScrollPosition);
-            });
+             // Localize Last Login Time
+            function localizeLastLoginTimes() {
+                 const lastLoginElements = document.querySelectorAll('.local-login-time');
+                 lastLoginElements.forEach(function (element) {
+                     // Avoid localizing twice if already done
+                     if (element.dataset.localized) {
+                          return;
+                     }
+                     const utcTimeString = element.getAttribute('data-utc-time');
+                     if (utcTimeString) {
+                         const date = new Date(utcTimeString);
+                         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
+                         try {
+                              const localTimeString = date.toLocaleString(undefined, options);
+                              element.textContent = localTimeString;
+                              element.dataset.localized = 'true'; // Mark as localized
+                         } catch (e) {
+                              console.error("Error formatting date:", e);
+                              element.textContent = utcTimeString + " (UTC)";
+                         }
+                     } else {
+                         element.textContent = 'Never';
+                     }
+                 });
+            }
 
-            // Save scroll position before navigating via pagination links
-            const paginationLinks = document.querySelectorAll('.pagination a.page-link');
-            paginationLinks.forEach(link => {
-                link.addEventListener('click', saveScrollPosition);
-            });
+            // Function to update sort indicators (arrows) on headers
+            function updateSortIndicators() {
+                console.log("updateSortIndicators called.");
+                // Re-select elements here to ensure they are current after potential DOM updates
+                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
 
-            // Save scroll position before navigating via row click to EditUser
-            const tableRows = userTable ? userTable.querySelectorAll('tbody tr.user-row') : [];
-            tableRows.forEach(row => {
-                row.addEventListener('click', saveScrollPosition);
-            });
-
-
-            // --- Restore scroll position when the page loads ---
-            restoreScrollPosition();
-
-
-            // --- Existing JavaScript (integrated) ---
-
-            // Handle Search Input Clear Button visibility
-            searchInput.addEventListener('input', function() {
-                clearSearch.style.display = this.value ? 'block' : 'none';
-            });
-
-            // Handle Clear Search Button click
-            clearSearch.addEventListener('click', function() {
-                searchInput.value = '';
-                clearSearch.style.display = 'none';
-                // When clearing search, submit the form to reset pagination, sorting, and preserve toggle state
-                searchForm.submit();
-            });
-
-            // Added event listener for Enter key on search input
-            searchInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Prevent default form submission
-                    // The submit event listener on the form will handle saving scroll position and submitting
-                    searchForm.submit(); // Trigger form submission
+                // Remove existing indicators from the *entire* table header
+                // Target the thead within the *current* userTable
+                const currentUserTable = document.getElementById('userTable'); // Re-select userTable
+                if (currentUserTable) {
+                    currentUserTable.querySelectorAll('thead .sort-indicator').forEach(span => {
+                        console.log("Removing existing sort indicator:", span);
+                        span.remove();
+                    });
+                     console.log("Existing sort indicators removed.");
+                } else {
+                     console.warn("User table not found for updating sort indicators.");
                 }
-            });
-
-            // Initial check on page load for clear button visibility
-            clearSearch.style.display = searchInput.value ? 'block' : 'none';
 
 
-            // Handle Show Extra Fields Toggle
-            if (showExtraFieldsCheckbox && showExtraFieldsHidden && searchForm) {
+                if (sortColumn && currentUserTable) { // Check currentUserTable again
+                    // Find the header link for the current sort column using data attribute
+                    // Search within the *current* userTable structure
+                    const headerLink = currentUserTable.querySelector(`th a.nav-link[data-sort-column="${sortColumn.toLowerCase()}"]`); // Use lower case for matching
+
+                    console.log(`Attempting to find header link for sort column: ${sortColumn.toLowerCase()}`, headerLink);
+
+                    if (headerLink) {
+                        const indicator = document.createElement('span');
+                        indicator.classList.add('sort-indicator', 'ms-1');
+                        if (sortOrder === 'asc') {
+                            indicator.innerHTML = '&uarr;'; // Up arrow
+                        } else {
+                            indicator.innerHTML = '&darr;'; // Down arrow
+                        }
+                        headerLink.appendChild(indicator); // Append to the link inside th
+                         console.log(`Sort indicator added to ${sortColumn} (${sortOrder}).`);
+                    } else {
+                         console.warn(`Header link not found for sort column: ${sortColumn}. Cannot add indicator.`);
+                    }
+                } else {
+                     console.log("No sort column active or user table not found, no indicators to add.");
+                }
+                 console.log("updateSortIndicators finished.");
+            }
+
+            // Function to show/hide extra fields columns
+            function updateExtraFieldsDisplay() {
+                console.log("updateExtraFieldsDisplay called.");
+                // Re-select hidden input here to ensure it's current
+                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+                const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value === "True" : false; // Get boolean state
+
+                console.log("Show Extra Fields state:", showExtraFields);
+
+                // Find the main table or container that has the class controlling column visibility
+                // Assuming the class 'hide-extra-fields' is on the table itself or its container
+                const currentTableContainer = document.getElementById('usersTableContainer'); // Re-select tableContainer
+                if (currentTableContainer) { // Or userTable, depending on where the class is applied
+                    console.log("Table container found:", currentTableContainer);
+                    if (showExtraFields) {
+                        currentTableContainer.classList.remove('hide-extra-fields');
+                         console.log("Removed 'hide-extra-fields' class from table container.");
+                    } else {
+                        currentTableContainer.classList.add('hide-extra-fields');
+                         console.log("Added 'hide-extra-fields' class to table container.");
+                    }
+                     console.log("Extra fields display updated.");
+                } else {
+                     console.warn("Table container not found to update extra fields display.");
+                }
+                 console.log("updateExtraFieldsDisplay finished.");
+            }
+
+            // Function to attach row click listeners (call this after table body update)
+            function attachRowClickListeners(targetElement) { // Accept target element
+                console.log("attachRowClickListeners called with target:", targetElement);
+                if (targetElement) {
+                     const userTableRows = targetElement.querySelectorAll('tr.user-row'); // Select rows within the target
+                     console.log("Attaching row click listeners. Found rows:", userTableRows.length);
+                     userTableRows.forEach(row => {
+                         // Remove any existing listeners by cloning and replacing
+                         const clonedRow = row.cloneNode(true);
+                         row.replaceWith(clonedRow);
+                         const newRow = clonedRow; // Use the new cloned row
+
+                         newRow.addEventListener('click', function (event) {
+                             console.log("Row clicked.");
+
+                             // Prevent the default link behavior if the click was on a link inside the row
+                             if (event.target.tagName === 'A' || event.target.closest('a')) { // Also check if target is inside an <a>
+                                 console.log("Click was on or inside a link, preventing row navigation.");
+                                  return;
+                             }
+
+                             const userId = this.dataset.userId;
+                             console.log("Row clicked for User ID:", userId);
+
+                             if (!userId) {
+                                 console.error("User ID not found on the clicked row.");
+                                 return; // Exit if userId is not available
+                             }
+
+                             // Retrieve current state from hidden inputs and search input
+                             // Re-select inputs here to ensure they are current
+                             const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                             const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                             const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                             const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                             const currentSearchInput = document.getElementById('searchInput');
+                             const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+
+                             const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
+                             const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                             const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                             const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
+                             const searchTerm = currentSearchInput ? currentSearchInput.value : ''; // Get actual input value
+                             const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'False'; // Get actual hidden input value ('True' or 'False')
+
+
+                             let returnUrl = `${window.location.pathname}?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+
+                             if (sortColumn) {
+                                 returnUrl += `&SortColumn=${sortColumn}&SortOrder=${sortOrder}`;
+                             }
+                             // Ensure searchTerm is included if it has a value
+                             if (searchTerm && searchTerm.trim() !== '') {
+                                 returnUrl += `&SearchTerm=${encodeURIComponent(searchTerm.trim())}`;
+                             }
+
+                             returnUrl += `&ShowExtraFields=${showExtraFields}`;
+
+                             console.log("Constructed returnUrl:", returnUrl);
+
+                             saveScrollPosition(); // Save before navigating
+                             const navigateUrl = `/Identity/EditUser?id=${userId}&returnUrl=${encodeURIComponent(returnUrl)}`;
+                             console.log("Navigating to:", navigateUrl);
+                             window.location.href = navigateUrl;
+                         });
+                     });
+                 } else {
+                     console.warn("Target element not provided or found for attaching row click listeners.");
+                 }
+                 console.log("attachRowClickListeners finished.");
+            }
+
+
+            // Function to attach pagination link listeners (call this after pagination update)
+            function attachPaginationLinkListeners(targetElement) { // Accept target element
+                 console.log("attachPaginationLinkListeners called with target:", targetElement);
+                 const paginationLinks = targetElement ? targetElement.querySelectorAll('a.page-link') : []; // Select links within the target
+                 console.log("Found pagination links to attach listeners:", paginationLinks.length);
+
+                 paginationLinks.forEach(link => {
+                     // Remove any existing listeners by cloning and replacing
+                     const clonedLink = link.cloneNode(true);
+                     link.replaceWith(clonedLink);
+                     const newLink = clonedLink; // Use the new cloned link
+
+                     newLink.addEventListener('click', function(event) {
+                         event.preventDefault(); // Prevent default link navigation
+                         console.log("Pagination link clicked (AJAX):", this.dataset.pageNumber);
+
+                         // Get the parameters from the data attributes on the link
+                         const pageNumber = this.dataset.pageNumber;
+                         const pageSize = this.dataset.pageSize;
+                         const sortColumn = this.dataset.sortColumn || ''; // Use || '' for potentially missing attributes
+                         const sortOrder = this.dataset.sortOrder || '';
+                         const searchTerm = this.dataset.searchTerm || '';
+                         const showExtraFields = this.dataset.showExtraFields;
+
+
+                         // Update the hidden input values to reflect the new state
+                         // Re-select inputs here to ensure they are current
+                         const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                         const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                         const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                         const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                         const currentSearchTermInput = document.querySelector('input[name="SearchTerm"]');
+                         const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+
+                         if (currentPageNumberInput) currentPageNumberInput.value = pageNumber;
+                         if (currentPageSizeInput) currentPageSizeInput.value = pageSize;
+                         if (currentSortColumnInput) currentSortColumnInput.value = sortColumn;
+                         if (currentSortOrderInput) currentSortOrderInput.value = sortOrder;
+                         if (currentSearchTermInput) currentSearchTermInput.value = searchTerm; // Update the hidden search term as well
+                         if (currentShowExtraFieldsHidden) currentShowExtraFieldsHidden.value = showExtraFields; // Update hidden toggle
+
+                         // Update the visible search input value
+                         const currentSearchInput = document.getElementById('searchInput');
+                         const currentClearSearch = document.getElementById('clearSearch');
+                         if (currentSearchInput) currentSearchInput.value = searchTerm;
+                         if (currentClearSearch && currentSearchInput) currentClearSearch.style.display = currentSearchInput.value ? 'block' : 'none';
+
+
+                         // Update the checkbox state to reflect the hidden input
+                         const currentShowExtraFieldsCheckbox = document.getElementById('showExtraFieldsCheckbox');
+                         if (currentShowExtraFieldsCheckbox && currentShowExtraFieldsHidden) {
+                             currentShowExtraFieldsCheckbox.checked = currentShowExtraFieldsHidden.value === "True";
+                         }
+
+                         updateTableAjax(); // Call the AJAX update function
+                     });
+                 });
+                 console.log("attachPaginationLinkListeners finished.");
+            }
+
+
+            // --- AJAX Update Table Function (for Search Input) ---
+            // This function fetches and updates table content via AJAX for live search
+            async function updateTableAjax() {
+                console.log("updateTableAjax called for search input.");
+                saveScrollPosition(); // Save scroll position before the update
+
+                // Get current state from the hidden inputs and the search input
+                // Re-select inputs here to ensure they are current
+                const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                const currentSearchInput = document.getElementById('searchInput');
+                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+
+                const searchTerm = currentSearchInput ? currentSearchInput.value : '';
+                const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
+                const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
+                const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'False';
+
+                console.log("Current state for AJAX fetch:", {
+                    PageNumber: pageNumber,
+                    PageSize: pageSize,
+                    SortColumn: sortColumn,
+                    SortOrder: sortOrder,
+                    SearchTerm: searchTerm,
+                    ShowExtraFields: showExtraFields
+                });
+
+
+                // Construct the URL with current parameters
+                const queryParams = new URLSearchParams({
+                    PageNumber: pageNumber,
+                    PageSize: pageSize,
+                    SortColumn: sortColumn,
+                    SortOrder: sortOrder,
+                    SearchTerm: searchTerm,
+                    ShowExtraFields: showExtraFields,
+                    handler: 'PartialTable' // Target the OnGetPartialTableAsync handler
+                });
+
+                console.log("Fetching URL (AJAX):", `${window.location.pathname}?${queryParams.toString()}`);
+
+                try {
+                    const response = await fetch(`${window.location.pathname}?${queryParams.toString()}`);
+
+                    console.log("Fetch response received (AJAX):", response);
+
+                    if (!response.ok) {
+                        console.error("HTTP error fetching data (AJAX):", response.status, response.statusText);
+                        // Consider displaying a user-friendly error message
+                        return;
+                    }
+
+                    const html = await response.text();
+
+                    console.log("Received HTML (AJAX):", html);
+
+                    // --- Parse HTML using a temporary div and getElementsByTagName ---
+                    const tempDiv = document.createElement('div');
+                    // Wrap the received HTML in a table to ensure tbody is parsed correctly
+                    tempDiv.innerHTML = '<table>' + html + '</table>';
+
+                    // Find the new elements within the temporary div
+                    // Use getElementsByTagName for tbody, then check for the ID
+                    const tempTbodies = tempDiv.getElementsByTagName('tbody');
+                    let newTableBody = null;
+                    if (tempTbodies.length > 0 && tempTbodies[0].id === 'userTableBody') {
+                         newTableBody = tempTbodies[0];
+                    } else {
+                         console.warn("AJAX update: Could not find tbody with ID 'userTableBody' using getElementsByTagName.");
+                    }
+
+
+                    // Select other elements using querySelector on the tempDiv
+                    const newUserCountSpan = tempDiv.querySelector('#userCount');
+                    const newPaginationNav = tempDiv.querySelector('#paginationNav');
+
+
+                    console.log("AJAX update: Found new elements in parsed HTML (Temp Div + getElementsByTagName):", { newTableBody, newUserCountSpan, newPaginationNav });
+
+                    // Re-select existing elements just before updating them
+                    // Select directly from the document to ensure we have the latest references
+                    const existingTableBody = document.getElementById('userTableBody'); // Select the existing tbody by ID
+                    const existingUserCountSpan = document.getElementById('userCount');
+                    const existingPaginationNav = document.getElementById('paginationNav');
+
+                    console.log("AJAX update: Existing elements found in main DOM:", { existingTableBody, existingUserCountSpan, existingPaginationNav });
+
+
+                    // Replace the existing tbody with the new tbody
+                    if (existingTableBody && newTableBody) { // Check for existence of both existing and new elements
+                         console.log("AJAX update: Replacing existing table body with new one using replaceWith().");
+                         existingTableBody.replaceWith(newTableBody); // Use replaceWith()
+
+                         // After replacing, re-select the *new* tbody for listener attachment
+                         // The new tbody is now in the DOM and has the ID
+                         userTableBody = document.getElementById('userTableBody'); // Re-select the new one
+                         console.log("AJAX update: Re-selected updated table body:", userTableBody);
+
+                         if (userTableBody) {
+                             attachRowClickListeners(userTableBody); // Pass the updated tbody to the attachment function
+                             localizeLastLoginTimes(); // Localize dates in new rows
+                             console.log("AJAX update: Table body updated, row listeners re-attached and dates localized.");
+                         } else {
+                             console.warn("AJAX update: Could not find the updated table body after replaceWith().");
+                         }
+
+                    } else {
+                        console.warn("AJAX update: Could not find existing table body or new table body for replacement. Existing Tbody:", existingTableBody, "New Tbody:", newTableBody);
+                    }
+
+                    // Replace the user count span element
+                    if (existingUserCountSpan && newUserCountSpan) { // Check for existence of both existing and new elements
+                        console.log("AJAX update: Replacing existing user count span with new one using replaceWith(). Existing:", existingUserCountSpan, "New:", newUserCountSpan);
+                        existingUserCountSpan.replaceWith(newUserCountSpan); // Use replaceWith()
+                         // Update the top-level userCountSpan variable to the new element
+                         userCountSpan = document.getElementById('userCount'); // Re-select the new one
+                         console.log("AJAX update: User count updated.");
+                    } else {
+                         console.warn("AJAX update: Could not replace existing user count span. Existing:", existingUserCountSpan, "New:", newUserCountSpan);
+                    }
+
+                    // Replace the pagination nav element
+                    if (existingPaginationNav && newPaginationNav) { // Check for existence of both existing and new elements
+                        console.log("AJAX update: Replacing existing pagination nav with new one using replaceWith(). Existing:", existingPaginationNav, "New:", newPaginationNav);
+                        existingPaginationNav.replaceWith(newPaginationNav); // Use replaceWith()
+                        // Update the top-level paginationNavContainer variable to the new element
+                        paginationNavContainer = document.getElementById('paginationNav'); // Re-select the new one
+                        if (paginationNavContainer) {
+                            attachPaginationLinkListeners(paginationNavContainer); // Pass the updated nav to the attachment function
+                             console.log("AJAX update: Pagination updated and listeners re-attached.");
+                        } else {
+                             console.warn("AJAX update: Could not find the updated pagination nav after replaceWith().");
+                        }
+                    } else {
+                         console.warn("AJAX update: Could not replace existing pagination nav elements. Existing:", existingPaginationNav, "New:", newPaginationNav);
+                    }
+
+                    // Update visual state after successful update
+                    // These can likely run immediately as they don't rely on the replaced elements' listeners
+                    updateSortIndicators(); // Update sort arrows on existing headers
+                    updateExtraFieldsDisplay(); // Show/hide columns based on state
+
+
+                    restoreScrollPosition(); // Restore scroll position
+                    // Search input focus is maintained automatically with AJAX
+                     console.log("AJAX update finished.");
+
+
+                } catch (error) {
+                    console.error("Error during AJAX update:", error);
+                    // Optionally display a user-friendly error message
+                }
+            }
+
+
+            // --- Function to prepare and submit the form (for Toggle/Sort/Paginate) ---
+            // This function ensures all hidden inputs are updated before submitting.
+            function prepareAndSubmitForm() {
+                console.log("prepareAndSubmitForm called for full form submit.");
+
+                // Update hidden inputs from their corresponding UI elements if they exist
+                // SearchTerm is already updated by the input handler before this is called for search/clear
+                // Re-select inputs here to ensure they are current
+                const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                const currentSearchTermInput = document.querySelector('input[name="SearchTerm"]');
+                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+                const currentSearchInput = document.getElementById('searchInput');
+
+
+                if (currentSearchTermInput && currentSearchInput) {
+                    currentSearchTermInput.value = currentSearchInput.value;
+                    console.log("prepareAndSubmitForm: currentSearchTermInput updated to:", currentSearchTermInput.value);
+                }
+                if (currentShowExtraFieldsHidden && showExtraFieldsCheckbox) {
+                    currentShowExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
+                    console.log("prepareAndFieldsHidden value set to:", showExtraFieldsHidden.value);
+                }
+                // PageNumber, PageSize, SortColumn, SortOrder are updated by their
+                // specific event handlers (pagination/sort link clicks) before this is called,
+                // or they are set by the server on initial load.
+
+
+                console.log("Submitting form with state:");
+                console.log("  PageNumber:", currentPageNumberInput ? currentPageNumberInput.value : 'Not found');
+                console.log("  PageSize:", currentPageSizeInput ? currentPageSizeInput.value : 'Not found');
+                console.log("  SortColumn:", currentSortColumnInput ? currentSortColumnInput.value : 'Not found');
+                console.log("  SortOrder:", currentSortOrderInput ? currentSortOrderInput.value : 'Not found');
+                console.log("  SearchTerm:", currentSearchTermInput ? currentSearchTermInput.value : 'Not found');
+                console.log("  ShowExtraFields:", currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'Not found');
+
+
+                saveScrollPosition(); // Save scroll before submitting
+                // No need for RefocusSearch flag with this hybrid approach
+                searchForm.submit(); // Submit the form
+            }
+            // --- End Function to prepare and submit the form ---
+
+
+            // --- Event Listeners (Attach listeners after functions are defined) ---
+
+             // Sync initial checkbox state with hidden input value
+             if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                 showExtraFieldsCheckbox.checked = showExtraFieldsHidden.value === "True";
+                 console.log("Initial checkbox state synced with hidden input:", showExtraFieldsCheckbox.checked);
+             }
+
+
+            // Handle Live Search Input (uses AJAX)
+            // Ensure necessary elements exist
+            if (searchInput && searchForm && pageNumberInput && searchTermInput && clearSearch) {
+                 // Use debounce to delay the AJAX request
+                 const debouncedAjaxUpdate = debounce(function() {
+                     console.log("Debounced AJAX update triggered.");
+                     // Reset to the first page on search input change
+                     pageNumberInput.value = 1;
+                     // Update hidden search term immediately (optional, updateTableAjax also reads from searchInput)
+                     searchTermInput.value = searchInput.value;
+                     updateTableAjax(); // Call the AJAX update function
+                 }, 300); // Adjust delay (milliseconds) as needed for live search responsiveness
+
+                 searchInput.addEventListener('input', function() {
+                     console.log("Search input 'input' event fired (AJAX).");
+                     clearSearch.style.display = this.value ? 'block' : 'none';
+                     debouncedAjaxUpdate(); // Call the debounced AJAX update function
+                 });
+
+                 // Handle Enter key press on search input
+                 searchInput.addEventListener('keydown', function(event) {
+                     console.log("Search input 'keydown' event fired:", event.key);
+                     if (event.key === 'Enter') {
+                         console.log("Enter key pressed in search input (AJAX).");
+                         event.preventDefault(); // Prevent default form submission
+                         // Ensure hidden search term is updated before immediate AJAX update
+                         searchTermInput.value = this.value;
+                         // Reset to the first page on Enter
+                         pageNumberInput.value = 1;
+                         updateTableAjax(); // Trigger immediate AJAX update
+                     }
+                 });
+
+                 // Initial check on page load for clear button visibility
+                 clearSearch.style.display = searchInput.value ? 'block' : 'none';
+            } else {
+                 console.warn("Search input or related elements not found for Live Search setup.");
+            }
+
+            // --- End Handle Live Search Input ---
+
+
+            // --- Handle Clear Search Button click (uses AJAX) ---
+            // Ensure necessary elements exist
+            if (clearSearch && searchInput && searchTermInput && pageNumberInput) {
+                clearSearch.addEventListener('click', function() {
+                    console.log("Clear search button clicked (AJAX).");
+                    searchInput.value = ''; // Clear the visible input
+                    clearSearch.style.display = 'none'; // Hide the clear button
+
+                    // Update hidden inputs directly
+                    searchTermInput.value = ''; // Explicitly set hidden search term to empty
+                    pageNumberInput.value = 1; // Reset to the first page
+
+                    console.log("Clear search handler (AJAX): searchTermInput set to '', pageNumberInput set to 1.");
+
+                    updateTableAjax(); // Call the AJAX update function
+                });
+            } else {
+                 console.warn("Clear search button or related elements not found for Clear Search setup.");
+            }
+            // --- End Handle Clear Search Button click ---
+
+
+            // --- Handle Show Extra Fields Toggle (uses Form Submit) ---
+            // Ensure necessary elements exist
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden && pageNumberInput) {
                 showExtraFieldsCheckbox.addEventListener('change', function() {
-                    // Update the value of the hidden input field to match the checkbox state
-                    showExtraFieldsHidden.value = this.checked;
-                    // Submit the form to refresh the page with the new toggle state
-                    // The submit event listener on the form will handle saving scroll position and submitting
-                    searchForm.submit();
+                    console.log("Show Extra Fields toggle changed. New checkbox state:", this.checked);
+                    // Update the hidden input value immediately to "True" or "False" string
+                    showExtraFieldsHidden.value = this.checked ? "True" : "False";
+                    console.log("showExtraFieldsHidden value set to:", showExtraFieldsHidden.value);
+                    // Reset to the first page on toggle change
+                    pageNumberInput.value = 1;
+                    prepareAndSubmitForm(); // Trigger form submit
+                });
+            } else {
+                 console.warn("Show Extra Fields checkbox or hidden input not found.");
+            }
+            // --- End Handle Show Extra Fields Toggle ---
+
+            // Handle Row Click to Edit User
+            // This listener is attached once on DOMContentLoaded and re-attached after AJAX updates
+            // Ensure necessary elements exist
+            if (userTable && pageNumberInput && pageSizeInput && sortColumnInput && sortOrderInput && searchInput && showExtraFieldsHidden) {
+                 // Initial attachment
+                 const initialTableBody = userTable.querySelector('tbody');
+                 if (initialTableBody) {
+                     attachRowClickListeners(initialTableBody);
+                 } else {
+                     console.warn("Initial table body not found for row click listener setup.");
+                 }
+            } else {
+                 console.warn("User table or necessary inputs not found for initial row click listener setup.");
+            }
+
+
+            // --- Handle Sorting Links (uses Form Submit) ---
+            // These links use asp-route-* tags to generate the correct URL.
+            // We will let the default link navigation happen, which submits the form with the correct parameters.
+            // The initial listeners are attached once on DOMContentLoaded.
+            const sortLinks = document.querySelectorAll('#userTable thead a.nav-link'); // Select sort links
+
+            sortLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    // Do NOT preventDefault() here. Let the browser navigate using the link's href.
+                    // The asp-route-* tags will ensure the correct parameters are in the URL,
+                    // including PageNumber (reset to 1), SortColumn, SortOrder, SearchTerm, and ShowExtraFields.
+
+                    console.log("Sort link clicked (default navigation):", this.textContent.trim(), "Href:", this.href);
+
+                    // Save scroll position before the page reloads due to the form submit
+                    saveScrollPosition();
+
+                    // No need to manually update hidden inputs here; the form submission
+                    // triggered by the link's default behavior will use the query parameters
+                    // from the link's href.
+                });
+            });
+            // --- End Handle Sorting Links ---
+
+
+            // --- Handle Pagination Links (uses Form Submit) ---
+            // These links use asp-route-* tags to generate the correct URL.
+            // We will let the default link navigation happen, which submits the form with the correct parameters.
+            // The initial listeners are attached once on DOMContentLoaded and re-attached after AJAX updates
+            // Ensure necessary elements exist
+            // Check if the pagination nav exists on initial load
+            if (document.getElementById('paginationNav')) {
+                 attachPaginationLinkListeners(document.getElementById('paginationNav'));
+            } else {
+                 console.warn("Pagination container element with ID 'paginationNav' not found on initial page load.");
+            }
+            // --- End Handle Pagination Links ---
+
+
+            // Prevent default form submission for the search form
+            // This is needed because we are using AJAX for search updates initiated by the form controls.
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Stop the default form submission
+                    console.log("Form submit event prevented. AJAX update should handle search/clear.");
+                    // Submission is handled by updateTableAjax for search/clear
+                    // Other submissions (toggle, sort, paginate) are handled by default link navigation
                 });
             }
 
 
-            // Handle Row Click to Edit User (Modified to just navigate, scroll position is saved by click listener)
+            // --- Initial Setup Calls (Call functions after they are defined) ---
+
+            // Initial localization on page load
+            localizeLastLoginTimes();
+
+             // Restore scroll position on initial page load
+            restoreScrollPosition();
+
+            // Initial visual state updates on page load
+            updateSortIndicators(); // Display initial sort arrows
+            updateExtraFieldsDisplay(); // Set initial column visibility
+
+        });
+    </script>
+}
+
+
+
+@* @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            const searchButton = document.getElementById('searchButton'); // Still needed for explicit click/Enter
+            const searchForm = document.getElementById('searchForm');
+            const userCountSpan = document.getElementById('userCount');
+            const userTable = document.getElementById('userTable'); // Use the ID
+            const tableContainer = document.getElementById('usersTableContainer'); // Get the table container for scroll
+            const showExtraFieldsCheckbox = document.getElementById('showExtraFieldsCheckbox');
+            const showExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+            // Get hidden inputs for current state
+            const pageNumberInput = document.querySelector('input[name="PageNumber"]');
+            const pageSizeInput = document.querySelector('input[name="PageSize"]');
+            const sortColumnInput = document.querySelector('input[name="SortColumn"]');
+            const sortOrderInput = document.querySelector('input[name="SortOrder"]');
+            const searchTermInput = document.querySelector('input[name="SearchTerm"]');
+
+             // Sync initial checkbox state with hidden input value
+             if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                 showExtraFieldsCheckbox.checked = showExtraFieldsHidden.value === "True";
+                 console.log("Initial checkbox state synced with hidden input:", showExtraFieldsCheckbox.checked);
+             }
+             // --- End Initial State Setup & Check ---
+
+            // Function to save scroll position (Keep)
+            function saveScrollPosition() {
+                if (tableContainer) {
+                    sessionStorage.setItem('usersTableScrollLeft', tableContainer.scrollLeft);
+                }
+            }
+             
+            // Function to restore scroll position (Keep)
+            function restoreScrollPosition() {
+                if (tableContainer) {
+                    const savedScrollLeft = sessionStorage.getItem('usersTableScrollLeft');
+                    if (savedScrollLeft !== null) {
+                        tableContainer.scrollLeft = parseInt(savedScrollLeft, 10);
+                    }
+                }
+            }
+
+            // --- Debounce Function ---
+            // Helper function to debounce inputs, preventing too many submits
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
+            }
+            // --- End Debounce Function ---
+
+            // --- Function to prepare and submit the form ---
+            // This function ensures all hidden inputs are updated before submitting.
+            function prepareAndSubmitForm() {
+                console.log("prepareAndSubmitForm called.");
+
+                // Update hidden inputs from their corresponding UI elements if they exist
+                if (searchTermInput && searchInput) {
+                    searchTermInput.value = searchInput.value;
+                }
+                if (showExtraFieldsHidden && showExtraFieldsCheckbox) {
+                    showExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
+                }
+                // Note: PageNumber, PageSize, SortColumn, SortOrder are updated by their
+                // specific event handlers (pagination/sort link clicks) before this is called,
+                // or they are set by the server on initial load.
+
+                 // Add a flag to the form data to indicate we want to refocus the search input after reload
+                 // This requires adding a hidden input named 'RefocusSearch' to your form in Users.cshtml
+                 const refocusInput = searchForm.querySelector('input[name="RefocusSearch"]');
+                 if (refocusInput) {
+                     // Only set refocus to true if the submission was likely triggered by search input
+                     // (This is a heuristic, could be refined)
+                     if (document.activeElement === searchInput || document.activeElement === clearSearch || document.activeElement === searchButton) {
+                          refocusInput.value = 'true';
+                     } else {
+                          refocusInput.value = 'false';
+                     }
+                 } else {
+                     console.warn("Hidden input 'RefocusSearch' not found in the form.");
+                 }
+
+
+                console.log("Submitting form with state:");
+                console.log("  PageNumber:", pageNumberInput ? pageNumberInput.value : 'Not found');
+                console.log("  PageSize:", pageSizeInput ? pageSizeInput.value : 'Not found');
+                console.log("  SortColumn:", sortColumnInput ? sortColumnInput.value : 'Not found');
+                console.log("  SortOrder:", sortOrderInput ? sortOrderInput.value : 'Not found');
+                console.log("  SearchTerm:", searchTermInput ? searchTermInput.value : 'Not found');
+                console.log("  ShowExtraFields:", showExtraFieldsHidden ? showExtraFieldsHidden.value : 'Not found');
+                console.log("  RefocusSearch:", refocusInput ? refocusInput.value : 'N/A');
+
+
+                saveScrollPosition(); // Save scroll before submitting
+                searchForm.submit(); // Submit the form
+            }
+            // --- End Function to prepare and submit the form ---
+
+            // --- Handle Live Search Input ---
+            if (searchInput && searchForm) {
+                 // Use debounce to prevent submitting on every single keypress
+                 const debouncedSubmit = debounce(function() {
+                     // Reset to the first page on search input change
+                     document.querySelector('input[name="PageNumber"]').value = 1;
+                     saveScrollPosition(); // Save scroll before submitting
+                     searchForm.submit(); // Submit the form
+                 }, 10); // Adjust delay (milliseconds) as needed
+
+                 searchInput.addEventListener('input', function() {
+                     clearSearch.style.display = this.value ? 'block' : 'none';
+                     debouncedSubmit(); // Call the debounced submit function
+                 });
+
+                 // Prevent the search input from losing focus after form submission
+                 // This is a bit tricky with full form submits. We'll try to re-focus
+                 // after the page reloads. This requires the browser to remember focus,
+                 // or we need to pass a flag in the URL. A simpler approach for now
+                 // is just to submit and let the browser handle focus, but the user
+                 // explicitly asked to stay in the field. Let's add a flag.
+
+                 // Add a hidden input to indicate if we should re-focus the search input
+                 let refocusInput = document.createElement('input');
+                 refocusInput.type = 'hidden';
+                 refocusInput.name = 'RefocusSearch';
+                 refocusInput.value = 'false'; // Default
+                 searchForm.appendChild(refocusInput);
+
+
+                 // When the input event triggers a submit, set the refocus flag
+                 searchInput.addEventListener('input', function() {
+                     clearSearch.style.display = this.value ? 'block' : 'none';
+                     refocusInput.value = 'true'; // Set flag before submitting
+                     debouncedSubmit();
+                 });
+
+                 // When the clear search button triggers a submit, set the refocus flag
+                 clearSearch.addEventListener('click', function() {
+                     searchInput.value = '';
+                     clearSearch.style.display = 'none';
+                     // Reset to the first page when clearing search
+                     document.querySelector('input[name="PageNumber"]').value = 1;
+                     refocusInput.value = 'true'; // Set flag before submitting
+                     saveScrollPosition(); // Save scroll before submitting
+                     searchForm.submit();
+                 });
+
+
+                 // When the search button is clicked or Enter is pressed, also set the refocus flag
+                 // The keydown listener for Enter on searchInput already triggers searchButton.click()
+                 if (searchButton) {
+                     searchButton.addEventListener('click', function(event) {
+                         // Prevent default form submission if button is clicked (form submit is handled by input/clear)
+                         // event.preventDefault(); // Keep default submit for button click/Enter for now
+                         refocusInput.value = 'true'; // Set flag before submitting
+                         saveScrollPosition(); // Save scroll before submitting
+                         // The form will submit normally here
+                     });
+                 }
+
+
+                 // On page load, check if the refocus flag was set and re-focus the input
+                 const urlParams = new URLSearchParams(window.location.search);
+                 if (urlParams.get('RefocusSearch') === 'true') {
+                     // Remove the flag from the URL to prevent infinite loops on refresh
+                     urlParams.delete('RefocusSearch');
+                     const newUrl = `${window.location.pathname}?${urlParams.toString()}${urlParams.toString() ? '&' : ''}${window.location.hash}`;
+                     // Use replaceState to change the URL without adding to history
+                     window.history.replaceState({}, document.title, newUrl);
+
+                     // Re-focus the input after a small delay to ensure the DOM is ready
+                     setTimeout(() => {
+                         searchInput.focus();
+                         // Move cursor to the end of the input
+                         const len = searchInput.value.length;
+                         searchInput.setSelectionRange(len, len);
+                     }, 10); // Small delay
+                 }
+
+                 // Initial check on page load for clear button visibility
+                 clearSearch.style.display = searchInput.value ? 'block' : 'none';
+            }
+
+            // --- End Handle Live Search Input ---
+            if (showExtraFieldsHidden && showExtraFieldsCheckbox) {
+                    showExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
+            }
+
+            // --- Handle Show Extra Fields Toggle ---
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                showExtraFieldsCheckbox.addEventListener('change', function() {
+                    console.log("Show Extra Fields toggle changed. New checkbox state:", this.checked);
+                    // Update the hidden input value immediately to "True" or "False" string
+                    showExtraFieldsHidden.value = this.checked ? "True" : "False";
+                    console.log("showExtraFieldsHidden value set to:", showExtraFieldsHidden.value);
+                    // Reset to the first page on toggle change
+                    if (pageNumberInput) pageNumberInput.value = 1;
+                    prepareAndSubmitForm(); // Trigger form submit
+                });
+            }
+            // --- End Handle Show Extra Fields Toggle ---
+
+            // Handle Row Click to Edit User (Original logic, ensures returnUrl includes search term)
             if (userTable) {
-                const userTableRows = userTable.querySelectorAll('tbody tr.user-row'); // Re-select if needed, or use the existing tableRows variable
+                const userTableRows = userTable.querySelectorAll('tbody tr.user-row');
                  userTableRows.forEach(row => {
                     row.addEventListener('click', function (event) {
                         // Prevent the default link behavior if the click was on a link inside the row
@@ -660,34 +1450,31 @@ else
 
                         const userId = this.dataset.userId;
 
-                        // Retrieve current state from hidden inputs (more reliable than dataset)
+                        // Retrieve current state from hidden inputs and search input
                         const pageNumber = document.querySelector('input[name="PageNumber"]').value;
                         const pageSize = document.querySelector('input[name="PageSize"]').value;
                         const sortColumn = document.querySelector('input[name="SortColumn"]').value;
                         const sortOrder = document.querySelector('input[name="SortOrder"]').value;
-                        const searchTerm = document.getElementById('searchInput').value; // Get actual input value
-                        const showExtraFields = document.getElementById('showExtraFieldsHidden').value; // Get actual hidden input value ('true' or 'false')
-
+                        const searchTerm = document.getElementById('searchInput').value;
+                        const showExtraFields = document.getElementById('showExtraFieldsHidden').value;
 
                         let returnUrl = `${window.location.pathname}?PageNumber=${pageNumber}&PageSize=${pageSize}`;
 
                         if (sortColumn) {
                             returnUrl += `&SortColumn=${sortColumn}&SortOrder=${sortOrder}`;
                         }
+                        // Ensure searchTerm is included if it has a value
                         if (searchTerm && searchTerm.trim() !== '') {
                             returnUrl += `&SearchTerm=${encodeURIComponent(searchTerm.trim())}`;
                         }
 
-                        // Append ShowExtraFields state (should already be 'true' or 'false')
-                        returnUrl += `&ShowExtraFields=${showExtraFields}`; // Use the value directly
+                        returnUrl += `&ShowExtraFields=${showExtraFields}`;
 
-                        // The click event listener on the row already calls saveScrollPosition()
-                        // Now, navigate to the edit page
+                        saveScrollPosition(); // Save before navigating
                         window.location.href = `/Identity/EditUser?id=${userId}&returnUrl=${encodeURIComponent(returnUrl)}`;
                     });
                  });
             }
-
 
             // Localize Last Login Time
             const lastLoginElements = document.querySelectorAll('.local-login-time');
@@ -695,21 +1482,21 @@ else
                 const utcTimeString = element.getAttribute('data-utc-time');
                 if (utcTimeString) {
                     const date = new Date(utcTimeString);
-                    // Format the date and time in the local timezone
                     const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
                     try {
                          const localTimeString = date.toLocaleString(undefined, options);
                          element.textContent = localTimeString;
                     } catch (e) {
                          console.error("Error formatting date:", e);
-                         // Fallback to original text if formatting fails
                          element.textContent = utcTimeString + " (UTC)";
                     }
                 } else {
                     element.textContent = 'Never';
                 }
             });
-            // --- End Existing JavaScript ---
+
+             // Restore scroll position on initial page load
+            restoreScrollPosition();
         });
     </script>
-}
+} *@
