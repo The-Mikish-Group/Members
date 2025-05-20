@@ -107,17 +107,20 @@
 
                             <!-- Cancel Button -->
                             <div class="col-6 text-end pe-2">
-                                <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
-                                    <i class="bi bi-box-arrow-left"></i> Cancel
-                                </button>
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Changes">
+                                    <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
+                                        <i class="bi bi-box-arrow-left"></i> Cancel
+                                    </button>
+                                </span>
                             </div>
 
-                            <!-- Save Button -->
                             <div class="col-6 text-start ps-2">
-                                <button type="submit" class="btn btn-sm btn-primary me-2">
-                                    <i class="bi bi-save"></i> Save
-                                </button>
-                            </div>  
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Save Changes">
+                                    <button type="submit" class="btn btn-sm btn-primary me-2">
+                                        <i class="bi bi-save"></i> Save
+                                    </button>
+                                </span>
+                            </div>
 
                         </div> <!-- End Button Row -->
 

@@ -27,7 +27,9 @@
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
-                            <button type="submit" class="btn btn-primary rounded-start-0 w-100">Add</button>
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Add Item">
+                                <button type="submit" class="btn btn-primary rounded-start-0 w-100">Add</button>
+                            </span>
                         </div>
                     </div>
                 </form>
@@ -108,7 +110,8 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-secondary" href="/PdfCategory/ManageCategoryFiles">
+                <a class="btn btn-back" href="/PdfCategory/ManageCategoryFiles"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit PDF Category Files">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>

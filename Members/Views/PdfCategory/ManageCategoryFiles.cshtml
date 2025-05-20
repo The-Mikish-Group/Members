@@ -105,11 +105,13 @@
                                                             data-category-id="@ViewBag.CategoryId">
 
                                         <td class="p-0">
-                                            <button type="button" class="btn btn-sm btn-rename py-2 px-2"
-                                                                                data-bs-toggle="modal" data-bs-target="#renameModal"
-                                                                                onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@ViewBag.CategoryId')">
-                                                <i class="bi bi-pencil-square px-0"></i>
-                                            </button>
+                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Rename File">
+                                                <button type="button" class="btn btn-sm btn-rename py-2 px-2"
+                                                        data-bs-toggle="modal" data-bs-target="#renameModal"
+                                                        onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@ViewBag.CategoryId')">
+                                                    <i class="bi bi-pencil-square px-0"></i>
+                                                </button>
+                                            </span>
                                         </td>
 
                                         <td class="p-0">
@@ -121,10 +123,13 @@
                                         <td>@file.SortOrder</td>
                                         <td class="text-end p-0">
                                             <form method="post" asp-action="DeleteFileFromCategory" asp-controller="PdfCategory" asp-route-id="@file.FileID" asp-route-categoryId="@ViewBag.SelectedCategoryId" class="d-inline">
-                                                
-                                                <button type="submit" class="btn btn-delete py-2 px-2" onclick="return confirm('Are you sure you want to delete the file: @file.FileName?');">
-                                                    <i class="bi bi-trash-fill px-0"></i>
-                                                </button>
+
+                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete File">
+                                                    <button type="submit" class="btn btn-delete py-2 px-2" onclick="return confirm('Are you sure you want to delete the file: @file.FileName?');">
+                                                        <i class="bi bi-trash-fill px-0"></i>
+                                                    </button>
+                                                </span>
+
                                             </form>
                                         </td>
                                     </tr>
@@ -207,14 +212,12 @@ else
 <div class="row justify-content-center mx-auto p-0">
     <div class="col-md-8 bg-transparent pt-2 pe-2">
         <div class="d-flex justify-content-end mb-3">
-            <a class="btn btn-option" href="/PdfCategory/ManageCategories">
+            <a class="btn btn-back" href="/PdfCategory/ManageCategories">
                 <i class="bi bi-arrow-left text-gold-darker"></i> Edit PDF Categories
             </a>
         </div>
     </div>
 </div>
-
-
 
 <!-- View Styles -->
 @section Styles {

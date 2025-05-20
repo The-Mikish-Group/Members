@@ -175,14 +175,17 @@
                         <div class="d-flex justify-content-between">
 
                             <!-- Cancel Button -->
-                            <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-secondary me-2">
+                            <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-secondary me-2"
+                               data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Registration">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
-                            <!-- Register Button -->
-                            <button id="registerSubmit" type="submit" class="btn btn-sm btn-primary me-2">
-                                <i class="bi bi-person-plus-fill"></i> Register
-                            </button>                            
+                            <!-- Register -->
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Register New Account">
+                                <button id="registerSubmit" type="submit" class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-person-plus-fill"></i> Register
+                                </button>
+                            </span>
 
                         </div>
                     </form>

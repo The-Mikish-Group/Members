@@ -410,6 +410,21 @@ a {
     }
 
 
+/* btn-back Defaults */
+.btn-back {   
+    border-color: transparent;
+    color: #4E3802;
+    background-color: #BEB08D; /* footer color */    
+}
+
+    .btn-back:focus,
+    .btn-back:hover {
+        border-color: transparent;
+        color: #4E3802 !important;
+        background-color: #AD8003 !important;
+    }
+
+
 /*  btn-rename Defaults */
 .btn-rename {
     border-color: transparent;

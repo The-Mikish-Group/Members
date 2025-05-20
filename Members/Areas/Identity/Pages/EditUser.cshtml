@@ -242,19 +242,20 @@
                         <!-- Admin Protection on Delete Button -->
                         @if (User.IsInRole("Admin"))
                         {
-                            <!-- Delete Button -->                            
-                            <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2" id="confirmDeleteButton">
-                                <i class="bi bi-x-circle"></i> Delete
-                            </button>
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Item">
+                                <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2" id="confirmDeleteButton">
+                                    <i class="bi bi-x-circle"></i> Delete
+                                </button>
+                            </span>
                         }
 
-                        <!-- Save Button -->
-                        <button type="submit" class="btn btn-sm btn-success me-2">
-                            <i class="bi bi-save"></i> Save
-                        </button>
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Save Changes">
+                            <button type="submit" class="btn btn-sm btn-success me-2">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                        </span>
 
                     </div>
-
                     
                 </form>
             </div>

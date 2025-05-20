@@ -27,14 +27,17 @@
                     <input type="hidden" asp-for="Id" />
 
                     <!-- Cancel -->
-                    <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]">
+                    <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]"
+                       data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Changes">
                         <i class="bi bi-box-arrow-left"></i> Cancel
                     </a>
 
                     <!-- Delete -->
-                    <button type="submit" class="btn btn-sm btn-danger">
-                        <i class="bi bi-trash"></i> Delete
-                    </button>
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete User">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </span>
 
                 </form>
             </div>

@@ -4,10 +4,15 @@
     ViewData["Title"] = $"Gallery: {ViewBag.GalleryName}";
 }
 
+<!-- Gallery Name -->
 <h1 class="text-center text-gold-darker my-2">Gallery: @ViewBag.GalleryName</h1>
 
+<!-- Back to Galleries Button -->
 <div class="text-center mb-3">
-    <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-secondary"><i class="bi bi-box-arrow-left"></i> Back to Galleries</a>
+    <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back"
+       data-bs-toggle="tooltip" data-bs-placement="top" title="Back to Gallery List">
+        <i class="bi bi-box-arrow-left"></i> Back to Galleries
+    </a>
 </div>
 
 <div class="text-center mb-3">
@@ -23,12 +28,12 @@
     //<div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-<div class="row gx-2 gy-0 m-1">
+<div class="row gx-1 gy-0 m-1">
     @if (Model != null && Model.Any())
     {
         foreach (var image in Model)
         {
-            <div class="col-md-6 col-lg-4 col-xl-2 mb-4">
+            <div class="col-md-6 col-lg-4 col-xl-2 mb-2">
                 <div class="card shadow rounded p-2 bg-Card-Menu h-100">
                     <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
                         <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
@@ -42,7 +47,7 @@
     }
     else
     {
-        <div class="col-12 text-center text-gold-dark">
+        <div class="col-12 text-center text-gold-dark p-4">
             <p>This gallery is empty.</p>
         </div>
     }

@@ -28,7 +28,7 @@
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
-                            <button type="submit" class="btn btn-sm btn-primary rounded-start-0 w-100"><i class="bi bi-upload"></i></button>
+                            <button type="submit" class="btn btn-primary rounded-start-0 w-100"><i class="bi bi-upload"></i></button>
                         </div>
                     </div>
                 </form>
@@ -102,7 +102,8 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategoryFiles">
+                <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit PDF Category Files">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -140,15 +141,17 @@
             
             <div class="modal-footer">
 
-                <!-- Cancel -->
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-box-arrow-left"></i> Cancel
-                </button>
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Discard Changes and Close">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-box-arrow-left"></i> Cancel
+                    </button>
+                </span>
 
-                <!-- Save -->
-                <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
-                    <i class="bi bi-save-fill"></i> Save Changes
-                </button>
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Save All Changes">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
+                        <i class="bi bi-save-fill"></i> Save Changes
+                    </button>
+                </span>
 
             </div>
 

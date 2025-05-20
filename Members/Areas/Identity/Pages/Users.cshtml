@@ -75,9 +75,11 @@
                     <input type="hidden" asp-for="ShowExtraFields" id="showExtraFieldsHidden" />
 
                     <!-- Clear Search Button -->
-                    <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
-                        <i class="bi bi-x text-black"></i>
-                    </button>
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Clear Search">
+                        <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
+                            <i class="bi bi-x text-black"></i>
+                        </button>
+                    </span>
 
                 </div>
             </form>

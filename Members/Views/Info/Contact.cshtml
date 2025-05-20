@@ -87,21 +87,23 @@
                         <!-- Send or Cancel -->
                         <div class="d-flex justify-content-between">
 
-                            <!-- Cancel -->
-                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                            <a href="~/" class="btn btn-sm btn-secondary me-2"
+                               data-bs-toggle="tooltip" data-bs-placement="top" title="Discard Changes and Return Home">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
-                            <!-- Reset -->
-                            <button type="reset" class="btn btn-sm btn-danger btn-sm me-2">
-                                <i class="bi bi-arrow-clockwise"></i> Reset
-                            </button>
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Reset Form Fields">
+                                <button type="reset" class="btn btn-sm btn-danger btn-sm me-2">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset
+                                </button>
+                            </span>
 
-                            <!-- Send -->
-                            <button type="submit" class="btn btn-sm btn-primary btn-sm">
-                                <i class="bi bi-check-lg"></i> Send
-                            </button> 
-                           
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Submit Form">
+                                <button type="submit" class="btn btn-sm btn-primary btn-sm">
+                                    <i class="bi bi-check-lg"></i> Send
+                                </button>
+                            </span>
+
                         </div>
                     </form>
 
@@ -127,11 +129,13 @@
                                     Avon Park FL 33825
                                 </div>
                                 <div class="ps-4 text-center">
-                                    <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
-                                            onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
-                                        <img style="height:32px; width:32px;" src="/Images/Svg/Buttons/Google-Square.svg" alt="Google Maps Icon">
-                                        <b>Google Maps</b>
-                                    </button>
+                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Open Google Maps">
+                                        <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
+                                                onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
+                                            <img style="height:32px; width:32px;" src="/Images/Svg/Buttons/Google-Square.svg" alt="Google Maps Icon">
+                                            <b>Google Maps</b>
+                                        </button>
+                                    </span>
                                 </div>
                             </div>
                         </div>

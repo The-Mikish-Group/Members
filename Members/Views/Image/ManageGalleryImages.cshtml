@@ -8,7 +8,7 @@
 <h1 class="text-center my-2">Manage Images for: @ViewBag.GalleryName</h1>
 
 <div class="text-center mb-3">
-    <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-secondary"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
+    <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -79,17 +79,18 @@
                                     
                                         <!-- Button Group -->
                                         <div class="btn-group mt-2" role="group" aria-label="Image Actions">
-                                        
-                                            <!-- Rename Button -->
-                                            <button type="button" class="rounded btn btn-sm btn-warning mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@image.FileName.Replace(".", "_")"><i class="bi bi-pencil"></i> Rename</button>
-                                                                                
-                                            <!-- Delete with Confirm Dialog -->
+
+                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Image">
+                                                <button type="button" class="rounded btn btn-sm btn-warning mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@image.FileName.Replace(".", "_")"><i class="bi bi-pencil"></i></button>
+                                            </span>
+                                            
                                             <form asp-controller="Image" asp-action="DeleteImage" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete \'@image.FileName\'?');">
                                                 <input type="hidden" name="galleryName" value="@image.GalleryName" />
                                                 <input type="hidden" name="fileName" value="@image.FileName" />
 
-                                                <!-- Delete Button -->
-                                                <button type="submit" class="rounded btn btn-sm btn-danger mx-2"><i class="bi bi-x-circle"></i> Delete</button>
+                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Image">
+                                                    <button type="submit" class="rounded btn btn-sm btn-danger mx-2"><i class="bi bi-x-circle"></i></button>
+                                                </span>
 
                                             </form>
                                         </div>
@@ -118,15 +119,17 @@
                                             <!-- Buttons -->
                                             <div class="modal-footer">
 
-                                                <!-- Close -->
-                                                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-                                                    <i class="bi bi-x-circle"></i> Close
-                                                </button>
+                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Close Window">
+                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                                                        <i class="bi bi-x-circle"></i> Close
+                                                    </button>
+                                                </span>
 
-                                                <!-- Rename -->
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-pencil"></i> Rename
-                                                </button>
+                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Apply Rename">
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-pencil"></i> Rename
+                                                    </button>
+                                                </span>
 
                                             </div>
 
