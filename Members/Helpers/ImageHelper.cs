@@ -1,9 +1,9 @@
 ﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Processing;
 
 namespace Members.Helpers;
@@ -40,8 +40,8 @@ public static class ImageHelper
             ".png" => new PngEncoder(),
             ".jpg" or ".jpeg" => new JpegEncoder(),
             ".gif" => new GifEncoder(),
-            ".bmp" => new BmpEncoder(),  
-            _ => new JpegEncoder()  
+            ".bmp" => new BmpEncoder(),
+            _ => new JpegEncoder()
         };
     }
 }

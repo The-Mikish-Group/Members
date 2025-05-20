@@ -1,19 +1,12 @@
-using System;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Members.Data;
 using Members.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Linq;
-using System.Net;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TempDataAttribute = Microsoft.AspNetCore.Mvc.TempDataAttribute;
 
 
@@ -169,7 +162,7 @@ namespace Members.Areas.Identity.Pages
             }).OrderBy(r => r.Text)];
         }
 
-        public async Task<IActionResult> OnGetAsync(string id, string? returnUrl) 
+        public async Task<IActionResult> OnGetAsync(string id, string? returnUrl)
         {
             // Optionally capture SearchTerm and ShowExtraFields from returnUrl if needed for display
             if (!string.IsNullOrEmpty(returnUrl))
@@ -240,7 +233,7 @@ namespace Members.Areas.Identity.Pages
                     return Redirect(ReturnUrl);
                 }
                 return RedirectToPage("./Users");
-            }                      
+            }
 
             user.UserName = Input.UserName;
             user.Email = Input.Email;
@@ -256,7 +249,7 @@ namespace Members.Areas.Identity.Pages
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                    
+
                 StatusMessage = "Error: User update failed.";
                 return Page();
             }
@@ -359,7 +352,7 @@ namespace Members.Areas.Identity.Pages
                 // Fallback: Redirect to the default Users page if ReturnUrl is invalid or missing
                 return RedirectToPage("./Users");
             }
-        }        
+        }
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {

@@ -1,18 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Members.Data;
+﻿using Members.Data;
 using Members.Models;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using Microsoft.AspNetCore.Identity;
-using Members.Services;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 
 namespace Members.Controllers
 {
@@ -322,7 +312,7 @@ namespace Members.Controllers
                     // Use TempData to show a user-friendly message on redirect
                     TempData["ErrorMessage"] = "Error: Category not found.";
                     // Redirect back to the appropriate page, maybe the category list or a general error page
-                    return RedirectToAction("Index", "PdfCategory"); 
+                    return RedirectToAction("Index", "PdfCategory");
                 }
 
                 // Ensure the target directory exists before saving

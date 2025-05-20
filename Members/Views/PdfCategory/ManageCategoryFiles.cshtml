@@ -8,12 +8,14 @@
     var pdfCategories = ViewBag.PDFCategories as IEnumerable<PDFCategory>;
 }
 
+<!-- Title -->
 <div class="d-flex justify-content-center my-4">
     <h1><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h1>
 </div>
 
+<!-- Category Selection Dropdown -->
 <div class="row justify-content-center my-2 mx-auto p-2">
-    <div class="shadow border rounded col-md-8 bg-Card-Menu p-2">
+    <div class="shadow-none border rounded col-md-8 bg-Card-Menu p-2">
         <div class="form-group mt-2">
             <div class="pb-2">
                 <label for="categoryId" id="categoryLabel" class="fw-bold">Select a Category:</label>
@@ -55,12 +57,12 @@
                             <input type="file" name="file" class="form-control visually-hidden" id="chooseFile" />
                             <div class="input-group">
                                 <label class="btn btn-search-fill no-right-radius" for="chooseFile"><i class="bi bi-search"></i></label>
-                                <input type="text" class="form-control no-left-radius no-right-radius" id="fileNameDisplay" placeholder="--No file chosen--" readonly />
+                                <input type="text" class="form-control no-left-radius no-right-radius shadow-none" id="fileNameDisplay" placeholder="--No file chosen--" readonly />
                             </div>
                         </div>
                         <div class="col-2 px-0">
                             <label for="sortOrder" class="form-label visually-hidden">Sort Order</label>
-                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius-sort" min="1" id="sortOrder" />
+                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius-sort shadow-none" min="1" id="sortOrder" />
                         </div>
                         <div class="col-2 ps-0">
                             <div class="input-group">
@@ -171,12 +173,17 @@
                                 </div>
 
                                 <div class="modal-footer">
+
+                                    <!-- Cancel -->
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <i class="bi bi-x-circle me-1"></i> Cancel
+                                        <i class="bi bi-box-arrow-left"></i> Cancel
                                     </button>
+
+                                    <!-- Save -->
                                     <button type="button" class="btn btn-primary" onclick="submitRenameForm()">
                                         <i class="bi bi-save-fill me-1"></i> Save Changes
                                     </button>
+
                                 </div>
 
                             </div>

@@ -1,11 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using Members.Data; // Add using for ApplicationDbContext
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Members.Data; // Add using for ApplicationDbContext
-using Members.Models; // Add using for UserProfile
+using System.ComponentModel.DataAnnotations;
 
 namespace Members.Areas.Identity.Pages.Account
 {

@@ -1,25 +1,16 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Members.Data;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Members.Services;
-using Microsoft.Extensions.Logging;
 using Members.Models; // Add this to access UserProfile
-using Microsoft.AspNetCore.Http; // For AddHttpContextAccessor
+using Members.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure; // For IActionContextAccessor and ActionContextAccessor
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.StaticAssets;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Syncfusion.Licensing; // Register Syncfusion license
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Register Syncfusion license
 string SYNCFUSION_KEY = Environment.GetEnvironmentVariable("SYNCFUSION_KEY")!;
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(SYNCFUSION_KEY); 
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(SYNCFUSION_KEY);
 
 // Retrieve connection string from environment variables
 string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER")!;
@@ -75,6 +66,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseStaticFiles(); // Add this to serve static files like in Gallerys
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(

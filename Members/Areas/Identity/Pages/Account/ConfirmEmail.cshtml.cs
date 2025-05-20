@@ -1,13 +1,13 @@
 ﻿#nullable disable
 
-using System.Text;
+using Members.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using Members.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Members.Areas.Identity.Pages.Account
 {

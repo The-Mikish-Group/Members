@@ -1,14 +1,8 @@
 using Members.Data;
-using Members.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Linq.Expressions; // Add this for PredicateBuilder
 
 namespace Members.Areas.Identity.Pages
 {
@@ -55,7 +49,6 @@ namespace Members.Areas.Identity.Pages
 
         [BindProperty(SupportsGet = true)]
         public int PageSize { get; set; } = 10; // Default page size
-
         public int TotalUsers { get; set; } // Total number of users after filtering
         public int TotalPages { get; set; } // Total number of pages
 
@@ -75,7 +68,6 @@ namespace Members.Areas.Identity.Pages
         public bool ShowExtraFields { get; set; } = false; // Default to false
         // --- End New Toggle Property ---
 
-
         // --- Your Original OnGetAsync (with ShowExtraFields added) ---
         // This handles the initial full page load.
         public async Task<IActionResult> OnGetAsync(string? searchTerm, int pageNumber = 1, int pageSize = 10, string? sortColumn = null, string? sortOrder = null, bool showExtraFields = false)
@@ -91,7 +83,6 @@ namespace Members.Areas.Identity.Pages
             return Page(); // Return the full page
         }
         // --- End Original OnGetAsync ---
-
 
         // --- New Handler for AJAX Requests ---
         // This handler will be targeted by the JavaScript fetch call using ?handler=PartialTable
@@ -113,7 +104,6 @@ namespace Members.Areas.Identity.Pages
             return Partial("_UsersTablePartial", this);
         }
         // --- End New Handler ---
-
 
         // --- Helper method to load users based on current properties (reused logic) ---
         private async Task LoadUsersDataAsync() // Renamed from LoadUsersAsync to differentiate
@@ -164,7 +154,7 @@ namespace Members.Areas.Identity.Pages
                             (ShowExtraFields && up.State != null && up.State.ToLower().Contains(searchTerm)) ||
                             (ShowExtraFields && up.ZipCode != null && up.ZipCode.ToLower().Contains(searchTerm)) ||
                             (ShowExtraFields && up.Plot != null && up.Plot.ToLower().Contains(searchTerm))
-                            // --- End new fields to search filter ---
+                        // --- End new fields to search filter ---
                         )
                     ));
 
@@ -228,7 +218,7 @@ namespace Members.Areas.Identity.Pages
                     "phonenumber" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.User.PhoneNumber) : joinedQuery.OrderByDescending(x => x.User.PhoneNumber), // Sort by IdentityUser's PhoneNumber
                     "homephonenumber" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.HomePhoneNumber : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.HomePhoneNumber : null), // Sort by UserProfile's HomePhoneNumber
                     "phonenumberconfirmed" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.User.PhoneNumberConfirmed) : joinedQuery.OrderByDescending(x => x.User.PhoneNumberConfirmed),
-                     "roles" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => _dbContext.UserRoles.Where(ur => ur.UserId == x.User.Id).Join(_dbContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name).FirstOrDefault()) : joinedQuery.OrderByDescending(x => _dbContext.UserRoles.Where(ur => ur.UserId == x.User.Id).Join(_dbContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name).FirstOrDefault()),
+                    "roles" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => _dbContext.UserRoles.Where(ur => ur.UserId == x.User.Id).Join(_dbContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name).FirstOrDefault()) : joinedQuery.OrderByDescending(x => _dbContext.UserRoles.Where(ur => ur.UserId == x.User.Id).Join(_dbContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name).FirstOrDefault()),
                     "lastlogin" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.LastLogin : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.LastLogin : null), // Sort by UserProfile's LastLogin
 
                     // --- Add sorting for new fields ---
@@ -249,7 +239,6 @@ namespace Members.Areas.Identity.Pages
                 };
             }
             // --- End Apply Sorting ---
-
 
             // Apply Pagination
             var paginatedJoinedUsers = await orderedQuery
@@ -301,7 +290,6 @@ namespace Members.Areas.Identity.Pages
             }
         }
 
-
         // Helper method to check if a sort column is one of the new extra fields
         private static bool IsExtraFieldSortColumn(string? sortColumn)
         {
@@ -318,14 +306,11 @@ namespace Members.Areas.Identity.Pages
     }
 
     // This helper class is needed for combining multiple LINQ Where clauses with OR
-    // You might need to add a reference to the LinqKit NuGet package
-    // or implement this class yourself.
     // For complex OR conditions across relationships, PredicateBuilder is helpful.
     public static class PredicateBuilder
     {
         public static System.Linq.Expressions.Expression<Func<T, bool>> True<T>() { return f => true; }
         public static System.Linq.Expressions.Expression<Func<T, bool>> False<T>() { return f => false; }
-
         public static System.Linq.Expressions.Expression<Func<T, bool>> Or<T>(this System.Linq.Expressions.Expression<Func<T, bool>> expr1,
                                                                              System.Linq.Expressions.Expression<Func<T, bool>> expr2)
         {
@@ -333,8 +318,7 @@ namespace Members.Areas.Identity.Pages
             return System.Linq.Expressions.Expression.Lambda<Func<T, bool>>(System.Linq.Expressions.Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
         }
 
-        public static System.Linq.Expressions.Expression<Func<T, bool>> And<T>(this System.Linq.Expressions.Expression<Func<T, bool>> expr1,
-                                                                             System.Linq.Expressions.Expression<Func<T, bool>> expr2) // Corrected this line
+        public static System.Linq.Expressions.Expression<Func<T, bool>> And<T>(this System.Linq.Expressions.Expression<Func<T, bool>> expr1, System.Linq.Expressions.Expression<Func<T, bool>> expr2)
         {
             var invokedExpr = System.Linq.Expressions.Expression.Invoke(expr2, expr1.Parameters.Cast<System.Linq.Expressions.Expression>());
             return System.Linq.Expressions.Expression.Lambda<Func<T, bool>>(System.Linq.Expressions.Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);

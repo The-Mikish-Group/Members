@@ -1,7 +1,4 @@
 ﻿// Members.Models.ViewModels/CreatePdfFormViewModel.cs
-using Members.Models; // Needed for PDFCategory
-using System.Collections.Generic;
-
 namespace Members.Models // Make sure this namespace matches your folder structure
 {
     // ViewModel used for the GET request to display the PDF generation form

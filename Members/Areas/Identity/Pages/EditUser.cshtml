@@ -69,7 +69,7 @@
 <!-- Banner Logo -->
 <partial name="_PartialBannerLogo" />
 
-<div class="container my-4">
+<div class="container px-2 my-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <div class="card p-2 shadow bg-Card-Menu">
@@ -225,12 +225,12 @@
                     <hr />
 
                     <div class="d-flex justify-content-center mt-3">
-                       
-                        <!-- Save Button -->
-                        <button type="submit" class="btn btn-sm btn-success me-2">
-                            <i class="bi bi-save"></i> Save
-                        </button>
 
+                        <!-- Cancel Button -->
+                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
+                            <i class="bi bi-box-arrow-left"></i> Cancel
+                        </button>
+                        
                         <!-- Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl -->
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
@@ -248,9 +248,9 @@
                             </button>
                         }
 
-                        <!-- Cancel Button -->
-                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
-                            <i class="bi bi-x-circle"></i> Cancel
+                        <!-- Save Button -->
+                        <button type="submit" class="btn btn-sm btn-success me-2">
+                            <i class="bi bi-save"></i> Save
                         </button>
 
                     </div>

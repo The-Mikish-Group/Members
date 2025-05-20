@@ -1,12 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using Members.Data; // Make sure this namespace is correct for your DbContext
+using Members.Models; // Make sure this namespace is correct for your UserProfile model
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Linq;
-using Members.Data; // Make sure this namespace is correct for your DbContext
-using Members.Models; // Make sure this namespace is correct for your UserProfile model
+using System.ComponentModel.DataAnnotations;
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
@@ -84,32 +81,32 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             public string? Plot { get; set; }
         }
 
-private async Task LoadAsync(IdentityUser user)
-{
-    var userName = await _userManager.GetUserNameAsync(user);
-    var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+        private async Task LoadAsync(IdentityUser user)
+        {
+            var userName = await _userManager.GetUserNameAsync(user);
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-    var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
+            var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
 
-    Username = userName;
+            Username = userName;
 
-    Input = new InputModel
-    {
-        PhoneNumber = phoneNumber, // Add this line to load the Cell Phone number
-        FirstName = userProfile?.FirstName ?? string.Empty,
-        MiddleName = userProfile?.MiddleName,
-        LastName = userProfile?.LastName ?? string.Empty,
-        Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
-        Anniversary = userProfile?.Anniversary?.ToString("yyyy-MM-dd") ?? string.Empty,
-        AddressLine1 = userProfile?.AddressLine1,
-        AddressLine2 = userProfile?.AddressLine2,
-        City = userProfile?.City,
-        State = userProfile?.State,
-        ZipCode = userProfile?.ZipCode,
-        Plot = userProfile?.Plot,
-        HomePhoneNumber = userProfile?.HomePhoneNumber
-    };
-}
+            Input = new InputModel
+            {
+                PhoneNumber = phoneNumber, // Add this line to load the Cell Phone number
+                FirstName = userProfile?.FirstName ?? string.Empty,
+                MiddleName = userProfile?.MiddleName,
+                LastName = userProfile?.LastName ?? string.Empty,
+                Birthday = userProfile?.Birthday?.ToString("yyyy-MM-dd") ?? string.Empty,
+                Anniversary = userProfile?.Anniversary?.ToString("yyyy-MM-dd") ?? string.Empty,
+                AddressLine1 = userProfile?.AddressLine1,
+                AddressLine2 = userProfile?.AddressLine2,
+                City = userProfile?.City,
+                State = userProfile?.State,
+                ZipCode = userProfile?.ZipCode,
+                Plot = userProfile?.Plot,
+                HomePhoneNumber = userProfile?.HomePhoneNumber
+            };
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -150,7 +147,7 @@ private async Task LoadAsync(IdentityUser user)
             {
                 await LoadAsync(user);
                 return Page();
-            }                 
+            }
 
             // Update UserProfile (This part is independent of the PhoneNumber update)
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);

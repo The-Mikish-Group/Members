@@ -1,17 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text;
-using System.Threading.Tasks;
-using Members.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Members.Areas.Identity.Pages
 {
@@ -27,7 +21,7 @@ namespace Members.Areas.Identity.Pages
         public IdentityUser? UserToEdit { get; set; }
 
         [BindProperty] // Bind on POST to get selected roles from the form
-        public List<RoleViewModel> AllRoles { get; set; } = new List<RoleViewModel>();
+        public List<RoleViewModel> AllRoles { get; set; } = [];
 
         // This property will capture the return URL to go back to the EditUser page
         [BindProperty(SupportsGet = true)]
@@ -83,12 +77,12 @@ namespace Members.Areas.Identity.Pages
             var roles = await _roleManager.Roles.ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            AllRoles = roles.Select(role => new RoleViewModel
+            AllRoles = [.. roles.Select(role => new RoleViewModel
             {
                 Value = role.Name ?? string.Empty,
                 Text = role.Name ?? string.Empty,
                 Selected = userRoles.Contains(role.Name ?? string.Empty)
-            }).OrderBy(r => r.Text).ToList();
+            }).OrderBy(r => r.Text)];
         }
 
 

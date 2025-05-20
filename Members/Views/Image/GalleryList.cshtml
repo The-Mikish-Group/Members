@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Members.Models.GalleryViewModel>
+
+@{
+    ViewData["Title"] = "Image Galleries";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    //<div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    //<div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<head>
+    <style>
+        /* Styles to remove the borders from the list items */
+        .list-group-item {
+            border-bottom: none !important;
+        }
+
+            .list-group-item:first-child {
+                border-top: none !important;
+            }
+
+            .list-group-item:last-child {
+                border-bottom: none !important;
+            }
+
+            /* CSS to control the link color on hover/focus */
+            /* Target the link directly within the list item on hover/focus */
+            .list-group-item:hover a.text-gold-darker,
+            .list-group-item:focus a.text-gold-darker,
+            .list-group-item a.text-gold-darker:hover,
+            .list-group-item a.text-gold-darker:focus {
+                color: #3b3726 !important; /* Use the dark gold color */
+            }
+
+            /* Optional: Adjust the background color of the list item on hover/focus */
+            .list-group-item:hover,
+            .list-group-item:focus {
+                background-color: rgba(0, 0, 0, 0.05) !important; /* Example subtle background */
+            }
+
+            a:hover,
+            a:focus {
+                color: forestgreen !important;
+            }
+    </style>
+</head>
+
+<h1 class="text-center text-gold-darker my-2"><i class="bi bi-image"></i> Image Galleries</h1>
+
+<div class="container row justify-content-center mx-auto p-1">
+    <div class="col-lg-6 col-md-10 m-1 p-1">
+        <div class="card shadow rounded border bg-Card-Menu">
+            <div class="card-body p-0">
+                
+                @if (Model != null && Model.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var gallery in Model)
+                        {  
+                            <li class="list-group-item bg-transparent text-gold-darker" style="cursor: pointer;">
+                                <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="text-decoration-none text-gold-dark d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
+                            </li>                         
+                        }
+                    </ul>  
+                }
+                else
+                {
+                    <div class="col-12 text-center">
+                        <p>No galleries available yet.</p>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+{
+    <div class="mt-4 text-center">
+        <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-info"><i class="bi bi-shield-lock"></i> Manage Galleries</a>
+    </div>
+}

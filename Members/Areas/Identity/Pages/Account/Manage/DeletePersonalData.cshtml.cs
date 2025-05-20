@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
@@ -13,17 +13,17 @@ namespace Members.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly SignInManager<IdentityUser> _signInManager = signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger = logger;
-        
+
         [BindProperty]
         public InputModel? Input { get; set; }
-        
+
         public class InputModel
-        {            
+        {
             [Required]
             [DataType(DataType.Password)]
             public string? Password { get; set; }
         }
-        
+
         public bool RequirePassword { get; set; }
 
         public async Task<IActionResult> OnGet()

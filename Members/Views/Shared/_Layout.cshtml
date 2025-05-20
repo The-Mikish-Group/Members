@@ -33,7 +33,7 @@
     string ogTitle = ViewData["OGTitle"]?.ToString() ?? pageTitle;
     string ogDescription = ViewData["OGDescription"]?.ToString() ?? description;
     string ogURL = ViewData["OGURL"]?.ToString() ?? siteURL;
-    string canonical = ViewData["Canonical"]?.ToString() ?? siteURL +"/Info/Index";
+    string canonical = ViewData["Canonical"]?.ToString() ?? siteURL + "/Info/Index";
 
     // Default Link Share Image (Change as needed)
     string ogImage = ViewData["OGImage"]?.ToString() ?? siteURL + "/Images/LinkImages/SmallLogo.png";
@@ -83,31 +83,25 @@
     <meta name="twitter:image" content="@ogImage" />
     <meta name="twitter:image:width" content=@ogImageWidth />
     <meta name="twitter:image:height" content=@ogImageHeight />
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" integrity="sha512-tze+o/xG0w3yxxE8xe32piisVvI/LfcEuf6LW7lFLUxhio2SfFQ9mQ0TqB0avvonmxUXT7/l8+fnWkR03u85fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <script src="~/js/ej2/ej2.min.js"></script>
-
+    
     <link rel="stylesheet" href="~/css/site.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/sizes.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/colors.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/mycards.css" asp-append-version=" true" />
 
-    @await RenderSectionAsync("Styles", required: false)
-
 </head>
 
-<!-- Body -->   
 <body>
 
-    <!-- Partial Header -->
-    <partial name="_PartialHeader" />    
+    <partial name="_PartialHeader" />
 
     <div id="MainContainer" class="m-0 p-0">
         <main role="main" class="m-0 p-0">
@@ -115,9 +109,8 @@
         </main>
     </div>
 
-    <!-- Partial Footer -->
     <partial name="_PartialFooter" />
-       
+
     <script>
 
         // Adjust the position of the footer based on actual content and footer height
@@ -168,17 +161,19 @@
             }
 
             // Add stopPropagation for the nested PDF Documents dropdown toggle in the footer
-             const pdfDocumentsFooterToggle = document.querySelector('#pdfDocumentsFooterDropdown');
-             if (pdfDocumentsFooterToggle) {
-                 pdfDocumentsFooterToggle.addEventListener('click', function(event) {
-                     event.stopPropagation();
-                 });
-             }
+            const pdfDocumentsFooterToggle = document.querySelector('#pdfDocumentsFooterDropdown');
+            if (pdfDocumentsFooterToggle) {
+                pdfDocumentsFooterToggle.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            }
         });
 
     </script>
+    
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>    
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>    
 
-    <!-- This renders the Scripts section from individual views -->
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

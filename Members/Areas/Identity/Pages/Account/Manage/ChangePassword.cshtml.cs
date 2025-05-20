@@ -1,10 +1,9 @@
 ﻿#nullable disable
 
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
@@ -91,14 +90,9 @@ namespace Members.Areas.Identity.Pages.Account.Manage
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CustomCompareAttribute : ValidationAttribute
+    public sealed class CustomCompareAttribute(string otherProperty) : ValidationAttribute
     {
-        private readonly string _otherProperty;
-
-        public CustomCompareAttribute(string otherProperty)
-        {
-            _otherProperty = otherProperty;
-        }
+        private readonly string _otherProperty = otherProperty;
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {

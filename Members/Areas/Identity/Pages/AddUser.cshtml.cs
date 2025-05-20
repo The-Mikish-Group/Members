@@ -64,7 +64,7 @@ namespace Members.Areas.Identity.Pages
         {
             [BindProperty(SupportsGet = true)]
             public string SearchTerm { get; set; }
-            
+
             [Required]
             [Display(Name = "FirstName")]
             public required string FirstName { get; set; }
@@ -258,6 +258,23 @@ namespace Members.Areas.Identity.Pages
 
             return Page();
         }
+
+        // --- OnPostCancel Handler ---
+        public IActionResult OnPostCancel(string returnUrl = null)
+        {
+            _logger.LogInformation("Cancel button clicked on AddUser page. Returning to: {ReturnUrl}", returnUrl ?? "./Users");
+
+            // Redirect to the ReturnUrl if available, otherwise to the default Users page
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToPage("./Users");
+            }
+        }
+        // --- OnPostCancel Handler ---
 
         private IdentityUser CreateUser()
         {

@@ -1,41 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization; // For the [Authorize] attribute
-using Microsoft.AspNetCore.Hosting; // Needed for IWebHostEnvironment
-using Microsoft.AspNetCore.Mvc; // For Controller, IActionResult, etc.
-using Microsoft.Extensions.Logging; // For ILogger
-using Members.Data; // Assuming your ApplicationDbContext is here
-using Members.Models; // Assuming ALL your models (ViewModels, UserProfile, PDFCategory, CategoryFile, etc.) are here
-using System.IO; // For Path.Combine, File operations, MemoryStream
-using System.Threading.Tasks; // For async/await
-using Microsoft.EntityFrameworkCore; // Needed for EF Core methods like Include, ToListAsync, MaxAsync, FirstOrDefaultAsync, AnyAsync, SelectMany, GroupBy
-using System; // For Exception, ArgumentNullException, DateTime
-using Microsoft.AspNetCore.Identity; // Needed for UserManager, IdentityUser
-using Members.Services; // Assuming your UserService is here
-using System.Collections.Generic; // Needed for Lists and IEnumerables
-using System.Linq; // Needed for LINQ methods like OrderBy, Where, Select, Max, Any, ToListAsync, Aggregate, SelectMany, GroupBy
-using System.ComponentModel.DataAnnotations; // Needed for ViewModel attributes
-using System.Text; // Needed for StringBuilder and Encoding
-
-// --- Add Syncfusion PDF Namespaces ---
-using Syncfusion;
-using Syncfusion.Licensing;
+﻿using Members.Data;
+using Members.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
+using Syncfusion.Drawing;
 using Syncfusion.Pdf;
 using Syncfusion.Pdf.Graphics;
-using Syncfusion.Drawing; // Contains RectangleF and SizeF for Syncfusion
-using Syncfusion.Pdf.Tables; // If using tables for layout
-using Syncfusion.Pdf.Interactive; // If needed for links, etc.
-using Syncfusion.Pdf.Grid; // If using grids for layout
-using Syncfusion.Pdf.Parsing;
-
-// --- Namespaces for View Rendering to String (Keep if RenderViewToStringAsync is used elsewhere) ---
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
+using System.Text;
 
 // This controller is dedicated to generating PDF files, specifically the Member Directory PDF, using Syncfusion PDF Library.
 // It also handles related data export functionality.
@@ -43,14 +17,14 @@ using Microsoft.AspNetCore.Mvc.Razor;
 namespace Members.Controllers;
 
 [Authorize(Roles = "Admin,Manager")]
-public class PdfGenerationController : Controller // Inherit from Controller
+public class PdfGenerationController : Controller
 {
-    // Injected dependencies for database access, environment info, logging, user management, AND View Rendering (keep if RenderViewToStringAsync is used elsewhere)
+    // Injected dependencies for database access, environment info, logging, user management.
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<PdfGenerationController> _logger;
     private readonly ApplicationDbContext _context;
 
-    // Injected services for View Rendering - keep if you still need RenderViewToStringAsync
+    // Injected services for View Rendering, TempData handling, and ActionContext access
     private readonly IRazorViewEngine _razorViewEngine;
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IActionContextAccessor _actionContextAccessor;
@@ -78,7 +52,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
 
         // Set the base path for protected files in the constructor
         _protectedFilesBasePath = Path.Combine(_environment.ContentRootPath, "ProtectedFiles");
-       
+
     }
 
     // GET: /PdfGeneration/CreatePdf - Displays the form for generating PDF (MODIFIED to hardcode Directory)
@@ -144,9 +118,10 @@ public class PdfGenerationController : Controller // Inherit from Controller
         }
         string databaseFileName = databaseAndPhysicalFileName;
         string filePath = Path.Combine(_protectedFilesBasePath, databaseFileName);
-       
+
         byte[]? pdfBytes = null;
 
+        // We only want Members with the "Member" role, excluding those with "Admin" or "Manager" roles.
         try
         {
             string? memberRoleId = await _context.Roles.Where(r => r.Name == "Member").Select(r => r.Id).FirstOrDefaultAsync();
@@ -165,7 +140,6 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 .Where(ur => (adminRoleId != null && ur.RoleId == adminRoleId) || (managerRoleId != null && ur.RoleId == managerRoleId))
                 .Select(ur => ur.UserId)
                 .ToListAsync();
-
             List<UserProfile> userProfilesWithUsers = await _context.UserProfile
                 .Include(up => up.User)
                 .Where(up => up.User != null
@@ -198,18 +172,23 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 PdfGraphics graphics = page.Graphics;
 
                 PdfFont regularFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
-                PdfFont boldFont = new PdfStandardFont(PdfFontFamily.Helvetica, 13, PdfFontStyle.Bold); // Keep for user names
+
+                // Keep for user names
+                PdfFont boldFont = new PdfStandardFont(PdfFontFamily.Helvetica, 13, PdfFontStyle.Bold);
                 PdfFont boldHeadingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 15, PdfFontStyle.Bold);
                 PdfFont HeadingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 15);
-                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12); // Regular footer font
-                                                                                       // Define a bold font specifically for the footer page numbers
+
+                // Regular footer font
+                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12); 
+                
+                // Define a bold font specifically for the footer page numbers
                 PdfFont boldFooterFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Bold); // Bold footer font
 
                 PdfBrush brush = PdfBrushes.Black;
 
                 // Define margins (adjust as needed)
-                float horizontalMargin = 20; // Keep left/right margin at 40
-                float verticalMargin = 20; // Reduce top/bottom margin to 20
+                float horizontalMargin = 20; 
+                float verticalMargin = 20; 
 
                 PdfStringFormat format = new() { WordWrap = PdfWordWrapType.Word };
 
@@ -340,7 +319,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
                             // Separate the heading text and the date for subsequent pages                            
                             string boldContinuedHeadingText = "HOA Member Directory";
                             Syncfusion.Drawing.SizeF boldContinuedHeadingTextSize = boldHeadingFont.MeasureString(boldContinuedHeadingText);
-                            
+
                             string continuedHeadingText = " (Continued)";
                             Syncfusion.Drawing.SizeF continuedHeadingTextSize = regularFont.MeasureString(continuedHeadingText);
 
@@ -416,11 +395,12 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 }
 
                 //footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 9); // Keep original font definition
-                PdfStringFormat footerFormat = new PdfStringFormat();
-
-                // Restored PdfTextAlignment
-                footerFormat.Alignment = PdfTextAlignment.Right; // Keep right alignment for footer
-                footerFormat.LineAlignment = PdfVerticalAlignment.Bottom;
+                PdfStringFormat footerFormat = new()
+                {
+                    // Restored PdfTextAlignment
+                    Alignment = PdfTextAlignment.Right, // Keep right alignment for footer
+                    LineAlignment = PdfVerticalAlignment.Bottom
+                };
 
                 string currentDate = DateTime.Now.ToString("MMMM dd,yyyy");
 
@@ -653,7 +633,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
 
             // Build the CSV content
             var builder = new StringBuilder();
-                        
+
             builder.AppendLine("First Name,Middle Name,Last Name,Address Line 1,Address Line 2,City,State,Zip Code,Email,Gell Phone,Home Phone,Birthday,Anniversary,Plot,Last Login,Email Confirmed,Phone Number Confirmed,Roles"); // Updated Header
 
             // Add Data Rows
@@ -665,7 +645,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
                 // Append data fields, using the EscapeCsv helper for each field
                 // The order here must match the header row above
                 builder.AppendLine(
-                   
+
                     $"{EscapeCsv(user.FirstName)}," +
                     $"{EscapeCsv(user.MiddleName)}," +
                     $"{EscapeCsv(user.LastName)}," +
@@ -673,7 +653,7 @@ public class PdfGenerationController : Controller // Inherit from Controller
                     $"{EscapeCsv(user.AddressLine2)}," +
                     $"{EscapeCsv(user.City)}," +
                     $"{EscapeCsv(user.State)}," +
-                    $"{EscapeCsv(user.ZipCode)}," + 
+                    $"{EscapeCsv(user.ZipCode)}," +
                     $"{EscapeCsv(user.Email)}," +
                     $"{EscapeCsv(user.PhoneNumber)}," +
                     $"{EscapeCsv(user.HomePhoneNumber)}," +

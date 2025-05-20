@@ -31,10 +31,22 @@
                                 @Html.DisplayNameFor(m => m.Input.RememberMachine)
                             </label>
                         </div>
+
+                        <!-- Buttons -->
                         <div class="d-flex justify-content-between">
-                            <button type="submit" class="btn btn-sm btn-primary">Log in</button>
-                            <a href="~/" class="btn btn-sm btn-secondary">Cancel</a>
+
+                            <!-- Cancel -->
+                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </a>
+
+                            <!-- Log In -->
+                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                                <i class="bi bi-save"></i> Log in
+                            </button>                            
+
                         </div>
+
                     </form>
                     <p class="text-center mt-3">
                         Don't have access to your authenticator device? You can

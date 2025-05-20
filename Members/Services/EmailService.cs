@@ -1,10 +1,7 @@
 ﻿//using Humanizer;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 
 namespace Members.Services
 {

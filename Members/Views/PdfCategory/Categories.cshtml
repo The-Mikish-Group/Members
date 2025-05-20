@@ -28,7 +28,7 @@
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
-                            <button type="submit" class="btn btn-primary rounded-start-0 w-100"><i class="bi bi-upload"></i></button>
+                            <button type="submit" class="btn btn-sm btn-primary rounded-start-0 w-100"><i class="bi bi-upload"></i></button>
                         </div>
                     </div>
                 </form>
@@ -78,7 +78,7 @@
                                     <td class="text-gold-darker">@item.SortOrder</td>
                                     <td class="delete-cell text-end py-0">
                                         <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
-                                            <button type="submit" class="btn btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                            <button type="submit" class="btn btn-sm btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
@@ -102,7 +102,7 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-option" href="/PdfCategory/ManageCategoryFiles">
+                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategoryFiles">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -139,12 +139,17 @@
             </div>
             
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i> Cancel
+
+                <!-- Cancel -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-box-arrow-left"></i> Cancel
                 </button>
-                <button type="button" class="btn btn-primary" onclick="submitCategoryRenameForm()">
-                    <i class="bi bi-save-fill me-1"></i> Save Changes
+
+                <!-- Save -->
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
+                    <i class="bi bi-save-fill"></i> Save Changes
                 </button>
+
             </div>
 
         </div>

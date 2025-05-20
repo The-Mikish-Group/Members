@@ -1,0 +1,125 @@
+﻿@model IEnumerable<Members.Models.GalleryViewModel>
+@using Members.Models
+
+@{
+    ViewData["Title"] = "Manage Image Galleries";
+}
+
+<h1 class="text-center text-gold-darker my-2"><i class="bi bi-images"></i> Manage Galleries</h1>
+
+<div class="text-center mb-3">
+    <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-secondary"><i class="bi bi-box-arrow-left"></i> Back to Galleries</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    @* <div class="alert alert-success">@TempData["SuccessMessage"]</div> *@
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    @* <div class="alert alert-danger">@TempData["ErrorMessage"]</div> *@
+}
+
+<div class="row gx-1 gy-0 mx-1 my-2">
+    <div class="col-md-8 mx-auto">
+
+        <h2 class="text-start text-gold-darker my-2 ps-2"><i class="bi bi-folder-plus"></i> Create a New Gallery</h2>
+
+        <form asp-controller="Image" asp-action="CreateGallery" method="post" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="GalleryName" class="form-control text-gold-darker" placeholder="New Gallery Name" required>
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-save"></i></button>
+            </div>
+            <span class="text-danger">@Html.ValidationMessage("GalleryName")</span>
+        </form>
+    </div>
+</div>
+
+
+@if (Model != null && Model.Any())
+{
+    <div class="row gx-1 gy-0 mx-1 my-2">
+        <div class="col-md-8 mx-auto">
+
+            <h2 class="text-start text-gold-darker my-2 ps-2"><i class="bi bi-images"></i> Existing Galleries</h2>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-gold-darker">Gallery Name</th>
+                        <th class="text-gold-darker">Images</th>
+                        <th class="text-gold-darker">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gallery in Model)
+                    {
+                        <tr>
+
+                            <td class="text-gold-darker">@gallery.Name</td>
+                            <td class="text-gold-darker">@gallery.ImageCount</td>
+                            <td>
+
+                                <!-- Manage Images Button -->
+                                <a asp-controller="Image" asp-action="ManageGalleryImages" asp-route-galleryName="@gallery.Name" class="btn btn-sm btn-info"><i class="bi bi-images"></i></a>
+                                
+                                <!-- Rename -->
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#renameGalleryModal_@gallery.Name"><i class="bi bi-pencil"></i></button>
+                                
+                                <!-- Delete -->
+                                <form asp-controller="Image" asp-action="DeleteGallery" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete the gallery \'@gallery.Name\' and all its images?');">
+                                    <input type="hidden" name="galleryName" value="@gallery.Name" />
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x-circle"></i></button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @* Move modal definitions outside of the <tbody> to fix the nesting issue *@
+            @foreach (var gallery in Model)
+            {
+                <div class="modal fade" id="renameGalleryModal_@gallery.Name" tabindex="-1" aria-labelledby="renameGalleryModalLabel_@gallery.Name" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form asp-controller="Image" asp-action="RenameGallery" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="renameGalleryModalLabel_@gallery.Name">Rename Gallery: @gallery.Name</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="oldGalleryName" value="@gallery.Name" />
+                                    <div class="mb-3">
+                                        <label for="newGalleryName_@gallery.Name" class="form-label">New Gallery Name:</label>
+                                        <input type="text" class="form-control" id="newGalleryName_@gallery.Name" name="newGalleryName" value="@gallery.Name" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-box-arrow-left me-2"></i>Close</button>
+                                    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-pencil me-2"></i> Rename</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+else
+{
+    <div class="row gx-1 gy-0 my-2">
+        <div class="col-md-8 text-center text-gold-dark mx-auto">
+            <p>No galleries exist yet. Create one above!</p>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

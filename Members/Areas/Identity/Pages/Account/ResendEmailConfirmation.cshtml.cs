@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Members.Areas.Identity.Pages.Account
 {
@@ -16,7 +16,7 @@ namespace Members.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly IEmailSender _emailSender = emailSender;
 
-       [BindProperty]
+        [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
 
         public class InputModel
@@ -82,8 +82,9 @@ namespace Members.Areas.Identity.Pages.Account
                 );
                 ModelState.AddModelError(string.Empty, "Verification email sent.");
                 return Page();
-            };
-            
+            }
+            ;
+
             ModelState.AddModelError(string.Empty, "Verification email sent.");
             return Page();
         }

@@ -8,7 +8,7 @@
 <!-- Email Edit -->
 <div class="row gx-0 gy-0">
 
-    <div class="col-md-8 ">
+    <div class="col-lg-8 ">
 
         <h1 class="text-center text-gold-darker pb-2">Manage your account</h1>
 
@@ -40,12 +40,17 @@
                     <label asp-for="Input.NewEmail" class="form-label"></label>
                     <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
                 </div>
-                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary">
+
+                <!-- Cancel -->
+                <a href="~/" class="btn btn-sm btn-secondary me-2">
+                    <i class="bi bi-box-arrow-left"></i> Cancel
+                </a>
+
+                <!-- Change Email -->
+                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary me-2">
                     <i class="bi bi-envelope-arrow-right"></i> Change email
                 </button>
-                <a href="~/" class="btn btn-sm btn-danger">
-                    <i class="bi bi-x-circle"></i> Cancel
-                </a>
+                
             </form>
         </div>
         <partial name="_StatusMessage" for="StatusMessage" />

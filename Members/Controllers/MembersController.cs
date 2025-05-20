@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Members.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Members.Data; 
-using Members.Models;
-using System.Linq;
-using Microsoft.EntityFrameworkCore; 
-using System.Collections.Generic; 
+using Microsoft.EntityFrameworkCore;
 
 namespace Members.Controllers
 {

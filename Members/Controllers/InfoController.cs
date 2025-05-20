@@ -1,15 +1,13 @@
+using Members.Models;
+using Members.Services; // Add this using statement
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Members.Models;
-using System;
-using System.Threading.Tasks; // Add this using statement
-using Members.Services; // Add this using statement
 
 namespace Members.Controllers
 {
     public class InfoController(EmailService emailService) : Controller
     {
-        private readonly EmailService _emailService = emailService; 
+        private readonly EmailService _emailService = emailService;
 
         public IActionResult Index()
         {
@@ -39,7 +37,7 @@ namespace Members.Controllers
             try
             {
                 string siteEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? string.Empty;
-                
+
                 // Use EmailService to send the email
                 await _emailService.SendEmailAsync(
                     siteEmail, // To address
