@@ -31,27 +31,24 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
         }
 
         // Helper method to get the full path to an image file
+        // MODIFIED: Removed Path.GetFileName from fileName parameter
         private string GetImagePath(string galleryName, string fileName)
         {
-            // Sanitize file name
-            var sanitizedFileName = Path.GetFileName(fileName);
-            return Path.Combine(GetGalleryPath(galleryName), sanitizedFileName);
+            // fileName is expected to be just the file name, not a path
+            return Path.Combine(GetGalleryPath(galleryName), fileName);
         }
 
         // Helper method to get the full path to a thumbnail file
-        // MODIFIED: The thumbnail will now retain the original image's extension
+        // MODIFIED: Removed Path.GetFileName from fileName parameter
         private string GetThumbnailPath(string galleryName, string fileName)
         {
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             var originalExtension = Path.GetExtension(fileName);
-            // Sanitize file name without extension
-            var sanitizedFileNameWithoutExtension = Path.GetFileName(fileNameWithoutExtension);
-            // Use originalExtension for the thumbnail file name
-            return Path.Combine(GetGalleryPath(galleryName), $"{sanitizedFileNameWithoutExtension}_thumb{originalExtension}");
+            // Construct the path directly, assuming fileName is already just the file name
+            return Path.Combine(GetGalleryPath(galleryName), $"{fileNameWithoutExtension}_thumb{originalExtension}");
         }
 
         // Helper method to generate a thumbnail for an image
-        // MODIFIED: Added logic to use PngEncoder for PNGs to preserve transparency
         private static async Task GenerateThumbnail(string imagePath, string thumbnailPath)
         {
             try
@@ -126,7 +123,6 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                                                 {
                                                     Name = new DirectoryInfo(dir).Name,
                                                     // Count image files, excluding thumbnails
-                                                    // MODIFIED: Use Contains("_thumb") for robustness
                                                     ImageCount = Directory.GetFiles(dir)
                                                                         .Count(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                                                     (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
@@ -162,7 +158,6 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
             // Get all image files (excluding thumbnails) in the gallery directory
             var filesInGallery = Directory.GetFiles(galleryPath)
-                                      // MODIFIED: Use Contains("_thumb") for robustness
                                       .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                   (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                                                    f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
@@ -188,7 +183,6 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                 {
                     GalleryName = galleryName,
                     FileName = fileName,
-                    // MODIFIED: Construct ThumbnailUrl using the original extension for the thumbnail
                     ThumbnailUrl = $"/Galleries/{Uri.EscapeDataString(galleryName)}/{Uri.EscapeDataString(Path.GetFileNameWithoutExtension(fileName))}_thumb{Uri.EscapeDataString(Path.GetExtension(fileName))}",
                     FullImageUrl = $"/Galleries/{Uri.EscapeDataString(galleryName)}/{Uri.EscapeDataString(fileName)}"
                 });
@@ -222,7 +216,6 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
             {
                 GalleryName = galleryName,
                 FileName = fileName,
-                // MODIFIED: Calculate and assign the ThumbnailUrl using the original extension for the thumbnail
                 ThumbnailUrl = $"/Galleries/{Uri.EscapeDataString(galleryName)}/{Uri.EscapeDataString(Path.GetFileNameWithoutExtension(fileName))}_thumb{Uri.EscapeDataString(Path.GetExtension(fileName))}",
                 FullImageUrl = $"/Galleries/{Uri.EscapeDataString(galleryName)}/{Uri.EscapeDataString(fileName)}"
             };
@@ -250,7 +243,6 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                                                 {
                                                     Name = new DirectoryInfo(dir).Name,
                                                     // Count image files, excluding thumbnails
-                                                    // MODIFIED: Use Contains("_thumb") for robustness
                                                     ImageCount = Directory.GetFiles(dir)
                                                                         .Count(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                                                     (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
@@ -453,7 +445,7 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                 return RedirectToAction("ManageGalleryImages", new { galleryName });
             }
 
-            var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "Galleries", galleryName); // Corrected: "Galleries"
+            var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "Galleries", galleryName);
 
             // Ensure the directory exists
             if (!Directory.Exists(uploadsPath))
@@ -477,19 +469,8 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
                 if (imageFile.Length > 0)
                 {
-                    // MODIFIED LINE: Removed the GUID generation for unique filenames
                     var fileName = Path.GetFileName(imageFile.FileName); // Use the original filename
-
                     var filePath = Path.Combine(uploadsPath, fileName);
-
-                    // OPTIONAL: Add a check here if you want to explicitly warn the user if a file with the same name exists.
-                    // If you want to prevent overwrite and show an error:
-                    // if (System.IO.File.Exists(filePath))
-                    // {
-                    //     failedUploads.Add(imageFile.FileName + " (file with same name already exists)");
-                    //     continue;
-                    // }
-                    // If you want to overwrite silently, no extra check is needed here.
 
                     try
                     {
@@ -545,11 +526,19 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                 return RedirectToAction(nameof(ManageGalleryImages), new { galleryName = model.GalleryName });
             }
 
+            // ADDED: Explicitly check for invalid characters in old and new file names
+            if (model.OldFileName.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ||
+                model.NewFileName.Any(c => Path.GetInvalidFileNameChars().Contains(c)))
+            {
+                TempData["ErrorMessage"] = "File names contain invalid characters.";
+                return RedirectToAction(nameof(ManageGalleryImages), new { galleryName = model.GalleryName });
+            }
+
             var galleryPath = GetGalleryPath(model.GalleryName);
             var oldFilePath = GetImagePath(model.GalleryName, model.OldFileName);
             var newFilePath = GetImagePath(model.GalleryName, model.NewFileName);
 
-            if (!Path.GetExtension(model.OldFileName).Equals(System.IO.Path.GetExtension(model.NewFileName), StringComparison.CurrentCultureIgnoreCase))
+            if (!Path.GetExtension(model.OldFileName).Equals(Path.GetExtension(model.NewFileName), StringComparison.CurrentCultureIgnoreCase))
             {
                 TempData["ErrorMessage"] = "The new file name must have the same extension as the old file name.";
                 return RedirectToAction(nameof(ManageGalleryImages), new { galleryName = model.GalleryName });

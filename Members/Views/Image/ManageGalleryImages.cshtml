@@ -74,9 +74,14 @@
                                         
                                         <div class="btn-group mt-2" role="group" aria-label="Image Actions">
 
+                                            @* CRITICAL CHANGE START: Create a sanitized ID for HTML attributes *@
+                                            @{
+                                                var sanitizedImageFileNameForId = image.FileName.Replace(" ", "_").Replace(".", "_");
+                                            }
                                             <span data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Image">
-                                                <button type="button" class="rounded btn btn-sm btn-warning mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@image.FileName.Replace(".", "_")"><i class="bi bi-pencil"></i></button>
+                                                <button type="button" class="rounded btn btn-sm btn-warning mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@sanitizedImageFileNameForId"><i class="bi bi-pencil"></i></button>
                                             </span>
+                                            @* CRITICAL CHANGE END *@
                                             
                                             <form asp-controller="Image" asp-action="DeleteImage" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete \'@image.FileName\'?');">
                                                 <input type="hidden" name="galleryName" value="@image.GalleryName" />
@@ -92,20 +97,21 @@
                                 </div>
                             </div>
 
-                            <div class="modal fade" id="renameImageModal_@image.FileName.Replace(".", "_")" tabindex="-1" aria-labelledby="renameImageModalLabel_@image.FileName.Replace(".", "_")" aria-hidden="true">
+                            @* CRITICAL CHANGE START: Use the sanitized ID for the modal itself and its internal elements *@
+                            <div class="modal fade" id="renameImageModal_@sanitizedImageFileNameForId" tabindex="-1" aria-labelledby="renameImageModalLabel_@sanitizedImageFileNameForId" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form asp-controller="Image" asp-action="RenameImage" method="post">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="renameImageModalLabel_@image.FileName.Replace(".", "_")">Rename Image: @image.FileName</h5>
+                                                <h5 class="modal-title" id="renameImageModalLabel_@sanitizedImageFileNameForId">Rename Image: @image.FileName</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="galleryName" value="@image.GalleryName" />
                                                 <input type="hidden" name="oldFileName" value="@image.FileName" />
                                                 <div class="mb-3">
-                                                    <label for="newFileName_@image.FileName.Replace(".", "_")" class="form-label">New File Name:</label>
-                                                    <input type="text" class="form-control" id="newFileName_@image.FileName.Replace(".", "_")" name="newFileName" value="@image.FileName" required>
+                                                    <label for="newFileName_@sanitizedImageFileNameForId" class="form-label">New File Name:</label>
+                                                    <input type="text" class="form-control" id="newFileName_@sanitizedImageFileNameForId" name="newFileName" value="@image.FileName" required>
                                                 </div>
                                             </div>
 
@@ -129,6 +135,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @* CRITICAL CHANGE END *@
                         }
                     </div>
                 }
@@ -197,7 +204,7 @@
                     alertElement.addEventListener('transitionend', function() {
                         alertElement.remove(); // Remove the alert element from the DOM
                     }, { once: true }); // The '{ once: true }' option ensures the event listener is automatically removed after it fires once.
-                }, 2500); // 5000 milliseconds = 5 seconds: Time before the alert starts to fade out.
+                }, 2500); // 2500 milliseconds = 2.5 seconds: Time before the alert starts to fade out.
             });
         });
     </script>
