@@ -16,12 +16,47 @@
     font-size: 16px;
 }
 
+.nav-item-one {
+    padding-top: 50px;
+}
+
+.logo {
+    height: 60px;
+}
+
+.nbLogo {
+    height: 18px;
+}
+
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
 @media (min-width: 575px) and (max-width: 768px) {
 
     #mainContainer {
         margin-top: 30px;
-    }   
+    }
+    .nbLogo {
+        height: 18px;
+    }
+
+    #mainContainer {
+        margin-top: 30px;
+    }
+
+    .nav-item-one {
+        padding-top: 47px;
+    }
+
+    .nav-link-fs {
+        font-size: 18px;
+    }
+
+    .link-fs {
+        font-size: 20px;
+    }
+
+    .nav-text-fs {
+        font-size: 18px;
+    }
 
 }
 /* #endregion  */
@@ -32,15 +67,57 @@
     #mainContainer {
         margin-top: 30px;
     }
+
+    .viewContainer {
+        border-right: 16px solid darkgoldenrod;
+        border-left: 16px solid darkgoldenrod;
+    }
+
+    .nav-item-one {
+        padding-top: 0;
+    }
+
+    .nav-link-fs {
+        font-size: 24px;
+    }
+
+    .link-fs {
+        font-size: 16px;
+    }
+
+    .nav-text-fs {
+        font-size: 18px;
+    }
 }
 /* #endregion */
 
 /* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
 @media (min-width: 992px) {
 
-    #mainContainer {       
-        padding-top: 30px;
-    }   
+    #mainContainer {
+        margin-top: 30px;
+    }
+
+    .viewContainer {
+        border-right: 16px solid darkgoldenrod;
+        border-left: 16px solid darkgoldenrod;
+    }
+
+    .nav-item-one {
+        padding-top: 0;
+    }
+
+    .nav-link-fs {
+        font-size: 24px;
+    }
+
+    .link-fs {
+        font-size: 16px;
+    }
+
+    .nav-text-fs {
+        font-size: 24px;
+    }
       
 }
 /* #endregion*/

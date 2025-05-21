@@ -29,7 +29,7 @@
                     <form method="post">
 
                         <!-- Alert -->
-                        <div asp-validation-summary="All" class="text-danger text-center xmb-3" role="alert"></div>
+                        <div asp-validation-summary="All" class="text-danger text-center" role="alert"></div>
 
                         <!-- Email field -->
                         <div class="form-floating mb-3">
@@ -42,17 +42,14 @@
                         <div class="d-flex justify-content-between">
 
                             <!-- Cancel -->
-                            <a href="~/" class="btn btn-sm btn-secondary me-2"
-                               data-bs-toggle="tooltip" data-bs-placement="top" title="Discard Changes and Return Home">
+                            <a href="~/" class="btn btn-sm btn-secondary me-2" title="Discard Changes and Return Home">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
-                            <!-- Send -->
-                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Send Information">
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-arrow-clockwise"></i> Send
-                                </button>
-                            </span>
+                            <!-- Send -->                            
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-arrow-clockwise"></i> Send
+                            </button>
 
                         </div>
                     </form>

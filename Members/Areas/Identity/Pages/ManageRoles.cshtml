@@ -21,7 +21,7 @@
                 {
                 <h4 class="text-center">User: @Model.UserToEdit.UserName</h4>
                     
-                @* Display Status Message *@
+                <!-- Display Status Message -->
                 <partial name="_StatusMessage" for="StatusMessage" />
 
                 <form method="post">
@@ -30,7 +30,7 @@
 
                     <!-- Hidden fields to pass essential data on post -->
                     <input type="hidden" asp-for="UserId" />
-                    <input type="hidden" asp-for="ReturnUrl" /> @* Pass the ReturnUrl back on post *@
+                    <input type="hidden" asp-for="ReturnUrl" />
 
                     <!-- Validation -->
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
@@ -76,7 +76,7 @@
                                         }
                                         else
                                         {
-                                            @* Render enabled checkbox for other roles or if user is Admin *@
+                                            <!-- Render enabled checkbox for other roles or if user is Admin -->
                                             <input type="checkbox" asp-for="AllRoles[i].Selected"
                                                     class="form-check-input"
                                                     id="role-@i"
@@ -95,7 +95,7 @@
                                 <p>No roles available.</p>
                             }
 
-                        </div> <!-- End Select Roles-->
+                        </div>
 
                     </div>
 
@@ -106,27 +106,24 @@
                         <div class="row gx-0 justify-content-center">
 
                             <!-- Cancel Button -->
-                            <div class="col-6 text-end pe-2">
-                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Changes">
-                                    <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
-                                        <i class="bi bi-box-arrow-left"></i> Cancel
-                                    </button>
-                                </span>
+                            <div class="col-6 text-end pe-2">                                
+                                <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
+                                    <i class="bi bi-box-arrow-left"></i> Cancel
+                                </button>
                             </div>
 
-                            <div class="col-6 text-start ps-2">
-                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Save Changes">
-                                    <button type="submit" class="btn btn-sm btn-primary me-2">
-                                        <i class="bi bi-save"></i> Save
-                                    </button>
-                                </span>
+                            <!-- Save -->
+                            <div class="col-6 text-start ps-2">                                
+                                <button type="submit" class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-save"></i> Save
+                                </button>
                             </div>
 
-                        </div> <!-- End Button Row -->
+                        </div>
 
-                    </div> <!-- End Buttons-->
+                    </div>
 
-                </form> <!-- End Form -->
+                </form>
                 }
                 else
                 {

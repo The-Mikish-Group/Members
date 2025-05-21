@@ -5,12 +5,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center mt-4 mb-2">
-    <h3><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
+<div class="text-centertext-gold-darker mt-4 mb-2">
+    <h3><i class="bi bi-list-ul ms-2 "></i> @ViewData["Title"]</h3>
 </div>
 
 <div class="row mx-0 p-0 mb-3">
     <div class="col-md-8 mx-auto p-2 my-0">
+
         <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
             <div class="card-body m-1 p-2">
                 <div class="text-center mb-2">
@@ -20,15 +21,15 @@
                     @Html.AntiForgeryToken()
                     <div class="row">
                         <div class="col-8 px-0">
-                            <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
-                            <input type="text" class="form-control rounded-end-0" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
+                            <label for="newCategoryName" class="form-label visually-hidden text-gold-darker">Category Name</label>
+                            <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
                         </div>
                         <div class="col-2 px-0">
-                            <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
+                            <label for="newSortOrder" class="form-label visually-hidden text-gold-darker">Sort Order</label>
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
-                            <button type="submit" class="btn btn-primary rounded-start-0 w-100"><i class="bi bi-upload"></i></button>
+                            <button type="submit" class="btn btn-primary no-left-radius w-100"><i class="bi bi-upload"></i></button>
                         </div>
                     </div>
                 </form>
@@ -51,10 +52,10 @@
                     <table class="w-100">
                         <thead>
                             <tr class="bg-gold-dark text-white">
-                                <th id="EditHeader"><span class="header-text ps-2">Edit</span></th>
-                                <th id="CategoryHeader"><span class="header-text">Category</span></th>
-                                <th id="SortHeader"><span class="header-text">Sort</span></th>
-                                <th id="DeleteHeader" class="text-end"><span class="header-text pe-2">Delete</span></th>
+                                <th id="EditHeader"><span class="header-text text-gold-darker ps-2">Rename</span></th>
+                                <th id="CategoryHeader"><span class="header-text text-gold-darker">Category</span></th>
+                                <th id="SortHeader"><span class="header-text text-gold-darker">Sort</span></th>
+                                <th id="DeleteHeader" class="text-end text-gold-darker"><span class="header-text pe-2">Delete</span></th>
                             </tr>
                         </thead>
 
@@ -102,8 +103,7 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles"
-                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit PDF Category Files">
+                <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -122,16 +122,16 @@
                 
                 <div class="row mb-2 align-items-center">
                     <div class="col-3"> 
-                        <label for="newCategoryName" class="col-form-label">New Name:</label>
+                        <label for="newCategoryName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
                     </div>
                     <div class="col-9"> 
                         <input type="text" class="form-control" id="newCategoryNameInput" name="newCategoryName">
                     </div>
                 </div>
 
-                <div class="row align-items-center">
+                <div class="row mb-1 align-items-center">
                      <div class="col-3">
-                        <label for="newSortOrder" class="col-form-label">Sort Order:</label>
+                        <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
                      </div>
                      <div class="col-9">
                         <input type="number" class="form-control" id="newSortOrderInput" name="newSortOrder" min="0">
@@ -141,17 +141,15 @@
             
             <div class="modal-footer">
 
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Discard Changes and Close">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-box-arrow-left"></i> Cancel
-                    </button>
-                </span>
+                <!-- Cancel Button -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-box-arrow-left"></i> Cancel
+                </button>
 
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Save All Changes">
-                    <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
-                        <i class="bi bi-save-fill"></i> Save Changes
-                    </button>
-                </span>
+                <!-- Save Button -->
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
+                    <i class="bi bi-save-fill"></i> Save Changes
+                </button>
 
             </div>
 
@@ -174,22 +172,7 @@
          .even-row > td,
          .odd-row > td {
              background-color: inherit !important;
-         }
-
-        /* Styles for consistent input group rounding */
-        .rounded-end-0 {
-             border-top-right-radius: 0 !important;
-             border-bottom-right-radius: 0 !important;
-        }
-
-         .rounded-0 {
-             border-radius: 0 !important;
-         }
-
-        .rounded-start-0 {
-             border-top-left-radius: 0 !important;
-             border-bottom-left-radius: 0 !important;
-        }
+         }        
 
          /* Specific styles for the 'Add Category' sort order input if needed */
         #newSortOrder.rounded-0 {
@@ -217,12 +200,7 @@
         /* Remove the top border of the modal footer to get rid of the line above the buttons */
         #renameModal .modal-footer {
             border-top: none;
-        }
-
-        /* Optional: Remove other modal borders if desired */
-        /* #renameModal .modal-header { border-bottom: none; } */
-        /* #renameModal .modal-body { border-bottom: none; } */
-
+        } 
 
     </style>
 }

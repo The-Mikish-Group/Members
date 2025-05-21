@@ -18,6 +18,17 @@ body {
     
 }
 
+/* No Radius Right or  Left */
+.no-right-radius {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.no-left-radius {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
 .video-container {
     position: relative;
     height: 100%;
@@ -30,15 +41,7 @@ body {
     }
 }
 
-.upload-file-input {
-   /* border-right: solid;
-    border-top-right-radius: 0.375rem;
-    border-bottom-right-radius: 0.375rem;*/
-   
-}
-
-.upload-button {
-    /*border-radius: 0.375rem;*/
+.upload-button {    
     position: static;
     transform: none;
     height: 100%; 
@@ -47,10 +50,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0.35rem 0.75rem;
-    font-size: 0.875rem;
-    /*border: 1px solid #ced4da;*/
+    font-size: 0.875rem;    
     background-color: transparent;
-    /*color: white;*/
     line-height: 1.5;
 }
 
@@ -131,17 +132,7 @@ html > body header {
     transform: translateY(-10%);
 }
 
-.nav-item-one {
-    padding-top: 50px;
-}
 
-.logo {
-    height: 60px;
-}
-
-.nbLogo {
-    height: 18px;
-}
 
 /* Adjust form styling within nav-item to prevent misalignment */
 .navbar-nav .nav-item form.form-inline {
@@ -343,12 +334,8 @@ img {
         background-color: #C72D27; /* bg-red-dark*/
     }
 
-
-/* Responsive Nav colors */
 .siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
-    padding-left: 120px;
-   /* color: #4f7d1f !important;
-    transition: color 0.3s ease;*/
+    padding-left: 120px;   
 }
 
 /* #endregion */
@@ -405,29 +392,7 @@ img {
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Small tablet styles */
 @media (min-width: 575px) and (max-width: 768px) {
-    .nbLogo {
-        height: 18px;
-    }
-
-    #mainContainer {
-        margin-top: 30px;
-    }
-
-    .nav-item-one {
-        padding-top: 47px;
-    }   
-
-    .nav-link-fs {
-        font-size: 18px;
-    }
-
-    .link-fs {
-        font-size: 20px;
-    }
-
-    .nav-text-fs {
-        font-size: 18px;
-    }
+    
 }
 
 /* #endregion */
@@ -435,73 +400,20 @@ img {
 /* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
 @media (min-width: 768.01px) and (max-width: 991px) {
 
-    #mainContainer {
-        margin-top: 30px;
-    }
-
-    .viewContainer {
-        border-right: 16px solid darkgoldenrod;
-        border-left: 16px solid darkgoldenrod;
-    }
-
-    .nav-item-one {
-        padding-top: 0;
-    }
-
-    .nav-link-fs {
-        font-size: 24px;
-    }
-
-    .link-fs {
-        font-size: 16px;
-    }
-
-    .nav-text-fs {
-        font-size: 18px;
-    }
+    
 }
 /* #endregion */
 
 /* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
 @media (min-width: 992px) {
-
-    #mainContainer {
-        margin-top: 30px;
-    }
-
-    .viewContainer {
-        border-right: 16px solid darkgoldenrod;
-        border-left: 16px solid darkgoldenrod;
-    }
-
-    .nav-item-one {
-        padding-top: 0;
-    }
-
-    .nav-link-fs {
-        font-size: 24px;
-    }
-
-    .link-fs {
-        font-size: 16px;
-    }
-
-    .nav-text-fs {
-        font-size: 24px;
-    }
-
-    /*.nav-link-footer-fs {
-        font-size: 12px;
-    }*/
+   
 }
 
 /* #endregion */
 
 /* #region (min-width: 1200px) */
 @media (min-width: 1200px) {
-    /*.nav-link-footer-fs {
-        font-size: 14px;
-    }*/
+    
 }
 
 /* #endregion */

@@ -5,34 +5,41 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Title -->
 <div class="text-center mt-4 mb-2">
     <h3><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
 </div>
 
+<!-- Row and Column -->
 <div class="row mx-0 p-0 mb-3">
     <div class="col-md-8 mx-auto p-2 my-0">
+
+        <!-- Card with Shadow -->
         <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
             <div class="card-body m-1 p-2">
+
+                <!-- Heading: Add a New Category -->
                 <div class="text-center mb-2">
                     <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
                 </div>
+
+                <!-- Create Category form -->
                 <form id="addCategoryForm" method="post" asp-action="CreateCategory">
                     <div class="row">
                         <div class="col-8 px-0">
                             <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
-                            <input type="text" class="form-control rounded-end-0" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
+                            <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
                         </div>
                         <div class="col-2 px-0">
                             <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
-                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Add Item">
-                                <button type="submit" class="btn btn-primary rounded-start-0 w-100">Add</button>
-                            </span>
+                            <button type="submit" class="btn btn-primary no-left-radius w-100">Add</button>
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -110,8 +117,7 @@
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pt-2 pe-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-back" href="/PdfCategory/ManageCategoryFiles"
-                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit PDF Category Files">
+                <a class="btn btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -134,22 +140,6 @@
             .odd-row > td {
                 background-color: inherit !important;
             }
-
-        .no-right-radius {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .no-left-radius {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-
-        .no-right-radius-sort {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
 
         .delete-button i {
             font-size: 0.9em;

@@ -9,8 +9,8 @@
 }
 
 <!-- Title -->
-<div class="d-flex justify-content-center mt-4 mb-2">
-    <h1><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h1>
+<div class="d-flex justify-content-center text-gold-darker mt-4 mb-2">
+    <h1><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h1>
 </div>
 
 <!-- Category Selection Dropdown -->
@@ -18,7 +18,7 @@
     <div class="shadow-none border rounded col-md-8 bg-Card-Menu p-2">
         <div class="form-group mt-2">
             <div class="pb-2">
-                <label for="categoryId" id="categoryLabel" class="fw-bold">Select a Category:</label>
+                <label for="categoryId" id="categoryLabel" class="fw-bold text-gold-darker">Select a Category:</label>
             </div>
             <div class="input-group" style="position: relative;">
                 <select id="categoryId" class="form-control rounded">
@@ -45,7 +45,7 @@
             <!-- Add a New File Section -->
             <div class="mt-2">
                 <div class="pb-2">
-                    <label for="file" class="fw-bold">Add a New File:</label>
+                    <label for="file" class="fw-bold text-gold-darker">Add a New File:</label>
                 </div>
 
                 <form method="post" class="mx-auto" asp-action="UploadFileToCategory" asp-controller="PdfCategory" asp-route-categoryId="@ViewBag.SelectedCategoryId" enctype="multipart/form-data">
@@ -61,8 +61,8 @@
                             </div>
                         </div>
                         <div class="col-2 px-0">
-                            <label for="sortOrder" class="form-label visually-hidden">Sort Order</label>
-                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius-sort shadow-none" min="1" id="sortOrder" />
+                            <label for="sortOrder" class="form-label visually-hidden text-gold-darker">Sort Order</label>
+                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius shadow-none" min="1" id="sortOrder" />
                         </div>
                         <div class="col-2 ps-0">
                             <div class="input-group">
@@ -88,11 +88,11 @@
                         <table class="w-100">
                             <thead>
                                 <tr>
-                                    <th>Edit</th>
-                                    <th>View</th>
-                                    <th>Name</th>
-                                    <th>Sort</th>
-                                    <th class="text-end">Delete</th>
+                                    <th class="text-gold-dark">Rename</th>
+                                    <th class="text-gold-dark">View</th>
+                                    <th class="text-gold-dark">Name</th>
+                                    <th class="text-gold-dark">Sort</th>
+                                    <th class="text-gold-dark text-end">Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,13 +105,11 @@
                                                             data-category-id="@ViewBag.CategoryId">
 
                                         <td class="p-0">
-                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Rename File">
-                                                <button type="button" class="btn btn-sm btn-rename py-2 px-2"
-                                                        data-bs-toggle="modal" data-bs-target="#renameModal"
-                                                        onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@ViewBag.CategoryId')">
-                                                    <i class="bi bi-pencil-square px-0"></i>
-                                                </button>
-                                            </span>
+                                            <button type="button" class="btn btn-sm btn-rename py-2 px-2"
+                                                    data-bs-toggle="modal" data-bs-target="#renameModal"
+                                                    onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@ViewBag.CategoryId')">
+                                                <i class="bi bi-pencil-square px-0"></i>
+                                            </button>
                                         </td>
 
                                         <td class="p-0">
@@ -124,11 +122,10 @@
                                         <td class="text-end p-0">
                                             <form method="post" asp-action="DeleteFileFromCategory" asp-controller="PdfCategory" asp-route-id="@file.FileID" asp-route-categoryId="@ViewBag.SelectedCategoryId" class="d-inline">
 
-                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete File">
-                                                    <button type="submit" class="btn btn-delete py-2 px-2" onclick="return confirm('Are you sure you want to delete the file: @file.FileName?');">
-                                                        <i class="bi bi-trash-fill px-0"></i>
-                                                    </button>
-                                                </span>
+                                                <!-- Delete Button -->
+                                                <button type="submit" class="btn btn-delete py-2 px-2" onclick="return confirm('Are you sure you want to delete the file: @file.FileName?');">
+                                                    <i class="bi bi-trash-fill px-0"></i>
+                                                </button>
 
                                             </form>
                                         </td>
@@ -138,8 +135,7 @@
                         </table>
                     }
                     else
-                    {
-                        <!-- Corrected: Use a div instead of a tr when no table is rendered -->
+                    {                        
                         <div class="text-center text-gold-darker mt-2">
                             No files found for this category.
                         </div>
@@ -158,18 +154,18 @@
                                     <input type="hidden" id="oldFileName" name="oldFileName" />
 
                                     <!-- Form controls using Bootstrap grid within modal-body -->
-                                    <div class="row mb-3 align-items-center">
+                                    <div class="row mb-2 align-items-center">
                                         <div class="col-3">
-                                            <label for="newFileName" class="col-form-label">New Name:</label>
+                                            <label for="newFileName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
                                         </div>
                                         <div class="col-9">
                                             <input type="text" class="form-control" id="newFileName" name="newFileName">
                                         </div>
                                     </div>
 
-                                    <div class="row align-items-center">
+                                    <div class="row align-items-center mb-1">
                                         <div class="col-3">
-                                            <label for="newSortOrder" class="col-form-label">Sort Order:</label>
+                                            <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
                                         </div>
                                         <div class="col-9">
                                             <input type="number" class="form-control" id="newSortOrder" name="newSortOrder" min="0">
@@ -263,11 +259,6 @@ else
             border-top: none;
         }
 
-        /* Optional: Remove other modal borders if desired */
-        /* #renameModal .modal-header { border-bottom: none; } */
-        /* #renameModal .modal-body { border-bottom: none; } */
-
-
         /* styles for alternating table rows */
         #categoryFilesContainer table tbody tr.even-row {
             background-color: antiquewhite !important;
@@ -275,23 +266,7 @@ else
 
         #categoryFilesContainer table tbody tr.odd-row {
             background-color: #ffffff !important; /* White */
-        }
-
-        /* Styles for other input groups and related elements */
-        .no-right-radius {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .no-left-radius {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-
-        .no-right-radius-sort {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
+        } 
 
         /* Delete button icon size */
         .delete-button i {

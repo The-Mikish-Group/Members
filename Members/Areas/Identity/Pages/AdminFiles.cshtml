@@ -53,7 +53,7 @@
                     <!-- Delete -->
                     <div class="col-6 text-end">
                         <p class="pe-2 text-gold-darker">
-                            <strong data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">Delete</strong>
+                            <strong>Delete</strong>
                         </p>
                     </div>
 
@@ -72,9 +72,7 @@
                                     var rowClass = fileIndex % 2 == 0 ? "even-row" : "odd-row";
                                     <li class="list-group-item @rowClass">
                                         <div class="row align-items-center">
-                                            @* <div class="col-auto me-2">
-                                                <button type="button" class="btn-link btn btn-sm btn-rename" data-filename="@file"><i class="bi bi-pencil-square"></i></button>
-                                            </div> *@
+                                            
                                             <div class="col d-flex align-items-center">
                                                 <span class="flex-grow-1 d-block text-gold-darker" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
                                             </div>
@@ -85,17 +83,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                   @*  <li class="list-group-item d-none" id="rename-@file">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm" name="newFileName" placeholder="New file name">
-                                            <button type="submit" asp-page-handler="UpdateRename" class="btn btn-sm btn-primary update-rename-button" data-oldfilename="@file">
-                                                <i class="bi bi-pencil-fill"></i> <span class="d-none d-lg-inline">Rename</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger cancel-rename" data-file="@file">
-                                                <i class="bi bi-arrow-return-left"></i> <span class="d-none d-lg-inline">Cancel</span>
-                                            </button>
-                                        </div>
-                                    </li> *@
+                                  
                                     fileIndex++;
                                 }
                             </ul>
@@ -127,26 +115,9 @@
                 background-color: inherit !important;
             }
 
-        .no-right-radius {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .no-left-radius {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-
-        .no-right-radius-sort {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-
         .delete-button i {
             font-size: 1.0em;
         }
-
 
         .btn-rename i {
             font-size: 1.0em;

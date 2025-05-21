@@ -6,142 +6,141 @@
     var currentGalleryName = ViewBag.GalleryName as string; // Get the gallery name once
 }
 
-<h1 class="text-center mt-4 mb-2">Manage Images for:<br />@ViewBag.GalleryName</h1>
-
-<div class="text-center mb-3">
-    <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
-</div>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    @* Ensure `fade show` classes are present *@
-    <div class="alert alert-success fade show auto-hide-alert" role="alert">
-        @TempData["SuccessMessage"]
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    @* Ensure `fade show` classes are present *@
-    <div class="alert alert-danger fade show auto-hide-alert" role="alert">
-        @TempData["ErrorMessage"]
-    </div>
-}
-
 <div class="row gx-1 gy-0 m-2">
-    <div class="col-md-8 mx-auto">
-        
-        <div class="card shadow rounded p-2 bg-Card-Menu h-100">
+    <div class="col-md-8 col-lg-10 mx-auto">
+
+        <h1 class="text-center mt-4 mb-2">Manage Images for:<br />@ViewBag.GalleryName</h1>
+
+        <div class="text-center mb-3">
+            <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {            
+            <div class="alert alert-success fade show auto-hide-alert" role="alert">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {            
+            <div class="alert alert-danger fade show auto-hide-alert" role="alert">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+       
+        <div class="card shadow rounded p-2 bg-Card-Menu">
             
-            <h2 class="mt-4 mb-2 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>    
+            <h2 class="mt-4 mb-2 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
             
-            @* CRITICAL: Ensure enctype="multipart/form-data" is present *@
             <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="galleryName" value="@currentGalleryName" />
 
                 <div class="input-group">
-                    @* CRITICAL: Ensure name="ImageFiles" matches the controller parameter *@
+                    
                     <input type="file" name="ImageFiles" class="form-control" accept="image/*" required multiple>
 
-                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Upload Image">
                         <button type="submit" class="btn btn-primary no-left-radius">
                             <i class="bi bi-cloud-arrow-up"></i>
                         </button>
-                    </span>
+
                 </div>
                 @Html.AntiForgeryToken()
             </form>
+        </div>
+
+        <div class="card shadow rounded p-2 bg-Card-Menu mt-4">
 
             @if (Model != null && Model.Any())
-                {
-                    <h2 class="mt-4 mb-2 ps-2">
-                        <i class="bi bi-images"></i> Existing Images
-                    </h2>
+                {                   
+                <h2 class="mt-4 mb-2 ps-2">
+                    <i class="bi bi-images"></i> Existing Images
+                </h2>
 
-                    <div class="row gx-1 gy-0 m-1">
-                        @foreach (var image in Model)
-                        {
-                            <div class="col-md-6 col-lg-4 col-xl-4 mb-2">
+                <div class="row gx-1 gy-0 m-1">
+                    @foreach (var image in Model)
+                    {
+                        <div class="col-md-6 col-lg-3 col-xl-2 mb-2">
 
-                                <div class="card shadow rounded p-2 bg-Card-Menu h-100">
+                            <div class="card shadow rounded p-2 bg-Card-Menu h-100">
 
-                                    <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
-                                        <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
-                                    </a>
+                                <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
+                                    <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
+                                </a>
                                     
-                                    <div class="card-body text-center">
+                                <div class="card-body text-center">
 
-                                        <p class="card-text">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
+                                    <p class="card-text">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
                                         
-                                        <div class="btn-group mt-2" role="group" aria-label="Image Actions">
+                                    <div class="btn-group mt-2" role="group" aria-label="Image Actions">
 
-                                            @* CRITICAL CHANGE START: Create a sanitized ID for HTML attributes *@
-                                            @{
-                                                var sanitizedImageFileNameForId = image.FileName.Replace(" ", "_").Replace(".", "_");
-                                            }
-                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Rename Image">
-                                                <button type="button" class="rounded btn btn-sm btn-warning mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@sanitizedImageFileNameForId"><i class="bi bi-pencil"></i></button>
-                                            </span>
-                                            @* CRITICAL CHANGE END *@
                                             
-                                            <form asp-controller="Image" asp-action="DeleteImage" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete \'@image.FileName\'?');">
-                                                <input type="hidden" name="galleryName" value="@image.GalleryName" />
-                                                <input type="hidden" name="fileName" value="@image.FileName" />
+                                        @{
+                                            var sanitizedImageFileNameForId = image.FileName.Replace(" ", "_").Replace(".", "_");
+                                        }
 
-                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Image">
-                                                    <button type="submit" class="rounded btn btn-sm btn-danger mx-2"><i class="bi bi-x-circle"></i></button>
-                                                </span>
-
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            @* CRITICAL CHANGE START: Use the sanitized ID for the modal itself and its internal elements *@
-                            <div class="modal fade" id="renameImageModal_@sanitizedImageFileNameForId" tabindex="-1" aria-labelledby="renameImageModalLabel_@sanitizedImageFileNameForId" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form asp-controller="Image" asp-action="RenameImage" method="post">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="renameImageModalLabel_@sanitizedImageFileNameForId">Rename Image: @image.FileName</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="galleryName" value="@image.GalleryName" />
-                                                <input type="hidden" name="oldFileName" value="@image.FileName" />
-                                                <div class="mb-3">
-                                                    <label for="newFileName_@sanitizedImageFileNameForId" class="form-label">New File Name:</label>
-                                                    <input type="text" class="form-control" id="newFileName_@sanitizedImageFileNameForId" name="newFileName" value="@image.FileName" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="modal-footer">
-
-                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Close Window">
-                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-                                                        <i class="bi bi-x-circle"></i> Close
-                                                    </button>
-                                                </span>
-
-                                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Apply Rename">
-                                                    <button type="submit" class="btn btn-sm btn-primary">
-                                                        <i class="bi bi-pencil"></i> Rename
-                                                    </button>
-                                                </span>
-
-                                            </div>
+                                        <!-- Rename -->
+                                        <button type="button" class="rounded btn btn-sm btn-success mx-2" data-bs-toggle="modal" data-bs-target="#renameImageModal_@sanitizedImageFileNameForId"><i class="bi bi-pencil-square px-0"></i></button>                                                
+                                            
+                                        <!-- Delete Dialog -->
+                                        <form asp-controller="Image" asp-action="DeleteImage" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete \'@image.FileName\'?');">
+                                            <input type="hidden" name="galleryName" value="@image.GalleryName" />
+                                            <input type="hidden" name="fileName" value="@image.FileName" />
+                                                
+                                            <!-- Delete Button -->
+                                            <button type="submit" class="rounded btn btn-sm btn-danger mx-2"><i class="bi bi-x-circle"></i></button>                      
 
                                         </form>
+
                                     </div>
                                 </div>
                             </div>
-                            @* CRITICAL CHANGE END *@
-                        }
-                    </div>
+                        </div>
+                            
+                        <!-- Modal Rename Form -->
+                        <div class="modal fade" id="renameImageModal_@sanitizedImageFileNameForId" tabindex="-1" aria-labelledby="renameImageModalLabel_@sanitizedImageFileNameForId" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form asp-controller="Image" asp-action="RenameImage" method="post">                                      
+                                        <div class="modal-body">
+
+                                            <!-- Gallery Name and Old file Name -->
+                                            <input type="hidden" name="galleryName" value="@image.GalleryName" />
+                                            <input type="hidden" name="oldFileName" value="@image.FileName" />
+
+                                            <!-- New File Name -->
+                                            <div class="mb-2">
+                                                <label for="newFileName_@sanitizedImageFileNameForId" class="form-label fw-bold">New File Name:</label>
+                                                <input type="text" class="form-control" id="newFileName_@sanitizedImageFileNameForId" name="newFileName" value="@image.FileName" required>
+                                            </div>
+
+                                            <!-- Buttons -->
+                                            <div class="modal-footer p-0">
+
+                                                <!-- Cancel button -->
+                                                <button type="button" class="btn btn-sm btn-secondary me-2" data-bs-dismiss="modal" aria-label="Cancel">
+                                                    <i class="bi bi-box-arrow-left"></i> Cancel
+                                                </button>
+
+                                                <!-- Save Changes Button -->
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-pencil-square px-0"></i> Save Changes
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                            
+                    }
+                </div>                    
                 }
                 else
                 {
-                    <div class="text-center text-gold-dark">This gallery is empty. Upload images above!</div>
+                    <div class="text-center text-gold-dark py-4">This gallery is empty. Upload images above!</div>
                 }    
             
         </div>
@@ -173,15 +172,11 @@
             transform: scale(1.02);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
-        .no-right-radius {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .no-left-radius {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
+        /* Remove the top border of the modal footer to get rid of the line above the buttons */
+        .modal-footer {
+            border-top: none;
+        } 
+        
     </style>
 }
 
@@ -195,15 +190,10 @@
 
             alertsToAutoHide.forEach(function(alertElement) {
                 setTimeout(function() {
-                    // 1. Remove the 'show' class to trigger the CSS fade-out transition.
-                    //    Bootstrap's CSS handles the animation when 'show' is removed.
                     alertElement.classList.remove('show');
-
-                    // 2. Listen for the 'transitionend' event. This ensures the element is
-                    //    removed from the DOM only after the fade-out animation is complete.
                     alertElement.addEventListener('transitionend', function() {
-                        alertElement.remove(); // Remove the alert element from the DOM
-                    }, { once: true }); // The '{ once: true }' option ensures the event listener is automatically removed after it fires once.
+                        alertElement.remove();
+                    }, { once: true });
                 }, 2500); // 2500 milliseconds = 2.5 seconds: Time before the alert starts to fade out.
             });
         });
