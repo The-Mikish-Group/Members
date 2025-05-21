@@ -5,10 +5,10 @@
 }
 
 <!-- Gallery Name -->
-<h1 class="text-center text-gold-darker my-2">Gallery: @ViewBag.GalleryName</h1>
+<h1 class="text-center text-gold-darker mt-4 mb-2">Gallery: @ViewBag.GalleryName</h1>
 
 <!-- Back to Galleries Button -->
-<div class="text-center mb-3">
+<div class="text-center mt-2 mb-2">
     <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back"
        data-bs-toggle="tooltip" data-bs-placement="top" title="Back to Gallery List">
         <i class="bi bi-box-arrow-left"></i> Back to Galleries
@@ -16,7 +16,7 @@
 </div>
 
 <div class="text-center mb-3">
-    <h5 class="text-gold-dark">(Click to Enlarge)</h5> 
+    <h6 class="text-gold-dark">(Click to Enlarge)</h6> 
 </div>
 
 @if (TempData["SuccessMessage"] != null)

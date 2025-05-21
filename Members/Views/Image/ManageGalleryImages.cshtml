@@ -6,7 +6,7 @@
     var currentGalleryName = ViewBag.GalleryName as string; // Get the gallery name once
 }
 
-<h1 class="text-center my-2">Manage Images for: @ViewBag.GalleryName</h1>
+<h1 class="text-center mt-4 mb-2">Manage Images for:<br />@ViewBag.GalleryName</h1>
 
 <div class="text-center mb-3">
     <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
