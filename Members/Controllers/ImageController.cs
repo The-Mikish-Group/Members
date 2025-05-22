@@ -50,7 +50,7 @@ namespace Members.Controllers
         }
 
         // Helper method to generate a thumbnail for an image
-        private async Task GenerateThumbnail(string imagePath, string thumbnailPath)
+        private static async Task GenerateThumbnail(string imagePath, string thumbnailPath)
         {
             try
             {
@@ -469,7 +469,7 @@ namespace Members.Controllers
             }
 
             int successfulUploads = 0;
-            List<string> failedUploads = new List<string>();
+            List<string> failedUploads = [];
 
             foreach (var imageFile in ImageFiles)
             {
