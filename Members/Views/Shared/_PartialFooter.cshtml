@@ -22,7 +22,7 @@
                     <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/">Welcome</a></li>
                     <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/About">About Us</a></li>
                     <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Info/Facilities">Facilities</a></li>
-                    @* <li class="nav-item text-light"><a class="nav-link footer-fs" href="~/Oaks">Galleries</a></li> *@
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Image/GalleryList">Galleries</a></li>
                 </ul>
             </div>
 
@@ -39,8 +39,11 @@
                         <a class="nav-link footer-fs" href="~/Info/MoreLinks">More Links</a>
                     </li>
 
-                    <!-- Members Dropdown in the footer -->
-                    <li class="nav-item dropdown pt-0 pt-lg-0">
+                     <!-- Members Dropdown -->
+                    @if (SignInManager.IsSignedIn(User))
+                    { 
+                        <!-- Members Dropdown in the footer -->
+                        <li class="nav-item dropdown pt-0 pt-lg-0">
 
                         <!-- Members Dropdown Toggle in the footer -->
                         <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="membersfooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -98,6 +101,8 @@
                             </li>
                         </ul>
                     </li>
+                    }
+
                 </ul>
             </div>
 

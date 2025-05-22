@@ -51,7 +51,7 @@
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Index"><i class="bi bi-house-fill"></i> Welcome</a></li>
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="About"><i class="bi bi-info-circle-fill"></i> About</a></li>
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Facilities"><i class="bi bi-building-fill"></i> Facilities</a></li>
-                        @* <li><a class="nav-link text-dark" href="~/Oaks"><i class="bi bi-images"></i> Galleries</a></li> *@
+                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="GalleryList"><i class="bi bi-image me-2"></i> Galleries</a></li>
                     </ul>
                 </li>              
 
@@ -63,7 +63,9 @@
                 </li>
 
                 <!-- Members Dropdown -->
-                <li class="nav-item dropdown pt-0">
+                @if (SignInManager.IsSignedIn(User))
+                {                   
+                    <li class="nav-item dropdown pt-0">
 
                     <!-- Members Dropdown Toggle -->
                     <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -116,13 +118,11 @@
                                     }
                                 }
                             </ul>
-                        </li>
-                        <li>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="GalleryList"><i class="bi bi-image me-2"></i> Galleries</a>
-                        </li>
+                        </li>                       
 
                     </ul>
                 </li>
+                }                
 
                 @if (SignInManager.IsSignedIn(User))
                 {

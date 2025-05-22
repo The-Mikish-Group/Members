@@ -2,18 +2,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats; // ADDED: For IImageEncoder
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png; // ADDED: For PNG encoding
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
-using Microsoft.AspNetCore.Hosting; // Make sure this is included for IWebHostEnvironment
-using Microsoft.AspNetCore.Http; // Make sure this is included for IFormFile
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic; // Make sure this is included for IEnumerable<IFormFile>
-using System; // Make sure this is included for Guid and Exception
-using System.Threading.Tasks; // Make sure this is included for async/await
+using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
-namespace Members.Controllers // Assuming your controllers are in the Members.Controllers namespace
+namespace Members.Controllers
 {
     public class ImageController(IWebHostEnvironment webHostEnvironment) : Controller
     {
@@ -31,34 +32,30 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
         }
 
         // Helper method to get the full path to an image file
-        // MODIFIED: Removed Path.GetFileName from fileName parameter
         private string GetImagePath(string galleryName, string fileName)
         {
             // fileName is expected to be just the file name, not a path
+            // DO NOT sanitize fileName here further as it might remove valid GUID parts if present
             return Path.Combine(GetGalleryPath(galleryName), fileName);
         }
 
         // Helper method to get the full path to a thumbnail file
-        // MODIFIED: Removed Path.GetFileName from fileName parameter
         private string GetThumbnailPath(string galleryName, string fileName)
         {
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             var originalExtension = Path.GetExtension(fileName);
-            // Construct the path directly, assuming fileName is already just the file name
-            return Path.Combine(GetGalleryPath(galleryName), $"{fileNameWithoutExtension}_thumb{originalExtension}");
+            // Construct the thumbnail filename with "_thumb" suffix
+            var thumbnailFileName = $"{fileNameWithoutExtension}_thumb{originalExtension}";
+            return Path.Combine(GetGalleryPath(galleryName), thumbnailFileName);
         }
 
         // Helper method to generate a thumbnail for an image
-        private static async Task GenerateThumbnail(string imagePath, string thumbnailPath)
+        private async Task GenerateThumbnail(string imagePath, string thumbnailPath)
         {
             try
             {
-                // Ensure the directory for the thumbnail exists (user's existing robust check)
+                // Ensure the directory for the thumbnail exists (it's the same as the gallery)
                 var thumbnailDirectory = System.IO.Path.GetDirectoryName(thumbnailPath);
-                if (thumbnailDirectory != null && thumbnailDirectory != string.Empty)
-                {
-                    thumbnailDirectory = thumbnailDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                }
                 if (thumbnailDirectory != null && thumbnailDirectory != string.Empty)
                 {
                     if (!Directory.Exists(thumbnailDirectory))
@@ -68,7 +65,7 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                 }
                 else
                 {
-                    throw new DirectoryNotFoundException("Thumbnail directory not found.");
+                    throw new DirectoryNotFoundException("Thumbnail directory path is invalid.");
                 }
 
                 using var image = await Image.LoadAsync(imagePath);
@@ -88,16 +85,23 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                     Mode = ResizeMode.Max
                 }));
 
-                // ADDED LOGIC: Determine the encoder based on the original file's extension
-                var originalExtension = Path.GetExtension(imagePath).ToLowerInvariant();
+                // Determine the encoder based on the original file's extension
+                IImageEncoder encoder;
+                var originalExtension = Path.GetExtension(imagePath)?.ToLowerInvariant();
                 if (originalExtension == ".png")
                 {
-                    await image.SaveAsync(thumbnailPath, new PngEncoder());
+                    encoder = new PngEncoder();
                 }
-                else
+                else if (originalExtension == ".gif")
                 {
-                    await image.SaveAsync(thumbnailPath, new JpegEncoder());
+                    encoder = new JpegEncoder { Quality = 75 };
                 }
+                else // Default to JPEG for others
+                {
+                    encoder = new JpegEncoder { Quality = 75 }; // Adjust quality as needed (0-100)
+                }
+
+                await image.SaveAsync(thumbnailPath, encoder);
             }
             catch (Exception ex)
             {
@@ -119,18 +123,20 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
             // Get all directories within the Galleries root path
             var galleryDirectories = Directory.GetDirectories(galleriesRootPath)
-                                                .Select(dir => new GalleryViewModel
-                                                {
-                                                    Name = new DirectoryInfo(dir).Name,
-                                                    // Count image files, excluding thumbnails
-                                                    ImageCount = Directory.GetFiles(dir)
+                                               .Select(dir => new GalleryViewModel
+                                               {
+                                                   Name = new DirectoryInfo(dir).Name,
+                                                   // Count image files, excluding thumbnails
+                                                   ImageCount = Directory.GetFiles(dir)
                                                                         .Count(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                                                     (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                                                                                      f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
                                                                                      f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                                                     f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
-                                                })
-                                                .ToList();
+                                                                                     f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
+                                                                                     f.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                                                                                     f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
+                                               })
+                                               .ToList();
 
             // Pass the list of galleries to the view
             return View(galleryDirectories);
@@ -158,13 +164,15 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
             // Get all image files (excluding thumbnails) in the gallery directory
             var filesInGallery = Directory.GetFiles(galleryPath)
-                                      .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
-                                                  (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
-                                      .OrderBy(f => Path.GetFileName(f))
-                                      .ToList();
+                                            .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
+                                                        (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
+                                            .OrderBy(f => Path.GetFileName(f))
+                                            .ToList();
 
             // --- Thumbnail Recreation Check ---
             foreach (var filePath in filesInGallery)
@@ -239,18 +247,20 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
             // Get all directories within the Galleries root path
             var galleryDirectories = Directory.GetDirectories(galleriesRootPath)
-                                                .Select(dir => new GalleryViewModel
-                                                {
-                                                    Name = new DirectoryInfo(dir).Name,
-                                                    // Count image files, excluding thumbnails
-                                                    ImageCount = Directory.GetFiles(dir)
+                                               .Select(dir => new GalleryViewModel
+                                               {
+                                                   Name = new DirectoryInfo(dir).Name,
+                                                   // Count image files, excluding thumbnails
+                                                   ImageCount = Directory.GetFiles(dir)
                                                                         .Count(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                                                     (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                                                                                      f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
                                                                                      f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                                                     f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
-                                                })
-                                                .ToList();
+                                                                                     f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
+                                                                                     f.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                                                                                     f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
+                                               })
+                                               .ToList();
 
             ViewBag.ShowManagementOptions = true;
             return View(galleryDirectories);
@@ -395,13 +405,15 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
             var imageFiles = new List<ImageViewModel>();
 
             var filesInGallery = Directory.GetFiles(galleryPath)
-                                      .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
-                                                  (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                   f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
-                                      .OrderBy(f => Path.GetFileName(f))
-                                      .ToList();
+                                            .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
+                                                        (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                                                         f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
+                                            .OrderBy(f => Path.GetFileName(f))
+                                            .ToList();
 
             foreach (var filePath in filesInGallery)
             {
@@ -431,6 +443,9 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        // ADDED: Request size limits to handle larger uploads without crashing
+        [RequestSizeLimit(200_000_000)] // Allows up to 200 MB per request (adjust as needed)
+        [RequestFormLimits(MultipartBodyLengthLimit = 200_000_000)] // Also set form limits for multipart data
         public async Task<IActionResult> UploadImage(string galleryName, IEnumerable<IFormFile> ImageFiles)
         {
             if (string.IsNullOrEmpty(galleryName))
@@ -445,7 +460,7 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
                 return RedirectToAction("ManageGalleryImages", new { galleryName });
             }
 
-            var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "Galleries", galleryName);
+            var uploadsPath = GetGalleryPath(galleryName); // Using GetGalleryPath for consistency
 
             // Ensure the directory exists
             if (!Directory.Exists(uploadsPath))
@@ -458,56 +473,99 @@ namespace Members.Controllers // Assuming your controllers are in the Members.Co
 
             foreach (var imageFile in ImageFiles)
             {
+                if (imageFile.Length == 0)
+                {
+                    failedUploads.Add($"{imageFile.FileName} (empty file)");
+                    continue; // Skip to the next file
+                }
+
+                // Basic file type validation based on MIME type and extension
+                var allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp" };
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
                 var fileExtension = Path.GetExtension(imageFile.FileName)?.ToLowerInvariant();
 
-                if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
+                if (!allowedMimeTypes.Contains(imageFile.ContentType?.ToLowerInvariant()) ||
+                    string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
                 {
-                    failedUploads.Add(imageFile.FileName + " (invalid file type)");
-                    continue;
+                    failedUploads.Add(imageFile.FileName + " (invalid file type or content)");
+                    continue; // Skip to the next file
                 }
 
-                if (imageFile.Length > 0)
+                // *** CRITICAL CHANGE: Use the original filename directly ***
+                // Sanitize file name to prevent path traversal (Path.GetFileName does this)
+                var fileName = Path.GetFileName(imageFile.FileName);
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                // OPTIONAL: Add a check here if you want to explicitly warn the user if a file with the same name exists.
+                // If you want to prevent overwrite and show an error:
+                if (System.IO.File.Exists(filePath))
                 {
-                    var fileName = Path.GetFileName(imageFile.FileName); // Use the original filename
-                    var filePath = Path.Combine(uploadsPath, fileName);
+                    failedUploads.Add(imageFile.FileName + " (file with same name already exists - NOT UPLOADED)");
+                    continue; // Skip this file to prevent overwrite
+                }
+                // If you want to overwrite silently, remove the 'if (System.IO.File.Exists(filePath))' block.
 
-                    try
+                try
+                {
+                    // Save original image
+                    using (var stream = new FileStream(filePath, FileMode.Create)) // FileMode.Create will overwrite if file exists (if the above check is removed)
                     {
-                        using (var stream = new FileStream(filePath, FileMode.Create)) // FileMode.Create will overwrite if file exists
-                        {
-                            await imageFile.CopyToAsync(stream);
-                        }
-
-                        // Generate thumbnail immediately after successful upload
-                        var thumbnailPath = GetThumbnailPath(galleryName, fileName);
-                        await GenerateThumbnail(filePath, thumbnailPath);
-
-                        successfulUploads++;
+                        await imageFile.CopyToAsync(stream);
                     }
-                    catch (Exception ex)
+
+                    // Generate thumbnail immediately after successful original upload
+                    var thumbnailPath = GetThumbnailPath(galleryName, fileName);
+                    await GenerateThumbnail(filePath, thumbnailPath);
+
+                    successfulUploads++;
+                }
+                catch (IOException ex)
+                {
+                    failedUploads.Add($"{imageFile.FileName} (IO Error: {ex.Message})");
+                    Console.WriteLine($"IO Error uploading {imageFile.FileName} to {filePath}: {ex.Message}");
+                    // Clean up partially uploaded file if exists
+                    if (System.IO.File.Exists(filePath))
                     {
-                        failedUploads.Add(imageFile.FileName);
-                        Console.WriteLine($"Error uploading {imageFile.FileName}: {ex.Message}");
+                        System.IO.File.Delete(filePath);
                     }
                 }
-                else
+                catch (ImageFormatException ex)
                 {
-                    failedUploads.Add(imageFile.FileName + " (empty file)");
+                    failedUploads.Add($"{imageFile.FileName} (Image Format Error: {ex.Message})");
+                    Console.WriteLine($"Image Format Error processing {imageFile.FileName}: {ex.Message}");
+                    // Clean up original file if processing failed
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Catch any other unexpected errors during processing
+                    failedUploads.Add($"{imageFile.FileName} (Error: {ex.Message})");
+                    Console.WriteLine($"Generic Error uploading {imageFile.FileName}: {ex.Message}");
+                    // Attempt to clean up original file if processing failed
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
                 }
             }
 
+            // Provide consolidated feedback to the user
             if (successfulUploads > 0)
             {
                 TempData["SuccessMessage"] = $"{successfulUploads} image(s) uploaded successfully!";
             }
             if (failedUploads.Count > 0)
             {
-                TempData["ErrorMessage"] = $"Failed to upload: {string.Join(", ", failedUploads)}.";
+                // Join failed filenames to provide specific feedback
+                TempData["ErrorMessage"] = $"Failed to upload and/or process: {string.Join(", ", failedUploads)}. Check server logs for details.";
             }
             else if (successfulUploads == 0 && ImageFiles.Any())
             {
-                TempData["ErrorMessage"] = "No valid files were uploaded. Please check file types and sizes.";
+                // Case where files were provided but none were valid/processed
+                TempData["ErrorMessage"] = "No valid images were uploaded. Please check file types and sizes.";
             }
 
             return RedirectToAction("ManageGalleryImages", new { galleryName });
