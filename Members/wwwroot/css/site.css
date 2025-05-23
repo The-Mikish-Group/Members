@@ -18,6 +18,29 @@ body {
     
 }
 
+/* General input and select focus styles */
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus, /* Targets standard Bootstrap form controls */
+.custom-select:focus /* Targets Bootstrap custom select elements */ {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
+}
+
+/* Specific styles for Select2 with Bootstrap 4 theme */
+.select2-container--bootstrap4.select2-container--focus .select2-selection {
+    box-shadow: none !important;
+    border-color: initial !important; /* Ensure Select2's specific border also resets */
+}
+
+/* For file input, which often has its own styling */
+.custom-file-input:focus ~ .custom-file-label {
+    box-shadow: none !important;
+    border-color: initial !important;
+}
+
 /* No Radius Right or  Left */
 .no-right-radius {
     border-top-right-radius: 0 !important;

@@ -10,11 +10,11 @@
     <h3><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
 </div>
 
-<!-- Row and Column -->
+<!-- Row and Column for Add a New Category -->
 <div class="row mx-0 p-0 mb-3">
     <div class="col-md-8 mx-auto p-2 my-0">
 
-        <!-- Card with Shadow -->
+        <!-- Card with Shadow for Add a New Category -->
         <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
             <div class="card-body m-1 p-2">
 
@@ -26,17 +26,24 @@
                 <!-- Create Category form -->
                 <form id="addCategoryForm" method="post" asp-action="CreateCategory">
                     <div class="row">
-                        <div class="col-8 px-0">
+
+                        <!-- Category Name -->
+                        <div class="col-8 px-0">                            
                             <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
                             <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
                         </div>
+
+                        <!-- Sort Order -->
                         <div class="col-2 px-0">
                             <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
+
+                        <!-- Add -->
                         <div class="col-2 px-0">
                             <button type="submit" class="btn btn-primary no-left-radius w-100">Add</button>
                         </div>
+
                     </div>
                 </form>
 
@@ -50,7 +57,7 @@
         <div class="card m-sm-0 p-0 shadow border border-dark rounded bg-Card-Menu">
             <div class="card-body m-1 p-2">
                 <div class="text-center mb-3">
-                    <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
+                    <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Manage Existing Categories</h5>
                 </div>
                 <table class="table table-striped">
                     <thead>

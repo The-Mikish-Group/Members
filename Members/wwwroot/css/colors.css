@@ -379,36 +379,49 @@ a {
     }
 
 /*  btn-success Defaults */
-.btn-success {
-    border-color: #4DAF7C;
+.btn-success {    
     color: white;
-    background-color: #4DAF7C; /* bg-green */
+    border-color: #4DAF7C;
+    background-color: #4DAF7C;
 }
     .btn-success:focus,
     .btn-success:hover {
         color: black;
-        background-color: lightgreen; /* bg-green-dark */
-        border-color: lightgreen; /* gray */
+        border-color: lightgreen;
+        background-color: lightgreen;
+    }
+
+/*  btn-add Defaults */
+.btn-add {
+    color: black;    
+    border-color: black;
+    background-color: lightgreen;
+}
+
+    .btn-add:focus,
+    .btn-add:hover {
+        color: white;
+        border-color: black;
+        background-color: green;
     }
 
 /*  btn-Upload Defaults */
 .btn-upload {
     border-bottom-left-radius: 0px;
     border-top-left-radius: 0px;
-    border-color: transparent;
-    background-color: #f0f0f4;
-    color: black;
+    border-color: black;
+    background-color: green;
+    color: white;
 }
 
     .btn-upload:focus,
     .btn-upload:hover {
         border-bottom-left-radius: 0px;
         border-top-left-radius: 0px;
-        border-color:transparent;
-        color: darkgreen;
-        background-color: lightgreen
+        border-color:black;        
+        background-color: lightgreen;
+        color: black;
     }
-
 
 /* btn-back Defaults */
 .btn-back {   
