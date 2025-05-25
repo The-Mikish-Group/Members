@@ -19,7 +19,7 @@
             <div class="pb-2">
                 <label for="categoryId" id="categoryLabel" class="fw-bold text-gold-darker"><i class="bi bi-list-ul ms-2 me-2"></i> Current PDF Category:</label>
             </div>
-            <div class="input-group shadow border border-secondary rounded py-1 fw-bold bg-white" style="position: relative;">
+            <div class="input-group shadow border-0 border-transparent rounded py-1 fw-bold bg-white" style="position: relative;">
                 <select id="categoryId" class="form-control">                    
                     <option value="" selected disabled hidden>-- Select a Category --</option>
                     @if (pdfCategories != null)
@@ -49,24 +49,25 @@
 
                 <form method="post" class="mx-auto" asp-action="UploadFileToCategory" asp-controller="PdfCategory" asp-route-categoryId="@ViewBag.SelectedCategoryId" enctype="multipart/form-data">
 
-                    <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategoryId" />
+                    <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategoryId">
 
                     <div class="row align-items-center">
 
                         <div class="col-8 col-lg-10 pe-0">
 
-                            <input type="file" name="file" class="form-control visually-hidden" id="chooseFile" />
+                            <!-- PDF File Input -->
+                            <input type="file" name="file" class="form-control visually-hidden" id="chooseFile" accept=".pdf">
 
-                            <div class="input-group shadow">
-                                <label class="btn btn-add no-right-radius" for="chooseFile"><i class="bi bi-plus-square my-2"></i></label>
-                                <input type="text" class="form-control no-left-radius no-right-radius border border-secondary" id="fileNameDisplay" placeholder="--No file chosen--" readonly />
+                            <div class="input-group">
+                                <label class="btn btn-add no-right-radius" for="chooseFile"><i class="bi bi bi-search my-2"></i></label>
+                                <input type="text" class="form-control no-left-radius no-right-radius border border-secondary" id="fileNameDisplay" placeholder="--No file chosen--" readonly="">
                             </div>
 
                         </div>
 
                         <div class="col-2 col-lg-1 px-0">
                             <label for="sortOrder" class="form-label visually-hidden text-gold-darker text-center">Sort Order</label>
-                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius border border-secondary shadow" min="1" id="sortOrder" />
+                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius border border-secondary shadow" min="1" id="sortOrder">
                         </div>
 
                         <div class="col-2 col-lg-1 ps-0">
@@ -75,6 +76,7 @@
                             </button>
                         </div>
                     </div>
+                    @Html.AntiForgeryToken()
                 </form>
             </div>
 
@@ -221,23 +223,23 @@ else
                    if you're using other form controls not managed by Select2, but Select2 will largely
                    handle its own focus/hover styles for the generated elements. */
 
-        /* .form-control {
-            border-color: gray !important;
+        .form-control {
+            border-color: lightgray !important;
         }
 
         .form-control:focus,
         .form-control:hover,
         .form-control:active {
-            border-color: darkgray !important;
+                border-color: lightgray !important;
             box-shadow: none !important;
         }
 
         .form-control:focus,
         .form-control:hover,
         .form-control:active {
-            border-color: darkgray !important;
-            box-shadow: none !important; /* This removes the blue glow/shadow on focus */
-        } */
+                border-color: lightgray !important;
+            box-shadow: none !important;
+        }
 
         /* --- File Upload Section Styles --- */
         /* Add a pointer cursor to the file name display field */

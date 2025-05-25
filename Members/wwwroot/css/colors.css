@@ -311,12 +311,12 @@ text-red-lighter {
 
 /* Default <a> link */
 a {
-    color: #ffffff /* text-white */
+    color: #ffffff
 }
 
     a:hover,
     a:focus {
-        color: #DEDFE0; /* text-gray */
+        color: #DEDFE0; 
     }
 
 /* link */
@@ -381,12 +381,12 @@ a {
 /*  btn-success Defaults */
 .btn-success {    
     color: white;
-    border-color: #4DAF7C;
+    border-color: darkgray;
     background-color: #4DAF7C;
 }
     .btn-success:focus,
     .btn-success:hover {
-        color: black;
+        color: lightgray;
         border-color: lightgreen;
         background-color: lightgreen;
     }
@@ -394,14 +394,14 @@ a {
 /*  btn-add Defaults */
 .btn-add {
     color: black;    
-    border-color: black;
+    border-color: darkgray;
     background-color: lightgreen;
 }
 
     .btn-add:focus,
     .btn-add:hover {
         color: white;
-        border-color: black;
+        border-color: darkgray;
         background-color: green;
     }
 
@@ -409,7 +409,7 @@ a {
 .btn-upload {
     border-bottom-left-radius: 0px;
     border-top-left-radius: 0px;
-    border-color: black;
+    border-color: darkgray;
     background-color: green;
     color: white;
 }
@@ -418,7 +418,7 @@ a {
     .btn-upload:hover {
         border-bottom-left-radius: 0px;
         border-top-left-radius: 0px;
-        border-color:black;        
+        border-color:darkgray;        
         background-color: lightgreen;
         color: black;
     }
@@ -523,7 +523,7 @@ a {
 .btn-warning-reverse {
     color: #705103;
     background-color: #dec383;
-    border-color: black;
+    border-color: darkgray;
 }
 
     .btn-warning-reverse:focus,

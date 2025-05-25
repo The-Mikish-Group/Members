@@ -31,9 +31,11 @@
 <tbody id="userTableBody">
     @if (Model.Users.Any())
     {
+        var usercount = 1;
+
         @foreach (var user in Model.Users)
         {
-            <tr class="user-row text-gold-darker" data-user-id="@user.Id">
+            <tr class="user-row text-gold-darker" id="display-row-@usercount" data-user-id="@user.Id">
                 <td>@user.FullName</td>
                 <td>@user.Email</td>
                 <td>
@@ -80,6 +82,7 @@
                     <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
                 }
             </tr>
+            { usercount++; }
         }
     }
     else

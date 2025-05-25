@@ -179,16 +179,16 @@ public class PdfGenerationController : Controller
                 PdfFont HeadingFont = new PdfStandardFont(PdfFontFamily.Helvetica, 15);
 
                 // Regular footer font
-                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12); 
-                
+                PdfFont footerFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12);
+
                 // Define a bold font specifically for the footer page numbers
                 PdfFont boldFooterFont = new PdfStandardFont(PdfFontFamily.Helvetica, 12, PdfFontStyle.Bold); // Bold footer font
 
                 PdfBrush brush = PdfBrushes.Black;
 
                 // Define margins (adjust as needed)
-                float horizontalMargin = 20; 
-                float verticalMargin = 20; 
+                float horizontalMargin = 20;
+                float verticalMargin = 20;
 
                 PdfStringFormat format = new() { WordWrap = PdfWordWrapType.Word };
 

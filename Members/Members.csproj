@@ -44,6 +44,8 @@
   <ItemGroup>       
     <Compile Remove="Areas\Identity\Pages\MembersGrid.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\Users - Copy.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\UsersGrid.cshtml.cs" />       
     <Compile Remove="Controllers\AdminController.cs" />       
     <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
@@ -69,8 +71,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Identity\Pages\body.cshtml" />
     <Content Remove="Areas\Identity\Pages\MembersGrid.cshtml" />
     <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
+    <Content Remove="Areas\Identity\Pages\scripts.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users - Copy.cshtml" />
     <Content Remove="Areas\Identity\Pages\UsersGrid.cshtml" />
     <Content Remove="Views\Home\Directory.cshtml" />
     <Content Remove="Views\Home\Documents.cshtml" />

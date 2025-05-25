@@ -221,8 +221,13 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        // JavaScript to handle the auto-hide alert messages
-        document.addEventListener('DOMContentLoaded', function () {            
+        // DOM Listener - Content Loaded
+        document.addEventListener('DOMContentLoaded', function () { 
+
+            // Automatically apply colors to visible display rows on page load
+            applyRowColors();
+
+            // JavaScript to handle the auto-hide alert messages
             var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');
             alertsToAutoHide.forEach(function(alertElement) {
                 setTimeout(function() {
@@ -236,28 +241,16 @@
 
         // Function to apply alternating row colors to the table body
         function applyRowColors() {
-             // Target all table rows within the tbody that represent display rows
-             $('#manageGalleriesTableBody > tr[id^="display-row-"]:visible').each(function(index) {
-                 $(this).removeClass('even-row odd-row'); // Remove existing classes
-                 if (index % 2 === 0) {
-                     $(this).addClass('even-row'); // Apply even row class
-                 } else {
-                     $(this).addClass('odd-row'); // Apply odd row class
-                 }
-             });
-             // Ensure edit rows (which are now removed, but good practice if you add other hidden rows) don't interfere
-             // $('#manageCategoriesTableBody > tr[id^="edit-row-"]').removeClass('even-row odd-row'); // This line is no longer strictly necessary as edit rows are removed
+            // Target all table rows within the tbody that represent display rows
+            $('#manageGalleriesTableBody > tr[id^="display-row-"]:visible').each(function(index) {
+                $(this).removeClass('even-row odd-row');
+                if (index % 2 === 0) {
+                    $(this).addClass('even-row');
+                } else {
+                    $(this).addClass('odd-row');
+                }
+            });
         }
-
-        // --- Document Ready Block ---
-        // This block runs once the entire DOM is loaded.
-        // Use it for initial setup and attaching event listeners that don't use onclick attributes.
-        $(document).ready(function() {
-
-            // --- Initial Setup ---
-            // Automatically apply colors to visible display rows on page load
-            applyRowColors();            
-
-        }); // <-- Closing tag for the document ready block
+        
     </script>
 }

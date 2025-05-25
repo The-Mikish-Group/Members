@@ -12,13 +12,635 @@
     string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
 }
 
+<!-- Title -->
 <head>
+    <title>@ViewData["Title"]</title>   
+</head>
 
-    <title>@ViewData["Title"]</title>
+<!-- Must be an Admin or Manager -->
+@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+{
+    <div class="container mt-4 mb-2">
+        <div class="row mx-0 p-0">
 
+            <div class="col-12 mx-auto p-0 my-0">
+
+                <!-- Page Header with Title -->
+                <div class="row align-items-center mb-2">
+                    
+                    <!-- Page Title -->
+                    <div class="col-auto d-flex align-items-center mx-auto">
+                        <h1 class="text-center text-gold-darker"><i class="bi bi-people-fill"></i> Manage Members</h1>
+                    </div>
+
+                </div>
+
+                <!-- Shadow Card for Search Term and User Count -->
+                <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">                    
+                    <div class="card-body m-0 p-1">
+
+                        <!-- Searchterm input field and button -->
+                        <div class="mb-3">
+
+                            <!-- Comment out extra Search Term examples -->
+                            <!-- <h6 class="text-gold-darker mb-1 ps-2">(Also: "Bad", "No Role" and "Not Confirmed")</h6>  -->
+
+                            <!-- Search Term input field and button -->
+                            <form class="shadow" method="get" id="searchForm">
+
+                                <div class="input-group">
+
+                                    <button class="btn btn-sm btn-add" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
+                                    <input type="text" class="form-control text-gold-darker shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
+
+                                    <!-- Hidden fields for storing Table status  -->
+                                    <input type="hidden" asp-for="PageNumber" />
+                                    <input type="hidden" asp-for="PageSize" />
+                                    <input type="hidden" asp-for="SortColumn" />
+                                    <input type="hidden" asp-for="SortOrder" />
+                                    <input type="hidden" asp-for="ShowExtraFields" id="showExtraFieldsHidden" />
+
+                                    <!-- Clear Search Button -->                    
+                                    <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
+                                        <i class="bi bi-x text-black"></i>
+                                    </button>
+
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <!-- Member Count and Extra Fields Checkbox -->
+                        <div class="mb-2 d-flex align-items-center">
+                            <span id="userCount" class="me-3 pt-1 pb-1">Total Members: @Model.TotalUsers</span> <div class="form-check">
+                                <div class="form-check">
+                                    <input class="form-check-input custom-checkbox-green" type="checkbox" id="showExtraFieldsCheckbox"
+                                           @(Model.ShowExtraFields ? "checked" : "")>
+                                    <label class="form-check-label pt-1 ps-1" for="showExtraFieldsCheckbox">
+                                        Show All Fields
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row mx-0 p-0">
+            <div class="col-12 p-0 mt-2">            
+
+            <!-- Shadow Card for Manage Members Table -->
+            <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">                    
+                <div class="card-body m-0 p-0">
+
+                    <!-- Table Container for displaying users -->
+                    <div class="table-responsive mb-3" id="usersTableContainer">
+
+                        <!-- Row for Header: Manage Members -->
+                        <div class="row align-items-center mb-2">
+                    
+                            <!-- Header: Manage Members -->
+                            <div class="col-auto d-flex align-items-start">
+                                <h2 class="text-start text-gold-darker"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Table for displaying users -->
+                        <table class="table table-striped table-transparent table-bordered shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
+                
+                            <!-- Table Column Headings -->
+                            <thead>                   
+                                <tr>                       
+                                    <th>
+                                        <!-- Sort by Full Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="fullname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Full Name
+                                            @if (Model.SortColumn == "fullname")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Email -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="email"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Email
+                                            @if (Model.SortColumn == "email")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Email Confirmed -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="emailconfirmed"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Email <i class="bi bi-check-lg text-success"></i>
+                                            @if (Model.SortColumn == "emailconfirmed")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Cell Phone -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="phonenumber"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Cell Phone
+                                            @if (Model.SortColumn == "phonenumber")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Cell Phone Confirmed -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="phonenumberconfirmed"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumberconfirmed" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Phone <i class="bi bi-check-lg text-success"></i>
+                                            @if (Model.SortColumn == "phonenumberconfirmed")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Roles -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="roles"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Roles
+                                            @if (Model.SortColumn == "roles")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Last Login -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="lastlogin"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastlogin" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Last Login
+                                            @if (Model.SortColumn == "lastlogin")
+                                            {
+                                                @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                            }
+                                        </a>
+                                    </th>
+
+                                    @if (Model.ShowExtraFields)
+                                    {
+                                        <th class="extra-field">
+                                            <!-- Sort by First Name -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="firstname"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                First Name
+                                                @if (Model.SortColumn == "firstname")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Middle Name -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="middlename"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Middle Name
+                                                @if (Model.SortColumn == "middlename")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Last Name -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="lastname"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Last Name
+                                                @if (Model.SortColumn == "lastname")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Home Phone -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="homephonenumber"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Home Phone
+                                                @if (Model.SortColumn == "homephonenumber")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Address Line 1 -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="addressline1"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Address 1
+                                                @if (Model.SortColumn == "addressline1")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Address Line 2 -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="addressline2"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Address 2
+                                                @if (Model.SortColumn == "addressline2")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by City -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="city"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                City
+                                                @if (Model.SortColumn == "city")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by State -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="state"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                State
+                                                @if (Model.SortColumn == "state")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Zip Code -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="zipcode"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Zip Code
+                                                @if (Model.SortColumn == "zipcode")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Plot -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="plot"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Plot
+                                                @if (Model.SortColumn == "plot")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Birthday -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="birthday"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Birthday
+                                                @if (Model.SortColumn == "birthday")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+
+                                        <th class="extra-field">
+                                            <!-- Sort by Anniversary -->
+                                            <a class="nav-link"
+                                                asp-page="./Users"
+                                                asp-route-sortcolumn="anniversary"
+                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
+                                                asp-route-searchterm="@Model.SearchTerm"
+                                                asp-route-pageNumber="@Model.PageNumber"
+                                                asp-route-pageSize="@Model.PageSize"
+                                                asp-route-showextrafields="@Model.ShowExtraFields">
+                                                Anniversary
+                                                @if (Model.SortColumn == "anniversary")
+                                                {
+                                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
+                                                }
+                                            </a>
+                                        </th>
+                                    }
+                                    </tr>
+                            </thead>
+                
+                            <!-- Table Body -->
+                            <tbody id="userTableBody">
+
+                                <!-- Loop through User Rows -->
+                                @{  
+                                    int i = 0; // Declare and initialize the variable 'i' before the loop  
+                                }
+                                @foreach (var user in Model.Users)
+                                {
+                                    <!-- User Row -->
+                       
+                                    <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
+
+                                        <!-- Full Name -->
+                                        <td>@user.FullName</td>
+
+                                        <!-- Email -->
+                                        <td>@user.Email</td>
+
+                                        <!-- Email Confirmed -->
+                                        <td>
+                                            @if (user.EmailConfirmed)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+
+                                        <!-- Cell Phone -->
+                                        <td>@user.PhoneNumber</td>
+
+                                        <!-- Cell Phone Confirmed -->
+                                        <td>
+                                            @if (user.PhoneNumberConfirmed)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+                           
+                                        <!-- Roles -->
+                                        <td>
+                                            @if (user.Roles != null)
+                                            {
+                                                @foreach (var role in user.Roles)
+                                                {
+                                                    <span>@role</span>
+                                                    <br />
+                                                }
+                                            }
+                                        </td>
+
+                                        <!-- Last Login -->
+                                        <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                                            @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
+                                        </td>
+
+                                        <!-- Extra Fields -->
+                                        @if (Model.ShowExtraFields)
+                                        {
+                                            <td class="extra-field">@user.FirstName</td>
+                                            <td class="extra-field">@user.MiddleName</td>
+                                            <td class="extra-field">@user.LastName</td>
+                                            <td class="extra-field">@user.HomePhoneNumber</td>
+                                            <td class="extra-field">@user.AddressLine1</td>
+                                            <td class="extra-field">@user.AddressLine2</td>
+                                            <td class="extra-field">@user.City</td>
+                                            <td class="extra-field">@user.State</td>
+                                            <td class="extra-field">@user.ZipCode</td>
+                                            <td class="extra-field">@user.Plot</td>
+                                            <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
+                                            <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
+                                        }
+
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- Pagination Navigation -->
+                    @{
+                        var totalPages = Model.TotalPages;
+                        var currentPage = Model.PageNumber;
+
+                        <!-- Set the number of pages to display in the pagination -->
+                        var pageDisplayLimit = 5;
+
+                        <!-- Calculate the start and end pages to display -->
+                        var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
+                        var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
+
+                        <!-- Adjust startPage if endPage was capped by totalPages -->
+                        if (endPage - startPage + 1 < pageDisplayLimit)
+                        {
+                            startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
+                        }
+                    }
+
+                    <!-- Pagination Controls -->
+                    <nav navigation" id="paginationNav">
+                        <ul class="pagination justify-content-center">
+
+                            <!-- Previous Page Button -->
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage - 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields">
+                                    &laquo;
+                                </a>
+                            </li>
+
+                            <!-- Page Number Links -->
+                
+                            @for (var ii = startPage; ii <= endPage; ii++)
+                            {
+                                <li class="page-item @(ii == currentPage ? "active" : "")">
+                                    <a class="page-link" asp-page="./Users"
+                                        asp-route-PageNumber="@ii"
+                                        asp-route-PageSize="@Model.PageSize"
+                                        asp-route-SortColumn="@Model.SortColumn"
+                                        asp-route-SortOrder="@Model.SortOrder"
+                                        asp-route-SearchTerm="@Model.SearchTerm"
+                                        asp-route-showextrafields="@Model.ShowExtraFields">
+                                        @ii
+                                    </a>
+                                </li>
+                            }
+
+
+                            <!-- Next Page Button -->
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage + 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    aria-label="Next">
+                                    &raquo;
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Not an Admin or Manager -->
+    <div class="text-center mt-4">
+        <p class="mb-1 text-gold-darker">This is an Admin area of @siteName.</p>
+        <p class="mb-2 text-gold-darker">Please Login with Administration credentials.</p>
+        <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </div>
+} 
+
+@section Styles {
     <style>
 
-       /* Green Border around hovered row */
+       /* Alternating table row colors */
+
+        .table-striped > tbody > tr:nth-of-type(odd) > td {
+            background-color: antiquewhite !important; /* Your desired color for odd rows */
+        }
+
+        .table-striped > tbody > tr:nth-of-type(even) > td {
+            background-color: #ffffff !important; /* Your desired color for even rows */
+        }
+
+        /* Green Border around hovered row */
         .table-striped tbody tr.user-row:nth-of-type(odd):hover,
         .table-striped tbody tr.user-row:nth-of-type(even):hover,
         tbody tr.user-row:hover {
@@ -34,578 +656,120 @@
 
          /* Add some padding to the right of the table if it's scrollable */
          /* This helps ensure the last column's sort arrow is visible when scrolled all the way right */
-         .table-responsive {
-             padding-bottom: .5em; /* Add padding to the bottom for horizontal scrollbar appearance */
-         }
-
-    </style>
-</head>
-
-<!-- Must be an Admin or Manager -->
-@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
-{
-    <div class="container my-2">
-
-        <!-- Members Title and Icon -->
-        <div class="row align-items-center mb-2">
-            <div class="col-auto d-flex align-items-center mx-auto">
-                <h1 class="text-center text-gold-darker"><i class="bi bi-people-fill"></i> Manage Members</h1>
-            </div>
-        </div>
-
-        <!-- Searchterm input field and button -->
-        <div class="mb-3">
-
-            <!-- Comment out extra Search Term examples -->
-            <!-- <h6 class="text-gold-darker mb-1 ps-2">(Also: "Bad", "No Role" and "Not Confirmed")</h6>  -->
-
-            <!-- Search Term input field and button -->
-            <form method="get" id="searchForm">
-
-                <div class="input-group">
-
-                    <button class="btn btn-sm btn-info" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
-                    <input type="text" class="form-control text-gold-darker shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
-
-                    <!-- Hidden fields for storing Table status  -->
-                    <input type="hidden" asp-for="PageNumber" />
-                    <input type="hidden" asp-for="PageSize" />
-                    <input type="hidden" asp-for="SortColumn" />
-                    <input type="hidden" asp-for="SortOrder" />
-                    <input type="hidden" asp-for="ShowExtraFields" id="showExtraFieldsHidden" />
-
-                    <!-- Clear Search Button -->                    
-                    <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
-                        <i class="bi bi-x text-black"></i>
-                    </button>
-
-                </div>
-            </form>
-
-        </div>
-
-        <!-- Member Count and Extra Fields Checkbox -->
-        <div class="mb-2 d-flex align-items-center">
-            <span id="userCount" class="me-3">Total Members: @Model.TotalUsers</span>
-
-            <!-- Show Extra Fields Checkbox -->
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="showExtraFieldsCheckbox"
-                       @(Model.ShowExtraFields ? "checked" : "")>
-                <label class="form-check-label" for="showExtraFieldsCheckbox">
-                    Show All Fields
-                </label>
-            </div>
-
-        </div>
-
-        <!-- Table Container for displaying users -->
-        <div class="table-responsive mb-3" id="usersTableContainer">
-
-            <!-- Table for displaying users -->
-            <table class="table table-striped table-bordered @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
-                
-                <!-- Table Column Headings -->
-                <thead>                   
-                    <tr>                       
-                        <th>
-                            <!-- Sort by Full Name -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="fullname"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Full Name
-                                @if (Model.SortColumn == "fullname")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Email -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="email"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Email
-                                @if (Model.SortColumn == "email")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Email Confirmed -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="emailconfirmed"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Email <i class="bi bi-check-lg text-success"></i>
-                                @if (Model.SortColumn == "emailconfirmed")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Cell Phone -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="phonenumber"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Cell Phone
-                                @if (Model.SortColumn == "phonenumber")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Cell Phone Confirmed -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="phonenumberconfirmed"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumberconfirmed" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Phone <i class="bi bi-check-lg text-success"></i>
-                                @if (Model.SortColumn == "phonenumberconfirmed")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Roles -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="roles"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Roles
-                                @if (Model.SortColumn == "roles")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-                        <th>
-                            <!-- Sort by Last Login -->
-                            <a class="nav-link"
-                               asp-page="./Users"
-                               asp-route-sortcolumn="lastlogin"
-                               asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastlogin" ? "desc" : "asc")"
-                               asp-route-searchterm="@Model.SearchTerm"
-                               asp-route-pageNumber="@Model.PageNumber"
-                               asp-route-pageSize="@Model.PageSize"
-                               asp-route-showextrafields="@Model.ShowExtraFields">
-                                Last Login
-                                @if (Model.SortColumn == "lastlogin")
-                                {
-                                    @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                }
-                            </a>
-                        </th>
-
-                        @if (Model.ShowExtraFields)
-                        {
-                            <th class="extra-field">
-                                <!-- Sort by First Name -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="firstname"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    First Name
-                                    @if (Model.SortColumn == "firstname")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Middle Name -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="middlename"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Middle Name
-                                    @if (Model.SortColumn == "middlename")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Last Name -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="lastname"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Last Name
-                                    @if (Model.SortColumn == "lastname")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Home Phone -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="homephonenumber"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Home Phone
-                                    @if (Model.SortColumn == "homephonenumber")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Address Line 1 -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="addressline1"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Address 1
-                                    @if (Model.SortColumn == "addressline1")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Address Line 2 -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="addressline2"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Address 2
-                                    @if (Model.SortColumn == "addressline2")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by City -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="city"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    City
-                                    @if (Model.SortColumn == "city")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by State -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="state"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    State
-                                    @if (Model.SortColumn == "state")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Zip Code -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="zipcode"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Zip Code
-                                    @if (Model.SortColumn == "zipcode")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Plot -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="plot"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Plot
-                                    @if (Model.SortColumn == "plot")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Birthday -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="birthday"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Birthday
-                                    @if (Model.SortColumn == "birthday")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-
-                            <th class="extra-field">
-                                <!-- Sort by Anniversary -->
-                                <a class="nav-link"
-                                   asp-page="./Users"
-                                   asp-route-sortcolumn="anniversary"
-                                   asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
-                                   asp-route-searchterm="@Model.SearchTerm"
-                                   asp-route-pageNumber="@Model.PageNumber"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-showextrafields="@Model.ShowExtraFields">
-                                    Anniversary
-                                    @if (Model.SortColumn == "anniversary")
-                                    {
-                                        @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
-                                    }
-                                </a>
-                            </th>
-                        }
-                        </tr>
-                </thead>
-                
-                <!-- Table Body -->
-                <tbody id="userTableBody">
-
-                    <!-- Loop through User Rows -->
-                    @foreach (var user in Model.Users)
-                    {
-                        <!-- User Row -->
-                        <tr class="user-row text-gold-darker" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
-
-                            <!-- Full Name -->
-                            <td>@user.FullName</td>
-
-                            <!-- Email -->
-                            <td>@user.Email</td>
-
-                            <!-- Email Confirmed -->
-                            <td>
-                                @if (user.EmailConfirmed)
-                                {
-                                    <i class="bi bi-check-lg text-success"></i>
-                                }
-                            </td>
-
-                            <!-- Cell Phone -->
-                            <td>@user.PhoneNumber</td>
-
-                            <!-- Cell Phone Confirmed -->
-                            <td>
-                                @if (user.PhoneNumberConfirmed)
-                                {
-                                    <i class="bi bi-check-lg text-success"></i>
-                                }
-                            </td>
-                           
-                            <!-- Roles -->
-                            <td>
-                                @if (user.Roles != null)
-                                {
-                                    @foreach (var role in user.Roles)
-                                    {
-                                        <span>@role</span>
-                                        <br />
-                                    }
-                                }
-                            </td>
-
-                            <!-- Last Login -->
-                            <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
-                                @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
-                            </td>
-
-                            <!-- Extra Fields -->
-                            @if (Model.ShowExtraFields)
-                            {
-                                <td class="extra-field">@user.FirstName</td>
-                                <td class="extra-field">@user.MiddleName</td>
-                                <td class="extra-field">@user.LastName</td>
-                                <td class="extra-field">@user.HomePhoneNumber</td>
-                                <td class="extra-field">@user.AddressLine1</td>
-                                <td class="extra-field">@user.AddressLine2</td>
-                                <td class="extra-field">@user.City</td>
-                                <td class="extra-field">@user.State</td>
-                                <td class="extra-field">@user.ZipCode</td>
-                                <td class="extra-field">@user.Plot</td>
-                                <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
-                                <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
-                            }
-
-
-                        </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        <!-- Pagination Navigation -->
-        @{
-            var totalPages = Model.TotalPages;
-            var currentPage = Model.PageNumber;
-
-            <!-- Set the number of pages to display in the pagination -->
-            var pageDisplayLimit = 5;
-
-            <!-- Calculate the start and end pages to display -->
-            var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
-            var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
-
-            <!-- Adjust startPage if endPage was capped by totalPages -->
-            if (endPage - startPage + 1 < pageDisplayLimit)
-            {
-                startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
-            }
+        .table-responsive {
+            padding-bottom: .5em; /* Add padding to the bottom for horizontal scrollbar appearance */
         }
 
-        <!-- Pagination Controls -->
-        <nav aria-label="Page navigation" id="paginationNav">
-            <ul class="pagination justify-content-center">
-
-                <!-- Previous Page Button -->
-                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Users"
-                       asp-route-PageNumber="@(currentPage - 1)"
-                       asp-route-PageSize="@Model.PageSize"
-                       asp-route-SortColumn="@Model.SortColumn"
-                       asp-route-SortOrder="@Model.SortOrder"
-                       asp-route-SearchTerm="@Model.SearchTerm"
-                       asp-route-showextrafields="@Model.ShowExtraFields">
-                        &laquo;
-                    </a>
-                </li>
-
-                <!-- Page Number Links -->
-                @for (var i = startPage; i <= endPage; i++)
-                {
-                    <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" asp-page="./Users"
-                           asp-route-PageNumber="@i"
-                           asp-route-PageSize="@Model.PageSize"
-                           asp-route-SortColumn="@Model.SortColumn"
-                           asp-route-SortOrder="@Model.SortOrder"
-                           asp-route-SearchTerm="@Model.SearchTerm"
-                           asp-route-showextrafields="@Model.ShowExtraFields">
-                            @i
-                        </a>
-                    </li>
-                }
+       /* Base styles for your custom checkboxes */
+        .form-check-input[type=checkbox].custom-checkbox-green {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.2em;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            /* --- NEW ALIGNMENT NUDGE --- */
+            transform: translateY(1px); /* Nudge down by 1px. Adjust this value (e.g., 2px, 0px, -1px) as needed */
+        }
 
 
-                <!-- Next Page Button -->
-                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                    <a class="page-link" asp-page="./Users"
-                       asp-route-PageNumber="@(currentPage + 1)"
-                       asp-route-PageSize="@Model.PageSize"
-                       asp-route-SortColumn="@Model.SortColumn"
-                       asp-route-SortOrder="@Model.SortOrder"
-                       asp-route-SearchTerm="@Model.SearchTerm"
-                       asp-route-showextrafields="@Model.ShowExtraFields">
-                        &raquo;
-                    </a>
-                </li>
+        /* Styles when the checkbox is checked */
+        .form-check-input[type=checkbox].custom-checkbox-green:checked {
+            background-color: #fff; /* White background when checked */
+            border-color: #28a745; /* Green border when checked */
+        }
 
-            </ul>
-        </nav>
+        /* Styles for the checkmark itself when the checkbox is checked */
+        .form-check-input[type=checkbox].custom-checkbox-green:checked::before {
+            content: '\2713'; /* Unicode checkmark character */
+            display: block;
+            position: absolute;
+            /* Adjust top and left based on visual inspection.
+               Start with 50% and then fine-tune by a pixel or two if needed. */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centering trick */
 
-    </div>
-}
-else
-{
-    <!-- Not an Admin or Manager -->
-    <div class="text-center mt-4">
-        <p class="mb-1 text-gold-darker">This is an Admin area of @siteName.</p>
-        <p class="mb-2 text-gold-darker">Please Login with Administration credentials.</p>
-        <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </div>
+            /* Adjust font-size to make the checkmark fit well within the 1.2em box */
+            font-size: 1em; /* This is relative to the input's font-size, which might be default */
+            /* A fixed pixel size or a slightly larger em value often works better for icons */
+            /* Try 0.9em to make it slightly smaller than the box, or 16px if the box is 1.2em (approx 19px) */
+            /* Let's try to base it off the box height, but slightly smaller */
+            font-size: 1.1em; /* Increased slightly to better fill the 1.2em box */
+            line-height: 1; /* Prevent extra space above/below the checkmark character */
+            text-align: center; /* Ensures the character itself is centered within its pseudo-element box */
+            color: #28a745; /* Green checkmark */
+        }
+
+        /* Add focus styles to match the green theme */
+        .form-check-input[type=checkbox].custom-checkbox-green:focus {
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25); /* Greenish glow on focus */
+            outline: none; /* Remove default outline */
+        }
+
+         /* Field Border Color */
+        .form-control {
+            border-color: lightgray !important;
+        }
+
+            .form-control:focus,
+            .form-control:hover,
+            .form-control:active {
+                border-color: lightgray !important;
+                box-shadow: none !important;
+            }
+
+            .form-control:focus,
+            .form-control:hover,
+            .form-control:active {
+                border-color: lightgray !important;
+                box-shadow: none !important;
+            }
+
+
+
+        .page-link {
+            background-color: white !important;
+            border-color: darkgray !important;
+            color: #4E3802 !important;
+        }
+
+            .active>.page-link, .page-link.active { 
+            background-color: #DAA425 !important;
+            border-color: darkgray !important;
+            color: #fff !important;
+            }
+
+            .page-link:hover {
+                background-color: #F2CA46 !important;
+            }
+
+        .page-link a {
+            color: #4E3802;
+        }
+
+        .table-striped tbody tr.user-row:nth-of-type(odd):hover,
+        .table-striped tbody tr.user-row:nth-of-type(even):hover,
+        tbody tr.user-row:hover {
+            cursor: pointer;
+            border: 2px solid green;
+        }
+        .hide-extra-fields th.extra-field,
+        .hide-extra-fields td.extra-field {
+            display: none;
+        }
+
+        .table-responsive {
+            padding-bottom: .5em;                     
+        }
+
+    </style>
 }
 
 @section Scripts {
@@ -638,6 +802,14 @@ else
             let sortColumnInput = document.querySelector('input[name="SortColumn"]');
             let sortOrderInput = document.querySelector('input[name="SortOrder"]');
             let searchTermInput = document.querySelector('input[name="SearchTerm"]');
+
+            // Initialize all event listeners for elements present on initial load
+
+            // --- Initial localization and display updates ---
+            localizeLastLoginTimes();
+            updateSortIndicators();
+            updateExtraFieldsDisplay();
+            restoreScrollPosition();
 
             // --- Function Definitions (Define all functions here before any calls or listeners) ---
 
@@ -1016,8 +1188,8 @@ else
 
             // --- Event Listeners (Attach listeners after functions are defined) ---
 
-             // Sync initial checkbox state with hidden input value
-             if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+            // Sync initial checkbox state with hidden input value
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
                  showExtraFieldsCheckbox.checked = showExtraFieldsHidden.value === "True";
              }
 
@@ -1173,7 +1345,7 @@ else
 
             // Initial visual state updates on page load
             updateSortIndicators(); // Display initial sort arrows
-            updateExtraFieldsDisplay(); // Set initial column visibility
+            updateExtraFieldsDisplay(); // Set initial column visibility            
 
         });
     </script>

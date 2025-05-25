@@ -19,6 +19,8 @@ body {
 }
 
 /* General input and select focus styles */
+page-item:focus,
+page-link:focus,
 input:focus,
 select:focus,
 textarea:focus,
@@ -154,8 +156,6 @@ html > body header {
     top: 20px;
     transform: translateY(-10%);
 }
-
-
 
 /* Adjust form styling within nav-item to prevent misalignment */
 .navbar-nav .nav-item form.form-inline {
@@ -318,12 +318,12 @@ img {
     transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
     padding: 8px;
     display: inline-block;
-    border-color: Black !important;
+    border-color: darkgray !important;
 }
 
     .border-link:hover {
         color: black !important;
-        border-color: black !important;
+        border-color: darkgray !important;
         font-weight: bold !important;
     }
 

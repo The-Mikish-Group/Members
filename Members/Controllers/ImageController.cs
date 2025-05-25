@@ -6,13 +6,6 @@ using SixLabors.ImageSharp.Formats; // ADDED: For IImageEncoder
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
 
 namespace Members.Controllers
 {

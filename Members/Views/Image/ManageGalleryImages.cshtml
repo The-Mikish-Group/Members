@@ -23,15 +23,7 @@
             <div class="alert alert-success fade show auto-hide-alert" role="alert">
                 @TempData["SuccessMessage"]
             </div>
-        }
-
-        <!-- Status Error Message (Auto-Clear) -->
-        @if (TempData["ErrorMessage"] != null)
-        {            
-            <div class="alert alert-danger fade show auto-hide-alert" role="alert">
-                @TempData["ErrorMessage"]
-            </div>
-        }
+        }           
        
         <!-- Shadow Card (Upload a New Image) -->
         <div class="card shadow rounded p-2 bg-Card-Menu">
@@ -43,15 +35,22 @@
             <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="galleryName" value="@currentGalleryName" />
 
-                <div class="input-group">
+                <div class="input-group shadow">
                     
-                    <!-- Multiple File Input -->
-                    <input type="file" name="ImageFiles" class="form-control" accept="image/*" required multiple>
+                    <!-- Multiple Image File Input -->
+                    <input type="file" name="ImageFiles" class="form-control visually-hidden" id="chooseFile" accept="image/*" required multiple>
+                    
+                    <div class="input-group">
 
+                        <label class="btn btn-add no-right-radius" for="chooseFile"><i class="bi bi bi-search my-2"></i></label>
+                        <input type="text" class="form-control no-left-radius no-right-radius border border-secondary" id="fileNameDisplay" placeholder="--No file chosen--" readonly="">
+                    
                         <!-- Upload Button -->
                         <button type="submit" class="btn btn-primary no-left-radius">
                             <i class="bi bi-cloud-arrow-up"></i>
                         </button>
+                    
+                    </div>                    
 
                 </div>
                 @Html.AntiForgeryToken()
@@ -207,11 +206,11 @@
         }
         
         .delete-button i {
-            font-size: 0.9em;
+            font-size: 1.2em;
         }        
 
         .btn-rename i {
-            font-size: 0.9em;
+            font-size: 1.2em;
         }
         
     </style>
@@ -234,5 +233,33 @@
                 }, 2500); // 2500 milliseconds = 2.5 seconds: Time before the alert starts to fade out.
             });
         });
+
+        // Handle file input change for the upload form: Listener for when a file is selected
+            $('#chooseFile').on('change', function() {
+                var fileName = $(this).val().split('\\').pop(); // Extract just the file name
+                $('#fileNameDisplay').val(fileName || '--No file chosen--'); // Display the file name or default placeholder
+            });
+
+            // --- NEW: Event listener for clicking the file name display input ---
+            $('#fileNameDisplay').on('click', function() {
+                console.log('#fileNameDisplay clicked, triggering #chooseFile');
+                $('#chooseFile').trigger('click'); // Trigger a click on the hidden file input
+            });
+
+
+            // Event listener for clicking the filename cell (in the table) to open the rename modal
+            $('#categoryFilesContainer table tbody').on('click', '.filename-cell', function() {
+                 var row = $(this).closest('tr'); // Find the parent table row
+                 // Retrieve file data stored in data attributes on the table row
+                 var fileId = row.data('file-id');
+                 var fileName = row.data('file-name');
+                 var sortOrder = row.data('sort-order');
+                 // Assuming data-category-id exists on the row as well
+                 var categoryId = row.data('category-id');
+
+                 // Call the global function to show the modal, passing the retrieved data
+                 showRenameModal(fileId, fileName, sortOrder, categoryId);
+            });
+
     </script>
 }
