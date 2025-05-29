@@ -8,122 +8,91 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using TempDataAttribute = Microsoft.AspNetCore.Mvc.TempDataAttribute;
-
-
 namespace Members.Areas.Identity.Pages
 {
     public class EditUserModel(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender, ApplicationDbContext dbContext) : PageModel
     {
-
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IEmailSender _emailSender = emailSender;
         private readonly ApplicationDbContext _dbContext = dbContext;
-
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
-
         // This property will capture the full return URL from the query string
         // It's also marked for binding on POST
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
-
         [BindProperty(SupportsGet = true)]
         public string? ShowExtraFields { get; set; }
-
         [TempData] // Use TempData to display status messages after redirect
         public string? StatusMessage { get; set; }
-
         [BindProperty] // Bind on POST to get selected roles from the form
         public List<RoleViewModel> AllRoles { get; set; } = [];
-
         public class RoleViewModel
         {
             public required string Value { get; set; }
             public string? Text { get; set; }
             public bool Selected { get; set; }
         }
-
         public class InputModel
         {
             public string? Id { get; set; }
-
             [Display(Name = "Username")]
             public string? UserName { get; set; }
-
             [EmailAddress]
             [Display(Name = "Email")]
             public string? Email { get; set; }
-
             [Display(Name = "Email Confirmed")]
             public bool EmailConfirmed { get; set; }
-
             [DataType(DataType.Password)]
             [Display(Name = "New Password")]
             public string? NewPassword { get; set; }
-
             [Phone]
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
-
             [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; }
-
             [Phone]
             [Display(Name = "Home Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? HomePhoneNumber { get; set; }
-
             [Required]
             [Display(Name = "First Name")]
             public string? FirstName { get; set; }
-
             [Display(Name = "Middle Name")]
             public string? MiddleName { get; set; }
-
             [Required]
             [Display(Name = "Last Name")]
             public string? LastName { get; set; }
-
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
-
             [Display(Name = "Anniversary")]
             [DataType(DataType.Date)]
             public DateTime? Anniversary { get; set; }
-
             [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
-
             [Display(Name = "Address Line 2")]
             public string? AddressLine2 { get; set; }
-
             [Required]
             [Display(Name = "City")]
             public string? City { get; set; }
-
             [Required]
             [Display(Name = "State")]
             public string? State { get; set; }
-
             [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
-
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
         }
-
         private async Task LoadUserAsync(IdentityUser user)
         {
             var userProfile = await _dbContext.UserProfile.FindAsync(user.Id);
-
             Input = new InputModel
             {
                 Id = user.Id,
@@ -145,15 +114,12 @@ namespace Members.Areas.Identity.Pages
                 ZipCode = userProfile?.ZipCode,
                 Plot = userProfile?.Plot
             };
-
             await PopulateRoleViewModelsAsync(user);
         }
-
         private async Task PopulateRoleViewModelsAsync(IdentityUser user)
         {
             var roles = await _roleManager.Roles.ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
-
             AllRoles = [.. roles.Select(role => new RoleViewModel
             {
                 Value = role.Name ?? string.Empty,
@@ -161,7 +127,6 @@ namespace Members.Areas.Identity.Pages
                 Selected = userRoles.Contains(role.Name ?? string.Empty)
             }).OrderBy(r => r.Text)];
         }
-
         public async Task<IActionResult> OnGetAsync(string id, string? returnUrl)
         {
             // Optionally capture SearchTerm and ShowExtraFields from returnUrl if needed for display
@@ -178,7 +143,6 @@ namespace Members.Areas.Identity.Pages
                     ShowExtraFields = showExtraFieldsValue.ToString();
                 }
             }
-
             if (string.IsNullOrEmpty(id))
             {
                 StatusMessage = "Error: User ID is missing.";
@@ -188,7 +152,6 @@ namespace Members.Areas.Identity.Pages
                 }
                 return RedirectToPage("./Users");
             }
-
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
@@ -199,16 +162,12 @@ namespace Members.Areas.Identity.Pages
                 }
                 return RedirectToPage("./Users");
             }
-
             await LoadUserAsync(user);
-
             Input.City ??= Environment.GetEnvironmentVariable("DEFAULT_CITY");
             Input.State ??= Environment.GetEnvironmentVariable("DEFAULT_STATE");
             Input.ZipCode ??= Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE");
-
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
             var userOnPost = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
@@ -216,15 +175,12 @@ namespace Members.Areas.Identity.Pages
             {
                 await PopulateRoleViewModelsAsync(userOnPost);
             }
-
             if (!ModelState.IsValid)
             {
                 StatusMessage = "Error: Please fix the validation errors.";
                 return Page();
             }
-
             var user = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
-
             if (user == null)
             {
                 StatusMessage = $"Error: Unable to find user with ID '{Input.Id}' to update.";
@@ -234,26 +190,21 @@ namespace Members.Areas.Identity.Pages
                 }
                 return RedirectToPage("./Users");
             }
-
             user.UserName = Input.UserName;
             user.Email = Input.Email;
             user.EmailConfirmed = Input.EmailConfirmed;
             user.PhoneNumber = Input.PhoneNumber;
             user.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
-
             var result = await _userManager.UpdateAsync(user);
-
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-
                 StatusMessage = "Error: User update failed.";
                 return Page();
             }
-
             var userProfile = await _dbContext.UserProfile.FindAsync(Input.Id);
             if (userProfile == null)
             {
@@ -272,39 +223,11 @@ namespace Members.Areas.Identity.Pages
             userProfile.ZipCode = Input.ZipCode;
             userProfile.Plot = Input.Plot;
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
-
             await _dbContext.SaveChangesAsync();
             StatusMessage = "User updated successfully.";
-
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {
@@ -312,40 +235,12 @@ namespace Members.Areas.Identity.Pages
                 return RedirectToPage("./Users");
             }
         }
-
         public IActionResult OnPostCancel()
         {
             StatusMessage = "User Cancelled.";
-
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {
@@ -353,12 +248,10 @@ namespace Members.Areas.Identity.Pages
                 return RedirectToPage("./Users");
             }
         }
-
         public async Task<IActionResult> OnPostDeleteAsync()
         {
             // Find the user to delete using the Id from the bound Input model
             var userToDelete = await _userManager.FindByIdAsync(Input.Id ?? string.Empty);
-
             if (userToDelete == null)
             {
                 StatusMessage = $"Error: Unable to find user with ID '{Input.Id}' to delete.";
@@ -369,7 +262,6 @@ namespace Members.Areas.Identity.Pages
                 }
                 return RedirectToPage("./Users");
             }
-
             // Prevent deleting the currently logged-in user (optional but recommended)
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser != null)
@@ -384,10 +276,8 @@ namespace Members.Areas.Identity.Pages
                     return RedirectToPage("./Users");
                 }
             }
-
             // Delete the user
             var result = await _userManager.DeleteAsync(userToDelete);
-
             if (!result.Succeeded)
             {
                 // If deletion fails, add errors to ModelState and return to the page
@@ -404,7 +294,6 @@ namespace Members.Areas.Identity.Pages
                 StatusMessage = "Error: User deletion failed.";
                 return Page(); // Stay on the Edit page with errors
             }
-
             // Delete the associated UserProfile as well
             var userProfileToDelete = await _dbContext.UserProfile.FindAsync(userToDelete.Id);
             if (userProfileToDelete != null)
@@ -412,38 +301,10 @@ namespace Members.Areas.Identity.Pages
                 _dbContext.UserProfile.Remove(userProfileToDelete);
                 await _dbContext.SaveChangesAsync();
             }
-
             StatusMessage = $"User '{userToDelete.UserName}' deleted successfully.";
-
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {
