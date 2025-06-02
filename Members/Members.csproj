@@ -137,9 +137,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
-    <PackageReference Include="Syncfusion.Licensing" Version="29.2.5" />
-    <PackageReference Include="Syncfusion.Pdf.Imaging.NET" Version="29.2.5" />
-    <PackageReference Include="Syncfusion.Pdf.NET" Version="29.2.5" />
+    <PackageReference Include="Syncfusion.Licensing" Version="29.2.7" />
+    <PackageReference Include="Syncfusion.Pdf.Imaging.NET" Version="29.2.7" />
+    <PackageReference Include="Syncfusion.Pdf.NET" Version="29.2.7" />
     <PackageReference Include="System.Security.Permissions" Version="9.0.5" />
   </ItemGroup>
 
