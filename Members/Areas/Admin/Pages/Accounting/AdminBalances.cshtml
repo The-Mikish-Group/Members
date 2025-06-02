@@ -1,0 +1,103 @@
+﻿@page
+@model Members.Areas.Admin.Pages.Accounting.AdminBalancesModel
+@{
+    ViewData["Title"] = "Member Balances";
+    Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <form method="get" class="mb-3">
+        <div class="form-check">
+            <input asp-for="ShowOnlyOutstanding" class="form-check-input" onchange="this.form.submit()" />
+            <label asp-for="ShowOnlyOutstanding" class="form-check-label">Show Only Members with Outstanding Balances</label>
+        </div>
+        @* Hidden inputs to retain sort order when filter changes *@
+        <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
+    </form>
+
+    @if (!Model.MemberBalances.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            No member balances to display with the current filter.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>
+                            <a asp-page="./AdminBalances"
+                               asp-route-sortOrder="@Model.NameSort"
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()">Name</a>
+                            @if (Model.CurrentSort == Model.NameSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.NameSort?.Replace("_desc", "_asc") || (string.IsNullOrEmpty(Model.CurrentSort) && Model.NameSort == "name_desc"))
+                            {
+                                <i class="bi @(Model.NameSort == "name_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                            }
+                        </th>
+                        <th>
+                            <a asp-page="./AdminBalances"
+                               asp-route-sortOrder="@Model.EmailSort"
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()">Email</a>
+                            @if (Model.CurrentSort == Model.EmailSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.EmailSort?.Replace("_desc", "_asc"))
+                            {
+                                <i class="bi @(Model.EmailSort == "email_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                            }
+                        </th>
+                        <th class="text-end">
+                            <a asp-page="./AdminBalances"
+                               asp-route-sortOrder="@Model.BalanceSort"
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()">Current Balance</a>
+                            @if (Model.CurrentSort == Model.BalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.BalanceSort?.Replace("_desc", "_asc"))
+                            {
+                                <i class="bi @(Model.BalanceSort == "balance_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                            }
+                        </th>
+                        <th>Actions</th> @* Placeholder for future actions *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in Model.MemberBalances)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => member.FullName)</td>
+                            <td>@Html.DisplayFor(modelItem => member.Email)</td>
+                            <td class="text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
+                                @member.CurrentBalance.ToString("C")
+                            </td>
+                            <td>
+                                @* Placeholder for future action links/buttons per row *@
+                                @* Example:
+                                <a asp-page="./ApplyLateFee" asp-route-userId="@member.UserId" class="btn btn-sm btn-warning @(member.CurrentBalance <= 0 ? "disabled" : "")">Apply Late Fee</a>
+                                <a asp-page="/Member/MyBilling" asp-route-userId="@member.UserId" class="btn btn-sm btn-info" target="_blank">View Ledger</a>
+                                *@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .table th a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+            .table th a:hover {
+                text-decoration: underline;
+            }
+
+        .table th .bi { /* For sort indicators */
+            font-size: 0.9em;
+            margin-left: 0.25rem;
+        }
+    </style>
+}
+

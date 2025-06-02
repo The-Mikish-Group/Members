@@ -120,6 +120,14 @@
                             </ul>
                         </li>                       
 
+                        @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                            {
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="Member" asp-page="/MyBilling" title="My Billing"><i class="bi bi-plus-circle"></i> My Billing</a>                                             
+                                </li>
+                                
+                            }   
+                        
                     </ul>
                 </li>
                 }                
@@ -198,7 +206,8 @@
                                             <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" style="min-width: 200px;" aria-labelledby="adminAccountingDropdown" data-bs-auto-close="outside">
 
                                                 <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AddInvoice" title="Add Invoice"><i class="bi bi-plus-circle"></i> Add Invoice</a></li>
-                                                <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/RecordPayment" title="Record Payment"><i class="bi bi-plus-circle"></i> Record Payment</a></li>                                                
+                                                <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/RecordPayment" title="Record Payment"><i class="bi bi-plus-circle"></i> Record Payment</a></li>
+                                                <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Member Balances"><i class="bi bi-plus-circle"></i> Member Balances</a></li>
                                             </ul>
                                         </li>
                                     </ul>

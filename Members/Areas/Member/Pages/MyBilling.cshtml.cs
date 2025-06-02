@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 namespace Members.Areas.Member.Pages // Or adjust if your folder structure leads to a different namespace
 {
-    [Authorize(Roles = "Member")] // Only accessible to users in the "Member" role
+    [Authorize(Roles = "Admin,Manager,Member")] // Only accessible to users in the "Member" role
     public class MyBillingModel : PageModel
     {
         private readonly ApplicationDbContext _context;
