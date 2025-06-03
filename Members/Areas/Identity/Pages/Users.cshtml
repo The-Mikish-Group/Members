@@ -188,6 +188,20 @@
                                         </a>
                                     </th>
                                     <th>
+                                        <!-- Sort by Is Billing Contact -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="isbillingcontact"
+                                            data-sort-column="isbillingcontact"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "isbillingcontact" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Billable <i class="bi bi-check-lg text-success"></i>
+                                        </a>
+                                    </th>
+                                    <th>
                                         <!-- Sort by Roles -->
                                         <a class="nav-link"
                                             asp-page="./Users"
@@ -215,187 +229,175 @@
                                             Last Login
                                         </a>
                                     </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by First Name -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="firstname"
-                                                data-sort-column="firstname"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                First Name
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Middle Name -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="middlename"
-                                                data-sort-column="middlename"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Middle Name
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Last Name -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="lastname"
-                                                data-sort-column="lastname"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Last Name
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Home Phone -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="homephonenumber"
-                                                data-sort-column="homephonenumber"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Home Phone
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Address Line 1 -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="addressline1"
-                                                data-sort-column="addressline1"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Address 1
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Address Line 2 -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="addressline2"
-                                                data-sort-column="addressline2"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Address 2
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by City -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="city"
-                                                data-sort-column="city"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                City
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by State -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="state"
-                                                data-sort-column="state"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                State
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Zip Code -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="zipcode"
-                                                data-sort-column="zipcode"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Zip Code
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Plot -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="plot"
-                                                data-sort-column="plot"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Plot
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Birthday -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="birthday"
-                                                data-sort-column="birthday"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Birthday
-                                            </a>
-                                        </th>
-
-                                        <th class="extra-field">
-                                            <!-- Sort by Anniversary -->
-                                            <a class="nav-link"
-                                                asp-page="./Users"
-                                                asp-route-sortcolumn="anniversary"
-                                                data-sort-column="anniversary"
-                                                asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
-                                                asp-route-searchterm="@Model.SearchTerm"
-                                                asp-route-pageNumber="@Model.PageNumber"
-                                                asp-route-pageSize="@Model.PageSize"
-                                                asp-route-showextrafields="@Model.ShowExtraFields">
-                                                Anniversary
-                                            </a>
-                                        </th>
-                                    </tr>
+                                    <th class="extra-field">
+                                        <!-- Sort by First Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="firstname"
+                                            data-sort-column="firstname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            First Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Middle Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="middlename"
+                                            data-sort-column="middlename"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Middle Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Last Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="lastname"
+                                            data-sort-column="lastname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Last Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Home Phone -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="homephonenumber"
+                                            data-sort-column="homephonenumber"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Home Phone
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Address Line 1 -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="addressline1"
+                                            data-sort-column="addressline1"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Address 1
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Address Line 2 -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="addressline2"
+                                            data-sort-column="addressline2"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Address 2
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by City -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="city"
+                                            data-sort-column="city"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            City
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by State -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="state"
+                                            data-sort-column="state"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            State
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Zip Code -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="zipcode"
+                                            data-sort-column="zipcode"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Zip Code
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Plot -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="plot"
+                                            data-sort-column="plot"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Plot
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Birthday -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="birthday"
+                                            data-sort-column="birthday"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Birthday
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Anniversary -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="anniversary"
+                                            data-sort-column="anniversary"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Anniversary
+                                        </a>
+                                    </th>
+                                </tr>
                             </thead>
                 
                             <!-- Table Body -->
@@ -431,6 +433,14 @@
                                         <!-- Cell Phone Confirmed -->
                                         <td>
                                             @if (user.PhoneNumberConfirmed)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+
+                                        <!-- Is Billing Contact -->
+                                        <td>
+                                            @if (user.IsBillingContact)
                                             {
                                                 <i class="bi bi-check-lg text-success"></i>
                                             }

@@ -10,60 +10,6 @@
 
 <head>
     <title>@ViewData["Title"]</title>
-
-    <style>
-        .readonly-email,
-        .readonly-PhoneNumber {
-            background-color: #f0f0f0; /* Light gray */
-            cursor: not-allowed; /* Indicate it's not editable */
-            padding-right: 2.5em; /* Make space for the icon */
-            position: relative; /* Needed for absolute positioning of the icon */
-        }
-
-        .email-icon-container,
-        .phoneNumber-icon-container {
-            position: absolute;
-            top: 50%;
-            right: 0.5em;
-            transform: translateY(-50%);
-        }
-
-        .form-check-input[type=checkbox].email-confirmed-checkbox,
-        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox,
-        .form-check-input[type=checkbox].role-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 1.2em;
-            height: 1.2em;
-            border: 1px solid #ccc;
-            border-radius: 0.2em;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-        }
-
-            .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
-            .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked,
-            .form-check-input[type=checkbox].role-checkbox:checked {
-                background-color: #fff; /* White background when checked */
-                border-color: #28a745; /* Green border when checked */
-            }
-
-                .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
-                .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,
-                .form-check-input[type=checkbox].role-checkbox:checked::before {
-                    content: '\2713'; /* Unicode checkmark character */
-                    display: block;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 1em;
-                    color: #28a745; /* Green checkmark */
-                }
-    </style>
-
 </head>
 
 <!-- Banner Logo -->
@@ -215,11 +161,24 @@
 
                     <hr />
 
-                    <!-- Plot -->
-                    <div class="col-12 form-floating mb-4">
-                        <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
-                        <label asp-for="Input.Plot" class="form-label">Plot</label>
-                        <span asp-validation-for="Input.Plot" class="text-danger"></span>
+                    <div class="row gx-1">
+
+                        <!-- Plot -->
+                        <div class="col-6 form-floating mb-4">
+                            <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
+                            <label asp-for="Input.Plot" class="form-label">Plot</label>
+                            <span asp-validation-for="Input.Plot" class="text-danger"></span>
+                        </div>
+
+                        <!-- Is Billing Contact -->
+                        <div class="col-6 form-floating mb-4">
+                            <div class="form-check ms-2">
+                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox" id="IsBillingContactCheckbox" />
+                                <label asp-for="Input.IsBillingContact" class="form-check-label"></label>
+                            </div>
+                            <span asp-validation-for="Input.IsBillingContact" class="text-danger"></span>
+                        </div>
+
                     </div>
 
                     <hr />
@@ -260,6 +219,64 @@
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .readonly-email,
+        .readonly-PhoneNumber {
+            background-color: #f0f0f0; /* Light gray */
+            cursor: not-allowed; /* Indicate it's not editable */
+            padding-right: 2.5em; /* Make space for the icon */
+            position: relative; /* Needed for absolute positioning of the icon */
+        }
+
+        .email-icon-container,
+        .phoneNumber-icon-container {
+            position: absolute;
+            top: 50%;
+            right: 0.5em;
+            transform: translateY(-50%);
+        }
+
+        .form-check-input[type=checkbox].isBillingContact-checkbox,
+        .form-check-input[type=checkbox].email-confirmed-checkbox,
+        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox,
+        .form-check-input[type=checkbox].role-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.2em;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .form-check-input[type=checkbox].isBillingContact-checkbox:checked,
+            .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
+            .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked,
+            .form-check-input[type=checkbox].role-checkbox:checked {
+                background-color: #fff; /* White background when checked */
+                border-color: #28a745; /* Green border when checked */
+            }
+                
+                .form-check-input[type=checkbox].isBillingContact-checkbox:checked::before,
+                .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
+                .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,
+                .form-check-input[type=checkbox].role-checkbox:checked::before {
+                    content: '\2713'; /* Unicode checkmark character */
+                    display: block;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 1em;
+                    color: #28a745; /* Green checkmark */
+                }
+    </style>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

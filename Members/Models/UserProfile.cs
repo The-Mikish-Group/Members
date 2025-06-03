@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System; // Required for DateTime if not already present
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Members.Models
 {
     public class UserProfile
@@ -9,7 +9,6 @@ namespace Members.Models
         [Key]
         [ForeignKey("User")] // Links this profile to a specific IdentityUser
         public required string UserId { get; set; }
-
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string? LastName { get; set; }
@@ -23,6 +22,8 @@ namespace Members.Models
         public string? Plot { get; set; }
         public string? HomePhoneNumber { get; set; }
         public DateTime? LastLogin { get; set; }
+        [Display(Name = "Is Billing Contact")]
+        public bool IsBillingContact { get; set; } = false;
         public required IdentityUser User { get; set; }
     }
 }

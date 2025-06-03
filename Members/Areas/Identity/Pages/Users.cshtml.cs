@@ -35,6 +35,7 @@ namespace Members.Areas.Identity.Pages
             public string? Plot { get; set; }
             public DateTime? Birthday { get; set; }
             public DateTime? Anniversary { get; set; }
+            public bool IsBillingContact { get; set; } 
             // --- End New UserProfile Fields ---
         }
         // Property to hold the users for the current page
@@ -204,6 +205,7 @@ namespace Members.Areas.Identity.Pages
                     "plot" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Plot : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Plot : null),
                     "birthday" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Birthday : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Birthday : null),
                     "anniversary" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Anniversary : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Anniversary : null),
+                    "isbillingcontact" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.IsBillingContact : false) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.IsBillingContact : false),
                     // --- End sorting for new fields ---
                     _ => joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.LastName : null).ThenBy(x => x.UserProfile != null ? x.UserProfile.FirstName : null), // Default sort by Full Name if SortColumn is invalid or not provided
                 };
@@ -249,7 +251,8 @@ namespace Members.Areas.Identity.Pages
                     ZipCode = userProfile?.ZipCode,
                     Plot = userProfile?.Plot,
                     Birthday = userProfile?.Birthday,
-                    Anniversary = userProfile?.Anniversary
+                    Anniversary = userProfile?.Anniversary,
+                    IsBillingContact = userProfile?.IsBillingContact ?? false
                     // --- End Map Additional UserProfile Fields ---
                 });
             }

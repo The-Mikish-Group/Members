@@ -8,12 +8,34 @@
 <div class="container mt-4">
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
+    @if (TempData["StatusMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
     <form method="get" class="mb-3">
-        <div class="form-check">
+        <div class="form-check mb-2">
             <input asp-for="ShowOnlyOutstanding" class="form-check-input" onchange="this.form.submit()" />
             <label asp-for="ShowOnlyOutstanding" class="form-check-label">Show Only Members with Outstanding Balances</label>
         </div>
-        @* Hidden inputs to retain sort order when filter changes *@
         <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
     </form>
 
@@ -56,7 +78,7 @@
                                 <i class="bi @(Model.BalanceSort == "balance_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
                             }
                         </th>
-                        <th>Actions</th> @* Placeholder for future actions *@
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,11 +91,17 @@
                                 @member.CurrentBalance.ToString("C")
                             </td>
                             <td>
-                                @* Placeholder for future action links/buttons per row *@
-                                @* Example:
-                                <a asp-page="./ApplyLateFee" asp-route-userId="@member.UserId" class="btn btn-sm btn-warning @(member.CurrentBalance <= 0 ? "disabled" : "")">Apply Late Fee</a>
-                                <a asp-page="/Member/MyBilling" asp-route-userId="@member.UserId" class="btn btn-sm btn-info" target="_blank">View Ledger</a>
-                                *@
+                                <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
+                                    @* We might need to pass sourceInvoiceId if we refine the logic later *@
+                                    @* <input type="hidden" name="sourceInvoiceId" value="THE_ID_OF_OVERDUE_DUES_INVOICE" /> *@
+                                    <button type="submit" class="btn btn-sm btn-warning @(member.CurrentBalance <= 0 ? "disabled" : "")"
+                                            title="Apply Late Fee if Dues are Overdue"
+                                            onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue Dues invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
+                                        Apply Late Fee
+                                    </button>
+                                </form>
+                                @* Add other action links here later if needed *@
+                                @* <a asp-page="/Member/MyBilling" asp-route-userId="@member.UserId" class="btn btn-sm btn-info" target="_blank">View Ledger</a> *@
                             </td>
                         </tr>
                     }
@@ -100,4 +128,3 @@
         }
     </style>
 }
-

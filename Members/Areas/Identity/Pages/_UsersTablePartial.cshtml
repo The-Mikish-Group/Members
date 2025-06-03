@@ -52,6 +52,13 @@
                     }
                 </td>
                 <td>
+                    @if (user.IsBillingContact)
+                    {
+                        <i class="bi bi-check-lg text-success"></i>
+                    }
+                </td>
+
+                <td>
                     @if (user.Roles != null)
                     {
                         @foreach (var role in user.Roles)
@@ -88,7 +95,7 @@
     else
     {
         <tr>
-            <td colspan="@(Model.ShowExtraFields ? "13" : "7")" class="text-center">No members found matching the criteria.</td>
+            <td colspan="@(Model.ShowExtraFields ? "13" : "8")" class="text-center">No members found matching the criteria.</td>
         </tr>
     }
 </tbody>

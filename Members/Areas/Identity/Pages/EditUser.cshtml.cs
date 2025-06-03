@@ -89,6 +89,9 @@ namespace Members.Areas.Identity.Pages
             public string? ZipCode { get; set; }
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
+
+            [Display(Name = "Is Billing Contact for Plot")]
+            public bool IsBillingContact { get; set; }
         }
         private async Task LoadUserAsync(IdentityUser user)
         {
@@ -112,7 +115,9 @@ namespace Members.Areas.Identity.Pages
                 City = userProfile?.City,
                 State = userProfile?.State,
                 ZipCode = userProfile?.ZipCode,
-                Plot = userProfile?.Plot
+                Plot = userProfile?.Plot,
+                IsBillingContact = userProfile?.IsBillingContact ?? false
+
             };
             await PopulateRoleViewModelsAsync(user);
         }
@@ -223,6 +228,45 @@ namespace Members.Areas.Identity.Pages
             userProfile.ZipCode = Input.ZipCode;
             userProfile.Plot = Input.Plot;
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
+
+            // --- ADD/MODIFY THIS BLOCK for IsBillingContact ---
+            if (Input.IsBillingContact)
+            {
+                // If admin is trying to set this user as the billing contact,
+                // check for conflicts on the same plot (if plot is not null/empty).
+                if (!string.IsNullOrWhiteSpace(userProfile.Plot))
+                {
+                    var existingBillingContact = await _dbContext.UserProfile
+                        .FirstOrDefaultAsync(up => up.Plot == userProfile.Plot &&
+                                                    up.IsBillingContact &&
+                                                    up.UserId != userProfile.UserId); // Exclude current user
+
+                    if (existingBillingContact != null)
+                    {
+                        var conflictingUserIdentity = await _userManager.FindByIdAsync(existingBillingContact.UserId);
+                        string conflictingUserName = conflictingUserIdentity?.UserName ?? "another user";
+
+                        ModelState.AddModelError("Input.IsBillingContact",
+                            $"Cannot set as billing contact. Plot '{userProfile.Plot}' already has {conflictingUserName} (ID: {existingBillingContact.UserId}) designated as the billing contact. " +
+                            "Please unassign the other user first if you want to make this change.");
+
+                        // Repopulate roles, as we are returning to the page due to validation error
+                        await PopulateRoleViewModelsAsync(user);
+                        StatusMessage = "Error: Could not save changes due to billing contact conflict.";
+                        return Page();
+                    }
+                }
+                userProfile.IsBillingContact = true;
+            }
+            else
+            {
+                userProfile.IsBillingContact = false;
+            }
+            // --- END IsBillingContact BLOCK ---
+
+            await _dbContext.SaveChangesAsync();
+            StatusMessage = "User updated successfully.";
+
             await _dbContext.SaveChangesAsync();
             StatusMessage = "User updated successfully.";
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
