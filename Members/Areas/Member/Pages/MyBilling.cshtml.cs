@@ -5,12 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 namespace Members.Areas.Member.Pages // Or adjust if your folder structure leads to a different namespace
 {
     [Authorize(Roles = "Admin,Manager,Member")] // Only accessible to users in the "Member" role

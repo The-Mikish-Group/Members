@@ -41,52 +41,68 @@ namespace Members.Areas.Identity.Pages
             public string? Id { get; set; }
             [Display(Name = "Username")]
             public string? UserName { get; set; }
+
             [EmailAddress]
             [Display(Name = "Email")]
             public string? Email { get; set; }
             [Display(Name = "Email Confirmed")]
             public bool EmailConfirmed { get; set; }
+
             [DataType(DataType.Password)]
             [Display(Name = "New Password")]
             public string? NewPassword { get; set; }
+
             [Phone]
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
+
             [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; }
+
             [Phone]
             [Display(Name = "Home Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? HomePhoneNumber { get; set; }
+
             [Required]
             [Display(Name = "First Name")]
             public string? FirstName { get; set; }
+
             [Display(Name = "Middle Name")]
             public string? MiddleName { get; set; }
+
             [Required]
             [Display(Name = "Last Name")]
             public string? LastName { get; set; }
+
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
+
             [Display(Name = "Anniversary")]
             [DataType(DataType.Date)]
             public DateTime? Anniversary { get; set; }
+
             [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
+
             [Display(Name = "Address Line 2")]
             public string? AddressLine2 { get; set; }
+
             [Required]
             [Display(Name = "City")]
             public string? City { get; set; }
+
             [Required]
             [Display(Name = "State")]
             public string? State { get; set; }
+
             [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
+
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
 
@@ -199,7 +215,7 @@ namespace Members.Areas.Identity.Pages
             user.Email = Input.Email;
             user.EmailConfirmed = Input.EmailConfirmed;
             user.PhoneNumber = Input.PhoneNumber;
-            user.PhoneNumberConfirmed = user.PhoneNumberConfirmed;
+            user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed;
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {

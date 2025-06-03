@@ -35,7 +35,7 @@ namespace Members.Areas.Identity.Pages
             public string? Plot { get; set; }
             public DateTime? Birthday { get; set; }
             public DateTime? Anniversary { get; set; }
-            public bool IsBillingContact { get; set; } 
+            public bool IsBillingContact { get; set; }
             // --- End New UserProfile Fields ---
         }
         // Property to hold the users for the current page

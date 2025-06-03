@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System; // Required for DateTime if not already present
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Members.Models

@@ -31,9 +31,9 @@
                 <form method="post" id="editForm">
 
                     <!-- Hidden Fields -->
-                    @Html.AntiForgeryToken()                   
+                    @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="ReturnUrl" />
-                    <input type="hidden" asp-for="Input.Id" />                 
+                    <input type="hidden" asp-for="Input.Id" />
                     <input type="hidden" asp-for="Input.UserName" />
                     <input type="hidden" asp-for="Input.Email" id="hiddenEmail" />
 
@@ -41,7 +41,7 @@
                     <input type="hidden" id="isManager" value="@User.IsInRole("Manager")" />
 
                     <!-- Email -->
-                    <div class="form-floating mb-3">                        
+                    <div class="form-floating mb-3">
                         <span class="form-control email-display readonly-email">@Model.Input.Email</span>
                         <div class="email-icon-container" id="emailCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
@@ -57,7 +57,7 @@
                     </div>
 
                     <!-- Phone Number -->
-                    <div class="form-floating mb-3">                        
+                    <div class="form-floating mb-3">
                         <input asp-for="Input.PhoneNumber" class="form-control readonly-PhoneNumber" id="phoneNumber" placeholder="Phone Number" />
                         <div class="phoneNumber-icon-container" id="phoneNumberCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
@@ -189,7 +189,7 @@
                         <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
                             <i class="bi bi-box-arrow-left"></i> Cancel
                         </button>
-                        
+
                         <!-- Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl -->
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
@@ -200,20 +200,48 @@
 
                         <!-- Admin Protection on Delete Button -->
                         @if (User.IsInRole("Admin"))
-                        {       
+                        {
                             <!-- Delete -->
                             <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2" id="confirmDeleteButton">
                                 <i class="bi bi-x-circle"></i> Delete
-                            </button>                            
+                            </button>
                         }
-                       
+
                         <!-- Save -->
                         <button type="submit" class="btn btn-sm btn-success me-2">
                             <i class="bi bi-save"></i> Save
-                        </button>                       
+                        </button>
 
                     </div>
-                    
+
+                    <hr />                    
+
+                    <h5 class="text-center text-gold-darker mt-4 mb-3">Accounting Actions</h5>
+
+                    <div class="row gx-2 gy-2 mb-4 justify-content-center">
+                        <div class="col-auto">
+                            <a asp-area="Admin" asp-page="/Accounting/AddInvoice" asp-route-userId="@Model.Input.Id" class="btn btn-sm btn-primary">
+                                <i class="bi bi-file-earmark-plus"></i> Add Invoice
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <a asp-area="Admin" asp-page="/Accounting/RecordPayment" asp-route-userId="@Model.Input.Id" class="btn btn-sm btn-success">
+                                <i class="bi bi-cash-coin"></i> Record Payment
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            @* Placeholder for Apply Late Fee - will be a POST form later *@
+                            <button type="button" class="btn btn-sm btn-warning disabled" title="Apply Late Fee (Coming Soon)">
+                                <i class="bi bi-alarm"></i> Apply Late Fee
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <a asp-area="Member" asp-page="/MyBilling" asp-route-userId="@Model.Input.Id" class="btn btn-sm btn-info" target="_blank">
+                                <i class="bi bi-card-list"></i> View Billing History
+                            </a>
+                        </div>
+                    </div>                    
+
                 </form>
             </div>
         </div>
@@ -261,7 +289,7 @@
                 background-color: #fff; /* White background when checked */
                 border-color: #28a745; /* Green border when checked */
             }
-                
+
                 .form-check-input[type=checkbox].isBillingContact-checkbox:checked::before,
                 .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
                 .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,

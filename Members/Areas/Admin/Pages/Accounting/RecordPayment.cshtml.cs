@@ -6,12 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")] // Or your specific admin roles
@@ -84,8 +79,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             foreach (var user in usersInMemberRole.OrderBy(u => u.UserName))
             {
                 if (userProfiles != null)
-                    {              
-                        if (userProfiles.TryGetValue(user.Id, out UserProfile? profile) && profile != null && !string.IsNullOrEmpty(profile.LastName))
+                {
+                    if (userProfiles.TryGetValue(user.Id, out UserProfile? profile) && profile != null && !string.IsNullOrEmpty(profile.LastName))
                     {
                         profilesMatched++;
                         userListItems.Add(new SelectListItem
@@ -94,7 +89,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                             Text = $"{profile.LastName}, {profile.FirstName} ({user.Email})"
                         });
                     }
-                    }
+                }
                 else
                 {
                     userListItems.Add(new SelectListItem
