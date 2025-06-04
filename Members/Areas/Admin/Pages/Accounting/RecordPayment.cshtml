@@ -1,9 +1,8 @@
-﻿@page
+﻿@page "{userId?}"
 @model Members.Areas.Admin.Pages.Accounting.RecordPaymentModel
 @{
     ViewData["Title"] = "Record New Payment";
-    // Adjust layout as needed, similar to AddInvoice.cshtml
-    Layout = "/Views/Shared/_Layout.cshtml";
+    Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
 }
 
 <div class="container mt-4">
@@ -11,14 +10,19 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    @* Changed color for variety *@
-                    <h4 class="mb-0">@ViewData["Title"]</h4>
+                    <h4 class="mb-0">
+                        @ViewData["Title"]
+                        @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
+                        {
+                            <span> for @Model.TargetUserName</span>
+                        }
+                    </h4>
                 </div>
                 <div class="card-body">
                     @if (TempData["StatusMessage"] != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @TempData["StatusMessage"]
+                            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
@@ -26,23 +30,34 @@
                     <form method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="Input.SelectedUserID" class="form-label"></label>
-                            <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
-                                <option value="">-- Select User --</option>
-                            </select>
-                            <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
-                        </div>
+                        @if (Model.IsUserPreselected)
+                        {
+                            <input type="hidden" asp-for="Input.SelectedUserID" />
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">User</label>
+                                <p class="form-control-plaintext">@Model.TargetUserName</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Input.SelectedUserID" class="form-label"></label>
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
+                                    <option value="">-- Select User --</option>
+                                </select>
+                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
+                            </div>
+                        }
 
-                        @* TODO: Future enhancement - Dynamically load unpaid invoices for the selected user here *@
-                        @* For now, SelectedInvoiceID is a simple textbox if someone wants to type it.
-                           Or, it can be hidden if we decide not to link payments to invoices directly in this version.
-                           Let's make it a number input for now, but it's not very user-friendly without a lookup.
-                        *@
+                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                        {
+                            <input type="hidden" asp-for="ReturnUrl" />
+                        }
                         <div class="mb-3">
                             <label asp-for="Input.SelectedInvoiceID" class="form-label"></label>
                             <input asp-for="Input.SelectedInvoiceID" class="form-control" type="number" />
                             <span asp-validation-for="Input.SelectedInvoiceID" class="text-danger"></span>
+                            <small class="form-text text-muted">If this payment is for a specific invoice, enter its ID.</small>
                         </div>
 
                         <div class="row mb-3">
@@ -76,18 +91,25 @@
                             <textarea asp-for="Input.Notes" class="form-control" rows="3"></textarea>
                             <span asp-validation-for="Input.Notes" class="text-danger"></span>
                         </div>
-
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-success">Record Payment</button>
+                            @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                            {
+                                <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Back to Edit User</a>
+                            }
+                            else if (!Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                            {
+                                // Fallback if ReturnUrl exists but user wasn't preselected (e.g. back to a list of payments)
+                                <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Cancel</a>
+                            }
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                </div> @* card-body *@
+            </div> @* card *@
+        </div> @* col *@
+    </div> @* row *@
+</div> @* container *@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    @* TODO: Add JavaScript here if we implement dynamic loading of unpaid invoices based on selected user *@
 }

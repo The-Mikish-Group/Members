@@ -5,69 +5,116 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-namespace Members.Areas.Member.Pages // Or adjust if your folder structure leads to a different namespace
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Members.Areas.Member.Pages
 {
-    [Authorize(Roles = "Admin,Manager,Member")] // Only accessible to users in the "Member" role
-    public class MyBillingModel : PageModel
+    [Authorize] // Can be just [Authorize] if any logged-in user can see their own,
+                // or [Authorize(Roles="Member,Admin,Manager")] if admins can also view.
+                // The logic inside OnGetAsync will differentiate.
+    public class MyBillingModel(
+        ApplicationDbContext context,
+        UserManager<IdentityUser> userManager,
+        ILogger<MyBillingModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<MyBillingModel> _logger;
-        public MyBillingModel(
-            ApplicationDbContext context,
-            UserManager<IdentityUser> userManager,
-            ILogger<MyBillingModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
-        public IList<Invoice> Invoices { get; set; } = new List<Invoice>();
-        public IList<Payment> Payments { get; set; } = new List<Payment>();
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<MyBillingModel> _logger = logger;
+
+        public IList<Invoice> Invoices { get; set; } = [];
+        public IList<Payment> Payments { get; set; } = [];
+
         [DataType(DataType.Currency)]
         public decimal CurrentBalance { get; set; }
-        // Combined list for display
-        public List<BillingTransaction> Transactions { get; set; } = new List<BillingTransaction>();
+
+        public List<BillingTransaction> Transactions { get; set; } = [];
+
+        // New properties for display
+        public string DisplayName { get; set; } = "My"; // Default for own view
+        public bool IsViewingSelf { get; set; } = true;
+        public string? ViewedUserId { get; set; } // To carry UserId if admin is viewing another
+
         public class BillingTransaction
         {
             public DateTime Date { get; set; }
             public string Description { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
-            public decimal? ChargeAmount { get; set; } // Debit
+            public decimal? ChargeAmount { get; set; }
             [DataType(DataType.Currency)]
-            public decimal? PaymentAmount { get; set; } // Credit
-            [DataType(DataType.Currency)]
-            public decimal RunningBalance { get; set; } // Optional: if you want to show this
-            public string Type { get; set; } = string.Empty; // "Invoice" or "Payment"
-            public string StatusOrMethod { get; set; } = string.Empty; // Invoice Status or Payment Method
+            public decimal? PaymentAmount { get; set; }
+            public string Type { get; set; } = string.Empty;
+            public string StatusOrMethod { get; set; } = string.Empty;
         }
-        public async Task<IActionResult> OnGetAsync()
+
+        public async Task<IActionResult> OnGetAsync(string? userId) // Added userId parameter
         {
-            _logger.LogInformation("OnGetAsync called for MyBillingModel.");
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            _logger.LogInformation("OnGetAsync called for MyBillingModel. Requested UserID: {UserId}", userId);
+
+            IdentityUser? targetUser;
+            var currentUser = await _userManager.GetUserAsync(User); // Current logged-in user
+
+            if (currentUser == null)
             {
-                _logger.LogWarning("User not found for MyBillingModel.");
-                return NotFound("Unable to load user.");
+                return Challenge(); // Should not happen if [Authorize] is effective
             }
+
+            if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+            {
+                // Admin/Manager is viewing a specific user's billing
+                targetUser = await _userManager.FindByIdAsync(userId);
+                if (targetUser == null)
+                {
+                    _logger.LogWarning("Admin/Manager tried to view billing for non-existent UserID: {UserId}", userId);
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToPage("/Index", new { area = "" }); // Or some other appropriate redirect
+                }
+                IsViewingSelf = false;
+                ViewedUserId = targetUser.Id; // Store for link generation if needed
+                var targetUserProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == targetUser.Id);
+                DisplayName = (targetUserProfile != null && !string.IsNullOrWhiteSpace(targetUserProfile.FirstName) && !string.IsNullOrWhiteSpace(targetUserProfile.LastName))
+                              ? $"{targetUserProfile.FirstName} {targetUserProfile.LastName} ({targetUser.Email})"
+                              : targetUser.UserName ?? targetUser.Email ?? "Selected User's";
+            }
+            else
+            {
+                // Member is viewing their own billing, or admin didn't specify a userId
+                targetUser = currentUser;
+                IsViewingSelf = true;
+                ViewedUserId = targetUser.Id;
+                var currentUserProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == targetUser.Id);
+                DisplayName = (currentUserProfile != null && !string.IsNullOrWhiteSpace(currentUserProfile.FirstName) && !string.IsNullOrWhiteSpace(currentUserProfile.LastName))
+                              ? $"{currentUserProfile.FirstName} {currentUserProfile.LastName}"
+                              : targetUser.UserName ?? targetUser.Email ?? "My";
+                if (DisplayName == targetUser.UserName || DisplayName == targetUser.Email) DisplayName += ""; else DisplayName += "";
+            }
+
+            _logger.LogInformation("Fetching billing data for user: {UserName} (ID: {UserId})", targetUser.UserName, targetUser.Id);
+
             Invoices = await _context.Invoices
-                                .Where(i => i.UserID == user.Id)
+                                .Where(i => i.UserID == targetUser.Id)
                                 .OrderByDescending(i => i.InvoiceDate)
                                 .ThenByDescending(i => i.DateCreated)
                                 .ToListAsync();
-            _logger.LogInformation($"Found {Invoices.Count} invoices for user {user.Id}.");
+            _logger.LogInformation("Found {InvoiceCount} invoices for user {UserId}.", Invoices.Count, targetUser.Id);
+
             Payments = await _context.Payments
-                                .Where(p => p.UserID == user.Id)
+                                .Where(p => p.UserID == targetUser.Id)
                                 .OrderByDescending(p => p.PaymentDate)
                                 .ThenByDescending(p => p.DateRecorded)
                                 .ToListAsync();
-            _logger.LogInformation($"Found {Payments.Count} payments for user {user.Id}.");
+            _logger.LogInformation("Found {PaymentCount} payments for user {UserId}.", Payments.Count, targetUser.Id);
+
             decimal totalCharges = Invoices.Sum(i => i.AmountDue);
             decimal totalPayments = Payments.Sum(p => p.Amount);
             CurrentBalance = totalCharges - totalPayments;
-            _logger.LogInformation($"Calculated balance for user {user.Id}: {CurrentBalance}");
-            // Combine and sort transactions for display
+            _logger.LogInformation("Calculated balance for user {UserId}: {CurrentBalance}", targetUser.Id, CurrentBalance);
+
+            Transactions.Clear(); // Clear before repopulating
             foreach (var invoice in Invoices)
             {
                 Transactions.Add(new BillingTransaction
@@ -75,7 +122,6 @@ namespace Members.Areas.Member.Pages // Or adjust if your folder structure leads
                     Date = invoice.InvoiceDate,
                     Description = invoice.Description,
                     ChargeAmount = invoice.AmountDue,
-                    PaymentAmount = null,
                     Type = "Invoice",
                     StatusOrMethod = invoice.Status.ToString()
                 });
@@ -85,38 +131,14 @@ namespace Members.Areas.Member.Pages // Or adjust if your folder structure leads
                 Transactions.Add(new BillingTransaction
                 {
                     Date = payment.PaymentDate,
-                    Description = payment.Notes ?? $"Payment Ref: {payment.ReferenceNumber ?? "N/A"}",
-                    ChargeAmount = null,
+                    Description = payment.Notes ?? $"Payment (Ref: {payment.ReferenceNumber ?? "N/A"})",
                     PaymentAmount = payment.Amount,
                     Type = "Payment",
                     StatusOrMethod = payment.Method.ToString()
                 });
             }
-            Transactions = Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice").ToList();
-            // Optional: Calculate running balance if you want to display it in the table
-            decimal runningBal = 0;
-            var reversedTransactions = Transactions.OrderBy(t => t.Date).ThenBy(t => t.Type == "Invoice").ToList(); // oldest first
-            foreach (var trans in reversedTransactions)
-            {
-                if (trans.ChargeAmount.HasValue) runningBal += trans.ChargeAmount.Value;
-                if (trans.PaymentAmount.HasValue) runningBal -= trans.PaymentAmount.Value;
-            }
-            // Now iterate again to set running balance in the display order (most recent first)
-            // This is a bit complex for a simple list; often running balance is calculated from oldest to newest.
-            // For display, you might just show current balance at top and list transactions.
-            // The below is a simplified way to show running balance as of that transaction if list is oldest to newest.
-            // For newest to oldest, it's more like a statement.
-            // Let's recalculate running balance for display in descending date order (statement style)
-            decimal currentStatementBalance = CurrentBalance; // Start with the overall current balance
-            var statementTransactions = new List<BillingTransaction>();
-            // To show a running balance on a statement that lists recent items first,
-            // you'd typically start with an opening balance, list transactions, and end with a closing balance.
-            // The `Transactions` list is already sorted newest first.
-            // For simplicity, we'll assign the running balance after each transaction based on this order.
-            // This isn't a true "running balance from the beginning of time" for each row, but rather a "balance after this transaction in the context of the statement".
-            // A more accurate running balance in the table would require calculating from the start of time for each row, or sorting by date ascending.
-            // For now, we'll keep Transactions sorted by Date Descending and omit per-transaction running balance to keep it simple.
-            // The CurrentBalance property will show the overall balance.
+            Transactions = [.. Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice")];
+
             return Page();
         }
     }

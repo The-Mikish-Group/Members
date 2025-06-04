@@ -1,25 +1,31 @@
-﻿@page
+﻿@page "{userId?}"
 @model Members.Areas.Member.Pages.MyBillingModel
 @{
-    ViewData["Title"] = "My Billing Statement";
-    // Assuming a layout for the Member area or use the main one
-    // e.g., Layout = "/Pages/Shared/_Layout.cshtml";
-    // Or if you have a specific one: Layout = "/Areas/Member/Pages/Shared/_Layout.cshtml";
-    // For now, let's assume it will pick up a default or you'll adjust.
-    // You might need to create a _ViewStart.cshtml in /Areas/Member/Pages/
-    // if you want to specify a default layout for all pages in this area.
-    Layout = "_Layout"; // This will look for /Pages/Shared/_Layout.cshtml or /Views/Shared/_Layout.cshtml
-                        // or /Areas/Member/Pages/Shared/_Layout.cshtml if it exists.
+    ViewData["Title"] = $"{Model.DisplayName} Billing Statement"; // Use DisplayName here
+    Layout = "_Layout"; // Or your specific Member Area layout
 }
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
+            @* Use DisplayName in the main page header *@
             <h2 class="mb-4">@ViewData["Title"]</h2>
+
+            @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.ViewedUserId))
+            {
+                <div class="mb-3">
+                    @* Link back to EditUser page if admin is viewing and ViewedUserId is available *@
+                    <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Edit User @(Model.DisplayName.Replace("'s", "").Replace(" Billing Statement", ""))
+                        @* Attempt to get just the name back, might need refinement *@
+                    </a>
+                </div>
+            }
 
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Current Balance</h5>
+                    @* DisplayName also useful here if you want to be more explicit than "Current Balance" *@
+                    <h5 class="mb-0">Current Balance for @Model.DisplayName</h5>
                 </div>
                 <div class="card-body">
                     <h3 class="text-@(Model.CurrentBalance > 0 ? "danger" : "success")">
@@ -27,22 +33,23 @@
                     </h3>
                     @if (Model.CurrentBalance > 0)
                     {
-                        <p class="text-muted">You have an outstanding balance.</p>
+                        <p class="text-muted">This account has an outstanding balance.</p>
                     }
                     else if (Model.CurrentBalance == 0)
                     {
-                        <p class="text-muted">Your account is settled. Thank you!</p>
+                        <p class="text-muted">This account is settled. Thank you!</p>
                     }
                     else
                     {
-                        <p class="text-muted">You have a credit balance.</p>
+                        <p class="text-muted">This account has a credit balance.</p>
                     }
                 </div>
             </div>
 
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-0">Transaction History</h5>
+                    @* And here for transaction history heading *@
+                    <h5 class="mb-0">Transaction History for @Model.DisplayName</h5>
                 </div>
                 <div class="card-body p-0">
                     @if (!Model.Transactions.Any())

@@ -1,4 +1,5 @@
 using Members.Data;
+using Members.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -117,13 +118,18 @@ namespace Members.Areas.Identity.Pages
                     // Filter for users with unconfirmed email
                     filterCondition = filterCondition.Or(u => !u.EmailConfirmed);
                 }
+                else if (searchTerm.Equals("billable", StringComparison.OrdinalIgnoreCase))                              
+                {
+                    filterCondition = filterCondition.Or(u => _dbContext.UserProfile.Any(up => up.UserId == u.Id && (up.IsBillingContact)));
+                    //filterCondition = filterCondition.Or(u => _dbContext.UserProfile.Any(ur => ur.IsBillingContact));                    
+                }
                 else
                 {
                     // Standard search across multiple fields
                     filterCondition = filterCondition.Or(u => u.Email != null && u.Email.ToLower().Contains(searchTerm)); // Case-insensitive
                     filterCondition = filterCondition.Or(u => u.PhoneNumber != null && u.PhoneNumber.ToLower().Contains(searchTerm)); // Case-insensitive
                     filterCondition = filterCondition.Or(u => _dbContext.UserProfile.Any(up => up.UserId == u.Id &&
-                        (
+                        (                            
                             (up.FirstName != null && up.FirstName.ToLower().Contains(searchTerm)) ||
                             (up.MiddleName != null && up.MiddleName.ToLower().Contains(searchTerm)) ||
                             (up.LastName != null && up.LastName.ToLower().Contains(searchTerm)) ||
@@ -205,7 +211,7 @@ namespace Members.Areas.Identity.Pages
                     "plot" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Plot : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Plot : null),
                     "birthday" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Birthday : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Birthday : null),
                     "anniversary" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Anniversary : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Anniversary : null),
-                    "isbillingcontact" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.IsBillingContact : false) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.IsBillingContact : false),
+                    "isbillingcontact" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null && x.UserProfile.IsBillingContact) : joinedQuery.OrderByDescending(x => x.UserProfile != null && x.UserProfile.IsBillingContact),
                     // --- End sorting for new fields ---
                     _ => joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.LastName : null).ThenBy(x => x.UserProfile != null ? x.UserProfile.FirstName : null), // Default sort by Full Name if SortColumn is invalid or not provided
                 };
