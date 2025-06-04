@@ -81,7 +81,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 {
                     var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == userId);
                     TargetUserName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
-                                     ? $"{userProfile.LastName}, {userProfile.FirstName} ({user.Email})"
+                                     ? $"{userProfile.FirstName} {userProfile.LastName} ({user.Email})"
                                      : user.UserName ?? user.Email;
                     Input.SelectedUserID = userId;
                     IsUserPreselected = true;
@@ -120,7 +120,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 if (userProfiles.TryGetValue(user.Id, out UserProfile? profile) && profile != null && !string.IsNullOrEmpty(profile.LastName))
                 {
-                    userListItems.Add(new SelectListItem { Value = user.Id, Text = $"{profile.LastName}, {profile.FirstName} ({user.Email})" });
+                    userListItems.Add(new SelectListItem { Value = user.Id, Text = $",{profile.FirstName} {profile.LastName} ({user.Email})" });
                 }
                 else
                 {
@@ -151,7 +151,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == Input.SelectedUserID);
                         TargetUserName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
-                                     ? $"{userProfile.LastName}, {userProfile.FirstName} ({userForDisplay.Email})"
+                                     ? $"{userProfile.FirstName} {userProfile.LastName} ({userForDisplay.Email})"
                                      : userForDisplay.UserName ?? userForDisplay.Email;
                     }
                 }

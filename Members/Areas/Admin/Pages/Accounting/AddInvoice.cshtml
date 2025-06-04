@@ -5,17 +5,17 @@
     Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct for your project
 }
 
-<div class="container mt-4">
+<div class="container mt-4 mb-2">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
                         @ViewData["Title"]
-                        @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
+                        @* @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
                         {
                             <span> for @Model.TargetUserName</span>
-                        }
+                        } *@
                     </h4>
                 </div>
                 <div class="card-body">
@@ -29,16 +29,16 @@
 
                     <form method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-@if (Model.IsUserPreselected)
-{
+                        @if (Model.IsUserPreselected)
+                        {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
-                                <label class="form-label fw-bold">User</label>
+                                <label class="form-label fw-bold">Member</label>
                                 <p class="form-control-plaintext">@Model.TargetUserName</p>
                             </div>
-}
-else
-{
+                        }
+                        else
+                        {
                             <div class="mb-3">
                                 <label asp-for="Input.SelectedUserID" class="form-label"></label>
                                 <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
@@ -46,12 +46,12 @@ else
                                 </select>
                                 <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
                             </div>
-}
+                        }
 
-@if (!string.IsNullOrEmpty(Model.ReturnUrl))
-{
+                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                        {
                             <input type="hidden" asp-for="ReturnUrl" />
-}
+                        }
                         <div class="row mb-3">
                             <div class="col-sm-6">
                                 <label asp-for="Input.InvoiceDate" class="form-label"></label>

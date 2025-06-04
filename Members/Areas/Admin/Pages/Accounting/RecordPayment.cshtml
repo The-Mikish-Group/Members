@@ -5,17 +5,17 @@
     Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
 }
 
-<div class="container mt-4">
+<div class="container mt-4 mb-2">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0">
                         @ViewData["Title"]
-                        @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
+                        @* @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
                         {
                             <span> for @Model.TargetUserName</span>
-                        }
+                        } *@
                     </h4>
                 </div>
                 <div class="card-body">
@@ -34,7 +34,7 @@
                         {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
-                                <label class="form-label fw-bold">User</label>
+                                <label class="form-label fw-bold">Member</label>
                                 <p class="form-control-plaintext">@Model.TargetUserName</p>
                             </div>
                         }
