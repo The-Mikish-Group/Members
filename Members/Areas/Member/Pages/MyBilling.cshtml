@@ -15,7 +15,7 @@
             {
                 <div class="mb-3">
                     @* Link back to EditUser page if admin is viewing and ViewedUserId is available *@
-                    <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="btn btn-sm btn-outline-secondary">
+                    <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="shadow btn btn-sm btn-back">
                         <i class="bi bi-arrow-left"></i> Back to Edit User @(Model.DisplayName.Replace("'s", "").Replace(" Billing Statement", ""))
                         @* Attempt to get just the name back, might need refinement *@
                     </a>
@@ -98,4 +98,11 @@
             vertical-align: middle;
         }
     </style>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+    </script>
 }

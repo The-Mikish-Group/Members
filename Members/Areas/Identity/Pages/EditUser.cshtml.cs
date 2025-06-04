@@ -41,71 +41,54 @@ namespace Members.Areas.Identity.Pages
             public string? Id { get; set; }
             [Display(Name = "Username")]
             public string? UserName { get; set; }
-
             [EmailAddress]
             [Display(Name = "Email")]
             public string? Email { get; set; }
             [Display(Name = "Email Confirmed")]
             public bool EmailConfirmed { get; set; }
-
             [DataType(DataType.Password)]
             [Display(Name = "New Password")]
             public string? NewPassword { get; set; }
-
             [Phone]
             [Display(Name = "Cell Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? PhoneNumber { get; set; }
-
             [Display(Name = "Cell Confirmed")]
             public bool PhoneNumberConfirmed { get; set; }
-
             [Phone]
             [Display(Name = "Home Phone")]
             [RegularExpression(@"^\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$", ErrorMessage = "Not a valid format; try ### ###-####")]
             public string? HomePhoneNumber { get; set; }
-
             [Required]
             [Display(Name = "First Name")]
             public string? FirstName { get; set; }
-
             [Display(Name = "Middle Name")]
             public string? MiddleName { get; set; }
-
             [Required]
             [Display(Name = "Last Name")]
             public string? LastName { get; set; }
-
             [Display(Name = "Birthday")]
             [DataType(DataType.Date)]
             public DateTime? Birthday { get; set; }
-
             [Display(Name = "Anniversary")]
             [DataType(DataType.Date)]
             public DateTime? Anniversary { get; set; }
-
             [Required]
             [Display(Name = "Address Line 1")]
             public string? AddressLine1 { get; set; }
-
             [Display(Name = "Address Line 2")]
             public string? AddressLine2 { get; set; }
-
             [Required]
             [Display(Name = "City")]
             public string? City { get; set; }
-
             [Required]
             [Display(Name = "State")]
             public string? State { get; set; }
-
             [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
-
             [Display(Name = "Plot")]
             public string? Plot { get; set; }
-
             [Display(Name = "Is Billing Contact for Plot")]
             public bool IsBillingContact { get; set; }
         }
@@ -133,7 +116,6 @@ namespace Members.Areas.Identity.Pages
                 ZipCode = userProfile?.ZipCode,
                 Plot = userProfile?.Plot,
                 IsBillingContact = userProfile?.IsBillingContact ?? false
-
             };
             await PopulateRoleViewModelsAsync(user);
         }
@@ -244,45 +226,52 @@ namespace Members.Areas.Identity.Pages
             userProfile.ZipCode = Input.ZipCode;
             userProfile.Plot = Input.Plot;
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
-
             // --- ADD/MODIFY THIS BLOCK for IsBillingContact ---
+            // --- SERVER-SIDE VALIDATION FOR IsBillingContact AND PLOT ---
+            if (Input.IsBillingContact && string.IsNullOrWhiteSpace(Input.Plot))
+            {
+                ModelState.AddModelError("Input.IsBillingContact", "A Plot must be assigned to set this user as a Billing Contact.");
+                // Ensure dependent properties for the page are repopulated if returning due to error
+                await PopulateRoleViewModelsAsync(user); // user should be the one fetched at the start of OnPostAsync
+                StatusMessage = "Error: Cannot set as Billing Contact without a Plot.";
+                return Page();
+            }
+            // --- END SERVER-SIDE VALIDATION ---
+            // --- EXISTING IsBillingContact CONFLICT CHECK AND ASSIGNMENT ---
             if (Input.IsBillingContact)
             {
                 // If admin is trying to set this user as the billing contact,
-                // check for conflicts on the same plot (if plot is not null/empty).
-                if (!string.IsNullOrWhiteSpace(userProfile.Plot))
+                // check for conflicts on the same plot. Note: Input.Plot is used here.
+                if (!string.IsNullOrWhiteSpace(Input.Plot))
                 {
                     var existingBillingContact = await _dbContext.UserProfile
-                        .FirstOrDefaultAsync(up => up.Plot == userProfile.Plot &&
+                        .FirstOrDefaultAsync(up => up.Plot == Input.Plot && // Use Input.Plot
                                                     up.IsBillingContact &&
-                                                    up.UserId != userProfile.UserId); // Exclude current user
-
+                                                    up.UserId != userProfile.UserId);
                     if (existingBillingContact != null)
                     {
                         var conflictingUserIdentity = await _userManager.FindByIdAsync(existingBillingContact.UserId);
                         string conflictingUserName = conflictingUserIdentity?.UserName ?? "another user";
-
                         ModelState.AddModelError("Input.IsBillingContact",
-                            $"Cannot set as billing contact. Plot '{userProfile.Plot}' already has {conflictingUserName} (ID: {existingBillingContact.UserId}) designated as the billing contact. " +
+                            $"Cannot set as billing contact. Plot '{Input.Plot}' already has {conflictingUserName} designated as the billing contact. " +
                             "Please unassign the other user first if you want to make this change.");
-
-                        // Repopulate roles, as we are returning to the page due to validation error
                         await PopulateRoleViewModelsAsync(user);
-                        StatusMessage = "Error: Could not save changes due to billing contact conflict.";
+                        StatusMessage = "Error: Could not save changes due to billing contact conflict for the same Plot.";
                         return Page();
                     }
                 }
+                // If we pass both validations (Plot is not empty, and no conflict on Plot)
                 userProfile.IsBillingContact = true;
             }
             else
             {
                 userProfile.IsBillingContact = false;
             }
-            // --- END IsBillingContact BLOCK ---
-
             await _dbContext.SaveChangesAsync();
             StatusMessage = "User updated successfully.";
-
+            // --- END IsBillingContact BLOCK ---
+            await _dbContext.SaveChangesAsync();
+            StatusMessage = "User updated successfully.";
             await _dbContext.SaveChangesAsync();
             StatusMessage = "User updated successfully.";
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
