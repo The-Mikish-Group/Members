@@ -1,7 +1,7 @@
 ﻿@page "{userId?}"
 @model Members.Areas.Member.Pages.MyBillingModel
 @{
-    ViewData["Title"] = $"{Model.DisplayName} Billing Statement"; // Use DisplayName here
+    ViewData["Title"] = $"{Model.DisplayName} Billing History"; // Use DisplayName here
     Layout = "_Layout"; // Or your specific Member Area layout
 }
 
@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12">
             @* Use DisplayName in the main page header *@
-            <h2 class="mb-4">@ViewData["Title"]</h2>
+            <h2 class="mb-4 text-gold-darker">@ViewData["Title"]</h2>
 
             @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.ViewedUserId))
             {
@@ -22,10 +22,10 @@
                 </div>
             }
 
-            <div class="card shadow-sm mb-4">
+            <div class="card shadow bg-Card-Menu mb-4">
                 <div class="card-header">
                     @* DisplayName also useful here if you want to be more explicit than "Current Balance" *@
-                    <h5 class="mb-0">Current Balance for @Model.DisplayName</h5>
+                    <h5 class="text-gold-darker mb-0">Current Balance for @Model.DisplayName</h5>
                 </div>
                 <div class="card-body">
                     <h3 class="text-@(Model.CurrentBalance > 0 ? "danger" : "success")">
@@ -46,10 +46,10 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm">
+            <div class="card shadow bg-Card-Menu mb-2">
                 <div class="card-header">
                     @* And here for transaction history heading *@
-                    <h5 class="mb-0">Transaction History for @Model.DisplayName</h5>
+                    <h5 class="text-gold-darker mb-0">Transaction History for @Model.DisplayName</h5>
                 </div>
                 <div class="card-body p-0">
                     @if (!Model.Transactions.Any())
@@ -59,28 +59,33 @@
                     else
                     {
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
+                            <table class="w-100 shadow">
                                 <thead class="table-light">
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Description</th>
-                                        <th class="text-end">Charge</th>
-                                        <th class="text-end">Payment</th>
-                                        <th>Type</th>
-                                        <th>Status/Method</th>
+                                    <tr class="bg-gold-dark text-white py-1">
+                                        <th class="text-white ps-1 py-1">Date</th>
+                                        <th class="text-white py-1">Description</th>
+                                        <th class="text-white py-1 text-end">Charge</th>
+                                        <th class="text-white py-1 text-end">Payment</th>
+                                        <th class="text-white py-1">Type</th>
+                                        <th class="text-white py-1">Status/Method</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @{
+                                        int i = 0; // Declare and initialize the variable 'i' before the loop
+                                    }
                                     @foreach (var trans in Model.Transactions)
                                     {
-                                        <tr>
-                                            <td>@trans.Date.ToString("yyyy-MM-dd")</td>
-                                            <td>@Html.DisplayFor(modelItem => trans.Description)</td>
-                                            <td class="text-end">@trans.ChargeAmount?.ToString("C")</td>
-                                            <td class="text-end">@trans.PaymentAmount?.ToString("C")</td>
-                                            <td>@Html.DisplayFor(modelItem => trans.Type)</td>
-                                            <td>@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
+                                        <tr class="text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
+                                            <td class="ps-1 py-1 text-gold-darker">@trans.Date.ToString("yyyy-MM-dd")</td>
+                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Description)</td>
+                                            <td class="py-1 text-gold-darker text-end">@trans.ChargeAmount?.ToString("C")</td>
+                                            <td class="py-1 text-gold-darker text-end">@trans.PaymentAmount?.ToString("C")</td>
+                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Type)</td>
+                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
                                         </tr>
+
+                                        i++;
                                     }
                                 </tbody>
                             </table>
@@ -97,11 +102,37 @@
         .table th, .table td {
             vertical-align: middle;
         }
+
+        .row-even {
+            background-color: antiquewhite
+        }
+
+        .row-odd {
+            background-color: #ffffff;
+        }
+
+        .even-row > td,
+        .odd-row > td {
+            background-color: inherit !important;
+        }
+
+        .table th a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+            .table th a:hover {
+                text-decoration: underline;
+            }
+
+        .table th .bi { /* For sort indicators */
+            font-size: 0.9em;
+            margin-left: 0.25rem;
+        }
     </style>
 }
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+@section Scripts {    
     <script>
 
     </script>

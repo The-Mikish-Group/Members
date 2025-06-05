@@ -8,14 +8,10 @@
 <div class="container mt-4 mb-2">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">
+            <div class="card shadow bg-Card-Menu">
+                <div class="card-header bg-gold-light text-white">
+                    <h4 class="text-gold-darker mb-0">
                         @ViewData["Title"]
-                        @* @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
-                        {
-                            <span> for @Model.TargetUserName</span>
-                        } *@
                     </h4>
                 </div>
                 <div class="card-body">
@@ -35,14 +31,14 @@
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Member</label>
-                                <p class="form-control-plaintext">@Model.TargetUserName</p>
+                                <p class="shadow form-control">@Model.TargetUserName</p>
                             </div>
                         }
                         else
                         {
                             <div class="mb-3">
-                                <label asp-for="Input.SelectedUserID" class="form-label"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
+                                <label asp-for="Input.SelectedUserID" class="shadow form-label text-gold-darker"></label>
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select text-gold-darker">
                                     <option value="">-- Select User --</option>
                                 </select>
                                 <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
@@ -54,53 +50,53 @@
                             <input type="hidden" asp-for="ReturnUrl" />
                         }
                         <div class="mb-3">
-                            <label asp-for="Input.SelectedInvoiceID" class="form-label"></label>
-                            <input asp-for="Input.SelectedInvoiceID" class="form-control" type="number" />
+                            <label asp-for="Input.SelectedInvoiceID" class="form-label text-gold-darker"></label>
+                            <input asp-for="Input.SelectedInvoiceID" class="shadow form-control text-gold-darker" type="number" />
                             <span asp-validation-for="Input.SelectedInvoiceID" class="text-danger"></span>
                             <small class="form-text text-muted">If this payment is for a specific invoice, enter its ID.</small>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-sm-6">
-                                <label asp-for="Input.PaymentDate" class="form-label"></label>
-                                <input asp-for="Input.PaymentDate" class="form-control" />
+                                <label asp-for="Input.PaymentDate" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.PaymentDate" class="shadow form-control text-gold-darker" />
                                 <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
-                                <label asp-for="Input.Amount" class="form-label"></label>
-                                <input asp-for="Input.Amount" class="form-control" />
+                                <label asp-for="Input.Amount" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.Amount" class="shadow form-control text-gold-darker" />
                                 <span asp-validation-for="Input.Amount" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Method" class="form-label"></label>
-                            <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="form-select">
+                            <label asp-for="Input.Method" class="form-label text-gold-darker"></label>
+                            <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="shadow form-select text-gold-darker">
                             </select>
                             <span asp-validation-for="Input.Method" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.ReferenceNumber" class="form-label"></label>
-                            <input asp-for="Input.ReferenceNumber" class="form-control" />
+                            <label asp-for="Input.ReferenceNumber" class="form-label text-gold-darker"></label>
+                            <input asp-for="Input.ReferenceNumber" class="shadow form-control text-gold-darker" />
                             <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Notes" class="form-label"></label>
-                            <textarea asp-for="Input.Notes" class="form-control" rows="3"></textarea>
+                            <label asp-for="Input.Notes" class="form-label text-gold-darker"></label>
+                            <textarea asp-for="Input.Notes" class="shadow form-control text-gold-darker" rows="3"></textarea>
                             <span asp-validation-for="Input.Notes" class="text-danger"></span>
                         </div>
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success">Record Payment</button>
+                            <button type="submit" class="shadow btn btn-sm btn-success">Record Payment</button>
                             @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                             {
-                                <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Back to Edit User</a>
+                                <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-2">Back to Edit User</a>
                             }
                             else if (!Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                             {
                                 // Fallback if ReturnUrl exists but user wasn't preselected (e.g. back to a list of payments)
-                                <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Cancel</a>
+                                <a href="@Model.ReturnUrl" class="btn btn-subtle-danger mt-2">Cancel</a>
                             }
                         </div>
                     </form>
