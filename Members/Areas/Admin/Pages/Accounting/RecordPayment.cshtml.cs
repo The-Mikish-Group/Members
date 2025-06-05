@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")]
@@ -24,56 +23,43 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<RecordPaymentModel> _logger = logger;
-
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
-
         public SelectList? UserSelectList { get; set; }
         public string? TargetUserName { get; set; }
         public bool IsUserPreselected { get; set; } = false;
-
         // To carry over the returnUrl that leads back to EditUser page
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-
-
         public class InputModel
         {
             [Required]
             public string SelectedUserID { get; set; } = string.Empty;
-
             [Display(Name = "For Invoice (Optional ID)")]
             public int? SelectedInvoiceID { get; set; }
-
             [Required]
             [DataType(DataType.Date)]
             [Display(Name = "Payment Date")]
             public DateTime PaymentDate { get; set; } = DateTime.Today;
-
             [Required]
             [Range(0.01, 1000000.00, ErrorMessage = "Amount must be greater than 0.")]
             [DataType(DataType.Currency)]
             [Display(Name = "Payment Amount")]
             public decimal Amount { get; set; }
-
             [Required]
             [Display(Name = "Payment Method")]
             public PaymentMethod Method { get; set; } = PaymentMethod.Check;
-
             [StringLength(100)]
             [Display(Name = "Reference Number (e.g., Check #)")]
             public string? ReferenceNumber { get; set; }
-
             [StringLength(200)]
             [Display(Name = "Notes (Optional)")]
             public string? Notes { get; set; }
         }
-
         public async Task OnGetAsync(string? userId, string? returnUrl)
         {
             _logger.LogInformation("OnGetAsync called for RecordPaymentModel.");
             ReturnUrl = returnUrl;
-
             if (!string.IsNullOrEmpty(userId))
             {
                 var user = await _userManager.FindByIdAsync(userId);
@@ -98,13 +84,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                 await PopulateUserSelectList(); // No userId, show dropdown
             }
         }
-
         private async Task PopulateUserSelectList()
         {
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
             _logger.LogInformation("PopulateUserSelectList: Found {UserCount} users in role '{RoleName}'.", usersInMemberRole?.Count ?? 0, memberRoleName);
-
             if (usersInMemberRole == null || !usersInMemberRole.Any())
             {
                 UserSelectList = new SelectList(Enumerable.Empty<SelectListItem>());
@@ -114,13 +98,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             var userProfiles = await _context.UserProfile
                                         .Where(up => userIdsInMemberRole.Contains(up.UserId))
                                         .ToDictionaryAsync(up => up.UserId);
-
             var userListItems = new List<SelectListItem>();
             foreach (var user in usersInMemberRole.OrderBy(u => u.UserName))
             {
                 if (userProfiles.TryGetValue(user.Id, out UserProfile? profile) && profile != null && !string.IsNullOrEmpty(profile.LastName))
                 {
-                    userListItems.Add(new SelectListItem { Value = user.Id, Text = $",{profile.FirstName} {profile.LastName} ({user.Email})" });
+                    userListItems.Add(new SelectListItem { Value = user.Id, Text = $"{profile.FirstName} {profile.LastName} ({user.Email})" });
                 }
                 else
                 {
@@ -129,7 +112,6 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             UserSelectList = new SelectList(userListItems.OrderBy(item => item.Text), "Value", "Text");
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
             _logger.LogInformation("OnPostAsync called for RecordPaymentModel.");
@@ -157,7 +139,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 return Page();
             }
-
             var user = await _userManager.FindByIdAsync(Input.SelectedUserID);
             if (user == null)
             {
@@ -165,7 +146,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 await PopulateUserSelectList();
                 return Page();
             }
-
             var payment = new Payment
             {
                 UserID = Input.SelectedUserID,
@@ -177,21 +157,18 @@ namespace Members.Areas.Admin.Pages.Accounting
                 Notes = Input.Notes,
                 DateRecorded = DateTime.UtcNow
             };
-
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
             _logger.LogInformation("Successfully saved new payment ID {PaymentID} for user {UserName}.", payment.PaymentID, user.UserName);
-
             TempData["StatusMessage"] = $"Payment of {payment.Amount:C} recorded successfully for user {TargetUserName ?? user.UserName}.";
-
             // Redirect logic: If ReturnUrl (to EditUser) is present, use it. Otherwise, back to clean RecordPayment page.
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // This ReturnUrl should be the one leading back to EditUser page for this specific user
-                // e.g. /Identity/EditUser?id=USER_ID_HERE&returnUrl=ENCODED_USERS_PAGE_URL
+                // This ReturnUrl is now expected to be the URL back to the EditUser page
                 return Redirect(ReturnUrl);
             }
-            return RedirectToPage(new { userId = Input.SelectedUserID }); // Stay on RecordPayment, but keep user context if any
+            // Fallback if ReturnUrl wasn't provided (e.g. if page was accessed directly)
+            return RedirectToPage();
         }
     }
 }

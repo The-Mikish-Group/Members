@@ -16,8 +16,7 @@
                 <div class="mb-3">
                     @* Link back to EditUser page if admin is viewing and ViewedUserId is available *@
                     <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="shadow btn btn-sm btn-back">
-                        <i class="bi bi-arrow-left"></i> Back to Edit User @(Model.DisplayName.Replace("'s", "").Replace(" Billing Statement", ""))
-                        @* Attempt to get just the name back, might need refinement *@
+                        <i class="bi bi-arrow-left"></i> Back to Edit Member                       
                     </a>
                 </div>
             }
@@ -65,7 +64,7 @@
                                         <th class="text-white ps-1 py-1">Date</th>
                                         <th class="text-white py-1">Description</th>
                                         <th class="text-white py-1 text-end">Charge</th>
-                                        <th class="text-white py-1 text-end">Payment</th>
+                                        <th class="text-white pe-2 py-1 text-end">Payment</th>
                                         <th class="text-white py-1">Type</th>
                                         <th class="text-white py-1">Status/Method</th>
                                     </tr>
@@ -80,7 +79,7 @@
                                             <td class="ps-1 py-1 text-gold-darker">@trans.Date.ToString("yyyy-MM-dd")</td>
                                             <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Description)</td>
                                             <td class="py-1 text-gold-darker text-end">@trans.ChargeAmount?.ToString("C")</td>
-                                            <td class="py-1 text-gold-darker text-end">@trans.PaymentAmount?.ToString("C")</td>
+                                            <td class="pe-2 py-1 text-gold-darker text-end">@trans.PaymentAmount?.ToString("C")</td>
                                             <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Type)</td>
                                             <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
                                         </tr>

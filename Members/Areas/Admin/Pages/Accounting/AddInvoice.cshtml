@@ -12,10 +12,6 @@
                 <div class="card-header bg-gold-light text-white">
                     <h4 class="mb-0 text-gold-darker">
                         @ViewData["Title"]
-                        @* @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.TargetUserName))
-                        {
-                            <span> for @Model.TargetUserName</span>
-                        } *@
                     </h4>
                 </div>
                 <div class="card-body">
@@ -85,23 +81,32 @@
                             </div>
                         </div>
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="shadow btn btn-sm btn-primary">Create Invoice</button>                            
-                            @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
-                            {
-                                <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-secondary mt-2">Back to Edit User</a>
-                            }
-                             else if (!Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
-                            {
-                                // If accessed directly but still has a returnUrl (e.g. back to a list of invoices if we implement that)
-                                <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-secondary mt-2">Cancel</a>
-                            }
+
+                            <div class="row justify-content-center">
+                                
+                                <div class="col-6 text-center">
+                                    @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                    {
+                                        <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Back to Edit User</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                    }
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <button type="submit" class="shadow btn btn-sm btn-primary">Create Invoice</button>
+                                </div>
+                            </div>                                                      
+                            
                         </div>
                     </form>
-                </div> @* card-body *@
-            </div> @* card *@
-        </div> @* col *@
-    </div> @* row *@
-</div> @* container *@
+                </div>
+            </div> 
+        </div> 
+    </div>
+</div> 
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
