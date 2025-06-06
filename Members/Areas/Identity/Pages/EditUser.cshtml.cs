@@ -278,33 +278,7 @@ namespace Members.Areas.Identity.Pages
 
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {
@@ -319,33 +293,7 @@ namespace Members.Areas.Identity.Pages
 
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {
@@ -417,33 +365,7 @@ namespace Members.Areas.Identity.Pages
 
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // Parse the ReturnUrl to extract query parameters
-                var uri = new Uri("http://dummyurl" + ReturnUrl); // Use a dummy base URI for parsing
-                var queryParameters = QueryHelpers.ParseQuery(uri.Query);
-
-                // Extract PageNumber, PageSize, and SearchTerm
-                queryParameters.TryGetValue("PageNumber", out var pageNumberValue);
-                queryParameters.TryGetValue("PageSize", out var pageSizeValue);
-                queryParameters.TryGetValue("SearchTerm", out var searchTermValue);
-                queryParameters.TryGetValue("ShowExtraFields", out var showExtraFieldsValue);
-
-                int? pageNumber = null;
-                if (int.TryParse(pageNumberValue, out int pn))
-                {
-                    pageNumber = pn;
-                }
-
-                int? pageSize = null;
-                if (int.TryParse(pageSizeValue, out int ps))
-                {
-                    pageSize = ps;
-                }
-
-                string? extractedSearchTerm = searchTermValue.ToString();
-                string? extractedShowExtraFields = showExtraFieldsValue.ToString();
-
-                // Redirect to the Users page with the extracted parameters
-                return RedirectToPage("./Users", new { PageNumber = pageNumber, PageSize = pageSize, SearchTerm = extractedSearchTerm, ShowExtraFields = extractedShowExtraFields });
+                return Redirect(ReturnUrl);
             }
             else
             {

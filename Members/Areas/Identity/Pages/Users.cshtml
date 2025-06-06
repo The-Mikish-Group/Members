@@ -122,6 +122,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="fullname"
+                                            data-sort-column="fullname"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -139,6 +140,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="email"
+                                            data-sort-column="email"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -156,6 +158,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="emailconfirmed"
+                                            data-sort-column="emailconfirmed"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -173,6 +176,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="phonenumber"
+                                            data-sort-column="phonenumber"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -190,12 +194,13 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="phonenumberconfirmed"
+                                            data-sort-column="phonenumberconfirmed"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumberconfirmed" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
                                             asp-route-pageSize="@Model.PageSize"
                                             asp-route-showextrafields="@Model.ShowExtraFields">
-                                            Phone <i class="bi bi-check-lg text-success"></i>
+                                            Confirmed <i class="bi bi-check-lg text-success"></i>
                                             @if (Model.SortColumn == "phonenumberconfirmed")
                                             {
                                                 @(Model.SortOrder == "asc" ? Html.Raw("&#9650;") : Html.Raw("&#9660;"))
@@ -207,6 +212,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="roles"
+                                            data-sort-column="roles"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -224,6 +230,7 @@
                                         <a class="nav-link"
                                             asp-page="./Users"
                                             asp-route-sortcolumn="lastlogin"
+                                            data-sort-column="lastlogin"
                                             asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastlogin" ? "desc" : "asc")"
                                             asp-route-searchterm="@Model.SearchTerm"
                                             asp-route-pageNumber="@Model.PageNumber"
@@ -237,13 +244,12 @@
                                         </a>
                                     </th>
 
-                                    @if (Model.ShowExtraFields)
-                                    {
                                         <th class="extra-field">
                                             <!-- Sort by First Name -->
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="firstname"
+                                                data-sort-column="firstname"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -262,6 +268,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="middlename"
+                                                data-sort-column="middlename"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -280,6 +287,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="lastname"
+                                                data-sort-column="lastname"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -298,6 +306,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="homephonenumber"
+                                                data-sort-column="homephonenumber"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -316,6 +325,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="addressline1"
+                                                data-sort-column="addressline1"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -334,6 +344,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="addressline2"
+                                                data-sort-column="addressline2"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -352,6 +363,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="city"
+                                                data-sort-column="city"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -370,6 +382,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="state"
+                                                data-sort-column="state"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -388,6 +401,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="zipcode"
+                                                data-sort-column="zipcode"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -406,6 +420,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="plot"
+                                                data-sort-column="plot"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -424,6 +439,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="birthday"
+                                                data-sort-column="birthday"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -442,6 +458,7 @@
                                             <a class="nav-link"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="anniversary"
+                                                data-sort-column="anniversary"
                                                 asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
                                                 asp-route-searchterm="@Model.SearchTerm"
                                                 asp-route-pageNumber="@Model.PageNumber"
@@ -454,7 +471,6 @@
                                                 }
                                             </a>
                                         </th>
-                                    }
                                     </tr>
                             </thead>
                 
@@ -571,7 +587,13 @@
                                     asp-route-SortColumn="@Model.SortColumn"
                                     asp-route-SortOrder="@Model.SortOrder"
                                     asp-route-SearchTerm="@Model.SearchTerm"
-                                    asp-route-showextrafields="@Model.ShowExtraFields">
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage - 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()">
                                     &laquo;
                                 </a>
                             </li>
@@ -587,7 +609,13 @@
                                         asp-route-SortColumn="@Model.SortColumn"
                                         asp-route-SortOrder="@Model.SortOrder"
                                         asp-route-SearchTerm="@Model.SearchTerm"
-                                        asp-route-showextrafields="@Model.ShowExtraFields">
+                                        asp-route-showextrafields="@Model.ShowExtraFields"
+                                        data-page-number="@ii"
+                                        data-page-size="@Model.PageSize"
+                                        data-sort-column="@Model.SortColumn"
+                                        data-sort-order="@Model.SortOrder"
+                                        data-search-term="@Model.SearchTerm"
+                                        data-show-extra-fields="@Model.ShowExtraFields.ToString()">
                                         @ii
                                     </a>
                                 </li>
@@ -603,6 +631,12 @@
                                     asp-route-SortOrder="@Model.SortOrder"
                                     asp-route-SearchTerm="@Model.SearchTerm"
                                     asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage + 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()"
                                     aria-label="Next">
                                     &raquo;
                                 </a>
@@ -813,6 +847,18 @@ else
 
             // --- Function Definitions (Define all functions here before any calls or listeners) ---
 
+            // --- New: Function to update common hidden fields from UI elements ---
+            function updateAllHiddenFields() {
+                if (searchInput && searchTermInput) {
+                    searchTermInput.value = searchInput.value;
+                }
+                if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                    showExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
+                }
+                // PageNumber, PageSize, SortColumn, SortOrder are managed by the specific event handlers
+                // before this function is called, if they need to change for that action.
+            }
+
             // Function to save scroll position
             function saveScrollPosition() {
                 if (tableContainer) {
@@ -904,21 +950,24 @@ else
 
             // Function to show/hide extra fields columns
             function updateExtraFieldsDisplay() {
+                // console.log('updateExtraFieldsDisplay called. showExtraFieldsHidden.value:', document.getElementById('showExtraFieldsHidden').value); // REMOVED
 
                 // Re-select hidden input here to ensure it's current
                 const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
                 const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value === "True" : false; // Get boolean state
 
-                // Find the main table or container that has the class controlling column visibility
-                // Assuming the class 'hide-extra-fields' is on the table itself or its container
-                const currentTableContainer = document.getElementById('usersTableContainer'); // Re-select tableContainer
-                if (currentTableContainer) { // Or userTable, depending on where the class is applied
+                // Find the main table to toggle the class for column visibility
+                const currentUserTable = document.getElementById('userTable'); // Target the table itself
+                if (currentUserTable) {
 
                     if (showExtraFields) {
-                        currentTableContainer.classList.remove('hide-extra-fields');
+                        // console.log('Removing hide-extra-fields. Table classList before:', currentUserTable.classList); // REMOVED
+                        currentUserTable.classList.remove('hide-extra-fields');
                     } else {
-                        currentTableContainer.classList.add('hide-extra-fields');
+                        // console.log('Adding hide-extra-fields. Table classList before:', currentUserTable.classList); // REMOVED
+                        currentUserTable.classList.add('hide-extra-fields');
                     }
+                    // console.log('Table classList after:', currentUserTable.classList); // REMOVED
                      
                 }
 
@@ -1001,42 +1050,31 @@ else
                      newLink.addEventListener('click', function(event) {
                          event.preventDefault(); // Prevent default link navigation
 
-                         // Get the parameters from the data attributes on the link
+                         // Get all parameters from the clicked link's dataset
                          const pageNumber = this.dataset.pageNumber;
                          const pageSize = this.dataset.pageSize;
                          const sortColumn = this.dataset.sortColumn || '';
                          const sortOrder = this.dataset.sortOrder || '';
                          const searchTerm = this.dataset.searchTerm || '';
-                         const showExtraFields = this.dataset.showExtraFields;
+                         const showExtraFieldsString = this.dataset.showExtraFields; // Will be "True" or "False"
+                         const showExtraFieldsBool = (showExtraFieldsString === "True" || showExtraFieldsString === true);
 
-                         // Update the hidden input values to reflect the new state
-                         // Re-select inputs here to ensure they are current
-                         const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
-                         const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
-                         const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
-                         const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
-                         const currentSearchTermInput = document.querySelector('input[name="SearchTerm"]');
-                         const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
 
-                         if (currentPageNumberInput) currentPageNumberInput.value = pageNumber;
-                         if (currentPageSizeInput) currentPageSizeInput.value = pageSize;
-                         if (currentSortColumnInput) currentSortColumnInput.value = sortColumn;
-                         if (currentSortOrderInput) currentSortOrderInput.value = sortOrder;
-                         if (currentSearchTermInput) currentSearchTermInput.value = searchTerm;
-                         if (currentShowExtraFieldsHidden) currentShowExtraFieldsHidden.value = showExtraFields;
+                         // Update hidden inputs for PageNumber, PageSize, SortColumn, SortOrder
+                         if (pageNumberInput) pageNumberInput.value = pageNumber;
+                         if (pageSizeInput) pageSizeInput.value = pageSize; // Ensure pageSizeInput is selected globally
+                         if (sortColumnInput) sortColumnInput.value = sortColumn;
+                         if (sortOrderInput) sortOrderInput.value = sortOrder;
 
-                         // Update the visible search input value
-                         const currentSearchInput = document.getElementById('searchInput');
-                         const currentClearSearch = document.getElementById('clearSearch');
-                         if (currentSearchInput) currentSearchInput.value = searchTerm;
-                         if (currentClearSearch && currentSearchInput) currentClearSearch.style.display = currentSearchInput.value ? 'block' : 'none';
+                         // Update UI elements for SearchTerm and ShowExtraFields
+                         if (searchInput) searchInput.value = searchTerm;
+                         if (showExtraFieldsCheckbox) showExtraFieldsCheckbox.checked = showExtraFieldsBool;
 
-                         // Update the checkbox state to reflect the hidden input
-                         const currentShowExtraFieldsCheckbox = document.getElementById('showExtraFieldsCheckbox');
-                         if (currentShowExtraFieldsCheckbox && currentShowExtraFieldsHidden) {
-                             currentShowExtraFieldsCheckbox.checked = currentShowExtraFieldsHidden.value === "True";
-                         }
+                         // Now call updateAllHiddenFields to sync SearchTerm and ShowExtraFields hidden inputs
+                         // from their (now updated) UI counterparts.
+                         updateAllHiddenFields();
 
+                         saveScrollPosition();
                          updateTableAjax(); // Call the AJAX update function
                      });
                  });                 
@@ -1046,10 +1084,10 @@ else
             // This function fetches and updates table content via AJAX for live search
             async function updateTableAjax() {
 
-                saveScrollPosition(); // Save scroll position before the update
+                // saveScrollPosition(); // Called by handlers before updateTableAjax now
 
-                // Get current state from the hidden inputs and the search input
-                // Re-select inputs here to ensure they are current
+                // Get current state from the hidden inputs.
+                // Assumes hidden inputs are already correctly populated by handlers + updateAllHiddenFields()
                 const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
                 const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
                 const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
@@ -1161,27 +1199,17 @@ else
 
             // --- Function to prepare and submit the form (for Toggle/Sort/Paginate) ---
             // This function ensures all hidden inputs are updated before submitting.
+            // Primarily for non-AJAX fallback or specific scenarios.
             function prepareAndSubmitForm() {
-
-                // Update hidden inputs from their corresponding UI elements if they exist
-                // SearchTerm is already updated by the input handler before this is called for search/clear
-                // Re-select inputs here to ensure they are current
-                const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
-                const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
-                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
-                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
-                const currentSearchTermInput = document.querySelector('input[name="SearchTerm"]');
-                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
-                const currentSearchInput = document.getElementById('searchInput');
-
-                if (currentSearchTermInput && currentSearchInput) {
-                    currentSearchTermInput.value = currentSearchInput.value;
-                }
-                if (currentShowExtraFieldsHidden && showExtraFieldsCheckbox) {
-                    currentShowExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
-                }
                 
-                saveScrollPosition(); // Save scroll before submitting                
+                // Call the consolidated function to ensure all common fields are updated
+                updateAllHiddenFields();
+
+                // PageNumber, SortColumn etc. should have been set by the calling context if needed.
+                // For example, if a sort link (non-AJAX) were to use this, it would set sort order/column
+                // and PageNumber=1 before calling this.
+
+                saveScrollPosition(); // Save scroll before submitting
                 searchForm.submit(); // Submit the form
             }
             // --- End Function to prepare and submit the form ---
@@ -1200,10 +1228,11 @@ else
                  const debouncedAjaxUpdate = debounce(function() {
 
                      // Reset to the first page on search input change
-                     pageNumberInput.value = 1;
+                     if (pageNumberInput) pageNumberInput.value = '1';
 
-                     // Update hidden search term immediately (optional, updateTableAjax also reads from searchInput)
-                     searchTermInput.value = searchInput.value;
+                     // updateAllHiddenFields will sync searchInput to searchTermInput
+                     updateAllHiddenFields();
+                     saveScrollPosition();
                      updateTableAjax(); // Call the AJAX update function
                  }, 100); // Adjust delay (milliseconds) as needed for live search responsiveness
 
@@ -1219,13 +1248,13 @@ else
                          // Prevent default form submission
                          event.preventDefault(); 
 
-                         // Ensure hidden search term is updated before immediate AJAX update
-                         searchTermInput.value = this.value;
-
                          // Reset to the first page on Enter
-                         pageNumberInput.value = 1;
-                         updateTableAjax(); // Trigger immediate AJAX update
+                         if (pageNumberInput) pageNumberInput.value = '1';
 
+                         // updateAllHiddenFields will sync searchInput to searchTermInput
+                         updateAllHiddenFields();
+                         saveScrollPosition();
+                         updateTableAjax(); // Trigger immediate AJAX update
                      }
                  });
 
@@ -1240,38 +1269,37 @@ else
                 clearSearch.addEventListener('click', function() {
                     
                     // Clear the visible input
-                    searchInput.value = '';
+                    if (searchInput) searchInput.value = '';
 
                     // Hide the clear button
-                    clearSearch.style.display = 'none';                   
+                    clearSearch.style.display = 'none';
 
-                    // Explicitly set hidden search term to empty
-                    searchTermInput.value = '';
-                    
                     // Reset the page number to 1
-                    pageNumberInput.value = 1;
+                    if (pageNumberInput) pageNumberInput.value = '1';
 
-                    // Call the AJAX update function
-                    updateTableAjax(); 
+                    // updateAllHiddenFields will sync the cleared searchInput to searchTermInput
+                    updateAllHiddenFields();
+                    saveScrollPosition();
+                    updateTableAjax();
 
                 });
 
             }
             // --- End Handle Clear Search Button click ---
 
-            // --- Handle Show Extra Fields Toggle (uses Form Submit) ---
+            // --- Handle Show Extra Fields Toggle (uses AJAX) ---
             // Ensure necessary elements exist
-            if (showExtraFieldsCheckbox && showExtraFieldsHidden && pageNumberInput) {
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden && pageNumberInput && searchTermInput && searchInput) {
                 showExtraFieldsCheckbox.addEventListener('change', function() {
 
-                    // Update the hidden input value immediately to "True" or "False" string
-                    showExtraFieldsHidden.value = this.checked ? "True" : "False";
-
                     // Reset to the first page on toggle change
-                    pageNumberInput.value = 1;
+                    if (pageNumberInput) pageNumberInput.value = '1';
                     
-                    // Trigger form submit
-                    prepareAndSubmitForm();
+                    // updateAllHiddenFields will sync checkbox state to showExtraFieldsHidden
+                    // and also ensure searchTerm is synced.
+                    updateAllHiddenFields();
+                    saveScrollPosition();
+                    updateTableAjax();    // Call the AJAX update function
                     
                 });
             }
@@ -1292,34 +1320,57 @@ else
                  }
             }
 
-            // --- Handle Sorting Links (uses Form Submit) ---
-            // These links use asp-route-* tags to generate the correct URL.
-            // We will let the default link navigation happen, which submits the form with the correct parameters.
-            // The initial listeners are attached once on DOMContentLoaded.
+            // --- Handle Sorting Links (uses AJAX) ---
             const sortLinks = document.querySelectorAll('#userTable thead a.nav-link'); // Select sort links
 
             sortLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
+                // Remove any existing listeners by cloning and replacing the link
+                // This is to prevent multiple event listeners if this script section is re-evaluated.
+                const clonedLink = link.cloneNode(true);
+                link.parentNode.replaceChild(clonedLink, link);
 
-                    // Do NOT preventDefault() here. Let the browser navigate using the link's href.
-                    // The asp-route-* tags will ensure the correct parameters are in the URL,
-                    // including PageNumber (reset to 1), SortColumn, SortOrder, SearchTerm, and ShowExtraFields.
+                clonedLink.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default link navigation
 
-                    // Save scroll position before the page reloads due to the form submit
+                    const clickedSortColumn = this.dataset.sortColumn; // Get from data-sort-column attribute
+                    const currentSortColumnValue = sortColumnInput ? sortColumnInput.value : '';
+                    const currentSortOrderValue = sortOrderInput ? sortOrderInput.value : 'asc'; // Default to 'asc'
+
+                    let newSortColumn;
+                    let newSortOrder;
+
+                    if (clickedSortColumn && clickedSortColumn.toLowerCase() === currentSortColumnValue.toLowerCase()) {
+                        // Same column clicked, toggle order
+                        newSortOrder = (currentSortOrderValue === 'asc' ? 'desc' : 'asc');
+                        newSortColumn = currentSortColumnValue; // Column remains the same
+                    } else {
+                        // New column clicked
+                        newSortColumn = clickedSortColumn;
+                        newSortOrder = 'asc'; // Default to ascending for new column
+                    }
+
+                    // Update hidden input fields for sorting
+                    if (sortColumnInput) sortColumnInput.value = newSortColumn;
+                    if (sortOrderInput) sortOrderInput.value = newSortOrder;
+                    if (pageNumberInput) pageNumberInput.value = '1'; // Reset to first page
+
+                    // updateAllHiddenFields will handle SearchTerm and ShowExtraFields
+                    updateAllHiddenFields();
                     saveScrollPosition();
-
+                    updateTableAjax();    // Call the AJAX update function
                 });
             });
             // --- End Handle Sorting Links ---
 
-            // --- Handle Pagination Links (uses Form Submit) ---
-            // These links use asp-route-* tags to generate the correct URL.
-            // We will let the default link navigation happen, which submits the form with the correct parameters.
+            // --- Handle Pagination Links (uses AJAX) ---
             // The initial listeners are attached once on DOMContentLoaded and re-attached after AJAX updates
             // Ensure necessary elements exist
 
             // Check if the pagination nav exists on initial load
             if (document.getElementById('paginationNav')) {
+                 // The attachPaginationLinkListeners function already converts these to AJAX.
+                 // It was previously misnamed or the comment was outdated.
+                 // It correctly uses event.preventDefault() and updateTableAjax().
                  attachPaginationLinkListeners(document.getElementById('paginationNav'));
             }
             // --- End Handle Pagination Links ---
@@ -1330,10 +1381,26 @@ else
                 searchForm.addEventListener('submit', function(event) {
 
                     // Prevent default form submission to allow AJAX handling
+                    // This is important as various actions now call updateTableAjax() directly
+                    // instead of submitting the form.
                     event.preventDefault();
                     
+                    // Optionally, decide if the main search button should trigger AJAX or a full submit.
+                    // For consistency, it can also call updateTableAjax().
+                    // pageNumberInput.value = 1; // Reset to first page on manual form submit via button
+                    // searchTermInput.value = searchInput.value;
+                    // updateTableAjax();
                 });
             }
+
+            // --- Re-attach sorting link listeners after AJAX updates ---
+            // Since the table headers might be part of the AJAX refresh (if ShowExtraFields changes them),
+            // we need a way to re-attach sort link listeners.
+            // However, the current `updateTableAjax` only replaces `tbody`, `userCount`, and `paginationNav`.
+            // The `thead` (where sort links are) is NOT replaced by `updateTableAjax`.
+            // So, the initial attachment of sort link listeners should be sufficient.
+            // If `thead` were to be replaced, we'd need a function like `attachSortLinkListeners`
+            // to be called in `updateTableAjax` similar to `attachPaginationLinkListeners`.
 
             // --- Initial Setup Calls (Call functions after they are defined) ---
 
