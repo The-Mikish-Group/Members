@@ -188,12 +188,22 @@
                         <button type="submit" asp-page-handler="Cancel" class="shadow btn btn-sm btn-secondary me-2">
                             <i class="bi bi-box-arrow-left"></i> Cancel
                         </button>
-
+                        @{
+                            // Construct the return URL that points back to this EditUser page,
+                            // including its own ReturnUrl parameter (which typically points to the Users list page).
+                            var editUserReturnUrl = Url.Page("/EditUser",
+                            new
+                            {
+                                area = "Identity",
+                                id = Model.Input.Id,
+                                returnUrl = Model.ReturnUrl // This is EditUser's original ReturnUrl from the Users list
+                            });
+                        }
                         <!-- Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl -->
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
-                           asp-route-returnUrl="@Model.ReturnUrl"
-                           class="shadow btn btn-sm btn-info me-2">
+                           asp-route-returnUrl="@editUserReturnUrl"
+                           class="btn btn-sm btn-info me-2">
                             <i class="bi bi-tags"></i> Roles
                         </a>
 
