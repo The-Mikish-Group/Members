@@ -244,38 +244,33 @@ namespace Members.Areas.Identity.Pages
                 }
             }
 
-
             StatusMessage = $"Roles updated successfully for user '{UserToEdit.UserName}'.";
 
-            // Redirect back to the EditUser page for the user
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // If there's a ReturnUrl (from Users list -> EditUser), go back there
-                // This preserves pagination and search on the Users list
+                // ReturnUrl is now expected to be the URL of the EditUser page 
+                // (e.g., /Identity/EditUser?id=USER_ID&returnUrl=URL_TO_USERS_LIST)
                 return Redirect(ReturnUrl);
             }
             else
             {
-                // Otherwise, redirect back to the EditUser page for this user
                 return RedirectToPage("./EditUser", new { id = UserId });
             }
         }
-
 
         // Optional: Add a Cancel button handler to go back without saving changes
         public IActionResult OnPostCancel()
         {
             StatusMessage = "Role changes cancelled.";
 
-            // Redirect back to the EditUser page for the user
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // If there's a ReturnUrl (from Users list -> EditUser), go back there
+                // ReturnUrl should point back to the EditUser page
                 return Redirect(ReturnUrl);
             }
             else
             {
-                // Otherwise, redirect back to the EditUser page for this user
+                // Fallback if ReturnUrl is missing.                
                 return RedirectToPage("./EditUser", new { id = UserId });
             }
         }

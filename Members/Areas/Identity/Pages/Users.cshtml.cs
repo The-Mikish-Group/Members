@@ -37,6 +37,7 @@ namespace Members.Areas.Identity.Pages
             public DateTime? Birthday { get; set; }
             public DateTime? Anniversary { get; set; }
             public bool IsBillingContact { get; set; }
+            public decimal CurrentBalance { get; set; }
             // --- End New UserProfile Fields ---
         }
         // Property to hold the users for the current page
@@ -234,6 +235,21 @@ namespace Members.Areas.Identity.Pages
                 {
                     fullName = $"{userProfile.FirstName} {(string.IsNullOrEmpty(userProfile.MiddleName) ? "" : userProfile.MiddleName + " ")}{userProfile.LastName}".Trim();
                 }
+                // Fix for CS1963: An expression tree may not contain a dynamic operation  
+                // The issue arises because LINQ-to-Entities does not support dynamic types in expression trees.  
+                // To resolve this, we need to materialize the query into memory using `.ToList()` or `.AsEnumerable()` before performing operations involving dynamic types.  
+
+                // Updated code for calculating `totalCharges` and `totalPayments`  
+                decimal totalCharges = _dbContext.Invoices
+                    .AsEnumerable() // Materialize the query into memory  
+                    .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
+                    .Sum(i => i.AmountDue);
+                decimal totalPayments = _dbContext.Payments
+                    .AsEnumerable() // Materialize the query into memory  
+                    .Where(p => p.UserID == user.Id)
+                    .Sum(p => p.Amount);
+                decimal currentBalance = totalCharges - totalPayments;
+
                 Users.Add(new UserModel
                 {
                     Id = user.Id,
@@ -258,7 +274,8 @@ namespace Members.Areas.Identity.Pages
                     Plot = userProfile?.Plot,
                     Birthday = userProfile?.Birthday,
                     Anniversary = userProfile?.Anniversary,
-                    IsBillingContact = userProfile?.IsBillingContact ?? false
+                    IsBillingContact = userProfile?.IsBillingContact ?? false,
+                    CurrentBalance = currentBalance
                     // --- End Map Additional UserProfile Fields ---
                 });
             }

@@ -42,6 +42,7 @@ namespace Members.Areas.Member.Pages
         public class BillingTransaction
         {
             public DateTime Date { get; set; }
+            public int? InvoiceID { get; set; }
             public string Description { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
             public decimal? ChargeAmount { get; set; }
@@ -109,10 +110,16 @@ namespace Members.Areas.Member.Pages
                                 .ToListAsync();
             _logger.LogInformation("Found {PaymentCount} payments for user {UserId}.", Payments.Count, targetUser.Id);
 
-            decimal totalCharges = Invoices.Sum(i => i.AmountDue);
-            decimal totalPayments = Payments.Sum(p => p.Amount);
-            CurrentBalance = totalCharges - totalPayments;
-            _logger.LogInformation("Calculated balance for user {UserId}: {CurrentBalance}", targetUser.Id, CurrentBalance);
+            decimal totalChargesFromInvoices = Invoices
+                .Where(i => i.Status != InvoiceStatus.Cancelled) // Exclude Cancelled invoices
+                .Sum(i => i.AmountDue);
+            _logger.LogInformation("MyBilling: User {UserId} - Total Charges from non-Cancelled Invoices: {TotalCharges}", targetUser.Id, totalChargesFromInvoices);
+
+            decimal totalPaymentsReceived = Payments.Sum(p => p.Amount); // Sum all payments fetched for this user
+            _logger.LogInformation("MyBilling: User {UserId} - Total Payments Received: {TotalPayments}", targetUser.Id, totalPaymentsReceived);
+
+            CurrentBalance = totalChargesFromInvoices - totalPaymentsReceived;
+            _logger.LogInformation("MyBilling: User {UserId} - Calculated Current Balance: {CurrentBalance}", targetUser.Id, CurrentBalance);
 
             Transactions.Clear(); // Clear before repopulating
             foreach (var invoice in Invoices)
@@ -122,8 +129,10 @@ namespace Members.Areas.Member.Pages
                     Date = invoice.InvoiceDate,
                     Description = invoice.Description,
                     ChargeAmount = invoice.AmountDue,
+                    PaymentAmount = null,
                     Type = "Invoice",
-                    StatusOrMethod = invoice.Status.ToString()
+                    StatusOrMethod = invoice.Status.ToString(),
+                    InvoiceID = invoice.InvoiceID // <-- POPULATE IT HERE
                 });
             }
             foreach (var payment in Payments)
@@ -132,9 +141,11 @@ namespace Members.Areas.Member.Pages
                 {
                     Date = payment.PaymentDate,
                     Description = payment.Notes ?? $"Payment (Ref: {payment.ReferenceNumber ?? "N/A"})",
+                    ChargeAmount = null,
                     PaymentAmount = payment.Amount,
                     Type = "Payment",
-                    StatusOrMethod = payment.Method.ToString()
+                    StatusOrMethod = payment.Method.ToString(),
+                    InvoiceID = payment.InvoiceID // <-- POPULATE IT HERE (it's already on your Payment model)
                 });
             }
             Transactions = [.. Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice")];

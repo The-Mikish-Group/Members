@@ -9,21 +9,16 @@ using System.ComponentModel.DataAnnotations;
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")] // Or your specific admin/manager roles
-    public class AdminBalancesModel : PageModel
+    public class AdminBalancesModel(
+        ApplicationDbContext context,
+        UserManager<IdentityUser> userManager,
+        ILogger<AdminBalancesModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<AdminBalancesModel> _logger;
-        public AdminBalancesModel(
-            ApplicationDbContext context,
-            UserManager<IdentityUser> userManager,
-            ILogger<AdminBalancesModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
-        public List<MemberBalanceViewModel> MemberBalances { get; set; } = new List<MemberBalanceViewModel>();
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<AdminBalancesModel> _logger = logger;
+
+        public List<MemberBalanceViewModel> MemberBalances { get; set; } = [];
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; }
         [BindProperty(SupportsGet = true)]
@@ -36,68 +31,74 @@ namespace Members.Areas.Admin.Pages.Accounting
         public bool ShowOnlyOutstanding { get; set; } = true;
         public async Task<IActionResult> OnPostApplyLateFeeAsync(string userId)
         {
-            _logger.LogInformation($"OnPostApplyLateFeeAsync called for UserID: {userId}");
+            const string userIdLogTemplate = "OnPostApplyLateFeeAsync called for UserID: {UserId}";
+            const string userNotFoundLogTemplate = "User with ID {UserId} not found.";
+            const string lateFeeCalculationLogTemplate = "Calculated late fee for {UserName}: {LateFeeAmount:C} based on invoice {InvoiceId}. Description: {FeeDescription}";
+            const string defaultLateFeeLogTemplate = "Applying default late fee of $25 for {UserName} as no specific overdue Dues invoice found.";
+            const string recentLateFeeLogTemplate = "Recent late fee already exists for {UserName}. No new fee applied by this action.";
+            const string lateFeeInvoiceCreatedLogTemplate = "Late fee invoice {InvoiceId} created for {UserName}.";
+
+            _logger.LogInformation(userIdLogTemplate, userId);
+
             if (string.IsNullOrEmpty(userId))
             {
                 TempData["ErrorMessage"] = "User ID was not provided.";
-                return RedirectToPage(); // Or an error page
+                return RedirectToPage();
             }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 TempData["ErrorMessage"] = $"User with ID {userId} not found.";
+                _logger.LogWarning(userNotFoundLogTemplate, userId);
                 return RedirectToPage();
             }
-            // --- Determine the base amount for the 5% calculation ---
-            // For simplicity, let's find the most recent, unpaid "Dues" invoice for this user.
-            // In a more complex system, you might have specific rules for which invoice(s) trigger late fees.
+
             var latestUnpaidDuesInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
-                            i.Type == InvoiceType.Dues && // Assuming 'Dues' is the type for assessments
+                            i.Type == InvoiceType.Dues &&
                             i.Status != InvoiceStatus.Paid &&
                             i.Status != InvoiceStatus.Cancelled &&
-                            i.DueDate < DateTime.Today) // Ensure it's actually overdue
+                            i.DueDate < DateTime.Today)
                 .OrderByDescending(i => i.DueDate)
                 .FirstOrDefaultAsync();
+
             decimal lateFeeAmount;
             string feeCalculationDescription;
+
             if (latestUnpaidDuesInvoice != null)
             {
                 decimal fivePercentOfDues = latestUnpaidDuesInvoice.AmountDue * 0.05m;
                 lateFeeAmount = Math.Max(25.00m, fivePercentOfDues);
                 feeCalculationDescription = $"Late fee based on overdue dues of {latestUnpaidDuesInvoice.AmountDue:C} from {latestUnpaidDuesInvoice.DueDate:yyyy-MM-dd}. Fee: Max($25, 5% = {fivePercentOfDues:C}) = {lateFeeAmount:C}.";
-                _logger.LogInformation($"Calculated late fee for {user.UserName}: {lateFeeAmount:C} based on invoice {latestUnpaidDuesInvoice.InvoiceID}. Description: {feeCalculationDescription}");
+                _logger.LogInformation(lateFeeCalculationLogTemplate, user.UserName, lateFeeAmount, latestUnpaidDuesInvoice.InvoiceID, feeCalculationDescription);
             }
             else
             {
-                // Default to $25 if no specific overdue Dues invoice is found for the 5% calculation basis
-                // Or, you might decide to not allow applying a fee if no clear basis exists.
-                // For now, we'll apply the flat $25.
                 lateFeeAmount = 25.00m;
-                feeCalculationDescription = "Late fee (standard $25 applied as no specific overdue Dues invoice found as primary basis).";
-                _logger.LogInformation($"Applying default late fee of $25 for {user.UserName} as no specific overdue Dues invoice found.");
+                feeCalculationDescription = "Late fee (standard $25 applied). (No overdue Dues Invoice found for calculation basis).";
+                _logger.LogInformation(defaultLateFeeLogTemplate, user.UserName);
             }
-            // Check if a similar late fee was already applied recently to avoid duplicates
+
             var recentLateFeeExists = await _context.Invoices
                 .AnyAsync(i => i.UserID == userId &&
                                i.Type == InvoiceType.LateFee &&
-                               i.Description.Contains("Late fee based on overdue dues") && // Make description check more robust if needed
-                               i.InvoiceDate >= DateTime.Today.AddDays(-7)); // Check for fees in last 7 days
+                               i.Description.Contains("Late fee based on overdue dues") &&
+                               i.InvoiceDate >= DateTime.Today.AddDays(-7));
+
             if (recentLateFeeExists)
             {
                 TempData["WarningMessage"] = $"A late fee appears to have been applied recently for {user.UserName}. Please check history before applying another.";
-                // We could redirect or just allow them to proceed if they confirm.
-                // For now, we'll let the message show and they can decide if they still want to add one via the UI if we re-show the button.
-                // Or, more simply, just don't add it if one was recent. Let's prevent duplicate for now.
-                _logger.LogWarning($"Recent late fee already exists for {user.UserName}. No new fee applied by this action.");
+                _logger.LogWarning(recentLateFeeLogTemplate, user.UserName);
                 TempData["StatusMessage"] = $"Late fee application skipped for {user.UserName} as a recent one already exists.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
+
             var lateFeeInvoice = new Invoice
             {
                 UserID = userId,
                 InvoiceDate = DateTime.Today,
-                DueDate = DateTime.Today.AddDays(15), // Late fees are typically due relatively soon
+                DueDate = DateTime.Today.AddDays(15),
                 Description = feeCalculationDescription,
                 AmountDue = lateFeeAmount,
                 AmountPaid = 0,
@@ -106,11 +107,12 @@ namespace Members.Areas.Admin.Pages.Accounting
                 DateCreated = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow
             };
+
             _context.Invoices.Add(lateFeeInvoice);
             await _context.SaveChangesAsync();
             TempData["StatusMessage"] = $"Late fee of {lateFeeAmount:C} applied successfully to user {user.UserName}.";
-            _logger.LogInformation($"Late fee invoice {lateFeeInvoice.InvoiceID} created for {user.UserName}.");
-            // Redirect back to the same page, preserving sort and filter
+            _logger.LogInformation(lateFeeInvoiceCreatedLogTemplate, lateFeeInvoice.InvoiceID, user.UserName);
+
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
         public class MemberBalanceViewModel
@@ -147,7 +149,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 string fullName = user.UserName ?? "N/A"; // Fallback to UserName
                 if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
                 {
-                    fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                    fullName = $"{userProfile.FirstName} {userProfile.LastName}";
                 }
                 else if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName))
                 {
@@ -157,7 +159,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 {
                     fullName = userProfile.LastName;
                 }
-                _logger.LogInformation($"Calculating balance for user: {user.UserName} (ID: {user.Id})");
+                _logger.LogInformation($"Calculating balance for: {user.UserName} (ID: {user.Id})");
 
                 decimal totalChargesFromInvoices = await _context.Invoices
                     .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled) // Include Paid invoices in charges
@@ -188,13 +190,13 @@ namespace Members.Areas.Admin.Pages.Accounting
             // Sorting logic
             MemberBalances = sortOrder switch
             {
-                "name_desc" => memberBalancesTemp.OrderByDescending(s => s.FullName).ToList(),
-                "name_asc" => memberBalancesTemp.OrderBy(s => s.FullName).ToList(),
-                "email_desc" => memberBalancesTemp.OrderByDescending(s => s.Email).ToList(),
-                "email_asc" => memberBalancesTemp.OrderBy(s => s.Email).ToList(),
-                "balance_desc" => memberBalancesTemp.OrderByDescending(s => s.CurrentBalance).ToList(),
-                "balance_asc" => memberBalancesTemp.OrderBy(s => s.CurrentBalance).ToList(),
-                _ => memberBalancesTemp.OrderBy(s => s.FullName).ToList(),// Default sort
+                "name_desc" => [.. memberBalancesTemp.OrderByDescending(s => s.FullName)],
+                "name_asc" => [.. memberBalancesTemp.OrderBy(s => s.FullName)],
+                "email_desc" => [.. memberBalancesTemp.OrderByDescending(s => s.Email)],
+                "email_asc" => [.. memberBalancesTemp.OrderBy(s => s.Email)],
+                "balance_desc" => [.. memberBalancesTemp.OrderByDescending(s => s.CurrentBalance)],
+                "balance_asc" => [.. memberBalancesTemp.OrderBy(s => s.CurrentBalance)],
+                _ => [.. memberBalancesTemp.OrderBy(s => s.FullName)],// Default sort
             };
             _logger.LogInformation($"Populated MemberBalances. Count: {MemberBalances.Count}");
         }

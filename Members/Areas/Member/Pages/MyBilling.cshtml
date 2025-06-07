@@ -62,11 +62,12 @@
                                 <thead class="table-light">
                                     <tr class="bg-gold-dark text-white py-1">
                                         <th class="text-white ps-1 py-1">Date</th>
+                                        <th class="text-white ps-1 py-1">Invoice #</th>
                                         <th class="text-white py-1">Description</th>
                                         <th class="text-white py-1 text-end">Charge</th>
                                         <th class="text-white pe-2 py-1 text-end">Payment</th>
                                         <th class="text-white py-1">Type</th>
-                                        <th class="text-white py-1">Status/Method</th>
+                                        <th class="text-center text-white py-1">Status/Method</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -77,16 +78,26 @@
                                     {
                                         <tr class="text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
                                             <td class="ps-1 py-1 text-gold-darker">@trans.Date.ToString("yyyy-MM-dd")</td>
-                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Description)</td>
-                                            <td class="py-1 text-gold-darker text-end">@trans.ChargeAmount?.ToString("C")</td>
-                                            <td class="pe-2 py-1 text-gold-darker text-end">@trans.PaymentAmount?.ToString("C")</td>
-                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.Type)</td>
-                                            <td class="py-1 text-gold-darker">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
+                                            <td>
+                                                @if (trans.Type == "Invoice" && trans.InvoiceID.HasValue)
+                                                {
+                                                    @($"INV-{trans.InvoiceID:D5}")
+                                                }
+                                                else if (trans.Type == "Payment" && trans.InvoiceID.HasValue)
+                                                {
+                                                    @* Optionally show which invoice a payment was for, if directly linked *@
+                                                    @($"For INV-{trans.InvoiceID:D5}")
+                                                }
+                                            </td>
+                                            <td class="text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
+                                            <td class="text-gold-darker text-end py-1">@trans.ChargeAmount?.ToString("C")</td>
+                                            <td class="text-gold-darker text-end pe-1 py-1">@trans.PaymentAmount?.ToString("C")</td>
+                                            <td class="text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Type)</td>
+                                            <td class="text-gold-darker text-center py-1">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
                                         </tr>
-
                                         i++;
                                     }
-                                </tbody>
+                                </tbody>                                
                             </table>
                         </div>
                     }

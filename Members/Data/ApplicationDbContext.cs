@@ -11,6 +11,7 @@ namespace Members.Data
         public DbSet<Members.Models.File> Files { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<UserCredit> UserCredits { get; set; }
         // ... other DbSets
         protected override void OnModelCreating(ModelBuilder builder)
         {
