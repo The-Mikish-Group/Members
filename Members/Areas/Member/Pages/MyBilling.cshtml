@@ -1,7 +1,7 @@
 ﻿@page "{userId?}"
 @model Members.Areas.Member.Pages.MyBillingModel
 @{
-    ViewData["Title"] = $"{Model.DisplayName} Billing History"; // Use DisplayName here
+    ViewData["Title"] = "Billing History";
     Layout = "_Layout"; // Or your specific Member Area layout
 }
 
@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12">
             @* Use DisplayName in the main page header *@
-            <h2 class="mb-4 text-gold-darker">@ViewData["Title"]</h2>
+            <h2 class="mb-4 text-center text-gold-darker">@ViewData["Title"]</h2>
 
             @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.ViewedUserId))
             {
@@ -44,12 +44,46 @@
                     }
                 </div>
             </div>
+            @if (Model.TotalAvailableCredit > 0)
+            {
+                <div class="card shadow bg-Card-Menu mb-4">
+                    <div class="card-header">
+
+                        <h5 class="text-gold-darker mb-0">Available Account Credits for:<br /> @Model.DisplayName</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="text-success">
+                            @Model.TotalAvailableCredit.ToString("C")
+                        </h4>
+                        <p class="text-muted">This amount can be applied to future invoices.</p>
+                        @if (Model.AvailableCredits.Any())
+                        {
+                            <ul class="shadow list-group list-group-flush mt-2">
+                                @foreach (var credit in Model.AvailableCredits)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>
+                                            Credit on @credit.CreditDate.ToString("yyyy-MM-dd"): @credit.Reason
+                                            @if (credit.SourcePaymentID.HasValue)
+                                            {
+                                                <i class="text-muted">(from Payment ID: @credit.SourcePaymentID)</i>
+                                            }
+                                        </span>
+                                        <span class="badge bg-success rounded-pill">@credit.Amount.ToString("C")</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            }
 
             <div class="card shadow bg-Card-Menu mb-2">
                 <div class="card-header">
                     @* And here for transaction history heading *@
-                    <h5 class="text-gold-darker mb-0">Transaction History for @Model.DisplayName</h5>
+                    <h5 class="text-gold-darker mb-0">Transaction History for:<br />@Model.DisplayName</h5>
                 </div>
+
                 <div class="card-body p-0">
                     @if (!Model.Transactions.Any())
                     {
@@ -57,17 +91,17 @@
                     }
                     else
                     {
-                        <div class="table-responsive">
+                        <div class="table-responsive m-1">
                             <table class="w-100 shadow">
                                 <thead class="table-light">
                                     <tr class="bg-gold-dark text-white py-1">
-                                        <th class="text-white ps-1 py-1">Date</th>
-                                        <th class="text-white ps-1 py-1">Invoice #</th>
-                                        <th class="text-white py-1">Description</th>
-                                        <th class="text-white py-1 text-end">Charge</th>
-                                        <th class="text-white pe-2 py-1 text-end">Payment</th>
-                                        <th class="text-white py-1">Type</th>
-                                        <th class="text-center text-white py-1">Status/Method</th>
+                                        <th class="text-nowrap text-white ps-1 py-1">Date</th>
+                                        <th class="text-nowrap text-white ps-1 py-1">Invoice #</th>
+                                        <th class="text-nowrap text-white py-1">Description</th>
+                                        <th class="text-nowrap text-white py-1 text-end">Charge</th>
+                                        <th class="text-nowrap text-white pe-2 py-1 text-end">Payment</th>
+                                        <th class="text-nowrap text-white py-1">Type</th>
+                                        <th class="text-nowrap text-center text-white py-1">Status/Method</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -77,8 +111,8 @@
                                     @foreach (var trans in Model.Transactions)
                                     {
                                         <tr class="text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
-                                            <td class="ps-1 py-1 text-gold-darker">@trans.Date.ToString("yyyy-MM-dd")</td>
-                                            <td>
+                                            <td class="text-nowrap ps-1 py-1 text-gold-darker">@trans.Date.ToString("yyyy-MM-dd")</td>
+                                            <td class="text-nowrap ps-1 py-1 text-gold-darker">
                                                 @if (trans.Type == "Invoice" && trans.InvoiceID.HasValue)
                                                 {
                                                     @($"INV-{trans.InvoiceID:D5}")
@@ -89,11 +123,11 @@
                                                     @($"For INV-{trans.InvoiceID:D5}")
                                                 }
                                             </td>
-                                            <td class="text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
-                                            <td class="text-gold-darker text-end py-1">@trans.ChargeAmount?.ToString("C")</td>
-                                            <td class="text-gold-darker text-end pe-1 py-1">@trans.PaymentAmount?.ToString("C")</td>
-                                            <td class="text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Type)</td>
-                                            <td class="text-gold-darker text-center py-1">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
+                                            <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
+                                            <td class="text-nowrap text-gold-darker text-end py-1">@trans.ChargeAmount?.ToString("C")</td>
+                                            <td class="text-nowrap text-gold-darker text-end pe-1 py-1">@trans.PaymentAmount?.ToString("C")</td>
+                                            <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Type)</td>
+                                            <td class="text-nowrap text-gold-darker text-center py-1">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
                                         </tr>
                                         i++;
                                     }

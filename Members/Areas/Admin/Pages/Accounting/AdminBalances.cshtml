@@ -53,34 +53,37 @@
                 <thead>
 
                     <tr class="bg-gold-dark text-white">
-                        <th class="ps-1 py-1">
+                        <th class="text-nowrap ps-1 py-1">
                             <a asp-page="./AdminBalances"
                                asp-route-sortOrder="@Model.NameSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()" class="text-decoration-none">Name</a>
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()" 
+                               class="text-white text-decoration-none">Name</a>
                             @if (Model.CurrentSort == Model.NameSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.NameSort?.Replace("_desc", "_asc") || (string.IsNullOrEmpty(Model.CurrentSort) && Model.NameSort == "name_desc"))
                             {
                                 <i class="bi @(Model.NameSort == "name_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
                             }
                         </th>
-                        <th class="py-1">
+                        <th class="text-nowrap py-1">
                             <a asp-page="./AdminBalances"
                                asp-route-sortOrder="@Model.EmailSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()" class="text-decoration-none">Email</a>
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                               class="text-white text-decoration-none">Email</a>
                             @if (Model.CurrentSort == Model.EmailSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.EmailSort?.Replace("_desc", "_asc"))
                             {
                                 <i class="bi @(Model.EmailSort == "email_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
                             }
                         </th>
-                        <th class="py-1 text-end">
+                        <th class="text-nowrap py-1 text-end">
                             <a asp-page="./AdminBalances"
                                asp-route-sortOrder="@Model.BalanceSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()" class="text-decoration-none">Current Balance</a>
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                               class="text-white text-decoration-none">Current Balance</a>
                             @if (Model.CurrentSort == Model.BalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.BalanceSort?.Replace("_desc", "_asc"))
                             {
                                 <i class="bi @(Model.BalanceSort == "balance_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
                             }
                         </th>
-                        <th class="text-end pe-2 py-1">Fees</th>
+                        <th class="text-nowrap text-white text-decoration-none text-end pe-2 py-1">Fees</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,13 +94,13 @@
 
                     @foreach (var member in Model.MemberBalances)
                     {
-                        <tr class="text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
-                            <td class="text-gold-darker ps-1 py-1">@Html.DisplayFor(modelItem => member.FullName)</td>
-                            <td class="text-gold-darker py-1">@Html.DisplayFor(modelItem => member.Email)</td>
-                            <td class="text-gold-darker py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
+                        <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
+                            <td class="text-nowrap text-gold-darker ps-1 py-1">@Html.DisplayFor(modelItem => member.FullName)</td>
+                            <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => member.Email)</td>
+                            <td class="text-nowrap text-gold-darker py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
                                 @member.CurrentBalance.ToString("C")
                             </td>
-                            <td class="text-gold-darker py-1 pe-2 text-end">
+                            <td class="text-nowrap text-gold-darker py-1 pe-2 text-end">
                                 @if (member.CurrentBalance > 0)
                                 {
                                     <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
