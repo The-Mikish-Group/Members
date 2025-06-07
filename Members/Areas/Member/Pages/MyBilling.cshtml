@@ -16,7 +16,7 @@
                 <div class="mb-3">
                     @* Link back to EditUser page if admin is viewing and ViewedUserId is available *@
                     <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="shadow btn btn-sm btn-back">
-                        <i class="bi bi-arrow-left"></i> Back to Edit Member                       
+                        <i class="bi bi-arrow-left"></i> Edit Member                       
                     </a>
                 </div>
             }
@@ -24,7 +24,7 @@
             <div class="card shadow bg-Card-Menu mb-4">
                 <div class="card-header">
                     @* DisplayName also useful here if you want to be more explicit than "Current Balance" *@
-                    <h5 class="text-gold-darker mb-0">Current Balance for @Model.DisplayName</h5>
+                    <h5 class="text-gold-darker mb-0">Current Balance for:<br />@Model.DisplayName</h5>
                 </div>
                 <div class="card-body">
                     <h3 class="text-@(Model.CurrentBalance > 0 ? "danger" : "success")">

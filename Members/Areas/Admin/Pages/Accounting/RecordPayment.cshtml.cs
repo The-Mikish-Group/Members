@@ -75,6 +75,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             const string logTemplate = "OnGetAsync called for RecordPaymentModel. UserID: {UserId}, ReturnUrl: {ReturnUrl}";
             _logger.LogInformation(logTemplate, userId, returnUrl);
             ReturnUrl = returnUrl;
+
             if (!string.IsNullOrEmpty(userId))
             {
                 var user = await _userManager.FindByIdAsync(userId);
@@ -86,7 +87,9 @@ namespace Members.Areas.Admin.Pages.Accounting
                                      : user.UserName ?? user.Email;
                     Input.SelectedUserID = userId;
                     IsUserPreselected = true;
-                    _logger.LogInformation("RecordPayment page loaded for pre-selected user: {TargetUserName} (ID: {UserId})", TargetUserName, userId);
+                    const string userPreselectedLogTemplate = "RecordPayment page loaded for pre-selected user: {TargetUserName} (ID: {UserId})";
+                    _logger.LogInformation(userPreselectedLogTemplate, TargetUserName, userId);
+
                     OpenInvoicesForUser = await _context.Invoices
                         .Where(i => i.UserID == userId &&
                                     i.Status != InvoiceStatus.Cancelled &&
@@ -101,34 +104,42 @@ namespace Members.Areas.Admin.Pages.Accounting
                         })
                         .OrderBy(i => i.InvoiceDate)
                         .ToListAsync();
-                    _logger.LogInformation("Found {OpenInvoicesCount} open invoices for user {UserId}.", OpenInvoicesForUser.Count, userId);
+
+                    const string openInvoicesLogTemplate = "Found {OpenInvoicesCount} open invoices for user {UserId}.";
+                    _logger.LogInformation(openInvoicesLogTemplate, OpenInvoicesForUser.Count, userId);
                 }
                 else
                 {
-                    _logger.LogWarning("RecordPayment: UserID {UserId} provided but user not found. Falling back to user selection list.", userId);
+                    const string userNotFoundLogTemplate = "RecordPayment: UserID {UserId} provided but user not found. Falling back to user selection list.";
+                    _logger.LogWarning(userNotFoundLogTemplate, userId);
                     await PopulateUserSelectList();
                 }
             }
             else
             {
-                _logger.LogInformation("RecordPayment: No UserID provided. Populating user selection list.");
+                const string noUserIdLogTemplate = "RecordPayment: No UserID provided. Populating user selection list.";
+                _logger.LogInformation(noUserIdLogTemplate);
                 await PopulateUserSelectList();
             }
         }
         private async Task PopulateUserSelectList()
-        {
+        {                       
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
-            _logger.LogInformation($"PopulateUserSelectList: Found {usersInMemberRole?.Count ?? 0} users in role '{memberRoleName}'.");
+            const string populationUserSelectListTemplate = "RecordPayment: {UserCount} users found in role {RoleName}.";
+            _logger.LogInformation(populationUserSelectListTemplate, usersInMemberRole?.Count ?? 0, memberRoleName);
+
             if (usersInMemberRole == null || !usersInMemberRole.Any())
             {
                 UserSelectList = new SelectList(Enumerable.Empty<SelectListItem>());
                 return;
             }
+
             var userIdsInMemberRole = usersInMemberRole.Select(u => u.Id).ToList();
             var userProfiles = await _context.UserProfile
                                         .Where(up => userIdsInMemberRole.Contains(up.UserId))
                                         .ToDictionaryAsync(up => up.UserId);
+
             var userListItems = new List<SelectListItem>();
             foreach (var user in usersInMemberRole.OrderBy(u => u.UserName))
             {
@@ -141,20 +152,25 @@ namespace Members.Areas.Admin.Pages.Accounting
                     userListItems.Add(new SelectListItem { Value = user.Id, Text = $"{user.UserName} ({user.Email}) - Profile Incomplete" });
                 }
             }
+
             UserSelectList = new SelectList(userListItems.OrderBy(item => item.Text), "Value", "Text");
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            const string logTemplate = "OnPostAsync called for RecordPaymentModel. SelectedUserID: {SelectedUserID}, SelectedInvoiceID: {SelectedInvoiceID}";
-            _logger.LogInformation(logTemplate, Input.SelectedUserID, Input.SelectedInvoiceID);
+            const string logTemplateOnPost = "OnPostAsync called for RecordPaymentModel. SelectedUserID: {SelectedUserID}, SelectedInvoiceID: {SelectedInvoiceID}";
+            _logger.LogInformation(logTemplateOnPost, Input.SelectedUserID, Input.SelectedInvoiceID);
+
             if (!string.IsNullOrEmpty(Input.SelectedUserID))
             {
                 var userForDisplayTest = await _userManager.FindByIdAsync(Input.SelectedUserID);
                 if (userForDisplayTest != null) IsUserPreselected = true;
             }
+
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("RecordPayment OnPostAsync: ModelState is invalid.");
+                const string logTemplateInvalidModelState = "RecordPayment OnPostAsync: ModelState is invalid.";
+                _logger.LogWarning(logTemplateInvalidModelState);
+
                 if (!string.IsNullOrEmpty(Input.SelectedUserID))
                 {
                     var userForDisplay = await _userManager.FindByIdAsync(Input.SelectedUserID);
@@ -180,19 +196,25 @@ namespace Members.Areas.Admin.Pages.Accounting
                             .ToListAsync();
                     }
                 }
+
                 if (!IsUserPreselected)
                 {
                     await PopulateUserSelectList();
                 }
+
                 return Page();
             }
+
             var user = await _userManager.FindByIdAsync(Input.SelectedUserID);
             if (user == null) { /* This case should ideally be caught by model validation or earlier checks */ }
+
             var invoiceToPay = await _context.Invoices.FirstOrDefaultAsync(i => i.InvoiceID == Input.SelectedInvoiceID.GetValueOrDefault() && i.UserID == Input.SelectedUserID);
             if (invoiceToPay == null)
             {
-                _logger.LogWarning("OnPostAsync: Selected invoice ID {SelectedInvoiceID} not found for user {SelectedUserID}.", Input.SelectedInvoiceID, Input.SelectedUserID);
+                const string logTemplateInvoiceNotFound = "OnPostAsync: Selected invoice ID {SelectedInvoiceID} not found for user {SelectedUserID}.";
+                _logger.LogWarning(logTemplateInvoiceNotFound, Input.SelectedInvoiceID, Input.SelectedUserID);
                 ModelState.AddModelError("Input.SelectedInvoiceID", "The selected invoice was not found or does not belong to this user.");
+
                 if (!string.IsNullOrEmpty(Input.SelectedUserID))
                 {
                     var userForDisplay = await _userManager.FindByIdAsync(Input.SelectedUserID);
@@ -206,28 +228,40 @@ namespace Members.Areas.Admin.Pages.Accounting
                             .Where(i => i.UserID == Input.SelectedUserID &&
                                         i.Status != InvoiceStatus.Cancelled &&
                                         i.AmountPaid < i.AmountDue)
-                            .Select(i => new OpenInvoiceViewModel { /* ... populate ... */ })
+                            .Select(i => new OpenInvoiceViewModel
+                            {
+                                InvoiceID = i.InvoiceID,
+                                InvoiceDate = i.InvoiceDate,
+                                Description = i.Description,
+                                AmountDue = i.AmountDue,
+                                AmountPaid = i.AmountPaid
+                            })
                             .OrderBy(i => i.InvoiceDate)
                             .ToListAsync();
                     }
                 }
+
                 if (!IsUserPreselected) await PopulateUserSelectList();
                 return Page();
             }
+
             if (invoiceToPay.Status == InvoiceStatus.Cancelled || invoiceToPay.Status == InvoiceStatus.Paid)
             {
                 ModelState.AddModelError("Input.SelectedInvoiceID", $"Invoice {invoiceToPay.InvoiceID} is already {invoiceToPay.Status} and cannot receive further payments.");
                 await OnGetAsync(Input.SelectedUserID, ReturnUrl);
                 return Page();
             }
+
             decimal amountToApplyToInvoice = Input.Amount;
             decimal overpaymentAmount = 0;
             decimal amountRemainingOnInvoice = invoiceToPay.AmountDue - invoiceToPay.AmountPaid;
+
             if (Input.Amount > amountRemainingOnInvoice)
             {
                 amountToApplyToInvoice = amountRemainingOnInvoice; // Only apply what's remaining to the invoice
                 overpaymentAmount = Input.Amount - amountRemainingOnInvoice;
-                _logger.LogInformation($"Overpayment detected. Payment: {Input.Amount:C}, Remaining on Invoice {invoiceToPay.InvoiceID}: {amountRemainingOnInvoice:C}. Overpayment: {overpaymentAmount:C}");
+                const string overpaymentLogTemplate = "Overpayment detected. Payment: {PaymentAmount}, Remaining on Invoice {InvoiceID}: {RemainingAmount}. Overpayment: {OverpaymentAmount}";
+                _logger.LogInformation(overpaymentLogTemplate, Input.Amount, invoiceToPay.InvoiceID, amountRemainingOnInvoice, overpaymentAmount);
             }
             // Create the Payment record for the full amount received
             var payment = new Payment
@@ -240,7 +274,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 ReferenceNumber = Input.ReferenceNumber,
                 Notes = Input.Notes, // You might want to add "Overpayment processed" to notes if overpaymentAmount > 0
                 DateRecorded = DateTime.UtcNow
-            };           
+            };
             _context.Payments.Add(payment);
             // Note: We need payment.PaymentID for SourcePaymentID in UserCredit.
             // We will call SaveChangesAsync once after adding all entities.
@@ -278,7 +312,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                     DateCreated = DateTime.UtcNow
                 };
                 _context.UserCredits.Add(userCredit);
-                _logger.LogInformation($"UserCredit record created for {overpaymentAmount:C} for user {Input.SelectedUserID}.");
+                const string userCreditLogTemplate = "UserCredit record created for {CreditAmount} for user {UserID}.";
+                _logger.LogInformation(userCreditLogTemplate, overpaymentAmount, Input.SelectedUserID);
                 // To link UserCredit to the Payment, you might need to save Payment first,
                 // then assign payment.PaymentID to userCredit.SourcePaymentID, then save UserCredit.
                 // For simplicity with a single SaveChanges, we'll make SourcePaymentID on UserCredit nullable
@@ -306,7 +341,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                         await _context.SaveChangesAsync(); // Save the update to UserCredit
                     }
                 }
-                _logger.LogInformation($"Successfully processed payment ID {payment.PaymentID}, updated invoice ID {invoiceToPay.InvoiceID}, and potentially created UserCredit for user."); 
+                const string successLogTemplate = "Successfully processed payment ID {PaymentID}, updated invoice ID {InvoiceID}, and potentially created UserCredit for user.";
+                _logger.LogInformation(successLogTemplate, payment.PaymentID, invoiceToPay.InvoiceID);
                 TempData["StatusMessage"] = $"Payment of {Input.Amount:C} applied. Invoice INV-{invoiceToPay.InvoiceID:D5} status: {invoiceToPay.Status}.";
                 if (overpaymentAmount > 0)
                 {
@@ -315,23 +351,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Error saving payment/invoice/credit.");
+                const string errorLogTemplate = "Error saving payment/invoice/credit.";
+                _logger.LogError(ex, errorLogTemplate);
                 ModelState.AddModelError(string.Empty, "An error occurred while saving data. See logs for details.");
                 await OnGetAsync(Input.SelectedUserID, ReturnUrl); // Repopulate page data
                 return Page();
             }
-            //payment = new Payment
-            //{
-            //    UserID = Input.SelectedUserID,
-            //    InvoiceID = invoiceToPay.InvoiceID,
-            //    PaymentDate = Input.PaymentDate,
-            //    Amount = Input.Amount,
-            //    Method = Input.Method,
-            //    ReferenceNumber = Input.ReferenceNumber,
-            //    Notes = Input.Notes,
-            //    DateRecorded = DateTime.UtcNow
-            //};
-            //_context.Payments.Add(payment);
             invoiceToPay.AmountPaid += Input.Amount;
             if (invoiceToPay.AmountPaid >= invoiceToPay.AmountDue)
             {
@@ -343,7 +368,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             invoiceToPay.LastUpdated = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Successfully saved payment ID {PaymentID} and updated invoice ID {InvoiceID} for user {UserName}.", payment.PaymentID, invoiceToPay.InvoiceID, user?.UserName);
+            const string finalLogTemplate = "Successfully saved payment ID {PaymentID} and updated invoice ID {InvoiceID} for user {UserName}.";
+            _logger.LogInformation(finalLogTemplate, payment.PaymentID, invoiceToPay.InvoiceID, user?.UserName);
             TempData["StatusMessage"] = $"Payment of {payment.Amount:C} applied to invoice INV-{invoiceToPay.InvoiceID:D5} successfully for user {TargetUserName ?? user?.UserName}. Invoice status: {invoiceToPay.Status}.";
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {

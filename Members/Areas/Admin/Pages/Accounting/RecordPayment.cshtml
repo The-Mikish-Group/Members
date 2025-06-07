@@ -114,7 +114,6 @@
                                 <textarea asp-for="Input.Notes" class="form-control" rows="3"></textarea>
                                 <span asp-validation-for="Input.Notes" class="text-danger"></span>
                             </div>
-
                             <div class="d-grid gap-2 mt-4">
 
                                 <div class="row justify-content-center">
@@ -122,19 +121,18 @@
                                     <div class="col-6 text-center">
                                         @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                                         {
-                                            <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Back to Edit User</a>
+                                            <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"><i class="bi bi-arrow-left"> </i> Edit Member</a>
                                         }
-                                        else if (!Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                        else
                                         {
-                                            <a href="@Model.ReturnUrl" class="btn btn-secondary mt-2">Cancel</a>
+                                            <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
                                         }
                                     </div>
 
                                     <div class="col-6 text-center">
-                                        <button type="submit" class="shadow btn btn-sm btn-primary">Create Invoice</button>
+                                        <button type="submit" class="shadow btn btn-sm btn-primary">Record Payment</button>
                                     </div>
-                                </div>                                                      
-                            
+                                </div>
                             </div>
                             
                         } @* End of conditional block for payment fields *@
@@ -148,133 +146,3 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-
-
-
-
-
-
-
-
-
-
-
-@* @page "{userId?}"
-@model Members.Areas.Admin.Pages.Accounting.RecordPaymentModel
-@{
-    ViewData["Title"] = "Record New Payment";
-    Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
-}
-
-<div class="container mt-4 mb-2">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow bg-Card-Menu">
-                <div class="card-header bg-gold-light text-white">
-                    <h4 class="text-gold-darker mb-0">
-                        @ViewData["Title"]
-                    </h4>
-                </div>
-                <div class="card-body">
-                    @if (TempData["StatusMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-
-                    <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        @if (Model.IsUserPreselected)
-                        {
-                            <input type="hidden" asp-for="Input.SelectedUserID" />
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Member</label>
-                                <p class="shadow form-control">@Model.TargetUserName</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="mb-3">
-                                <label asp-for="Input.SelectedUserID" class="shadow form-label text-gold-darker"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select text-gold-darker">
-                                    <option value="">-- Select User --</option>
-                                </select>
-                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
-                            </div>
-                        }
-
-                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
-                        {
-                            <input type="hidden" asp-for="ReturnUrl" />
-                        }
-                        <div class="mb-3">
-                            <label asp-for="Input.SelectedInvoiceID" class="form-label text-gold-darker"></label>
-                            <input asp-for="Input.SelectedInvoiceID" class="shadow form-control text-gold-darker" type="number" />
-                            <span asp-validation-for="Input.SelectedInvoiceID" class="text-danger"></span>
-                            <small class="form-text text-muted">If this payment is for a specific invoice, enter its ID.</small>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-sm-6">
-                                <label asp-for="Input.PaymentDate" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.PaymentDate" class="shadow form-control text-gold-darker" />
-                                <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-6">
-                                <label asp-for="Input.Amount" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.Amount" class="shadow form-control text-gold-darker" />
-                                <span asp-validation-for="Input.Amount" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.Method" class="form-label text-gold-darker"></label>
-                            <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="shadow form-select text-gold-darker">
-                            </select>
-                            <span asp-validation-for="Input.Method" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.ReferenceNumber" class="form-label text-gold-darker"></label>
-                            <input asp-for="Input.ReferenceNumber" class="shadow form-control text-gold-darker" />
-                            <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.Notes" class="form-label text-gold-darker"></label>
-                            <textarea asp-for="Input.Notes" class="shadow form-control text-gold-darker" rows="3"></textarea>
-                            <span asp-validation-for="Input.Notes" class="text-danger"></span>
-                        </div>
-                        <div class="d-grid gap-2 mt-4">
-
-                            <div class="row justify-content-center">
-
-                                <div class="col-6 text-center">
-                                    @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
-                                    {
-                                        <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-2">Back to Edit User</a>
-                                    }
-                                    else
-                                    {
-                                        <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
-                                    }
-                                </div>
-
-                                <div class="col-6 text-center">
-                                    <button type="submit" class="shadow btn btn-sm btn-primary">Record Payment</button>
-                                </div>
-                                
-                            </div>                           
-                            
-                        </div>
-                    </form>
-                </div> 
-            </div>
-        </div>
-    </div>
-</div>
-
- *@
