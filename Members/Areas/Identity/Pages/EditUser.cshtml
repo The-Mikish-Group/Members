@@ -52,13 +52,16 @@
                             <i class="bi bi-tags"></i> Roles
                         </a>
 
-                        <!-- Link to Member History (MyBilling) -->
+                        <!-- Link to Member History (MyBilling) Only Billable Members -->
+                        @if (Model.Input.IsBillingContact)
+                        {
                         <a asp-area="Member" asp-page="/MyBilling"
                            asp-route-userId="@Model.Input.Id"
                            asp-route-returnUrl="@editUserReturnUrl"
                            class="btn btn-sm btn-info me-2">
                             <i class="bi bi-card-list"></i> Billing
                         </a>
+                        } 
 
                         <!-- Admin Protection on Delete Button -->
                         @if (User.IsInRole("Admin"))

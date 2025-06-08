@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12">
 
-            <h2 class="text-center text-gold-darker"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
+            <h2 class="mb-2 text-center text-gold-darker"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
 
 
             @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.BackToEditUserUrl))
@@ -176,7 +176,7 @@
                                                 else if (trans.Type == "Payment" && trans.InvoiceID.HasValue)
                                                 {
                                                     @* Optionally show which invoice a payment was for, if directly linked *@
-                                                    @($"For INV-{trans.InvoiceID:D5}")
+                                                    @($"INV-{trans.InvoiceID:D5} Payment")
                                                 }
                                             </td>
                                             <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
