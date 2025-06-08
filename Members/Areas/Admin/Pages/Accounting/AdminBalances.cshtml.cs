@@ -17,7 +17,6 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<AdminBalancesModel> _logger = logger;
-
         public List<MemberBalanceViewModel> MemberBalances { get; set; } = [];
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; }
@@ -37,15 +36,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             const string defaultLateFeeLogTemplate = "Applying default late fee of $25 for {UserName} as no specific overdue Dues invoice found.";
             const string recentLateFeeLogTemplate = "Recent late fee already exists for {UserName}. No new fee applied by this action.";
             const string lateFeeInvoiceCreatedLogTemplate = "Late fee invoice {InvoiceId} created for {UserName}.";
-
             _logger.LogInformation(userIdLogTemplate, userId);
-
             if (string.IsNullOrEmpty(userId))
             {
                 TempData["ErrorMessage"] = "User ID was not provided.";
                 return RedirectToPage();
             }
-
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -53,7 +49,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogWarning(userNotFoundLogTemplate, userId);
                 return RedirectToPage();
             }
-
             var latestUnpaidDuesInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
                             i.Type == InvoiceType.Dues &&
@@ -62,10 +57,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                             i.DueDate < DateTime.Today)
                 .OrderByDescending(i => i.DueDate)
                 .FirstOrDefaultAsync();
-
             decimal lateFeeAmount;
             string feeCalculationDescription;
-
             if (latestUnpaidDuesInvoice != null)
             {
                 decimal fivePercentOfDues = latestUnpaidDuesInvoice.AmountDue * 0.05m;
@@ -76,16 +69,14 @@ namespace Members.Areas.Admin.Pages.Accounting
             else
             {
                 lateFeeAmount = 25.00m;
-                feeCalculationDescription = "Late fee (standard $25 applied). (No overdue Dues Invoice found for calculation basis).";
+                feeCalculationDescription = "Standard $25 late fee applied.";
                 _logger.LogInformation(defaultLateFeeLogTemplate, user.UserName);
             }
-
             var recentLateFeeExists = await _context.Invoices
                 .AnyAsync(i => i.UserID == userId &&
                                i.Type == InvoiceType.LateFee &&
                                i.Description.Contains("Late fee based on overdue dues") &&
                                i.InvoiceDate >= DateTime.Today.AddDays(-7));
-
             if (recentLateFeeExists)
             {
                 TempData["WarningMessage"] = $"A late fee appears to have been applied recently for {user.UserName}. Please check history before applying another.";
@@ -93,7 +84,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 TempData["StatusMessage"] = $"Late fee application skipped for {user.UserName} as a recent one already exists.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
-
             var lateFeeInvoice = new Invoice
             {
                 UserID = userId,
@@ -107,12 +97,10 @@ namespace Members.Areas.Admin.Pages.Accounting
                 DateCreated = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow
             };
-
             _context.Invoices.Add(lateFeeInvoice);
             await _context.SaveChangesAsync();
             TempData["StatusMessage"] = $"Late fee of {lateFeeAmount:C} applied successfully to user {user.UserName}.";
             _logger.LogInformation(lateFeeInvoiceCreatedLogTemplate, lateFeeInvoice.InvoiceID, user.UserName);
-
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
         public class MemberBalanceViewModel
@@ -160,20 +148,16 @@ namespace Members.Areas.Admin.Pages.Accounting
                     fullName = userProfile.LastName;
                 }
                 _logger.LogInformation($"Calculating balance for: {user.UserName} (ID: {user.Id})");
-
                 decimal totalChargesFromInvoices = await _context.Invoices
                     .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled) // Include Paid invoices in charges
                     .SumAsync(i => i.AmountDue);
                 _logger.LogInformation($"User {user.UserName} - Total Charges from Invoices: {totalChargesFromInvoices}");
-
                 decimal totalPaymentsReceived = await _context.Payments
                     .Where(p => p.UserID == user.Id)
                     .SumAsync(p => p.Amount);
                 _logger.LogInformation($"User {user.UserName} - Total Payments Received: {totalPaymentsReceived}");
-
                 decimal currentBalance = totalChargesFromInvoices - totalPaymentsReceived;
                 _logger.LogInformation($"User {user.UserName} - Calculated Current Balance: {currentBalance}");
-
                 var memberVm = new MemberBalanceViewModel
                 {
                     UserId = user.Id,

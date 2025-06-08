@@ -11,23 +11,80 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<!-- Banner Logo -->
-<partial name="_PartialBannerLogo" />
+<h1 class="my-4 text-center text-gold-darker">
+    <i class="bi bi-person-fill"></i> @ViewData["Title"]
+</h1>
 
-<div class="container px-2 my-4">
+<div class="container px-2 mb-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card p-2 shadow bg-Card-Menu">
-
-                <h1 class="mb-4 text-gold-darker">
-                    <i class="bi bi-person-fill"></i> @ViewData["Title"]
-                </h1>
+            <div class="card p-2 shadow bg-Card-Menu">                
 
                 <!-- Display Status Message -->
                 <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
 
                 <!-- Form -->
                 <form method="post" id="editForm">
+
+                    <div class="d-flex justify-content-center my-3">
+
+                        <!-- Cancel Button -->
+                        <button type="submit" asp-page-handler="Cancel" class="shadow btn btn-sm btn-secondary me-2">
+                            <i class="bi bi-box-arrow-left"></i> Cancel
+                        </button>
+                        @{
+                            // Construct the return URL that points back to this EditUser page,
+                            // including its own ReturnUrl parameter (which typically points to the Users list page).
+                            var editUserReturnUrl = Url.Page("/EditUser",
+                            new
+                            {
+                                area = "Identity",
+                                id = Model.Input.Id,
+                                returnUrl = Model.ReturnUrl // This is EditUser's original ReturnUrl from the Users list
+                            });
+                        }
+
+                        <!-- Link to the Manage Roles page -->
+                        <a asp-page="./ManageRoles"
+                           asp-route-userId="@Model.Input.Id"
+                           asp-route-returnUrl="@editUserReturnUrl"
+                           class="btn btn-sm btn-info me-2">
+                            <i class="bi bi-tags"></i> Roles
+                        </a>
+
+                        <!-- Link to Member History (MyBilling) -->
+                        <a asp-area="Member" asp-page="/MyBilling"
+                           asp-route-userId="@Model.Input.Id"
+                           asp-route-returnUrl="@editUserReturnUrl"
+                           class="btn btn-sm btn-info me-2">
+                            <i class="bi bi-card-list"></i> Billing
+                        </a>
+
+                        <!-- Admin Protection on Delete Button -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <!-- Delete -->
+                            <button type="submit" asp-page-handler="Delete" class="shadow btn btn-sm btn-danger me-2" id="confirmDeleteButton">
+                                <i class="bi bi-x-circle"></i> Delete
+                            </button>
+                        }
+
+                        <!-- Save -->
+                        <button type="submit" class="shadow btn btn-sm btn-success me-2">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+
+                        @{                            
+                            editUserReturnUrl = Url.Page("/EditUser",
+                            new
+                            {
+                                area = "Identity",
+                                id = Model.Input.Id,
+                                returnUrl = Model.ReturnUrl
+                            });
+                        }
+                        
+                    </div>
 
                     <!-- Hidden Fields -->
                     @Html.AntiForgeryToken()
@@ -182,7 +239,7 @@
 
                     <hr />
 
-                    <div class="d-flex justify-content-center mt-3">
+                    @* <div class="d-flex justify-content-center mt-3">
 
                         <!-- Cancel Button -->
                         <button type="submit" asp-page-handler="Cancel" class="shadow btn btn-sm btn-secondary me-2">
@@ -221,77 +278,28 @@
                             <i class="bi bi-save"></i> Save
                         </button>
 
-                    </div> 
+                        @{                            
+                            editUserReturnUrl = Url.Page("/EditUser",
+                            new
+                            {
+                                area = "Identity",
+                                id = Model.Input.Id,
+                                returnUrl = Model.ReturnUrl
+                            });
+                        }
+                        <a asp-area="Member" asp-page="/MyBilling"
+                           asp-route-userId="@Model.Input.Id"
+                           asp-route-returnUrl="@editUserReturnUrl"
+                           class="btn btn-sm btn-info" target="_blank">
+                            <i class="bi bi-card-list"></i> Billing
+                        </a>
+
+                    </div>  *@
                     <hr />
 
                 </form>
             </div>
         </div>
-    </div>
-</div>
-@{
-    // Determine initial display style for accounting actions
-    var accountingActionsDisplayStyle = Model.Input.IsBillingContact ? "block" : "none";
-}
-
-<div id="accountingActionsSection" style="display: @accountingActionsDisplayStyle;">
-
-    <div class="container px-2 my-4">
-        <div class="row justify-content-center">
-
-            <div class="col-lg-8 col-md-10">
-
-                <div class="card p-2 shadow bg-Card-Menu">
-                
-                    <h5 class="text-center text-gold-darker mt-4 mb-3">Accounting Actions</h5>
-
-                    @{
-                        var editUserReturnUrl = Url.Page("/EditUser",
-                        new
-                        {
-                            area = "Identity",
-                            id = Model.Input.Id,
-                            returnUrl = Model.ReturnUrl // This is EditUser's ReturnUrl to the Users list
-                        });
-                    }
-
-                    <div class="row gx-2 gy-2 mb-4 justify-content-center">
-                        <div class="col-auto">
-                            <a asp-area="Admin" asp-page="/Accounting/AddInvoice"
-                               asp-route-userId="@Model.Input.Id"
-                               asp-route-returnUrl="@editUserReturnUrl"
-                               class="btn btn-sm btn-primary shadow">
-                                <i class="bi bi-file-earmark-plus"></i> Add Invoice
-                            </a>
-                        </div>
-
-                        <div class="col-auto">
-                            <a asp-area="Admin" asp-page="/Accounting/RecordPayment"
-                               asp-route-userId="@Model.Input.Id"
-                               asp-route-returnUrl="@editUserReturnUrl"
-                               class="btn btn-sm btn-success shadow">
-                                <i class="bi bi-cash-coin"></i> Record Payment
-                            </a>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-warning disabled shadow" title="Apply Late Fee (Coming Soon)">
-                                <i class="bi bi-alarm"></i> Apply Late Fee
-                            </button>
-                        </div>
-                        <div class="col-auto">
-                            <a asp-area="Member" asp-page="/MyBilling"
-                               asp-route-userId="@Model.Input.Id"
-                               asp-route-returnUrl="@editUserReturnUrl"
-                               class="btn btn-sm btn-info shadow" target="_blank">
-                                <i class="bi bi-card-list"></i> View Billing History
-                            </a>
-                        </div>
-                    </div>
-                </div> 
-            </div>
-           
-        </div>                
-        
     </div>
 </div>
 

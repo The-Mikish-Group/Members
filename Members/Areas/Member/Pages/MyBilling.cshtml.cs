@@ -24,7 +24,7 @@ namespace Members.Areas.Member.Pages
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<MyBillingModel> _logger = logger;
-        public List<UserCredit> AvailableCredits { get; set; } = new List<UserCredit>();
+        public List<UserCredit> AvailableCredits { get; set; } = [];
         [DataType(DataType.Currency)]
         public decimal TotalAvailableCredit { get; set; }
         public IList<Invoice> Invoices { get; set; } = [];
@@ -36,6 +36,11 @@ namespace Members.Areas.Member.Pages
         public string DisplayName { get; set; } = "My"; // Default for own view
         public bool IsViewingSelf { get; set; } = true;
         public string? ViewedUserId { get; set; } // To carry UserId if admin is viewing another
+        // Add the missing property definition for 'BackToEditUserUrl'
+        [BindProperty(SupportsGet = true)]
+        public string? BackToEditUserUrl { get; set; }
+        public bool TargetUserIsBillingContact { get; set; }
+        //public bool IsBillingContact { get; set; }
         public class BillingTransaction
         {
             public DateTime Date { get; set; }
@@ -46,37 +51,37 @@ namespace Members.Areas.Member.Pages
             [DataType(DataType.Currency)]
             public decimal? PaymentAmount { get; set; }
             public string Type { get; set; } = string.Empty;
-            public string StatusOrMethod { get; set; } = string.Empty;
+            public string StatusOrMethod { get; set; } = string.Empty;            
         }
-        public async Task<IActionResult> OnGetAsync(string? userId) // Added userId parameter
+        public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl) // returnUrl is passed from EditUser
         {
-            _logger.LogInformation("OnGetAsync called for MyBillingModel. Requested UserID: {UserId}", userId);
+            _logger.LogInformation("OnGetAsync called for MyBillingModel. Requested UserID: {UserId}, ReturnUrl from EditUser: {ReturnUrl}", userId, returnUrl);
+            this.BackToEditUserUrl = returnUrl; // Store the URL to get back to EditUser
             IdentityUser? targetUser;
-            var currentUser = await _userManager.GetUserAsync(User); // Current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return Challenge(); // Should not happen if [Authorize] is effective
+                return Challenge();
             }
             if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
             {
-                // Admin/Manager is viewing a specific user's billing
                 targetUser = await _userManager.FindByIdAsync(userId);
                 if (targetUser == null)
                 {
                     _logger.LogWarning("Admin/Manager tried to view billing for non-existent UserID: {UserId}", userId);
                     TempData["ErrorMessage"] = "User not found.";
-                    return RedirectToPage("/Index", new { area = "" }); // Or some other appropriate redirect
+                    return RedirectToPage("/Index", new { area = "" });
                 }
                 IsViewingSelf = false;
-                ViewedUserId = targetUser.Id; // Store for link generation if needed
+                ViewedUserId = targetUser.Id;
                 var targetUserProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == targetUser.Id);
                 DisplayName = (targetUserProfile != null && !string.IsNullOrWhiteSpace(targetUserProfile.FirstName) && !string.IsNullOrWhiteSpace(targetUserProfile.LastName))
                               ? $"{targetUserProfile.FirstName} {targetUserProfile.LastName} ({targetUser.Email})"
                               : targetUser.UserName ?? targetUser.Email ?? "Selected User's";
+                TargetUserIsBillingContact = targetUserProfile?.IsBillingContact ?? false;
             }
             else
             {
-                // Member is viewing their own billing, or admin didn't specify a userId
                 targetUser = currentUser;
                 IsViewingSelf = true;
                 ViewedUserId = targetUser.Id;
@@ -84,14 +89,15 @@ namespace Members.Areas.Member.Pages
                 DisplayName = (currentUserProfile != null && !string.IsNullOrWhiteSpace(currentUserProfile.FirstName) && !string.IsNullOrWhiteSpace(currentUserProfile.LastName))
                               ? $"{currentUserProfile.FirstName} {currentUserProfile.LastName}"
                               : targetUser.UserName ?? targetUser.Email ?? "My";
-                if (DisplayName == targetUser.UserName || DisplayName == targetUser.Email) DisplayName += ""; else DisplayName += "";
+                if (DisplayName == targetUser.UserName || DisplayName == targetUser.Email) DisplayName += "";
+                TargetUserIsBillingContact = currentUserProfile?.IsBillingContact ?? false;
             }
-            _logger.LogInformation("Fetching billing data for user: {UserName} (ID: {UserId})", targetUser.UserName, targetUser.Id);
+            _logger.LogInformation("Fetching billing data for user: {UserName} (ID: {UserId}). IsBillingContact: {IsBillingContact}", targetUser.UserName, targetUser.Id, TargetUserIsBillingContact);
             Invoices = await _context.Invoices
-                                .Where(i => i.UserID == targetUser.Id)
-                                .OrderByDescending(i => i.InvoiceDate)
-                                .ThenByDescending(i => i.DateCreated)
-                                .ToListAsync();
+                       .Where(i => i.UserID == targetUser.Id)
+                       .OrderByDescending(i => i.InvoiceDate)
+                       .ThenByDescending(i => i.DateCreated)
+                       .ToListAsync();
             _logger.LogInformation("Found {InvoiceCount} invoices for user {UserId}.", Invoices.Count, targetUser.Id);
             Payments = await _context.Payments
                                 .Where(p => p.UserID == targetUser.Id)
@@ -118,7 +124,7 @@ namespace Members.Areas.Member.Pages
                     PaymentAmount = null,
                     Type = "Invoice",
                     StatusOrMethod = invoice.Status.ToString(),
-                    InvoiceID = invoice.InvoiceID // <-- POPULATE IT HERE
+                    InvoiceID = invoice.InvoiceID
                 });
             }
             foreach (var payment in Payments)
@@ -131,7 +137,7 @@ namespace Members.Areas.Member.Pages
                     PaymentAmount = payment.Amount,
                     Type = "Payment",
                     StatusOrMethod = payment.Method.ToString(),
-                    InvoiceID = payment.InvoiceID // <-- POPULATE IT HERE (it's already on your Payment model)
+                    InvoiceID = payment.InvoiceID
                 });
             }
             Transactions = [.. Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice")];
@@ -139,9 +145,9 @@ namespace Members.Areas.Member.Pages
                 .Where(uc => uc.UserID == targetUser.Id && !uc.IsApplied)
                 .OrderByDescending(uc => uc.CreditDate)
                 .ToListAsync();
-            _logger.LogInformation($"Found {AvailableCredits.Count} available (unapplied) credits for user {targetUser.Id}.");
+            _logger.LogInformation("Found {AvailableCreditsCount} available (unapplied) credits for user {UserId}.", AvailableCredits.Count, targetUser.Id);
             TotalAvailableCredit = AvailableCredits.Sum(uc => uc.Amount);
-            _logger.LogInformation($"Total available credit for user {targetUser.Id}: {TotalAvailableCredit:C}");
+            _logger.LogInformation("Total available credit for user {UserId}: {TotalAvailableCredit:C}", targetUser.Id, TotalAvailableCredit);
             return Page();
         }
     }

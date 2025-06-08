@@ -118,37 +118,34 @@ namespace Members.Areas.Admin.Pages.Accounting
         }
         public async Task<IActionResult> OnPostAsync()
         {
+            _logger.LogInformation("OnPostAsync called for AddInvoiceModel.");
+
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("AddInvoice OnPostAsync: ModelState is invalid.");
-                if (!IsUserPreselected && string.IsNullOrEmpty(Input.SelectedUserID))
-                {
-                    await PopulateUserSelectList();
-                }
-                else if (!IsUserPreselected && !string.IsNullOrEmpty(Input.SelectedUserID))
-                {
-                    await PopulateUserSelectList();
-                }
-                else if (IsUserPreselected && !string.IsNullOrEmpty(Input.SelectedUserID))
+                if (!IsUserPreselected) await PopulateUserSelectList();
+                else if (!string.IsNullOrEmpty(Input.SelectedUserID)) // Repopulate TargetUserName if preselected
                 {
                     var userForDisplay = await _userManager.FindByIdAsync(Input.SelectedUserID);
                     if (userForDisplay != null)
                     {
                         var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == Input.SelectedUserID);
                         TargetUserName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
-                                     ? $"{userProfile.FirstName} {userProfile.LastName} ({userForDisplay.Email})"
-                                     : userForDisplay.UserName ?? userForDisplay.Email;
+                                         ? $"{userProfile.LastName}, {userProfile.FirstName} ({userForDisplay.Email})"
+                                         : userForDisplay.UserName ?? userForDisplay.Email;
                     }
                 }
                 return Page();
             }
+
             var user = await _userManager.FindByIdAsync(Input.SelectedUserID);
             if (user == null)
             {
                 ModelState.AddModelError("Input.SelectedUserID", "Selected user not found.");
-                await PopulateUserSelectList();
+                if (!IsUserPreselected) await PopulateUserSelectList();
                 return Page();
             }
+
             var invoice = new Invoice
             {
                 UserID = Input.SelectedUserID,
@@ -156,22 +153,131 @@ namespace Members.Areas.Admin.Pages.Accounting
                 DueDate = Input.DueDate,
                 Description = Input.Description,
                 AmountDue = Input.AmountDue,
-                AmountPaid = 0,
-                Status = InvoiceStatus.Due,
+                AmountPaid = 0, // Initial AmountPaid
+                Status = InvoiceStatus.Due, // Initial status
                 Type = Input.Type,
                 DateCreated = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow
             };
+
             _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Successfully saved new invoice ID {InvoiceId} for user {UserName}.", invoice.InvoiceID, user.UserName);
-            TempData["StatusMessage"] = $"Invoice '{invoice.Description}' created successfully for user {TargetUserName ?? user.UserName}.";
+
+            try
+            {
+                // --- FIRST SAVE: Get the InvoiceID for the new invoice ---
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Saved new invoice ID {invoice.InvoiceID} for user {user.UserName} before credit application.");
+
+                // --- APPLY AVAILABLE CREDITS ---
+                decimal remainingAmountDueOnNewInvoice = invoice.AmountDue; // Should be full AmountDue at this point
+                string appliedCreditsSummary = "";
+                bool creditsWereUpdated = false;
+
+                if (remainingAmountDueOnNewInvoice > 0)
+                {
+                    var availableCredits = await _context.UserCredits
+                        .Where(uc => uc.UserID == Input.SelectedUserID && !uc.IsApplied && uc.Amount > 0)
+                        .OrderBy(uc => uc.CreditDate) // Apply oldest credits first
+                        .ToListAsync();
+
+                    if (availableCredits.Any())
+                    {
+                        _logger.LogInformation($"User {user.UserName} has {availableCredits.Count} available credits. Attempting to apply to new invoice ID {invoice.InvoiceID}.");
+                        foreach (var credit in availableCredits)
+                        {
+                            if (remainingAmountDueOnNewInvoice <= 0) break; // Invoice is fully paid by credits
+
+                            decimal amountToApplyFromThisCredit;
+
+                            if (credit.Amount >= remainingAmountDueOnNewInvoice)
+                            {
+                                amountToApplyFromThisCredit = remainingAmountDueOnNewInvoice;
+                                // This credit covers the rest (or more)
+                                // For this iteration, we mark the credit as fully applied if any portion is used to pay off an invoice.
+                                // A more complex scenario would reduce the credit.Amount and leave it IsApplied=false.
+                                credit.IsApplied = true;
+                                credit.ApplicationNotes = $"Fully used to auto-pay invoice INV-{invoice.InvoiceID:D5}. Original credit: {credit.Amount:C}.";
+                                _logger.LogInformation($"Applying {amountToApplyFromThisCredit:C} from credit {credit.UserCreditID} (original: {credit.Amount:C}). Credit will be marked fully applied.");
+                            }
+                            else
+                            {
+                                // This credit will be fully used, but won't cover the whole invoice amount due
+                                amountToApplyFromThisCredit = credit.Amount;
+                                credit.IsApplied = true;
+                                credit.ApplicationNotes = $"Fully applied to invoice INV-{invoice.InvoiceID:D5}.";
+                                _logger.LogInformation($"Applying full credit {credit.UserCreditID} of {amountToApplyFromThisCredit:C} to invoice ID {invoice.InvoiceID}.");
+                            }
+
+                            credit.AppliedDate = DateTime.UtcNow;
+                            credit.AppliedToInvoiceID = invoice.InvoiceID; // NOW invoice.InvoiceID is valid
+                            _context.UserCredits.Update(credit);
+                            creditsWereUpdated = true;
+
+                            invoice.AmountPaid += amountToApplyFromThisCredit;
+                            remainingAmountDueOnNewInvoice -= amountToApplyFromThisCredit;
+
+                            if (string.IsNullOrEmpty(appliedCreditsSummary)) appliedCreditsSummary = "\nCredits applied: ";
+                            appliedCreditsSummary += $"{amountToApplyFromThisCredit:C} (from Credit #{credit.UserCreditID}); ";
+                        }
+                    }
+                }
+
+                // Update invoice status after applying credits
+                if (invoice.AmountPaid >= invoice.AmountDue)
+                {
+                    invoice.Status = InvoiceStatus.Paid;
+                    invoice.AmountPaid = invoice.AmountDue; // Ensure it doesn't exceed AmountDue
+                }
+                else if (invoice.AmountPaid > 0 && invoice.DueDate < DateTime.Today.AddDays(-1) && invoice.Status == InvoiceStatus.Due) // Partially paid and overdue
+                {
+                    invoice.Status = InvoiceStatus.Overdue;
+                }
+                else if (invoice.AmountPaid <= 0 && invoice.DueDate < DateTime.Today.AddDays(-1)) // Not paid at all and overdue
+                {
+                    invoice.Status = InvoiceStatus.Overdue;
+                }
+
+
+                // If credits were updated OR if the invoice's AmountPaid/Status changed due to credits
+                if (creditsWereUpdated || invoice.AmountPaid > 0)
+                {
+                    invoice.LastUpdated = DateTime.UtcNow;
+                    _context.Invoices.Update(invoice); // Ensure invoice is marked for update if AmountPaid changed
+                    await _context.SaveChangesAsync(); // --- SECOND SAVE: For credit updates and invoice payment/status updates ---
+                    _logger.LogInformation($"Updated invoice ID {invoice.InvoiceID} and any applied UserCredits.");
+                }
+
+                string successMessage = $"Invoice '{invoice.Description}' (INV-{invoice.InvoiceID:D5}) created. Status: {invoice.Status}. Amount Paid: {invoice.AmountPaid:C}.";
+                if (!string.IsNullOrEmpty(appliedCreditsSummary))
+                {
+                    successMessage += appliedCreditsSummary;
+                }
+                TempData["StatusMessage"] = successMessage;
+
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error saving new invoice or applying credits.");
+                ModelState.AddModelError(string.Empty, "An error occurred while saving data. See logs for details.");
+                if (!IsUserPreselected) await PopulateUserSelectList();
+                else if (!string.IsNullOrEmpty(Input.SelectedUserID))
+                {
+                    var userForDisplay = await _userManager.FindByIdAsync(Input.SelectedUserID);
+                    if (userForDisplay != null)
+                    {
+                        var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == Input.SelectedUserID);
+                        TargetUserName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                                            ? $"{userProfile.LastName}, {userProfile.FirstName} ({userForDisplay.Email})"
+                                            : userForDisplay.UserName ?? userForDisplay.Email;
+                    }
+                }
+                return Page();
+            }
+
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
-                // This ReturnUrl is now expected to be the URL back to the EditUser page
                 return Redirect(ReturnUrl);
             }
-            // Fallback if ReturnUrl wasn't provided (e.g. if page was accessed directly)
             return RedirectToPage();
         }
     }

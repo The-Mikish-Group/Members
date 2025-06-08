@@ -8,31 +8,74 @@
 <div class="container mt-4 mb-2">
     <div class="row">
         <div class="col-md-12">
-            @* Use DisplayName in the main page header *@
-            <h2 class="mb-4 text-center text-gold-darker">@ViewData["Title"]</h2>
 
-            @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.ViewedUserId))
+            <h2 class="text-center text-gold-darker"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
+
+
+            @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.BackToEditUserUrl))
             {
-                <div class="mb-3">
-                    @* Link back to EditUser page if admin is viewing and ViewedUserId is available *@
-                    <a asp-area="Identity" asp-page="/EditUser" asp-route-id="@Model.ViewedUserId" class="shadow btn btn-sm btn-back">
-                        <i class="bi bi-arrow-left"></i> Edit Member                       
+                <div class="text-center my-2">
+                    <a href="@Model.BackToEditUserUrl" class="shadow btn btn-sm btn-back">
+                        <i class="bi bi-arrow-left"></i> Edit Member
                     </a>
                 </div>
             }
 
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                var accountingActionsDisplayStyle = Model.TargetUserIsBillingContact ? "block" : "none";
+                var myBillingReturnUrl = Url.Page("/MyBilling",
+                new
+                {
+                    area = "Member",
+                    userId = Model.ViewedUserId,
+                    returnUrl = Model.BackToEditUserUrl
+                });
+               
+                @* <h5 class="text-center text-gold-darker mt-4 mb-3">Accounting Actions for @Model.DisplayName.Replace("'s","")</h5> *@
+                <div class="row gx-2 gy-2 mt-2 mb-3 justify-content-center">
+                    <div class="col-auto">
+                        <a asp-area="Admin" asp-page="/Accounting/AddInvoice"
+                           asp-route-userId="@Model.ViewedUserId"
+                           asp-route-returnUrl="@myBillingReturnUrl"
+                           class="btn btn-sm btn-primary shadow">
+                            <i class="bi bi-file-earmark-plus"></i> Invoice
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a asp-area="Admin" asp-page="/Accounting/RecordPayment"
+                           asp-route-userId="@Model.ViewedUserId"
+                           asp-route-returnUrl="@myBillingReturnUrl"
+                           class="btn btn-sm btn-success shadow">
+                            <i class="bi bi-cash-coin"></i> Payment
+                        </a>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-warning disabled shadow" title="Apply Late Fee (Coming Soon)">
+                            <i class="bi bi-alarm"></i> Late Fee
+                        </button>
+                    </div>
+                </div>
+            }
+
+
+            @* <!-- Current Balance for: Card --> *@
             <div class="card shadow bg-Card-Menu mb-4">
+
+                <!-- Card header with title: Current Balance for -->
                 <div class="card-header">
-                    @* DisplayName also useful here if you want to be more explicit than "Current Balance" *@
                     <h5 class="text-gold-darker mb-0">Current Balance for:<br />@Model.DisplayName</h5>
                 </div>
+
+                <!-- Display the current balance with appropriate styling -->
                 <div class="card-body">
                     <h3 class="text-@(Model.CurrentBalance > 0 ? "danger" : "success")">
                         @Model.CurrentBalance.ToString("C")
                     </h3>
                     @if (Model.CurrentBalance > 0)
                     {
-                        <p class="text-muted">This account has an outstanding balance.</p>
+                        <p class="text-muted ">This account has an outstanding balance.</p>
                     }
                     else if (Model.CurrentBalance == 0)
                     {
@@ -42,20 +85,33 @@
                     {
                         <p class="text-muted">This account has a credit balance.</p>
                     }
+
                 </div>
+
             </div>
+
             @if (Model.TotalAvailableCredit > 0)
             {
+                @* Available Account Credits for: Card *@
                 <div class="card shadow bg-Card-Menu mb-4">
-                    <div class="card-header">
 
+                    @* Card header with title: Available Account Credits for *@
+                    <div class="card-header">
                         <h5 class="text-gold-darker mb-0">Available Account Credits for:<br /> @Model.DisplayName</h5>
                     </div>
+
+                    @* Card body *@
                     <div class="card-body">
+
+                        @* Display the total available credit with appropriate styling *@
                         <h4 class="text-success">
                             @Model.TotalAvailableCredit.ToString("C")
                         </h4>
+
+                        @* Display a message about applying credits to future invoices *@
                         <p class="text-muted">This amount can be applied to future invoices.</p>
+
+                        @* If there are available credits, list them *@
                         @if (Model.AvailableCredits.Any())
                         {
                             <ul class="shadow list-group list-group-flush mt-2">
@@ -64,10 +120,10 @@
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <span>
                                             Credit on @credit.CreditDate.ToString("yyyy-MM-dd"): @credit.Reason
-                                            @if (credit.SourcePaymentID.HasValue)
+                                            @* @if (credit.SourcePaymentID.HasValue)
                                             {
                                                 <i class="text-muted">(from Payment ID: @credit.SourcePaymentID)</i>
-                                            }
+                                            } *@
                                         </span>
                                         <span class="badge bg-success rounded-pill">@credit.Amount.ToString("C")</span>
                                     </li>
@@ -80,7 +136,7 @@
 
             <div class="card shadow bg-Card-Menu mb-2">
                 <div class="card-header">
-                    @* And here for transaction history heading *@
+
                     <h5 class="text-gold-darker mb-0">Transaction History for:<br />@Model.DisplayName</h5>
                 </div>
 
@@ -131,14 +187,17 @@
                                         </tr>
                                         i++;
                                     }
-                                </tbody>                                
+                                </tbody>
                             </table>
                         </div>
                     }
                 </div>
             </div>
         </div>
+        </<div>
+        </div>
     </div>
+
 </div>
 
 @section Styles {
@@ -176,7 +235,7 @@
     </style>
 }
 
-@section Scripts {    
+@section Scripts {
     <script>
 
     </script>
