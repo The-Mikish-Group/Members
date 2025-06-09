@@ -67,130 +67,149 @@
                 <!-- Members Dropdown -->  
                 @if (SignInManager.IsSignedIn(User))  
                 {  
-                    <li class="nav-item dropdown pt-0">  
-                    <!-- Members Dropdown Toggle -->  
-                    <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
-                        <i class="bi bi-people-fill"></i> Members  
-                    </a>  
-                    <!-- Members Dropdown Menu -->  
-                    <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="membersDropdown" style="min-width: 210px;">  
-                        <!-- Blog -->  
-                        <li>  
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank"><i class="bi bi-newspaper me-2"></i> News and Notices</a>  
-                        </li>  
-                        <!-- PDF Documents Dropdown -->  
-                        <li class="nav-item dropdown">  
-                            <!-- PDF Documents Dropdown Toggle -->  
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="pdfDocumentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
-                                <i class="bi bi-file-earmark-pdf-fill me-2 text-gold-darker"></i> PDF Documents  
-                            </a>  
-                            <!-- PDF Documents Dropdown Menu -->  
-                            <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="pdfDocumentsDropdown">  
-                                @{  
-                                    // Fetch the non-empty categories directly in the layout  
-                                    var dynamicCategories = DbContext.PDFCategories  
-                                    .Where(c => c.CategoryFiles.Any())   
-                                    .OrderBy(c => c.SortOrder)  
-                                    .ThenBy(c => c.CategoryName)  
-                                    .ToList();  
-                                    // Check if any categories were found  
-                                    if (dynamicCategories != null && dynamicCategories.Any())  
-                                    {  
-                                        // Loop through the categories and create a link for each  
-                                        foreach (var category in dynamicCategories)  
+                    <li class="nav-item dropdown pt-0">
+                        
+                        <!-- Members Dropdown Toggle -->  
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
+                            <i class="bi bi-people-fill"></i> Members  
+                        </a>
+                    
+                        <!-- Members Dropdown Menu -->  
+                        <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="membersDropdown" style="min-width: 210px;">  
+                        
+                            <!-- Blog -->  
+                            <li>  
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank"><i class="bi bi-newspaper me-2"></i> News and Notices</a>  
+                            </li>
+                        
+                            <!-- PDF Documents Dropdown -->  
+                            <li class="nav-item dropdown">  
+                                <!-- PDF Documents Dropdown Toggle -->  
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="pdfDocumentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
+                                    <i class="bi bi-file-earmark-pdf-fill me-2 text-gold-darker"></i> PDF Documents  
+                                </a>  
+                                <!-- PDF Documents Dropdown Menu -->  
+                                <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" aria-labelledby="pdfDocumentsDropdown">  
+                                    @{  
+                                        // Fetch the non-empty categories directly in the layout  
+                                        var dynamicCategories = DbContext.PDFCategories  
+                                        .Where(c => c.CategoryFiles.Any())   
+                                        .OrderBy(c => c.SortOrder)  
+                                        .ThenBy(c => c.CategoryName)  
+                                        .ToList();  
+                                        // Check if any categories were found  
+                                        if (dynamicCategories != null && dynamicCategories.Any())  
                                         {  
-                                            <li>  
-                                                <a class="nav-link text-dark" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">  
-                                                    <i class="bi bi-list-ul ms-2 text-gold-darker"></i> @category.CategoryName  
-                                                </a>  
-                                            </li>  
+                                            // Loop through the categories and create a link for each  
+                                            foreach (var category in dynamicCategories)  
+                                            {  
+                                                <li>  
+                                                    <a class="nav-link text-dark" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">  
+                                                        <i class="bi bi-list-ul ms-2 text-gold-darker"></i> @category.CategoryName  
+                                                    </a>  
+                                                </li>  
+                                            }  
+                                        }  
+                                        else  
+                                        {  
+                                            // Optional: Display a placeholder if no categories are found  
+                                            <li><span class="dropdown-item-text">No PDF categories available</span></li>  
                                         }  
                                     }  
-                                    else  
-                                    {  
-                                        // Optional: Display a placeholder if no categories are found  
-                                        <li><span class="dropdown-item-text">No PDF categories available</span></li>  
-                                    }  
-                                }  
-                            </ul>  
-                        </li>  
-                        @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))  
-                        {  
-                            @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member") ))    
-                            {    
-                                <li>    
-                                    <a class="nav-link text-dark" asp-area="Member" asp-page="/MyBilling" title="My Billing"><i class="bi bi-plus-circle"></i> My Billing</a>    
-                                </li>    
-                            }  
-                        }  
-                    </ul>  
-                </li>  
+                                </ul>  
+                            </li>
+
+                            <!-- Profile -->
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <!-- Profile -->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">
+                                        <i class="bi bi-gear-fill"></i> Profile
+                                    </a>
+                                </li>
+                            }                        
+
+                        
+                        </ul>  
+                    </li>  
                 }  
                 @if (SignInManager.IsSignedIn(User))  
                 {  
                     <!-- Admin Dropdown -->  
                     @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))  
                     {  
-                        <li class="nav-item dropdown pt-0 pt-lg-0">  
+                        <li class="nav-item dropdown pt-0 pt-lg-0">
+                            
                             <!-- Admin Dropdown Toggle -->  
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
                                 <i class="bi bi-shield-lock-fill"></i> Manage  
-                            </a>  
+                            </a>
+                            
                             <!-- Admin Dropdown Menu -->  
                             <ul class="dropdown-menu ps-4 ps-lg-2 bg-gold-light border-0" style="min-width: 200px;" aria-labelledby="adminDropdown">  
+                                
                                 <!-- Admin Edit Members Dropdown -->  
                                 <li class="nav-item dropdown">  
+                                    
                                     <!-- Admin Edit Members Dropdown Toggle -->  
                                     <a class="nav-link dropdown-toggle text-dark" href="#" id="adminEditMembersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
                                         <i class="bi bi-people-fill"></i> Members  
                                     </a>  
+                                    
                                     <!-- Admin Edit Members Dropdown Menu -->  
                                     <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" style="min-width: 200px;" aria-labelledby="adminEditMembersDropdown" data-bs-auto-close="outside">  
                                         <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Users" title="Manage Members"><i class="bi bi-person-gear"></i> Manage Members</a></li>  
                                         <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/ResendEmailConfirmation"><i class="bi bi-envelope-check"></i> Re-Confirm Email</a></li>  
                                         <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AddUser" title="Add Member"><i class="bi bi-plus-circle"></i> Add Member</a></li>  
-                                    </ul>  
+                                    </ul>
+                                    
                                 </li>  
                                 <!-- Admin PDF Folders Dropdown -->  
-                                <li class="nav-item dropdown">  
+                                <li class="nav-item dropdown">
+                                    
                                     <!-- Admin PDF Folders Dropdown Toggle -->  
                                     <a class="nav-link dropdown-toggle text-dark" href="#" id="adminPdfFoldersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
                                         <i class="bi bi-folder-fill text-gold-dark"></i> PDF Menus  
-                                    </a>  
+                                    </a>
+                                    
                                     <!-- Admin PDF Folders Dropdown Menu -->  
                                     <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" style="min-width: 200px;" aria-labelledby="adminPdfFoldersDropdown" data-bs-auto-close="outside">  
                                         <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategories" title="Manage PDF Categories"><i class="bi bi-file-earmark-pdf-fill me-0 text-gold-darker"></i> Manage Categories</a></li>  
                                         <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" title="Manage PDF Category Files"><i class="bi bi-list-ul me-0 text-gold-darker"></i> Manage Documents</a></li>  
                                         <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfGeneration" asp-action="CreatePdf" title="New Directory PDF"><i class="bi bi-file-earmark-plus me-0 text-gold-darker"></i> New Directory PDF</a></li>  
                                         <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AdminFiles" title="Delete Protected Files"><i class="bi bi-list-ul me-0 text-gold-darker"></i> Delete Protected Files</a></li>  
-                                    </ul>  
-                                </li>  
+                                    </ul>
+                                    
+                                </li>
+                                
                                 <!-- Manage Galleries -->  
                                 <li class="nav-item">  
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="ManageGalleries">  
                                         <i class="bi bi-image"></i> Galleries  
                                     </a>  
-                                </li>  
+                                </li>
+                                
                                 <!-- Admin Accounting Dropdown -->  
-                                <li class="nav-item dropdown">  
+                                <li class="nav-item dropdown">
+                                    
                                     <!-- Admin Accounting Dropdown Toggle -->  
                                     <a class="nav-link dropdown-toggle text-dark" href="#" id="adminAccountingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
                                         <i class="bi bi-folder-fill text-gold-dark"></i> Accounting  
-                                    </a>  
+                                    </a>
+                                    
                                     <!-- Admin Accounting Dropdown Menu -->  
                                     <ul class="dropdown-menu ms-4 ps-4 ps-lg-2 bg-gold-light border-0" style="min-width: 200px;" aria-labelledby="adminAccountingDropdown" data-bs-auto-close="outside">                                          
                                         <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Member Balances"><i class="bi bi-plus-circle"></i> Member Balances</a></li>                                                                                 
-                                    </ul>  
-                                </li>  
-                            </ul>  
+                                    </ul>
+                                    
+                                </li>
+                                
+                            </ul>
+                            
                         </li>  
                     }  
-                    <!-- Profile -->  
-                    <li class="nav-item">  
-                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">  
-                            <i class="bi bi-gear-fill"></i> Profile  
-                        </a>  
-                    </li>  
+                    
                     <!-- Logout -->  
                     <li class="nav-item">  
                         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Info", new { area = "" })">  

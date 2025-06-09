@@ -67,7 +67,7 @@
                         {
                             <div class="mb-3">
                                 <label asp-for="Input.SelectedUserID" class="form-label"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="shadow form-select">
                                     <option value="">-- Select User --</option>
                                 </select>
                                 <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
@@ -85,33 +85,33 @@
                         {
                             <div class="row mb-3">
                                 <div class="col-sm-6">
-                                    <label asp-for="Input.PaymentDate" class="form-label"></label>
-                                    <input asp-for="Input.PaymentDate" class="form-control" />
+                                    <label asp-for="Input.PaymentDate" class="shadow form-label"></label>
+                                    <input asp-for="Input.PaymentDate" class="shadow form-control" />
                                     <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
                                 </div>
                                 <div class="col-sm-6">
                                     <label asp-for="Input.Amount" class="form-label"></label>
-                                    <input asp-for="Input.Amount" class="form-control" />
+                                    <input asp-for="Input.Amount" class="shadow form-control" />
                                     <span asp-validation-for="Input.Amount" class="text-danger"></span>
                                 </div>
                             </div>
                             
                             <div class="mb-3">
                                 <label asp-for="Input.Method" class="form-label"></label>
-                                <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="form-select">
+                                <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="shadow form-select">
                                 </select>
                                 <span asp-validation-for="Input.Method" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="Input.ReferenceNumber" class="form-label"></label>
-                                <input asp-for="Input.ReferenceNumber" class="form-control" />
+                                <input asp-for="Input.ReferenceNumber" class="shadow form-control" />
                                 <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="Input.Notes" class="form-label"></label>
-                                <textarea asp-for="Input.Notes" class="form-control" rows="3"></textarea>
+                                <textarea asp-for="Input.Notes" class="shadow form-control" rows="3"></textarea>
                                 <span asp-validation-for="Input.Notes" class="text-danger"></span>
                             </div>
                             <div class="d-grid gap-2 mt-4">
