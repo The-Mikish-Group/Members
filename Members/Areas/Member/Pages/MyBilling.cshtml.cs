@@ -61,102 +61,118 @@ namespace Members.Areas.Member.Pages
             public string Type { get; set; } = string.Empty;
             public string StatusOrMethod { get; set; } = string.Empty;            
         }
-        public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder) // Added sortOrder
+        public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
         {
-            _logger.LogInformation($"OnGetAsync called for MyBillingModel. UserID: {userId}, ReturnUrl: {returnUrl}, SortOrder: {sortOrder}");
+            _logger.LogInformation($"MyBilling.OnGetAsync START - UserID: {userId}, ReturnUrl: {returnUrl}, SortOrder: {sortOrder}");
             this.BackToEditUserUrl = returnUrl;
-            sortOrder ??= InvoiceIdSort;
-            this.CurrentSort = sortOrder;
-            // Setup next sort states for column headers
-            DateSort = (sortOrder == "date_asc") ? "date_desc" : "date_asc";
-            InvoiceIdSort = (sortOrder == "invoiceid_desc") ? "invoiceid_asc" : "invoiceid_desc";
-            DescriptionSort = (sortOrder == "desc_asc") ? "desc_desc" : "desc_asc";
-            TypeSort = (sortOrder == "type_asc") ? "type_desc" : "type_asc";
-            ChargeSort = (sortOrder == "charge_asc") ? "charge_desc" : "charge_asc";
-            PaymentSort = (sortOrder == "payment_asc") ? "payment_desc" : "payment_asc";
-            IdentityUser? targetUser;
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null) { return Challenge(); }
+            IdentityUser? determinedTargetUser = null;
+            var loggedInUser = await _userManager.GetUserAsync(User);
+            if (loggedInUser == null)
+            {
+                _logger.LogWarning("MyBilling.OnGetAsync: Current logged-in user is NULL. Challenging.");
+                return Challenge(); // Should not happen if [Authorize] is on the class
+            }
             if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
             {
-                targetUser = await _userManager.FindByIdAsync(userId);
-                if (targetUser == null)
+                _logger.LogInformation($"MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {userId}");
+                determinedTargetUser = await _userManager.FindByIdAsync(userId);
+                if (determinedTargetUser == null)
                 {
-                    _logger.LogWarning($"Admin/Manager tried to view billing for non-existent UserID: {userId}");
-                    TempData["ErrorMessage"] = "User not found.";
-                    return RedirectToPage("/Index", new { area = "" });
+                    _logger.LogWarning($"MyBilling.OnGetAsync: Admin/Manager provided UserID {userId}, but user was NOT FOUND. Defaulting to logged-in user for safety, but this is an error condition.");
+                    // Forcing to load loggedInUser's data instead of erroring out, to see if page renders.
+                    // TempData["ErrorMessage"] = $"User with ID '{userId}' not found. Showing your own data if applicable.";
+                    determinedTargetUser = loggedInUser; // Fallback to current user
+                    IsViewingSelf = true; // Act as if viewing self to avoid null refs on targetUser specific items
+                    ViewedUserId = loggedInUser.Id;
                 }
-                IsViewingSelf = false;
-                ViewedUserId = targetUser.Id;
-                var targetUserProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == targetUser.Id);
-                DisplayName = (targetUserProfile != null && !string.IsNullOrWhiteSpace(targetUserProfile.FirstName) && !string.IsNullOrWhiteSpace(targetUserProfile.LastName))
-                              ? $"{targetUserProfile.LastName}, {targetUserProfile.FirstName} ({targetUser.Email})"
-                              : targetUser.UserName ?? targetUser.Email ?? "Selected User's";
-                TargetUserIsBillingContact = targetUserProfile?.IsBillingContact ?? false;
+                else
+                {
+                    _logger.LogInformation($"MyBilling.OnGetAsync: Admin/Manager - TargetUser {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}) FOUND.");
+                    IsViewingSelf = false;
+                    ViewedUserId = determinedTargetUser.Id;
+                }
             }
             else
             {
-                targetUser = currentUser;
+                _logger.LogInformation($"MyBilling.OnGetAsync: Member viewing self, or Admin/Manager did not provide userId. Using LoggedInUser: {loggedInUser.UserName}");
+                determinedTargetUser = loggedInUser;
                 IsViewingSelf = true;
-                ViewedUserId = targetUser.Id;
-                var currentUserProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == targetUser.Id);
-                DisplayName = (currentUserProfile != null && !string.IsNullOrWhiteSpace(currentUserProfile.FirstName) && !string.IsNullOrWhiteSpace(currentUserProfile.LastName))
-                              ? $"{currentUserProfile.FirstName} {currentUserProfile.LastName}"
-                              : targetUser.UserName ?? targetUser.Email ?? "My";
-                if (DisplayName == targetUser.UserName || DisplayName == targetUser.Email) DisplayName += "'s"; else DisplayName += "'s";
-                TargetUserIsBillingContact = currentUserProfile?.IsBillingContact ?? false;
+                ViewedUserId = determinedTargetUser.Id;
             }
-            _logger.LogInformation($"Fetching billing data for user: {targetUser.UserName} (ID: {targetUser.Id}). IsBillingContact: {TargetUserIsBillingContact}");
-            Invoices = await _context.Invoices
-                                .Where(i => i.UserID == targetUser.Id)
-                                //.OrderByDescending(i => i.InvoiceDate) // Initial sort for combining, will be re-sorted later
-                                //.ThenByDescending(i => i.DateCreated)
-                                .ToListAsync();
-            _logger.LogInformation($"Found {Invoices.Count} invoices for user {targetUser.Id}.");
-            Payments = await _context.Payments
-                                .Where(p => p.UserID == targetUser.Id)
-                                // .OrderByDescending(p => p.PaymentDate) // Initial sort for combining, will be re-sorted later
-                                // .ThenByDescending(p => p.DateRecorded)
-                                .ToListAsync();
-            _logger.LogInformation($"Found {Payments.Count} payments for user {targetUser.Id}.");
-            decimal totalChargesFromInvoices = Invoices
-                .Where(i => i.Status != InvoiceStatus.Cancelled)
-                .Sum(i => i.AmountDue);
-            decimal totalPaymentsReceived = Payments.Sum(p => p.Amount);
-            CurrentBalance = totalChargesFromInvoices - totalPaymentsReceived;
-            _logger.LogInformation($"MyBilling: User {targetUser.Id} - Calculated Current Balance: {CurrentBalance}");
+            // Populate DisplayName and TargetUserIsBillingContact based on determinedTargetUser
+            var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == determinedTargetUser.Id);
+            if (IsViewingSelf)
+            {
+                DisplayName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                                ? $"{userProfile.FirstName} {userProfile.LastName}"
+                                : determinedTargetUser.UserName ?? determinedTargetUser.Email ?? "My";
+                if (DisplayName == determinedTargetUser.UserName || DisplayName == determinedTargetUser.Email) DisplayName += "'s"; else DisplayName += "'s";
+            }
+            else // Admin viewing another user
+            {
+                DisplayName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                                ? $"{userProfile.FirstName} {userProfile.LastName} ({determinedTargetUser.Email})"
+                                : determinedTargetUser.UserName ?? determinedTargetUser.Email ?? "Selected User's";
+            }
+            TargetUserIsBillingContact = userProfile?.IsBillingContact ?? false;
+            _logger.LogInformation($"MyBilling.OnGetAsync: DisplayName: {DisplayName}. TargetUserIsBillingContact: {TargetUserIsBillingContact}");
+            // Fetch data using determinedTargetUser.Id
+            _logger.LogInformation($"MyBilling.OnGetAsync: Fetching billing data for user: {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}).");
+            Invoices = await _context.Invoices.Where(i => i.UserID == determinedTargetUser.Id).ToListAsync();
+            Payments = await _context.Payments.Where(p => p.UserID == determinedTargetUser.Id).ToListAsync();
+            AvailableCredits = await _context.UserCredits.Where(uc => uc.UserID == determinedTargetUser.Id && !uc.IsApplied).ToListAsync();
+            _logger.LogInformation($"MyBilling.OnGetAsync: Found {Invoices.Count} invoices, {Payments.Count} payments, {AvailableCredits.Count} available credits for {determinedTargetUser.UserName}");
+            decimal totalCharges = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled).Sum(i => i.AmountDue);
+            decimal totalPayments = Payments.Sum(p => p.Amount);
+            CurrentBalance = totalCharges - totalPayments;
+            TotalAvailableCredit = AvailableCredits.Sum(uc => uc.Amount);
+            _logger.LogInformation($"MyBilling.OnGetAsync: Balance for {determinedTargetUser.UserName}: {CurrentBalance}, TotalAvailableCredit: {TotalAvailableCredit}");
+            // Populate Transactions
             Transactions.Clear();
-            foreach (var invoice in Invoices)
+            foreach (var invoice in Invoices.OrderByDescending(i => i.InvoiceDate).ThenByDescending(i => i.DateCreated))
             {
                 Transactions.Add(new BillingTransaction
-                {
+                { /* ... your existing mapping ... */
                     Date = invoice.InvoiceDate,
                     InvoiceID = invoice.InvoiceID,
                     Description = invoice.Description,
                     ChargeAmount = invoice.AmountDue,
-                    PaymentAmount = null, // Explicitly null
                     Type = "Invoice",
-                    StatusOrMethod = invoice.Status.ToString()                    
+                    StatusOrMethod = invoice.Status.ToString()
                 });
             }
-            foreach (var payment in Payments)
+            foreach (var payment in Payments.OrderByDescending(p => p.PaymentDate).ThenByDescending(p => p.DateRecorded))
             {
                 Transactions.Add(new BillingTransaction
-                {
+                { /* ... your existing mapping ... */
                     Date = payment.PaymentDate,
                     InvoiceID = payment.InvoiceID,
                     Description = payment.Notes ?? $"Payment (Ref: {payment.ReferenceNumber ?? "N/A"})",
-                    ChargeAmount = null, // Explicitly null
                     PaymentAmount = payment.Amount,
                     Type = "Payment",
-                    StatusOrMethod = payment.Method.ToString()                    
+                    StatusOrMethod = payment.Method.ToString()
                 });
             }
-            // --- NEW SORTING LOGIC FOR Transactions ---
-            switch (sortOrder)
+            _logger.LogInformation($"MyBilling.OnGetAsync: Populated {Transactions.Count} total transactions for {determinedTargetUser.UserName}.");
+            // Apply Sorting
+            string effectiveSort = sortOrder ?? "invoiceid_desc"; // Default to Invoice ID Descending
+            this.CurrentSort = effectiveSort;
+            DateSort = (effectiveSort == "date_asc") ? "date_desc" : "date_asc";
+            InvoiceIdSort = (effectiveSort == "invoiceid_asc") ? "invoiceid_desc" : "invoiceid_asc";
+            DescriptionSort = (effectiveSort == "desc_asc") ? "desc_desc" : "desc_asc";
+            TypeSort = (effectiveSort == "type_asc") ? "type_desc" : "type_asc";
+            ChargeSort = (effectiveSort == "charge_asc") ? "charge_desc" : "charge_asc";
+            PaymentSort = (effectiveSort == "payment_asc") ? "payment_desc" : "payment_asc";
+            // Ensure the default sort's "next click" state is correctly set
+            if (effectiveSort == "invoiceid_desc") InvoiceIdSort = "invoiceid_asc";
+            else if (effectiveSort == "date_desc" && sortOrder == null) DateSort = "date_asc"; // If date_desc was default
+                                                                                               // Add any other default scenarios if you change the default from invoiceid_desc
+            switch (effectiveSort)
             {
                 case "date_desc": Transactions = Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice").ToList(); break;
                 case "date_asc": Transactions = Transactions.OrderBy(t => t.Date).ThenBy(t => t.Type != "Invoice").ToList(); break;
+                case "invoiceid_desc": Transactions = Transactions.OrderByDescending(t => t.InvoiceID ?? int.MinValue).ThenByDescending(t => t.Date).ToList(); break;
+                case "invoiceid_asc": Transactions = Transactions.OrderBy(t => t.InvoiceID ?? int.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
                 case "desc_desc": Transactions = Transactions.OrderByDescending(t => t.Description).ToList(); break;
                 case "desc_asc": Transactions = Transactions.OrderBy(t => t.Description).ToList(); break;
                 case "type_desc": Transactions = Transactions.OrderByDescending(t => t.Type).ThenByDescending(t => t.Date).ToList(); break;
@@ -165,20 +181,136 @@ namespace Members.Areas.Member.Pages
                 case "charge_asc": Transactions = Transactions.OrderBy(t => t.ChargeAmount ?? decimal.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
                 case "payment_desc": Transactions = Transactions.OrderByDescending(t => t.PaymentAmount ?? decimal.MinValue).ThenByDescending(t => t.Date).ToList(); break;
                 case "payment_asc": Transactions = Transactions.OrderBy(t => t.PaymentAmount ?? decimal.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
-                case "invoiceid_desc": Transactions = Transactions.OrderByDescending(t => t.InvoiceID ?? int.MinValue).ThenByDescending(t => t.Date).ToList(); break;
-                case "invoiceid_asc": Transactions = Transactions.OrderBy(t => t.InvoiceID ?? int.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
-                default: Transactions = Transactions.OrderByDescending(t => t.InvoiceID).ToList();
-                if (string.IsNullOrEmpty(sortOrder)) InvoiceIdSort = "invoiceid_desc"; break;
+                    // No default needed here as effectiveSort is always set
             }
-            // --- END NEW SORTING LOGIC ---
-            AvailableCredits = await _context.UserCredits
-                .Where(uc => uc.UserID == targetUser.Id && !uc.IsApplied)
-                .OrderByDescending(uc => uc.CreditDate)
-                .ToListAsync();
-            TotalAvailableCredit = AvailableCredits.Sum(uc => uc.Amount);
-            _logger.LogInformation($"Total available credit for user {targetUser.Id}: {TotalAvailableCredit:C}");
+            _logger.LogInformation($"MyBilling.OnGetAsync: Transactions sorted by {effectiveSort}. Final count: {Transactions.Count}");
             return Page();
         }
+        //public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
+        //{
+        //    _logger.LogInformation($"MyBilling.OnGetAsync START - UserID: {userId}, ReturnUrl: {returnUrl}, SortOrder: {sortOrder}");
+        //    this.BackToEditUserUrl = returnUrl;
+        //    IdentityUser? determinedTargetUser = null;
+        //    var loggedInUser = await _userManager.GetUserAsync(User);
+        //    if (loggedInUser == null)
+        //    {
+        //        _logger.LogWarning("MyBilling.OnGetAsync: Current logged-in user is NULL. Challenging.");
+        //        return Challenge(); // Should not happen if [Authorize] is on the class
+        //    }
+        //    if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+        //    {
+        //        _logger.LogInformation($"MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {userId}");
+        //        determinedTargetUser = await _userManager.FindByIdAsync(userId);
+        //        if (determinedTargetUser == null)
+        //        {
+        //            _logger.LogWarning($"MyBilling.OnGetAsync: Admin/Manager provided UserID {userId}, but user was NOT FOUND. Defaulting to logged-in user for safety, but this is an error condition.");
+        //            // Forcing to load loggedInUser's data instead of erroring out, to see if page renders.
+        //            // TempData["ErrorMessage"] = $"User with ID '{userId}' not found. Showing your own data if applicable.";
+        //            determinedTargetUser = loggedInUser; // Fallback to current user
+        //            IsViewingSelf = true; // Act as if viewing self to avoid null refs on targetUser specific items
+        //            ViewedUserId = loggedInUser.Id;
+        //        }
+        //        else
+        //        {
+        //            _logger.LogInformation($"MyBilling.OnGetAsync: Admin/Manager - TargetUser {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}) FOUND.");
+        //            IsViewingSelf = false;
+        //            ViewedUserId = determinedTargetUser.Id;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _logger.LogInformation($"MyBilling.OnGetAsync: Member viewing self, or Admin/Manager did not provide userId. Using LoggedInUser: {loggedInUser.UserName}");
+        //        determinedTargetUser = loggedInUser;
+        //        IsViewingSelf = true;
+        //        ViewedUserId = determinedTargetUser.Id;
+        //    }
+        //    // Populate DisplayName and TargetUserIsBillingContact based on determinedTargetUser
+        //    var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == determinedTargetUser.Id);
+        //    if (IsViewingSelf)
+        //    {
+        //        DisplayName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+        //                        ? $"{userProfile.FirstName} {userProfile.LastName}"
+        //                        : determinedTargetUser.UserName ?? determinedTargetUser.Email ?? "My";
+        //        if (DisplayName == determinedTargetUser.UserName || DisplayName == determinedTargetUser.Email) DisplayName += "'s"; else DisplayName += "'s";
+        //    }
+        //    else // Admin viewing another user
+        //    {
+        //        DisplayName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+        //                        ? $"{userProfile.FirstName} {userProfile.LastName} ({determinedTargetUser.Email})"
+        //                        : determinedTargetUser.UserName ?? determinedTargetUser.Email ?? "Selected User's";
+        //    }
+        //    TargetUserIsBillingContact = userProfile?.IsBillingContact ?? false;
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: DisplayName: {DisplayName}. TargetUserIsBillingContact: {TargetUserIsBillingContact}");
+        //    // Fetch data using determinedTargetUser.Id
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: Fetching billing data for user: {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}).");
+        //    Invoices = await _context.Invoices.Where(i => i.UserID == determinedTargetUser.Id).ToListAsync();
+        //    Payments = await _context.Payments.Where(p => p.UserID == determinedTargetUser.Id).ToListAsync();
+        //    AvailableCredits = await _context.UserCredits.Where(uc => uc.UserID == determinedTargetUser.Id && !uc.IsApplied).ToListAsync();
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: Found {Invoices.Count} invoices, {Payments.Count} payments, {AvailableCredits.Count} available credits for {determinedTargetUser.UserName}");
+        //    decimal totalCharges = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled).Sum(i => i.AmountDue);
+        //    decimal totalPayments = Payments.Sum(p => p.Amount);
+        //    CurrentBalance = totalCharges - totalPayments;
+        //    TotalAvailableCredit = AvailableCredits.Sum(uc => uc.Amount);
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: Balance for {determinedTargetUser.UserName}: {CurrentBalance}, TotalAvailableCredit: {TotalAvailableCredit}");
+        //    // Populate Transactions
+        //    Transactions.Clear();
+        //    foreach (var invoice in Invoices.OrderByDescending(i => i.InvoiceDate).ThenByDescending(i => i.DateCreated))
+        //    {
+        //        Transactions.Add(new BillingTransaction
+        //        { /* ... your existing mapping ... */
+        //            Date = invoice.InvoiceDate,
+        //            InvoiceID = invoice.InvoiceID,
+        //            Description = invoice.Description,
+        //            ChargeAmount = invoice.AmountDue,
+        //            Type = "Invoice",
+        //            StatusOrMethod = invoice.Status.ToString()
+        //        });
+        //    }
+        //    foreach (var payment in Payments.OrderByDescending(p => p.PaymentDate).ThenByDescending(p => p.DateRecorded))
+        //    {
+        //        Transactions.Add(new BillingTransaction
+        //        { /* ... your existing mapping ... */
+        //            Date = payment.PaymentDate,
+        //            InvoiceID = payment.InvoiceID,
+        //            Description = payment.Notes ?? $"Payment (Ref: {payment.ReferenceNumber ?? "N/A"})",
+        //            PaymentAmount = payment.Amount,
+        //            Type = "Payment",
+        //            StatusOrMethod = payment.Method.ToString()
+        //        });
+        //    }
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: Populated {Transactions.Count} total transactions for {determinedTargetUser.UserName}.");
+        //    // Apply Sorting
+        //    string effectiveSort = sortOrder ?? "invoiceid_desc"; // Default to Invoice ID Descending
+        //    this.CurrentSort = effectiveSort;
+        //    DateSort = (effectiveSort == "date_asc") ? "date_desc" : "date_asc";
+        //    InvoiceIdSort = (effectiveSort == "invoiceid_asc") ? "invoiceid_desc" : "invoiceid_asc";
+        //    DescriptionSort = (effectiveSort == "desc_asc") ? "desc_desc" : "desc_asc";
+        //    TypeSort = (effectiveSort == "type_asc") ? "type_desc" : "type_asc";
+        //    ChargeSort = (effectiveSort == "charge_asc") ? "charge_desc" : "charge_asc";
+        //    PaymentSort = (effectiveSort == "payment_asc") ? "payment_desc" : "payment_asc";
+        //    // Ensure the default sort's "next click" state is correctly set
+        //    if (effectiveSort == "invoiceid_desc") InvoiceIdSort = "invoiceid_asc";
+        //    else if (effectiveSort == "date_desc" && sortOrder == null) DateSort = "date_asc"; // If date_desc was default
+        //                                                                                       // Add any other default scenarios if you change the default from invoiceid_desc
+        //    switch (effectiveSort)
+        //    {
+        //        case "date_desc": Transactions = Transactions.OrderByDescending(t => t.Date).ThenBy(t => t.Type != "Invoice").ToList(); break;
+        //        case "date_asc": Transactions = Transactions.OrderBy(t => t.Date).ThenBy(t => t.Type != "Invoice").ToList(); break;
+        //        case "invoiceid_desc": Transactions = Transactions.OrderByDescending(t => t.InvoiceID ?? int.MinValue).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "invoiceid_asc": Transactions = Transactions.OrderBy(t => t.InvoiceID ?? int.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "desc_desc": Transactions = Transactions.OrderByDescending(t => t.Description).ToList(); break;
+        //        case "desc_asc": Transactions = Transactions.OrderBy(t => t.Description).ToList(); break;
+        //        case "type_desc": Transactions = Transactions.OrderByDescending(t => t.Type).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "type_asc": Transactions = Transactions.OrderBy(t => t.Type).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "charge_desc": Transactions = Transactions.OrderByDescending(t => t.ChargeAmount ?? decimal.MinValue).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "charge_asc": Transactions = Transactions.OrderBy(t => t.ChargeAmount ?? decimal.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "payment_desc": Transactions = Transactions.OrderByDescending(t => t.PaymentAmount ?? decimal.MinValue).ThenByDescending(t => t.Date).ToList(); break;
+        //        case "payment_asc": Transactions = Transactions.OrderBy(t => t.PaymentAmount ?? decimal.MaxValue).ThenByDescending(t => t.Date).ToList(); break;
+        //            // No default needed here as effectiveSort is always set
+        //    }
+        //    _logger.LogInformation($"MyBilling.OnGetAsync: Transactions sorted by {effectiveSort}. Final count: {Transactions.Count}");
+        //    return Page();
+        //}
         public async Task<IActionResult> OnPostApplyLateFeeAsync(string userId)
         {
             _logger.LogInformation($"OnPostApplyLateFeeAsync called for UserID: {userId}. Current viewing user (admin/manager): {User.Identity?.Name}");

@@ -52,7 +52,7 @@ else
 }
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseStaticFiles(); // Add this to serve static files like in Gallerys
+app.UseStaticFiles(); 
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(
@@ -151,5 +151,5 @@ using (var scope = app.Services.CreateScope())
         // Do Nothing!
     }
 }
-Members.Helpers.ImageHelper.Initialize(app.Environment);
+//Members.Helpers.ImageHelper.Initialize(app.Environment);
 app.Run();

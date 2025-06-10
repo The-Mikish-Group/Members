@@ -2,13 +2,8 @@
 @using Members.Models
 
 @{
-   
-    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;    
     ViewData["Title"] = "Manage Image Galleries";
 }
-
-@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-{
 
 <div class="container row justify-content-center mx-auto p-1">
     <div class="col-lg-8 col-md-10 m-1 p-1">
@@ -62,27 +57,27 @@
                 {
                     <h2 class="text-start text-gold-darker my-2 ps-2"><i class="bi bi-images"></i> Existing Galleries</h2>
                     
-                    <table class="w-100 shadow">
+                    <table class="table table-striped table rounded shadow">
                         <thead>
-                            <tr class="bg-gold-dark text-white">
-                                <th class="p-2 xtext-gold-dark">
+                            <tr>
+                                <th class="text-gold-dark">
                                     <div class="row align-items-center">
-                                        <div class="xtext-gold-dark col-6 d-flex justify-content-start">Manage Images</div>
+                                        <div class="text-gold-dark col-6 d-flex justify-content-start">Manage Images</div>
 
-                                        <div class="xtext-gold-dark col-4 d-flex justify-content-center">Rename</div>
+                                        <div class="text-gold-dark col-4 d-flex justify-content-center">Rename</div>
                                         
-                                        <div class="xtext-gold-dark col-2 d-flex justify-content-end">Delete</div>
+                                        <div class="text-gold-dark col-2 d-flex justify-content-end">Delete</div>
                                     </div>
                                 </th>
                             </tr>
                         </thead>
 
-                        <tbody id="manageGalleriesTableBody">
+                        <tbody>
                             @foreach (var gallery in Model)
                             {
-                                <tr id="display-row-@gallery.ImageCount">
+                                <tr>
 
-                                    <td class="p-2 text-gold-darker py-0">
+                                    <td class="text-gold-darker py-0">
                                         <div class="row align-items-center">
 
                                             <div class="col-6 d-flex justify-content-start">
@@ -180,22 +175,10 @@
 
     </div>
 </div>
-}
-else
-{
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 50vh;">
-        <div class="card shadow rounded bg-Card-Menu p-4" style="max-width: 400px;">
-            <div class="card-body text-center">
-                <p class="card-text pb-2">This is the secure site of @siteName.</p>
-                <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
-            </div>
-        </div>
-    </div>
-}
 
 @section Styles {
     <style>
-        .even-row {
+       /*  .even-row {
             background-color: antiquewhite
         }
 
@@ -206,7 +189,7 @@ else
             .even-row > td,
             .odd-row > td {
                 background-color: inherit !important;
-            }
+            } */
 
         .delete-button i {
             font-size: 0.9em;
@@ -238,13 +221,8 @@ else
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        // DOM Listener - Content Loaded
-        document.addEventListener('DOMContentLoaded', function () { 
-
-            // Automatically apply colors to visible display rows on page load
-            applyRowColors();
-
-            // JavaScript to handle the auto-hide alert messages
+        // JavaScript to handle the auto-hide alert messages
+        document.addEventListener('DOMContentLoaded', function () {            
             var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');
             alertsToAutoHide.forEach(function(alertElement) {
                 setTimeout(function() {
@@ -256,18 +234,5 @@ else
             });
         });       
 
-        // Function to apply alternating row colors to the table body
-        function applyRowColors() {
-            // Target all table rows within the tbody that represent display rows
-            $('#manageGalleriesTableBody > tr[id^="display-row-"]:visible').each(function(index) {
-                $(this).removeClass('even-row odd-row');
-                if (index % 2 === 0) {
-                    $(this).addClass('even-row');
-                } else {
-                    $(this).addClass('odd-row');
-                }
-            });
-        }
-        
     </script>
 }
