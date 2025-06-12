@@ -5,12 +5,12 @@
     Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
 }
 
-<div class="container my-4">
+<div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7"> @* Slightly wider for more invoice details *@
-            <div class="card shadow">
+            <div class="card shadow mb-2 bg-Card-Menu">
                 <div class="card-header bg-gold-light text-white">
-                    <h4 class="text-gold-darker mb-0">
+                    <h4 class="mb-0 text-gold-darker">
                         @ViewData["Title"]                       
                     </h4>
                 </div>
@@ -39,7 +39,7 @@
                                 <label asp-for="Input.SelectedInvoiceID" class="form-label"></label>
                                 @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
                                 {
-                                    <div class="list-group" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                    <div class="ps-3 py-2 shadow card list-group" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
                                         @foreach (var invoice in Model.OpenInvoicesForUser)
                                         {
                                             <label class="list-group-item list-group-item-action">
@@ -54,12 +54,7 @@
                                 }
                                 else
                                 {
-                                    <p class="form-text">No open invoices found for this user to apply payment towards.</p>
-                                    @* Hide other payment fields if no invoice to select, or allow general payment?
-                                       For now, SelectedInvoiceID is required, so form won't submit without one.
-                                       If OpenInvoicesForUser is empty, the radio button list won't render,
-                                       and the RequiredValidator for SelectedInvoiceID will trigger on submit.
-                                    *@
+                                    <p class="ps-3 py-2 shadow card form-text">No open invoices found to apply payment towards.</p>
                                 }
                             </div>
                         }
@@ -79,13 +74,12 @@
                         {
                             <input type="hidden" asp-for="ReturnUrl" />
                         }
-                                                @* Only show these fields if a user context is established (either preselected or selected from dropdown)
-                           AND if there are invoices to pay (or if you decide to allow payments without direct invoice linking later) *@
-                        @if (!string.IsNullOrEmpty(Model.Input.SelectedUserID)) // Could also check Model.IsUserPreselected or if Model.OpenInvoicesForUser.Any()
+                                                
+                        @if (!string.IsNullOrEmpty(Model.Input.SelectedUserID)) 
                         {
                             <div class="row mb-3">
                                 <div class="col-sm-6">
-                                    <label asp-for="Input.PaymentDate" class="shadow form-label"></label>
+                                    <label asp-for="Input.PaymentDate" class="form-label"></label>
                                     <input asp-for="Input.PaymentDate" class="shadow form-control" />
                                     <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
                                 </div>
