@@ -167,7 +167,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // --- OPTIONAL: Auto-apply available credits NOW when finalizing ---
                 // (This is the logic from AddInvoice.OnPostAsync, adapted for an existing invoice)
                 decimal remainingAmountDueOnInvoice = invoice.AmountDue - invoice.AmountPaid; // Should be full AmountDue if draft
-                string appliedCreditsSummary = ""; // For individual invoice logging if needed
+                // string appliedCreditsSummary = ""; // For individual invoice logging if needed
                 if (remainingAmountDueOnInvoice > 0)
                 {
                     var availableCredits = await _context.UserCredits

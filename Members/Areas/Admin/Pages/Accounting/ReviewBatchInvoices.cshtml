@@ -3,35 +3,44 @@
 @{  
     ViewData["Title"] = $"Review Batch Invoices:"; 
     Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout  
-}  
+}
 
-@if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())  
-{  
-    <form method="get" id="selectBatchForm" class="row gx-2 gy-2 align-items-center mb-3">  
-        <div class="col-auto">  
-            <label for="SelectedBatchId" class="ms-2 form-label visually-hidden">Select Batch:</label>  
+<div class="container">
+
+    @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())  
+    {  
+        <form method="get" id="selectBatchForm" class="row gx-0 gy-0 align-items-center mb-3">
+            
+            <div class="col-12 text-start ms-1">  
+                <label for="SelectedBatchId" class="form-label visually-hidden">Select Batch:</label>  
+            </div>  
+
+            <div class="col-10 ms-2 mt-4 text-start me-0">
+                
+                <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">  
+                    <option value="">-- Select a Batch to Review --</option>  
+                </select>
+
+            </div>
+            
+            <div class="col-2 ms-0">  
+                <button type="submit" class="btn btn-sm btn-outline-primary">View Batch</button>
+            </div>
+        </form>        
+    }  
+    else if (string.IsNullOrEmpty(Model.BatchId)) // No batchId passed and no available drafts  
+    {  
+        <div class="alert alert-info" role="alert">  
+            There are currently no draft batches available for review.  
         </div>  
-        <div class="col-md-6 col-lg-5 ms-2 mt-4 text-center">  
-            <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">  
-                <option value="">-- Select a Batch to Review --</option>  
-            </select>  
+        <div class="mt-3">  
+            <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>  
         </div>  
-        <div class="col-auto ms-2">  
-            <button type="submit" class="btn btn-sm btn-outline-primary">View Batch</button>  
-        </div>  
-    </form>        
-}  
-else if (string.IsNullOrEmpty(Model.BatchId)) // No batchId passed and no available drafts  
-{  
-    <div class="alert alert-info" role="alert">  
-        There are currently no draft batches available for review.  
-    </div>  
-    <div class="mt-3">  
-        <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>  
-    </div>  
-    return; // Stop rendering if no batches exist at all and none selected  
-} 
+        return; // Stop rendering if no batches exist at all and none selected  
+    } 
     
+</div>
+
 @if (!string.IsNullOrEmpty(Model.BatchId))  
 {     
     <h2 class="ms-2 mb-3">@ViewData["Title"]
