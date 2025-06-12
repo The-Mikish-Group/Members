@@ -1,5 +1,6 @@
 ﻿@page "{userId?}"
 @model Members.Areas.Member.Pages.MyBillingModel
+@using Members.Models
 @{
     ViewData["Title"] = "Billing History";
     Layout = "_Layout"; // Or your specific Member Area layout
@@ -242,6 +243,7 @@
                                             {<i class="bi @(Model.TypeSort == "type_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
                                         </th>
                                         <th class="text-decoration-none text-nowrap text-center text-white py-1">Status/Method</th> @* Not made sortable by default *@
+                                        <th class="text-nowrap text-white py-1 text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -268,6 +270,48 @@
                                             <td class="text-nowrap text-gold-darker text-end pe-1 py-1">@trans.PaymentAmount?.ToString("C")</td>
                                             <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Type)</td>
                                             <td class="text-nowrap text-gold-darker text-center py-1">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
+                                            <td class="text-nowrap text-gold-darker text-center py-1">
+                                                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                                {
+                                                    if (trans.Type == "Invoice" && trans.InvoiceID.HasValue &&
+                                                        (trans.StatusOrMethod == InvoiceStatus.Draft.ToString() || trans.StatusOrMethod == InvoiceStatus.Due.ToString()))
+                                                    {
+                                                        <a asp-area="Admin" asp-page="/Accounting/EditInvoice"
+                                                           asp-route-invoiceId="@trans.InvoiceID.Value"
+                                                           asp-route-returnUrl="@Url.Page("/MyBilling", new { area = "Member", userId = Model.ViewedUserId, sortOrder = Model.CurrentSort, returnUrl = Model.BackToEditUserUrl })"
+                                                           class="btn btn-sm btn-outline-primary" title="Edit Invoice">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </a>
+                                                    }
+
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") &&
+                                                         trans.Type == "Invoice" && trans.InvoiceID.HasValue &&
+                                                         trans.StatusOrMethod != InvoiceStatus.Cancelled.ToString())
+                                                    {
+                                                        <form method="post" asp-page-handler="VoidInvoice" style="display:inline;"
+                                                              onsubmit="return handleVoidInvoice('@trans.InvoiceID.Value.ToString()');">
+                                                            <input type="hidden" name="invoiceId" value="@trans.InvoiceID.Value" />
+                                                            <input type="hidden" name="voidReason" id="voidReason_@trans.InvoiceID.Value.ToString()" />
+                                                            <button type="submit" class="btn btn-sm btn-danger ms-1" title="Void Invoice INV-@trans.InvoiceID.Value.ToString().PadLeft(5, '0')">
+                                                                <i class="bi bi-x-circle"></i> Void
+                                                            </button>
+                                                        </form>
+                                                    }
+
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") &&
+                                                         trans.Type == "Payment" && trans.PaymentID.HasValue && !trans.IsVoided)
+                                                    {
+                                                        <form method="post" asp-page-handler="VoidPayment" style="display:inline;"
+                                                              onsubmit="return handleVoidPayment('@trans.PaymentID.Value.ToString()', '@trans.Description');">
+                                                            <input type="hidden" name="paymentId" value="@trans.PaymentID.Value" />
+                                                            <input type="hidden" name="voidReason" id="voidPaymentReason_@trans.PaymentID.Value.ToString()" />
+                                                            <button type="submit" class="btn btn-sm btn-warning ms-1" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
+                                                                <i class="bi bi-eraser"></i> Void Pmt
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                }
+                                            </td>
                                         </tr>
                                         i++;
                                     }
@@ -321,6 +365,39 @@
 
 @section Scripts {
     <script>
+        function handleVoidInvoice(invoiceIdString) { // Renamed parameter for clarity
+            if (confirm('Are you sure you want to void invoice INV-' + invoiceIdString.padStart(5, '0') + '?')) {
+                const reason = prompt("Please enter the reason for voiding this invoice:");
+                if (reason && reason.trim() !== "") {
+                    document.getElementById('voidReason_' + invoiceIdString).value = reason;
+                    return true; // Proceed with form submission
+                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace
+                    alert("A reason is required to void an invoice.");
+                    return false; // Prevent form submission
+                }
+                // If reason is null (User clicked Cancel on prompt), also prevent submission
+                return false;
+            }
+            return false; // Prevent form submission if not confirmed
+        }
 
+        function handleVoidPayment(paymentIdString, paymentDescription) {
+            const confirmationMessage = `Are you sure you want to void this payment?
+ID: ${paymentIdString}
+Ref: ${paymentDescription}`;
+            if (confirm(confirmationMessage)) {
+                const reason = prompt("Please enter the reason for voiding this payment:");
+                if (reason && reason.trim() !== "") {
+                    document.getElementById('voidPaymentReason_' + paymentIdString).value = reason;
+                    return true; // Proceed with form submission
+                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace
+                    alert("A reason is required to void a payment.");
+                    return false; // Prevent form submission
+                }
+                // If reason is null (User clicked Cancel on prompt), also prevent submission
+                return false;
+            }
+            return false; // Prevent form submission if not confirmed
+        }
     </script>
 }

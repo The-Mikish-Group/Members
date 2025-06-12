@@ -58,6 +58,10 @@ namespace Members.Models
         [StringLength(250)]
         [Display(Name = "Reason for Voiding")]
         public string? ReasonForVoiding { get; set; }
+
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Last Updated")]
+        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
         public Payment()
         {
             UserID = string.Empty;
