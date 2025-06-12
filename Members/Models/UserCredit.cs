@@ -56,5 +56,9 @@ namespace Members.Models
         [DataType(DataType.DateTime)]
         [Display(Name = "Date Created")]
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Last Updated")]
+        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
     }
 }

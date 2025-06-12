@@ -53,13 +53,15 @@ namespace Members.Areas.Member.Pages
         {
             public DateTime Date { get; set; }
             public int? InvoiceID { get; set; }
+            public int? PaymentID { get; set; } // Added for voiding payments
             public string Description { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
             public decimal? ChargeAmount { get; set; }
             [DataType(DataType.Currency)]
             public decimal? PaymentAmount { get; set; }
             public string Type { get; set; } = string.Empty;
-            public string StatusOrMethod { get; set; } = string.Empty;            
+            public string StatusOrMethod { get; set; } = string.Empty;
+            public bool IsVoided { get; set; } = false; // Added for voiding payments
         }
         public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
         {
@@ -147,10 +149,12 @@ namespace Members.Areas.Member.Pages
                 { /* ... your existing mapping ... */
                     Date = payment.PaymentDate,
                     InvoiceID = payment.InvoiceID,
+                    PaymentID = payment.PaymentID, // Populate PaymentID
                     Description = payment.Notes ?? $"Payment (Ref: {payment.ReferenceNumber ?? "N/A"})",
                     PaymentAmount = payment.Amount,
                     Type = "Payment",
-                    StatusOrMethod = payment.Method.ToString()
+                    StatusOrMethod = payment.Method.ToString(),
+                    IsVoided = payment.IsVoided // Populate IsVoided
                 });
             }
             _logger.LogInformation($"MyBilling.OnGetAsync: Populated {Transactions.Count} total transactions for {determinedTargetUser.UserName}.");
@@ -379,6 +383,142 @@ namespace Members.Areas.Member.Pages
                 TempData["ErrorMessage"] = "Error applying late fee. Check logs.";
             }
             return RedirectToPage(new { userId = userId, returnUrl = BackToEditUserUrl });
+        }
+
+        public async Task<IActionResult> OnPostVoidPaymentAsync(int paymentId, string voidReason)
+        {
+            _logger.LogInformation($"OnPostVoidPaymentAsync called for PaymentID: {paymentId} by User: {User.Identity?.Name}. Reason: {voidReason}");
+
+            // 0. Ensure ViewedUserId is available (it's a class member, should be populated by OnGet)
+            if (string.IsNullOrEmpty(ViewedUserId))
+            {
+                // This case should ideally not happen if OnGet populates it correctly when viewing another user's billing.
+                // If it's null, it implies the user is viewing their own data, or an error occurred in OnGet.
+                var currentUserForSafety = await _userManager.GetUserAsync(User);
+                if (currentUserForSafety == null) return Challenge();
+                ViewedUserId = currentUserForSafety.Id; // Default to self if something went wrong.
+                _logger.LogWarning($"OnPostVoidPaymentAsync: ViewedUserId was null or empty. Defaulted to current user ID: {ViewedUserId}. This might indicate an issue if an admin was trying to void for another user.");
+            }
+
+            // 1. Authorization
+            if (!User.IsInRole("Admin") && !User.IsInRole("Manager"))
+            {
+                _logger.LogWarning($"User {User.Identity?.Name} attempted to void payment {paymentId} for user {ViewedUserId} without authorization.");
+                TempData["ErrorMessage"] = "You are not authorized to perform this action.";
+                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+            }
+
+            // 2. Reason Validation
+            if (string.IsNullOrWhiteSpace(voidReason))
+            {
+                TempData["WarningMessage"] = "A reason is required to void a payment.";
+                _logger.LogWarning($"Void Payment: Reason not provided for PaymentID {paymentId} by User {User.Identity?.Name}.");
+                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+            }
+
+            // 3. Fetch Payment
+            // Ensure we are fetching the payment for the correct user (ViewedUserId)
+            var payment = await _context.Payments
+                                .Include(p => p.Invoice) // Include linked invoice for updates
+                                .ThenInclude(i => i!.User) // Include User from Invoice for logging/context
+                                .FirstOrDefaultAsync(p => p.PaymentID == paymentId && p.UserID == ViewedUserId);
+
+            if (payment == null)
+            {
+                _logger.LogWarning($"Void Payment: PaymentID {paymentId} not found for UserID {ViewedUserId}.");
+                TempData["ErrorMessage"] = "Payment not found or you do not have permission to access it for this user.";
+                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+            }
+
+            // 4. Check if Already Voided
+            if (payment.IsVoided)
+            {
+                _logger.LogInformation($"Void Payment: PaymentID {paymentId} is already voided.");
+                TempData["WarningMessage"] = $"Payment (ID: {payment.PaymentID}, Ref: {payment.ReferenceNumber}) is already voided.";
+                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+            }
+
+            // 5. Void Payment
+            payment.IsVoided = true;
+            payment.VoidedDate = DateTime.UtcNow;
+            payment.ReasonForVoiding = voidReason.Trim();
+            payment.LastUpdated = DateTime.UtcNow;
+
+            _context.Payments.Update(payment); // Mark payment as updated
+
+            // 6. Rollback Effects on Linked Invoice (if any)
+            if (payment.InvoiceID.HasValue && payment.Invoice != null)
+            {
+                var invoice = payment.Invoice; // Already loaded with the payment
+                _logger.LogInformation($"Void Payment: PaymentID {paymentId} is linked to InvoiceID {invoice.InvoiceID}. Rolling back AmountPaid.");
+
+                invoice.AmountPaid -= payment.Amount;
+                // Ensure AmountPaid doesn't go below zero, though logically it shouldn't.
+                if (invoice.AmountPaid < 0) invoice.AmountPaid = 0;
+
+                // Re-evaluate invoice.Status
+                // Only change status if it was 'Paid'. If it was 'Due' or 'Overdue', reducing AmountPaid won't change that.
+                if (invoice.Status == InvoiceStatus.Paid)
+                {
+                    if (invoice.DueDate < DateTime.Today.AddDays(-1)) // Add -1 to DueDate to ensure that if DueDate is today, it's not Overdue yet.
+                    {
+                        invoice.Status = InvoiceStatus.Overdue;
+                        _logger.LogInformation($"InvoiceID {invoice.InvoiceID} status changed from Paid to Overdue due to voided payment. DueDate: {invoice.DueDate}");
+                    }
+                    else
+                    {
+                        invoice.Status = InvoiceStatus.Due;
+                        _logger.LogInformation($"InvoiceID {invoice.InvoiceID} status changed from Paid to Due due to voided payment. DueDate: {invoice.DueDate}");
+                    }
+                }
+                // If it was already Due/Overdue, and AmountPaid is now less than AmountDue, it remains Due/Overdue.
+                // No change needed unless specific logic for partial payments moving it from Overdue to Due previously existed.
+                // Current logic is: if it was Paid, it becomes Due or Overdue. If it was Due/Overdue, it stays that way.
+
+                invoice.LastUpdated = DateTime.UtcNow;
+                _context.Invoices.Update(invoice);
+            }
+            else
+            {
+                _logger.LogInformation($"Void Payment: PaymentID {paymentId} is not linked to any invoice or invoice entity is null.");
+            }
+
+            // 7. Rollback Effects on Generated User Credits (if any)
+            // These are credits that were created *from this payment* (e.g., overpayment)
+            // and have not yet been applied to any other invoice.
+            var generatedCreditsToVoid = await _context.UserCredits
+                .Where(uc => uc.SourcePaymentID == payment.PaymentID && !uc.IsApplied)
+                .ToListAsync();
+
+            if (generatedCreditsToVoid.Any())
+            {
+                _logger.LogInformation($"Void Payment: Found {generatedCreditsToVoid.Count} unapplied user credits generated from PaymentID {paymentId}. Voiding them.");
+                foreach (var credit in generatedCreditsToVoid)
+                {
+                    credit.IsApplied = true; // Effectively "voids" or "cancels" the credit by marking it as used up.
+                    credit.AppliedDate = DateTime.UtcNow;
+                    credit.ApplicationNotes = $"Credit (ID: {credit.UserCreditID}) voided/cancelled because its source payment (ID: {payment.PaymentID}) was voided. Original reason: {credit.Reason}";
+                    credit.LastUpdated = DateTime.UtcNow;
+                    _context.UserCredits.Update(credit);
+                }
+            }
+
+            // 8. Save Changes
+            try
+            {
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"PaymentID {paymentId} for UserID {ViewedUserId} successfully voided by {User.Identity?.Name}. Linked entities updated.");
+                TempData["StatusMessage"] = $"Payment (ID: {payment.PaymentID}, Amount: {payment.Amount:C}) voided successfully. Reason: {payment.ReasonForVoiding}";
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, $"Error voiding PaymentID {paymentId} for UserID {ViewedUserId}.");
+                TempData["ErrorMessage"] = "Error voiding payment. Please check logs for details. Transaction has been rolled back.";
+                // Note: EF Core automatically rolls back the transaction on SaveChanges failure with default transaction behavior.
+            }
+
+            // 9. Redirect
+            return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
         }
     }
 }
