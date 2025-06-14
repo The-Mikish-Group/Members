@@ -1,0 +1,78 @@
+﻿@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
+
+    ViewData["Title"] = "Our Facilities";
+    ViewData["Canonical"] = siteURL + "/Info/Facilities";
+    ViewData["OGDescription"] = "Discover our Facilities.";
+
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container row m-0 pt-0 pt-lg-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto">
+
+    <div class="col-11 col-md-8 pb-3 pt-sm-0 pt-lg-1 text-start mx-auto">
+
+        <h2 class="text-center text-gold-darker pb-md-2 ">Facilities</h2>
+
+        <p class="text-gold-darker about-text-fs text-left pb-4">
+            Enjoy a worry-free lifestyle with our Homeowner Association fees, which encompass complete 
+            lawn care, the use and maintenance of our clubhouse, swimming pool, and gazebo garden, and 
+            the upkeep of our community roads and irrigation infrastructure.
+        </p>
+
+        <img alt="uchris" class="img-fluid w-100 px-0 rounded" src="/Images/PageImages/uchris.jpg">
+        <p class="text-gold-darker about-text-fs text-center pb-2">
+            Lawn Care
+        </p>
+    </div> 
+    
+    <div class="col-11 col-md-8 pb-3 pt-sm-0 pt-lg-4 text-start mx-auto">
+
+       <img class="img-fluid w-100 pb-1 rounded" alt="uclub" src="/Images/PageImages/uclub.jpg">
+        <p class="text-gold-darker about-text-fs text-center pb-4">
+            The Clubhouse is home for our weekly Gathering. 
+            <br />(9:30 am Wednesday)
+       </p>
+
+        <p class="text-gold-darker about-text-fs text-left py-2 pb-2">       
+            The clubhouse, with its complete kitchen facilities, is available for residents
+            to reserve at no charge for private parties or community gatherings.
+            <br /><br />
+            <b>We also have a monthly community luncheon, game nights, and Missionary time.</b>
+        </p>    
+    </div>
+
+    <div class="col-11 col-md-8 pb-3 pt-sm-0 pt-lg-4 text-start mx-auto">
+
+        <img class="img-fluid w-100 pb-1 rounded" alt="upool" src="/Images/PageImages/upool.jpg">
+        <p class="text-gold-darker about-text-fs text-center pb-4">
+            Our "senior-friendly" pool.
+            <br />(heated in the winter)                   
+        </p>
+
+        <img class="img-fluid w-100 pb-1 rounded" alt="ugazebo" src="/Images/PageImages/ugazebo.jpg">
+        <p class="text-gold-darker about-text-fs text-center pb-4">
+            The Gazebo Garden is available for small group study or private reflection.
+        </p> 
+        
+        <img class="img-fluid w-100 pb-1 rounded" alt="uquad" src="/Images/PageImages/uquad.jpg">
+        <p class="text-gold-darker about-text-fs text-center pb-2">
+            The residences are nicely landscaped, and similar in appearance for unique community identity.
+            <br /><br />
+            <b>We also are the only truly gated community in Avon Park.</b>                  
+        </p>
+        
+    </div>
+</div>
+

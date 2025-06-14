@@ -1,0 +1,130 @@
+
+.italic {
+    font-style: italic;
+}
+
+/* #region Font Sizes (-fs) */
+
+.about-text-fs {
+    font-size: 16px;
+}
+
+.welcome-text-fs {
+    font-size: 20px;
+}
+
+.nav-link-fs {
+    font-size: 24px;
+}
+
+.link-fs {
+    font-size: 16px;
+}
+.nav-text-fs {
+    font-size: 20px;
+}
+
+nav-link-footer-fs {
+    font-size: 12px;
+    width: 100%;
+}
+/* #endregion */
+
+/* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
+@media (min-width: 575px) and (max-width: 768px) {
+
+    .about-text-fs {
+        font-size: 18px;
+    }
+
+    .welcome-text-fs {
+        font-size: 24px;
+    }
+
+   .nav-link-footer-fs {
+        font-size: 16px;
+    }
+
+    .nav-link-fs {
+        font-size: 18px;
+    }
+
+    .link-fs {
+        font-size: 20px;
+    }
+
+    .nav-text-fs {
+        font-size: 24px;
+    }
+}
+/* #endregion  */
+
+/* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
+@media (min-width: 768.01px) and (max-width: 991px) {
+
+    .about-text-fs {
+        font-size: 18px;
+    }
+
+    .welcome-text-fs {
+        font-size: 28px;
+    }
+
+    .nav-link-footer-fs {
+        font-size: 16px;
+    }
+
+    .nav-link-fs {
+        font-size: 24px;
+    }
+
+    .link-fs {
+        font-size: 16px;
+    }
+
+    .nav-text-fs {
+        font-size: 24px;
+    }
+}
+/* #endregion */
+
+/* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
+@media (min-width: 992px) {
+
+    .about-text-fs {
+        font-size: 18px;
+    }
+    .welcome-text-fs {
+        font-size: 28px;
+    }
+    nav-link-footer-fs {
+        font-size: 16px;
+    }
+
+}
+/* #endregion*/
+
+/* #region (BS -lx- ) (min-width: 1200px) Medium Desktop*/
+@media (min-width: 1200px) {
+    .about-text-fs {
+        font-size: 18px;
+    }
+
+    .welcome-text-fs {
+        font-size: 30px;
+    }
+
+}
+/* #endregion */
+
+/* #region (BS - xlg- ) (min-width: 1399.98px) Large Desktop */
+@media (min-width: 1399.98px) {
+    .about-text-fs {
+        font-size: 18px;
+    }
+
+    .welcome-text-fs {
+        font-size: 42px;
+    }
+}
+/* #endregion */

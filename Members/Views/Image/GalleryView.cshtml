@@ -1,0 +1,114 @@
+﻿@model IEnumerable<Members.Models.ImageViewModel>
+
+@{
+    ViewData["Title"] = $"Gallery: {ViewBag.GalleryName}";
+}
+
+<!-- Gallery Name -->
+<h1 class="text-center text-gold-darker mt-4 mb-2">Gallery: @ViewBag.GalleryName</h1>
+
+<!-- Back to Galleries Button -->
+<div class="text-center mt-2 mb-2">
+    <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back" title="Back to Gallery List">
+        <i class="bi bi-box-arrow-left"></i> Back to Galleries
+    </a>
+</div>
+
+<div class="text-center mb-3">
+    <h6 class="text-gold-dark">(Click to Enlarge)</h6> 
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    @* Ensure `fade show` classes are present *@
+    <div class="alert alert-success fade show auto-hide-alert" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    @* Ensure `fade show` classes are present *@
+    <div class="alert alert-danger fade show auto-hide-alert" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row gx-1 gy-0 m-1">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var image in Model)
+        {
+            <div class="col-md-6 col-lg-4 col-xl-2 mb-2">
+                <div class="card shadow rounded p-2 bg-Card-Menu h-100">
+                    <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
+                        <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
+                    </a>
+                    <div class="card-body text-center py-1">
+                        <p class="card-text text-gold-darker">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center text-gold-dark p-4">
+            <p>This gallery is empty.</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        /* Styles to remove borders */
+        .card-body .list-group-item {
+            border-bottom: none !important;
+        }
+        .card-body .list-group-item:first-child {
+            border-top: none !important;
+        }
+        .card-body .list-group-item:last-child {
+            border-bottom: none !important;
+        }
+        /* Add CSS to control the link color on hover/focus */
+        .text-decoration-none:hover, .text-decoration-none:focus {
+            text-decoration: none;
+            color: green; /* Bootstrap primary color */
+        }
+        .card-img-top {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-img-top:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select all alerts that we want to auto-hide
+            var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');
+
+            alertsToAutoHide.forEach(function(alertElement) {
+                setTimeout(function() {
+                    // 1. Remove the 'show' class to trigger the CSS fade-out transition.
+                    //    Bootstrap's CSS handles the animation when 'show' is removed.
+                    alertElement.classList.remove('show');
+
+                    // 2. Listen for the 'transitionend' event. This ensures the element is
+                    //    removed from the DOM only after the fade-out animation is complete.
+                    alertElement.addEventListener('transitionend', function() {
+                        alertElement.remove(); // Remove the alert element from the DOM
+                    }, { once: true }); // The '{ once: true }' option ensures the event listener is automatically removed after it fires once.
+                }, 2500); // 5000 milliseconds = 5 seconds: Time before the alert starts to fade out.
+            });
+        });
+    </script>
+}

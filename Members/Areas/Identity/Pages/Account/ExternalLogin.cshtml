@@ -1,0 +1,56 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    ViewData["Title"] = "External Login";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow rounded bg-Card-Menu m-4 p-4">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+                    <h2 id="external-login-title" class="text-center mb-4">Associate your @Model.ProviderDisplayName account.</h2>
+                    
+                    <p id="external-login-description" class="text-info text-center">
+                        You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
+                        Please enter an email address for this site below and click the Register button to finish
+                        logging in.
+                    </p>
+
+                    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email." />
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>                        
+                        
+                        <div class="d-flex justify-content-between">
+
+                            <!-- Cancel Button -->
+                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </a>
+
+                            <!-- Register -->
+                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                                <i class="bi bi-check-lg"></i> Register
+                            </button>                            
+
+                        </div>                        
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,62 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Register Confirmation";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card p-4 shadow rounded m-2 bg-Card-Menu">
+                <h1 class="text-center mb-4 text-gold-darker">
+                    <i class="bi bi-person-check-fill"></i> @ViewData["Title"]
+                </h1>
+                @{
+                    if (@Model.DisplayConfirmAccountLink)
+                    {                        
+                        <h3 class="text-center pb-4 text-gold-darker">Thank you for registering!</h3>
+                        <p class="text-danger pb-1">
+                            Important!
+                        </p>
+                        
+                        <p class="text-gold-darker pb-2">
+                            <strong>1. An Email Confirmation</strong> has been sent to your email address; please click the confirmation link in the email. If you do not see the email in your inbox, please check your Spam folder.
+                        </p>
+                       
+                        <p class="pb-2 text-gold-darker">
+                            <strong>2. Your account is pending approval by a Manager and one has been notified.</strong>
+                            <strong>Please allow 24 hours</strong> for the <strong>manual the approval process</strong> to complete.
+                        </p>
+                        
+                        <p class="pb-4 text-gold-darker">
+                            (The email(s) will come from @Environment.GetEnvironmentVariable("SMTP_USERNAME") + ".")
+                        </p>
+                        <p class="text-gold-darker pb-3">
+                            <strong>3. Finally,</strong> you will recieve a <strong>Welcome Email</strong> telling you that you're ready to login. Again, this step may take 24 hours,
+                            so please be patient. This is a manual process and we are a small team of volunteers.
+                        </p> 
+                        <p>
+                            When you confirm your email address, you will be able to <strong>login</strong>, but may still need to wait for manager approval to acces the Members area.
+                        </p>                         
+                    }
+                    else
+                    {
+                        // Handle the case where the confirmation link is not displayed
+                        <p class="text-center text-gold-darker">
+                            Thank you for registering!
+                        </p>
+                    }
+                }
+                <div class="d-flex justify-content-center mt-3">
+                    <a asp-controller="Info" asp-action="Index" class="btn btn-primary" title="Continue to Next Section">
+                        Continue <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

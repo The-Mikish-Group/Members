@@ -1,0 +1,43 @@
+﻿@page
+@model Members.Areas.Identity.Pages.DeleteUserModel
+@{
+    ViewData["Title"] = "Delete Member";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card p-4 shadow rounded m-2 bg-Card-Menu">
+                <h1 class="text-center text-gold-darker mb-4">
+                    <i class="bi bi-person-x-fill"></i> @ViewData["Title"]
+                </h1>
+
+                <p class="pb-1 text-center text-gold-darker">Are you sure you want to delete the user:</p>
+                <p class="text-center"><strong>"@Model.UserName"</strong></p>
+
+                <!-- Buttons-->
+                <form method="post" class="d-flex justify-content-center gap-2 my-3">
+                    <input type="hidden" asp-for="Id" />
+
+                    <!-- Cancel -->
+                    <a asp-page="./Users" class="btn btn-sm btn-danger" asp-route-searchTerm="@ViewContext.HttpContext.Request.Query["searchTerm"]" title="Cancel Changes">
+                        <i class="bi bi-box-arrow-left"></i> Cancel
+                    </a>
+
+                    <!-- Delete -->                    
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>                   
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

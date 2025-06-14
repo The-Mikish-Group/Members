@@ -1,0 +1,109 @@
+﻿@page
+@model Members.Areas.Information.Pages.IndexModel
+@{
+    ViewData["Title"] = "Welcome!";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, lightblue, #343a40);
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+            margin-bottom: 40px;
+        }
+
+            .hero h1 {
+                font-size: 3.5rem;
+                margin-bottom: 20px;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+                max-width: 700px;
+                margin: 0 auto 30px;
+            }
+
+        .features {
+            padding: 40px 0;
+        }
+
+        .feature-item {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .feature-item i {
+                font-size: 3rem;
+                color: #007bff;
+                margin-bottom: 20px;
+            }
+
+            .feature-item h3 {
+                margin-bottom: 10px;
+            }
+
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</head>
+<body>
+
+    <div class="hero">
+        <div class="container">
+            <h1>The Mikish Group</h1>
+            <h3>Site Designers</h3>
+            <p>Discover amazing features and services designed to meet your needs.</p>
+            <a href="#" class="btn btn-sm btn-primary">
+                <i class="bi bi-play-fill"></i> Get Started
+            </a>
+        </div>
+    </div>
+
+    <section class="features">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 feature-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>Innovative Solutions</h3>
+                    <p>We provide cutting-edge solutions to solve your problems.</p>
+                </div>
+                <div class="col-md-4 feature-item">
+                    <i class="fas fa-rocket"></i>
+                    <h3>Fast and Efficient</h3>
+                    <p>Experience speed and efficiency with our top-notch services.</p>
+                </div>
+                <div class="col-md-4 feature-item">
+                    <i class="fas fa-users"></i>
+                    <h3>Dedicated Support</h3>
+                    <p>Our team is here to support you every step of the way.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year Mikish.Com. All rights reserved.</p>
+    </footer>
+</body>
+</html>

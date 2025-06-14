@@ -1,0 +1,173 @@
+﻿@model Members.Models.CreatePdfFormViewModel
+
+@{
+    ViewData["Title"] = "New Directory PDF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-center my-4">
+    <h1><i class="bi bi-file-earmark-plus ms-2 text-gold-darker"></i> New Directory PDF</h1>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mx-auto col-md-8" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mx-auto col-md-8" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.DirectoryCategoryId > 0)
+{
+    <div class="row justify-content-center my-2 mx-auto p-2">
+        <div class="shadow border rounded col-md-8 bg-PDF-Menu p-2">
+            <div class="mt-2">
+                <form method="post" id="pdfForm" class="mx-auto bg-PDF-Menu" asp-action="CreatePdf" asp-controller="PdfGeneration" enctype="application/x-www-form-urlencoded">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="CategoryId" value="@Model.DirectoryCategoryId" />
+
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Category:</label>
+                        <div>Directory</div>
+                    </div>
+
+
+                    <div class="form-group mb-3">
+                        <label for="fileNameInput" class="form-label fw-bold">New PDF File Name (without .pdf):</label>
+                        <input type="text" name="FileName" class="form-control" id="fileNameInput" placeholder="Enter file name" required />
+                        <span class="text-danger" data-valmsg-for="FileName" data-val="true"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="sortOrderInput" class="form-label fw-bold">Sort Order:</label>
+                        <input type="number" name="SortOrder" class="form-control" min="0" value="@Model.SuggestedSortOrder" id="sortOrderInput" required /> <span class="text-danger" data-valmsg-for="SortOrder" data-val="true"></span>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-sm btn-primary w-100">
+                            <i class="bi bi-file-earmark-plus me-2"></i> Create Directory PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center my-0 mx-auto p-0 mt-3">
+        <div class="col-md-8 bg-transparent px-2 pe-2">
+            <div class="d-flex justify-content-start mb-3">
+                <button type="button" id="exportCsvButton" class="btn btn-sm btn-secondary">
+                    <i class="bi bi-download me-2"></i> Export Member Data (CSV)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mx-auto p-0">
+        <div class="col-md-8 bg-transparent pt-2 pe-2">
+            <div class="d-flex justify-content-end mb-3">
+                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategories">
+                    <i class="bi bi-arrow-left text-gold-darker"></i> Back to Edit PDF Categories
+                </a>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="alert alert-warning mx-auto col-md-8" role="alert">
+        The "Directory" category was not found in the database. Please ensure it exists to generate the directory PDF.
+    </div>
+    <div class="row justify-content-center mx-auto p-0">
+        <div class="col-md-8 bg-transparent pt-2 pe-2">
+            <div class="d-flex justify-content-end mb-3">
+                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategories">
+                    <i class="bi bi-box-arrow-right text-gold-darker"></i> Go to Edit PDF Categories
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Styles {
+    <style>
+
+         /* Ensure form-group has relative positioning if needed (optional now, as icon is removed) */
+        .form-group {
+            position: relative;
+        }
+
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Keep your existing PDF Form submission logic for overwrite confirmation
+            var pdfForm = $('#pdfForm');
+            pdfForm.on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission initially
+                if (!$(this).valid()) {
+                    return; // Stop if client-side validation fails
+                }
+
+                // Get the entered file name and the category ID from the hidden field
+                var fileName = $('#fileNameInput').val();
+                var categoryId = $('input[name="CategoryId"]').val();
+
+                // Call the server endpoint to check if the file exists
+                var checkUrl = '@Url.Action("CheckFileExists", "PdfGeneration")';
+
+                $.get(checkUrl, { fileName: fileName, categoryId: categoryId }, function(data) {
+                    if (data.exists) {
+                        // File exists, show confirmation dialog
+                        var confirmOverwrite = confirm('A file named "' + fileName + '.pdf" already exists in this category. Do you want to overwrite it?');
+
+                        if (confirmOverwrite) {
+                            // User confirmed overwrite, allow the form to submit
+                            // Temporarily unbind the submit handler to avoid infinite loop, then submit
+                            pdfForm.off('submit').submit();
+                        } else {
+                            // User cancelled, do nothing (form submission is already prevented)
+                            console.log("Overwrite cancelled by user.");
+                        }
+                    } else {
+                        // File does not exist, proceed with form submission
+                        // Temporarily unbind the submit handler and submit the form
+                        pdfForm.off('submit').submit();
+                    }
+                }).fail(function() {
+                    // Handle potential errors during the AJAX call
+                    alert('An error occurred while checking for existing file. Please try again.');
+                    console.error("Error checking file existence.");
+                });
+            });
+
+            // Find the new export button by its ID
+            $('#exportCsvButton').on('click', function() {
+                var confirmExport = confirm('Are you sure you want to download the complete user data export? This may take a moment.');
+
+                if (confirmExport) {
+                    var exportUrl = '@Url.Action("ExportUserData", "PdfGeneration")';
+                    window.location.href = exportUrl; } else {
+                    console.log("Export cancelled by user.");
+                }
+            });
+
+        }); // End of $(document).ready
+
+    </script>
+}

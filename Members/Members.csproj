@@ -1,0 +1,146 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-Members-c16f0045-8487-43aa-a4f5-70bcca044e60</UserSecretsId>
+    <Platforms>AnyCPU;x64</Platforms>
+    <SatelliteAssembliesInclude />
+    <PublishTrimmed>False</PublishTrimmed>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;CA1862</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;CA1862</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;CA1862</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;CA1862</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Pdf\**" />
+    <Compile Remove="Views\Admin\**" />
+    <Compile Remove="wwwroot\js\ej2\**" />
+    <Content Remove="Pdf\**" />
+    <Content Remove="Views\Admin\**" />
+    <Content Remove="wwwroot\js\ej2\**" />
+    <EmbeddedResource Remove="Pdf\**" />
+    <EmbeddedResource Remove="Views\Admin\**" />
+    <EmbeddedResource Remove="wwwroot\js\ej2\**" />
+    <None Remove="Pdf\**" />
+    <None Remove="Views\Admin\**" />
+    <None Remove="wwwroot\js\ej2\**" />
+  </ItemGroup>
+  <ItemGroup>       
+    <Compile Remove="Areas\Identity\Pages\MembersGrid.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\Users - Copy.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\UsersGrid.cshtml.cs" />       
+    <Compile Remove="Controllers\AdminController.cs" />       
+    <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
+    <Compile Remove="Controllers\PdfGenerationControllerBackup.cs" />       
+    <Compile Remove="Controllers\PdfGenerationControllerx.cs" />       
+    <Compile Remove="Controllers\SharedController.cs" />       
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />       
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />       
+    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].cs" />       
+    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].Designer.cs" />       
+    <Compile Remove="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />       
+    <Compile Remove="Models\CreateGalleryViewModel.cs" />       
+    <Compile Remove="Models\GalleryViewModel.cs" />       
+    <Compile Remove="Models\GalleryViewModels.cs" />       
+    <Compile Remove="Models\ImageViewModel.cs" />       
+    <Compile Remove="Models\ImportFile.cs" />       
+    <Compile Remove="Models\RenameImageViewModel.cs" />       
+    <Compile Remove="Models\UploadImageViewModel.cs" />       
+    <Compile Remove="Models\UserWithProfileViewItem.cs" />       
+    <Compile Remove="Services\UserService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Areas\Identity\Pages\body.cshtml" />
+    <Content Remove="Areas\Identity\Pages\MembersGrid.cshtml" />
+    <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
+    <Content Remove="Areas\Identity\Pages\scripts.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users - Copy.cshtml" />
+    <Content Remove="Areas\Identity\Pages\UsersGrid.cshtml" />
+    <Content Remove="Views\Home\Directory.cshtml" />
+    <Content Remove="Views\Home\Documents.cshtml" />
+    <Content Remove="Views\Home\Financials.cshtml" />
+    <Content Remove="Views\Home\Minutes.cshtml" />
+    <Content Remove="Views\Home\Privacy.cshtml" />
+    <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
+    <Content Remove="Views\Shared\Galleries.cshtml" />
+    <Content Remove="Views\Shared\Gallery.cshtml" />
+    <Content Remove="Views\Shared\Index.cshtml" />
+    <Content Remove="Views\Shared\_LoginPartial.cshtml" />
+    <Content Remove="wwwroot\Images\LinkImages\LogoOaksVillage.png" />
+    <Content Remove="wwwroot\Images\LinkImages\Oaks-Trees.png" />
+    <Content Remove="wwwroot\Images\LinkImages\OaksTrees-old.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Areas\Identity\Pages\EditUser.cshtml.cs_save" />
+    <None Remove="Areas\Identity\Pages\EditUser.cshtml_Save" />
+    <None Remove="ProtectedFiles\Agenda_2025.pdf" />
+    <None Remove="ProtectedFiles\Architectural Standards 4th Revision.pdf" />
+    <None Remove="ProtectedFiles\Architectural Standards August 2024 Additions.pdf" />
+    <None Remove="ProtectedFiles\Assessment Fee Covers.pdf" />
+    <None Remove="ProtectedFiles\Bits and Pieces.pdf" />
+    <None Remove="ProtectedFiles\Budget Report 2025.pdf" />
+    <None Remove="ProtectedFiles\Clubhouse Use Rules.pdf" />
+    <None Remove="ProtectedFiles\Directory 5-2025.pdf" />
+    <None Remove="ProtectedFiles\Directory.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 01-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 02-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 03-2025.pdf" />
+    <None Remove="ProtectedFiles\Financial Report 04-2025.pdf" />
+    <None Remove="ProtectedFiles\First Amendment to Covenants.pdf" />
+    <None Remove="ProtectedFiles\Minutes Feb-19-2025.pdf" />
+    <None Remove="ProtectedFiles\Miscellaneous Information.pdf" />
+    <None Remove="ProtectedFiles\Oaks Village Deed Restrictions.pdf" />
+    <None Remove="ProtectedFiles\Official Directory.pdf" />
+    <None Remove="ProtectedFiles\Paying Assessment Fee.pdf" />
+    <None Remove="ProtectedFiles\Pet Rules.pdf" />
+    <None Remove="ProtectedFiles\Pool Rules.pdf" />
+    <None Remove="ProtectedFiles\Regulations for Generators.pdf" />
+    <None Remove="ProtectedFiles\Welcome Letter.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\PublishProfiles\avonparknaz-001-site7 - FTP.pubxml.user" />
+    <None Include="Properties\PublishProfiles\avonparknaz-001-site7 - Web Deploy.pubxml.user" />
+    <None Include="Properties\PublishProfiles\avonparknaz-001-subsite12 - FTP.pubxml.user" />
+    <None Include="Properties\PublishProfiles\avonparknaz-001-subsite12 - Web Deploy.pubxml.user" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
+    <None Include="Properties\serviceDependencies.local.json.user" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="jQuery-Validation-Unobtrusive.NuGet" Version="5.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="Syncfusion.Licensing" Version="29.2.7" />
+    <PackageReference Include="Syncfusion.Pdf.Imaging.NET" Version="29.2.7" />
+    <PackageReference Include="Syncfusion.Pdf.NET" Version="29.2.7" />
+    <PackageReference Include="System.Security.Permissions" Version="9.0.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="ProtectedFiles\" />
+    <Folder Include="wwwroot\Galleries\" />
+  </ItemGroup>
+</Project>

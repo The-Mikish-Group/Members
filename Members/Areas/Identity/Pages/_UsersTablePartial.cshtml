@@ -1,0 +1,146 @@
+﻿@model Members.Areas.Identity.Pages.UsersModel
+
+@{
+    // This is a partial view, it doesn't use the main layout.
+    Layout = null;
+
+    // Recalculate pagination variables based on the Model passed from the handler
+    var totalPages = Model.TotalPages;
+    var currentPage = Model.PageNumber;
+    var pageDisplayLimit = 5; // Set the desired number of pages to display
+
+    // Calculate the start and end pages to display
+    var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
+    var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
+
+    // Adjust startPage if endPage was capped by totalPages
+    if (endPage - startPage + 1 < pageDisplayLimit && totalPages >= pageDisplayLimit)
+    {
+        startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
+    }
+    // Handle the case where totalPages is less than pageDisplayLimit
+    if (totalPages < pageDisplayLimit)
+    {
+        startPage = 1;
+        endPage = totalPages;
+    }
+
+}
+
+@* This tbody will be replaced by the JavaScript. Corrected ID: removed trailing space *@
+<tbody id="userTableBody">
+    @if (Model.Users.Any())
+    {
+        var usercount = 1;
+
+        @foreach (var user in Model.Users)
+        {
+            <tr class="user-row text-gold-darker" id="display-row-@usercount" data-user-id="@user.Id">
+                <td>@user.FullName</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (user.EmailConfirmed)
+                    {
+                        <i class="bi bi-check-lg text-success"></i>
+                    }
+                </td>
+                <td>@user.PhoneNumber</td>
+                <td>
+                    @if (user.PhoneNumberConfirmed)
+                    {
+                        <i class="bi bi-check-lg text-success"></i>
+                    }
+                </td>
+                <td>
+                    @if (user.IsBillingContact)
+                    {
+                        <i class="bi bi-check-lg text-success"></i>
+                    }
+                </td>
+
+                <td>
+                    @if (user.Roles != null)
+                    {
+                        @foreach (var role in user.Roles)
+                        {
+                            <span>@role</span>
+                            <br />
+                        }
+                    }
+                </td>
+                @* The local-login-time span will be updated by client-side script *@
+                <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                    @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
+                </td>
+
+                @if (Model.ShowExtraFields)
+                {
+                    <td class="extra-field">@user.FirstName</td>
+                    <td class="extra-field">@user.MiddleName</td>
+                    <td class="extra-field">@user.LastName</td>
+                    <td class="extra-field">@user.HomePhoneNumber</td>
+                    <td class="extra-field">@user.AddressLine1</td>
+                    <td class="extra-field">@user.AddressLine2</td>
+                    <td class="extra-field">@user.City</td>
+                    <td class="extra-field">@user.State</td>
+                    <td class="extra-field">@user.ZipCode</td>
+                    <td class="extra-field">@user.Plot</td>
+                    <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
+                    <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
+                }
+            </tr>
+            { usercount++; }
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="@(Model.ShowExtraFields ? "13" : "8")" class="text-center">No members found matching the criteria.</td>
+        </tr>
+    }
+</tbody>
+
+@* Also include the updated total user count element in the partial *@
+@* The JavaScript will find and update the existing one on the main page *@
+<span id="userCount" class="me-3">Total Members: @Model.TotalUsers</span>
+
+@* Include the pagination nav in the partial. Add the ID here. *@
+<nav aria-label="Page navigation" id="paginationNav">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+            <a class="page-link" href="#" data-page-number="@(currentPage - 1)"
+               data-page-size="@Model.PageSize"
+               data-sort-column="@Model.SortColumn"
+               data-sort-order="@Model.SortOrder"
+               data-search-term="@Model.SearchTerm"
+               data-show-extra-fields="@Model.ShowExtraFields">
+                &laquo;
+            </a>
+        </li>
+
+        @for (var i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" href="#" data-page-number="@i"
+                   data-page-size="@Model.PageSize"
+                   data-sort-column="@Model.SortColumn"
+                   data-sort-order="@Model.SortOrder"
+                   data-search-term="@Model.SearchTerm"
+                   data-show-extra-fields="@Model.ShowExtraFields">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+            <a class="page-link" href="#" data-page-number="@(currentPage + 1)"
+               data-page-size="@Model.PageSize"
+               data-sort-column="@Model.SortColumn"
+               data-sort-order="@Model.SortOrder"
+               data-search-term="@Model.SearchTerm"
+               data-show-extra-fields="@Model.ShowExtraFields">
+                &raquo;
+            </a>
+        </li>
+    </ul>
+</nav>

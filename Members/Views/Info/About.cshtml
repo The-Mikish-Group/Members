@@ -1,0 +1,56 @@
+﻿@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
+
+    ViewData["Title"] = "About Us";
+    ViewData["Canonical"] = siteURL + "/Info/About";
+    ViewData["OGDescription"] = "Discover the beautiful community of " + siteName + ".";
+
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container row m-0 pt-0 pt-lg-0 pb-2 pb-lg-4 gx-0 gy-2 gy-lg-3 mx-auto">
+
+    <div class="col-11 col-md-8 pb-3 pt-sm-0 pt-lg-1 text-start mx-auto"> 
+        
+        <h2 class="text-center text-gold-darker pb-md-2 ">About Us</h2>
+
+        <p class="text-gold-darker about-text-fs text-left pb-4">            
+            Oaks Village was founded by World Gospel Mission in 1994, to be a place of retirement for 
+            WGM missionaries. Some of the original residents were Dr. and Mrs. Clayton Luce, Dr. Malcom Evans, 
+            Dr. and Mrs. Ernie Steury, Dr. and Mrs. Bill Ury, Dr. and Mrs. Burnis Bushong, Rev. and Mrs. Gene Lewton, 
+            and Rev. and Mrs. Richard Adkins.
+            <br /><br />
+            In 2008 WGM sold Oaks Village to Growing Tree Foundation, a Christian non-profit organization founded, managed 
+            and funded by Enrique De La Piedra. Among other missions projects, Growing Tree Foundation, Inc. is involved 
+            in medical missions in Ecuador and an orphanage in Ukraine.
+            <br /><br />
+            When Growing Tree Foundation, Inc. purchased Oaks Village in 2008, Greg De La Piedra and his wife Eunice came 
+            to Oaks Village to serve as the property managers. In 2013 Oaks Village transitioned from being a life-lease 
+            rental based property to an owners association.
+            <br /><br />
+            In 2016, Growing Tree Foundation sold most of its remaining improved lots and 18 unimproved lots to Roger Gurganus 
+            and Chad Pritchett. Roger and Chad created Oaks Village, Inc. and jointly they are the majority owners of the units 
+            comprising Oaks Village. In 2017 Chad Pritchett was elected the new president of the HOA. Other officers include 
+            Roger Gurganus, Vice-President; Howard Pritchett, Secretary; and Carol Wawrzinski, Treasurer.
+            <br /><br />
+            Both previously owned and new homes are available for sale. Recently Southern Homes was contracted to build new 
+            homes on the undeveloped lots.
+        </p>
+
+        <img alt="uquad2" class="img-fluid w-100 px-0 rounded" src="/Images/PageImages/uquad2.jpg">
+        
+    </div>     
+    
+</div>
+

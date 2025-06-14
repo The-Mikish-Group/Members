@@ -1,0 +1,86 @@
+﻿@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
+
+    ViewData["Title"] = "More Links";
+    ViewData["Canonical"] = siteURL + "/Info/MoreLinks";
+    ViewData["OGDescription"] = "Explore our community and learn more about us.";
+
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-6">            
+                <h1 class="text-center mt-2 mb-3 text-gold-darker">@ViewData["Title"]</h1>
+            <p class="text-center mb-2 text-gold-darker">Helpful links for your convenience.</p>
+
+            <div class="card p-2 shadow rounded bg-Card-Menu">
+                <div class="row justify-content-center">
+                    <div class="col-md-auto">
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="mt-2">
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://Avonparkcamp.com" target="_blank">Avon Park Camp</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://www.avonparkchurch.org/" target="_blank">Community Bible Church</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://hcpao.org" target="_blank">Highlands County Property Appraiser</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://www.mysouthernhome.com" target="_blank">Southern Homes</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://www.myhlc.org/avon-park-public-library" target="_blank">Avon Park Library</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://ologap.org" target="_blank">Our Lady of Grace Catholic Church</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://slwcog.com" target="_blank">South Lake Wales Church of God</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://Duke-energy.com" target="_blank">Duke Energy</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://www.avonpark.city" target="_blank">Avon Park FL</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://avonparkhistoricalsociety.com/" target="_blank">Avon Park Depot Museum</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://aplbc.info/" target="_blank">Avon Park Lakes Baptist Church</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://OLOG-vita.com" target="_blank">VITA Free Tax Preparation</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://Fbcap.net" target="_blank">First Baptist Church</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://sfscarts.org/" target="_blank">SFSC Concerts</a>
+                            </div>
+                            <div class="mt-2">
+                                <a class="btn btn-option border-0" href="https://APNazarene.org" target="_blank">Avon Park Nazarene</a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>     
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personal Data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="card p-2 mx-0 mb-2 shadow rounded bg-Card-Menu">
+            <h1 class="mb-4 text-gold-darker">
+                <i class="bi bi-person-fill"></i> @ViewData["Title"]
+            </h1>
+
+            <p class="text-gold-darker">You can delete the personal data associated with your account.</p>
+
+            <p class="pt-2 text-gold-darker">
+                <strong>Important: Deleting this data will permanently delete your account, and this action cannot be undone.</strong>
+            </p>
+
+            <div class="d-flex justify-content-center gap-2 mt-4">
+                <!-- <form id="download-data" asp-page="DownloadPersonalData" method="post" class="my-0">
+                    <button class="btn btn-sm btn-primary" type="submit">
+                        <i class="bi bi-download"></i> Download
+                    </button>
+                </form> -->
+
+                <!-- <a id="delete" asp-page="DeletePersonalData" class="btn btn-sm btn-danger">
+                    <i class="bi bi-trash-fill"></i> Delete
+                </a> -->
+
+                <!-- Cancel -->
+                <a href="~/" class="btn btn-sm btn-secondary me-2">
+                    <i class="bi bi-box-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButton = document.querySelector('.delete-confirmation');
+
+            if (deleteButton) {
+                deleteButton.addEventListener('click', function (event) {
+                    if (!confirm("Are you sure you want to delete your personal data? This action cannot be undone.")) {
+                        event.preventDefault(); // Prevent the link from navigating
+                    }
+                });
+            }
+        });
+    </script>
+}

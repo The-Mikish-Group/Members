@@ -1,0 +1,187 @@
+﻿@page "{userId?}"
+@model Members.Areas.Admin.Pages.Accounting.RecordPaymentModel
+@{
+    ViewData["Title"] = "Record New Payment";
+    Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7"> @* Slightly wider for more invoice details *@
+            <div class="card shadow mb-2 bg-Card-Menu">
+                <div class="card-header bg-gold-light text-white">
+                    <h4 class="mb-0 text-gold-darker">
+                        @ViewData["Title"]                       
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @if (Model.IsUserPreselected)
+                        {
+                            <input type="hidden" asp-for="Input.SelectedUserID" />
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-gold-darker">Member</label>
+                                <p class="form-control shadow text-gold-darker">@Model.TargetUserName</p>
+                            </div>
+
+                            @* Display Open Invoices for Selection *@
+                            <div class="mb-3">
+                                <label asp-for="Input.SelectedInvoiceID" class="form-label text-gold-darker"></label>
+                                @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
+                                {
+                                    <div class="ps-3 py-2 shadow card list-group" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                        @foreach (var invoice in Model.OpenInvoicesForUser)
+                                        {
+                                            <label class="list-group-item list-group-item-action text-gold-darker">
+                                                <input type="radio" asp-for="Input.SelectedInvoiceID" value="@invoice.InvoiceID" class="form-check-input me-1" />
+                                                INV-@invoice.InvoiceID.ToString("D5") (@invoice.InvoiceDate.ToString("yyyy-MM-dd"))
+                                                - @invoice.Description
+                                                (Due: @invoice.AmountDue.ToString("C"), Paid: @invoice.AmountPaid.ToString("C"), Rem: @invoice.AmountRemaining.ToString("C"))
+                                            </label>
+                                        }
+                                    </div>
+                                    <span asp-validation-for="Input.SelectedInvoiceID" class="text-danger"></span>
+                                }
+                                else
+                                {
+                                    <p class="ps-3 py-2 shadow card form-text text-gold-darker">No open invoices found to apply payment towards.</p>
+                                }
+                            </div>
+
+                            <p class="mt-0 text-gold-darker">Apply Existing Credit to Selected Invoice</p>
+                            @if (Model.IsUserPreselected && Model.AvailableUserCredits.Any())
+                            {   
+                                <div class="mb-3">
+                                    <label asp-for="Input.SelectedUserCreditID" class="form-label text-gold-darker"></label>
+                                    <select asp-for="Input.SelectedUserCreditID" class="form-select shadow text-gold-darker">
+                                        <option value="">-- Select a credit --</option>
+                                        @foreach (var credit in Model.AvailableUserCredits)
+                                        {
+                                            <option value="@credit.UserCreditID">
+                                                ID: @credit.UserCreditID | Date: @credit.CreditDate.ToString("yyyy-MM-dd") | Avail: @credit.Amount.ToString("C") | @credit.Reason
+                                            </option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Input.SelectedUserCreditID" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Input.AmountToApplyFromCredit" class="form-label text-gold-darker"></label>
+                                    <input asp-for="Input.AmountToApplyFromCredit" class="form-control shadow text-gold-darker" placeholder="Amount from credit" />
+                                    <span asp-validation-for="Input.AmountToApplyFromCredit" class="text-danger"></span>
+                                </div>
+                            }
+                            else if (Model.IsUserPreselected)
+                            {                               
+                                <p class="mb-3 ps-3 py-2 shadow card form-text text-gold-darker">No available credits for this Member.</p>
+                            }
+                        }
+                        else // User not preselected, show dropdown (fallback)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Input.SelectedUserID" class="form-label text-gold-darker"></label>
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="shadow form-select text-gold-darker">
+                                    <option value="">-- Select User --</option>
+                                </select>
+                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
+                            </div>
+                            <p class="form-text text-gold-darker">Select a user to see their open invoices.</p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                        {
+                            <input type="hidden" asp-for="ReturnUrl" />
+                        }
+                                                
+                        @if (!string.IsNullOrEmpty(Model.Input.SelectedUserID)) 
+                        {
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.PaymentDate" class="form-label text-gold-darker"></label>
+                                    <input asp-for="Input.PaymentDate" class="shadow form-control text-gold-darker" />
+                                    <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.Amount" class="form-label text-gold-darker"></label>
+                                    <input asp-for="Input.Amount" class="shadow form-control text-gold-darker" />
+                                    <span asp-validation-for="Input.Amount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label asp-for="Input.Method" class="form-label text-gold-darker"></label>
+                                <select asp-for="Input.Method" asp-items="Html.GetEnumSelectList<Members.Models.PaymentMethod>()" class="shadow form-select text-gold-darker">
+                                </select>
+                                <span asp-validation-for="Input.Method" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.ReferenceNumber" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.ReferenceNumber" class="shadow form-control text-gold-darker" />
+                                <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Notes" class="form-label text-gold-darker"></label>
+                                <textarea asp-for="Input.Notes" class="shadow form-control text-gold-darker" rows="3"></textarea>
+                                <span asp-validation-for="Input.Notes" class="text-danger"></span>
+                            </div>
+                            <div class="d-grid gap-2 mt-0">
+
+                                <div class="row justify-content-center">
+                                
+                                    <div class="col-6 text-center">
+                                        @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                        {
+                                            <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                        }
+                                    </div>
+
+                                   <div class="d-grid gap-2 mt-4">
+                                        <div class="row justify-content-center">
+                                            <div class="col-md-auto mb-2 text-center">
+                                                @* Your Cancel/Back to Billing History link *@
+                                            </div>
+                                            <div class="col-md-auto mb-2 text-center">
+                                                <button type="submit" asp-page-handler="RecordNewPayment" class="shadow btn btn-sm btn-primary">
+                                                    <i class="bi bi-cash-coin"></i> Record New Payment
+                                                </button>
+                                            </div>
+                                            @if (Model.AvailableUserCredits.Any())
+                                            {
+                                                <div class="col-md-auto mb-2 text-center">
+                                                    <button type="submit" asp-page-handler="ApplyCredit" class="shadow btn btn-sm btn-success">
+                                                        <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        }                     
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

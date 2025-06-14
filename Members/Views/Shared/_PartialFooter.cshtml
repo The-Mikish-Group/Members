@@ -1,0 +1,135 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.IO;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.ViewComponents;
+@using Microsoft.EntityFrameworkCore;
+@using System.Linq;
+@using System.Threading.Tasks;
+@using System.Collections.Generic
+@using Members.Data;
+@using Members.Models;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject Members.Data.ApplicationDbContext DbContext
+
+<div id="footer" class="navbar navbar-dark border-top bg-gold-footer" role="contentinfo" aria-label="Site footer">
+
+    <div class="container text-right">
+        <div class="row w-100 gx-0 gx-lg-5">
+
+            <div class="col-4">
+                <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/">Welcome</a></li>
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/About">About Us</a></li>
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Info/Facilities">Facilities</a></li>
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Image/GalleryList">Galleries</a></li>
+                </ul>
+            </div>
+
+            <div class="col-4 pe-0">
+                <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+
+                    <!-- Contact in the footer -->
+                    <li class="nav-item text-light">
+                        <a class="nav-link footer-fs" href="~/Info/Contact">Contact</a>
+                    </li>
+
+                    <!-- More Links in the footer -->
+                    <li class="nav-item text-light">
+                        <a class="nav-link footer-fs" href="~/Info/MoreLinks">More Links</a>
+                    </li>
+
+                     <!-- Members Dropdown -->
+                    @if (SignInManager.IsSignedIn(User))
+                    { 
+                        <!-- Members Dropdown in the footer -->
+                        <li class="nav-item dropdown pt-0 pt-lg-0">
+
+                        <!-- Members Dropdown Toggle in the footer -->
+                        <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="membersfooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-people-fill"></i> Members
+                        </a>
+
+                        <!-- Members Dropdown Menu in the footer -->
+                        <ul class="dropdown-menu ps-4 ps-lg-2 bg-transparent border-0" aria-labelledby="membersfooterDropdown" style="min-width: 210px;">
+
+                            <!-- News and Notices -->
+                            <li class="nav-item text-light">
+                                <a class="nav-link footer-fs text-nowrap" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
+                                    <i class="bi bi-newspaper"></i> News and Notices
+                                </a>
+                            </li>
+
+                            <!-- Start of Nested "PDF Documents" Dropdown (wrapping the loop) -->
+                            <li class="nav-item dropdown">
+
+                                <!-- PDF Documents Dropdown Toggle in the footer -->
+                                <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-file-earmark-pdf-fill me-0 text-gold-dark"></i> PDF Documents
+                                </a>
+                                <!-- PDF Documents Menu in the footer -->
+                                <ul class="dropdown-menu ps-4 ps-lg-2 bg-transparent border-0" aria-labelledby="pdfDocumentsFooterDropdown">
+                                    @{
+                                        // Fetch the non-empty categories directly in the layout
+                                        var dynamicCategories = DbContext.PDFCategories
+                                        .Where(c => c.CategoryFiles.Any()) // Only include categories with files
+                                        .OrderBy(c => c.SortOrder)        // Order categories
+                                        .ThenBy(c => c.CategoryName)
+                                        .ToList(); // Execute the query
+
+                                        // Check if any categories were found
+                                        if (dynamicCategories != null && dynamicCategories.Any())
+                                        {
+                                            // Loop through the categories and create a link for each
+                                            foreach (var category in dynamicCategories)
+                                            {
+                                                // Maintain footer styles for nested list items
+                                                <li class="nav-item text-light">
+                                                    <a class="nav-link footer-fs text-nowrap" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
+                                                        <i class="bi bi-list-ul ms-2 text-gold-darker"></i> @category.CategoryName
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // Optional: Display a placeholder if no categories are found
+                                            <li><span class="dropdown-item-text text-light">No PDF categories available</span></li> <!-- Add text-light -->
+                                        }
+                                    }
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    }
+
+                </ul>
+            </div>
+
+            <!-- TOS and Privacy Links in the footer -->
+            <div class="col-4 pe-0">
+                <ul class="navbar-nav ms-auto flex-nowrap ps-2">
+
+                    <!-- TOS -->
+                    <li class="nav-item text-light">
+                        <a class="nav-link footer-fs text-nowrap" href="~/Info/TOS">TOS</a>
+                    </li>
+
+                    <!-- Privacy -->
+                    <li class="nav-item text-light">
+                        <a class="nav-link footer-fs" href="~/Info/Privacy">Privacy</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer logo and text -->
+    <div class="w-100 bg-gray text-white pt-4">
+        <p class="text-center py-2 text-white" style="font-size: 10px;"><img class="footer-logo" src="~/Images/Svg/Logos/SmallLogo.svg" /> @Environment.GetEnvironmentVariable("SITE_NAME") Copyright © @DateTime.Now.Year</p>
+    </div>
+
+</div>
+
+

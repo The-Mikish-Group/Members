@@ -1,0 +1,111 @@
+﻿@page
+@model Members.Areas.Identity.Pages.ViewPdfModel
+@{
+    ViewData["Title"] = "View PDF";    
+
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+
+}
+
+@if (Model.IsAuthorized)
+{
+    <div class="container mt-3 mt-lg-2 mb-0 pt-0 bg-white" style="margin: 10px auto; max-width: 800px;">
+        <div class="row">
+            <div class="col text-left">
+                <a id="closeButton" href="javascript:history.back()" class="text-decoration-none text-black ps-0 fs-2" title="Close">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+            <div class="col text-right">
+                <button id="downloadButton" class="btn fs-5 p-0" style="float: right;" title="Download Content">
+                    <i class="bi bi-download"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-viewer-container" style="display:block; margin: 0 auto; max-width: 800px;"></div>
+
+    @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var fileName = '@Model.FileName';
+            var url = '/File/ViewPdf?fileName=' + fileName;
+            var pdfContainer = document.getElementById('pdf-viewer-container');
+            var closeButton = document.getElementById('closeButton');
+            var downloadButton = document.getElementById('downloadButton');
+
+            pdfjsLib.getDocument(url).promise.then(function(pdfDoc) {
+                var renderPage = function(pageNum) {
+                    pdfDoc.getPage(pageNum).then(function(page) {
+                        var originalViewport = page.getViewport({ scale: 1 });
+                        var renderScale = 4;
+                        var renderViewport = page.getViewport({ scale: renderScale });
+                        var canvas = document.createElement('canvas');
+                        canvas.id = 'pdf-page-' + pageNum;
+                        canvas.style.width = renderViewport.width + "px";
+                        canvas.style.height = renderViewport.height + "px";
+                        canvas.style.marginBottom = '10px';
+                        var context = canvas.getContext('2d');
+                        canvas.height = renderViewport.height;
+                        canvas.width = renderViewport.width;
+                        var renderContext = {
+                            canvasContext: context,
+                            viewport: renderViewport,
+                        };
+
+                        page.render(renderContext).promise.then(function() {
+                            var containerWidth = pdfContainer.offsetWidth;
+                            var displayScale = containerWidth / originalViewport.width;
+                            canvas.style.width = (originalViewport.width * displayScale) + "px";
+                            canvas.style.height = (originalViewport.height * displayScale) + "px";
+                            canvas.style.display = 'block';
+                            canvas.style.marginBottom = '10px';
+                            canvas.style.backgroundColor = 'white';
+                            canvas.style.cursor = 'pointer';
+                            canvas.style.maxWidth = '100%';
+                            canvas.style.maxHeight = '100%';
+                            canvas.style.marginLeft = 'auto';
+                            canvas.style.marginRight = 'auto';
+                            canvas.style.display = 'block';
+                            canvas.style.visibility = 'visible';                            
+                            pdfContainer.appendChild(canvas);
+
+                            if (pageNum < pdfDoc.numPages) {
+                                renderPage(pageNum + 1);
+                            }
+                        });
+                    });
+                };
+                renderPage(1);
+
+                downloadButton.addEventListener('click', function() {
+                    if (confirm("Are you sure you want to download this PDF?")) {
+                        var link = document.createElement('a');
+                        link.href = '/File/DownloadPdf?fileName=' + fileName;
+                        link.download = fileName;
+                        link.click();
+                    }
+                });
+            });
+        });
+    </script>
+    }
+}
+else
+{
+    var returnUrl = HttpContext.Request.Path + HttpContext.Request.QueryString;
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="card-text">This is the <strong>Members</strong> area of @siteName.</p>
+                    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

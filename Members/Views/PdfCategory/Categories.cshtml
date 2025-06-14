@@ -1,0 +1,358 @@
+﻿@model IEnumerable<Members.Models.PDFCategory>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="text-center text-gold-darker mt-4 mb-2">
+    <h3><i class="bi bi-list-ul ms-2 "></i> @ViewData["Title"]</h3>
+</div>
+
+<div class="row mx-0 p-0 mb-3">
+    <div class="col-md-8 mx-auto p-2 my-0">
+
+        <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
+            <div class="card-body m-1 p-2">
+                <div class="text-center mb-2">
+                    <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
+                </div>
+                <form id="addCategoryForm" method="post" asp-action="CreateCategory">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-8 px-0">
+                            <label for="newCategoryName" class="form-label visually-hidden text-gold-darker">Category Name</label>
+                            <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
+                        </div>
+                        <div class="col-2 px-0">
+                            <label for="newSortOrder" class="form-label visually-hidden text-gold-darker">Sort Order</label>
+                            <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
+                        </div>
+                        <div class="col-2 px-0">
+                            <button type="submit" class="btn btn-primary no-left-radius w-100"><i class="bi bi-upload"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-0 p-0">
+    <div class="col-md-8 mx-auto p-2 my-0">
+        <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">
+            <div class="card-body m-1 p-2">
+                <div class="text-center mb-3">
+                    <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
+                </div>
+
+               
+                @if (Model != null && Model.Any())
+                {
+                    <table class="w-100">
+                        <thead>
+                            <tr class="bg-gold-dark text-white">
+                                <th id="EditHeader"><span class="header-text text-gold-darker ps-2">Rename</span></th>
+                                <th id="CategoryHeader"><span class="header-text text-gold-darker">Category</span></th>
+                                <th id="SortHeader"><span class="header-text text-gold-darker">Sort</span></th>
+                                <th id="DeleteHeader" class="text-end text-gold-darker"><span class="header-text pe-2">Delete</span></th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="manageCategoriesTableBody">
+                            @foreach (var item in Model)
+                            {
+                               
+                                <tr data-category-id="@item.CategoryID" id="display-row-@item.CategoryID"
+                                    data-category-name="@item.CategoryName"
+                                    data-sort-order="@item.SortOrder"> 
+                                    <td class="edit-cell py-0">
+                                       
+                                        <button type="button" class=" mt-1 btn btn-sm btn-link btn-rename"
+                                                data-bs-toggle="modal" data-bs-target="#renameModal"
+                                                onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </td>
+                                    
+                                    <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
+                                    <td class="text-gold-darker">@item.SortOrder</td>
+                                    <td class="delete-cell text-end py-0">
+                                        <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
+                                            <button type="submit" class="btn btn-sm btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>                               
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {                    
+                     <div class="text-center text-gold-darker mt-2">
+                         No categories found.
+                     </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mx-auto p-0">
+        <div class="col-md-8 bg-transparent pt-2 pe-2">
+            <div class="d-flex justify-content-end mb-3">
+                <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
+                    Edit PDF Category Files <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body pb-0">
+                
+                <input type="hidden" id="renameCategoryId" name="renameCategoryId" />
+                
+                <div class="row mb-2 align-items-center">
+                    <div class="col-3"> 
+                        <label for="newCategoryName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
+                    </div>
+                    <div class="col-9"> 
+                        <input type="text" class="form-control" id="newCategoryNameInput" name="newCategoryName">
+                    </div>
+                </div>
+
+                <div class="row mb-1 align-items-center">
+                     <div class="col-3">
+                        <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
+                     </div>
+                     <div class="col-9">
+                        <input type="number" class="form-control" id="newSortOrderInput" name="newSortOrder" min="0">
+                     </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+
+                <!-- Cancel Button -->
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-box-arrow-left"></i> Cancel
+                </button>
+
+                <!-- Save Button -->
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitCategoryRenameForm()">
+                    <i class="bi bi-save-fill"></i> Save Changes
+                </button>
+
+            </div>
+
+        </div>
+    </div> 
+</div>
+
+@section Styles {
+    <style>
+        /* Styles for alternating table rows */
+        .even-row {
+            background-color: antiquewhite !important; /* Added !important for specificity */
+        }
+
+        .odd-row {
+            background-color: #ffffff !important; /* Added !important for specificity */
+        }
+
+        /* Ensure table data cells inherit the row background color */
+         .even-row > td,
+         .odd-row > td {
+             background-color: inherit !important;
+         }        
+
+         /* Specific styles for the 'Add Category' sort order input if needed */
+        #newSortOrder.rounded-0 {
+            border-left: none; /* Remove border between category name and sort order inputs */
+        }
+
+
+        /* Delete button icon size */
+        .delete-button i {
+            font-size: 0.9em;
+        }
+
+        /* Rename button icon size */
+        .btn-rename i {
+            font-size: 0.9em;
+        }
+
+         /* Ensure the table container handles overflow */
+        #categoryFilesContainer { /* This ID is not present in this view's main table, but keep if used elsewhere or intended */
+             overflow-x: auto; /* Enable horizontal scrolling */
+        }
+
+        /* --- Modal Specific Styles --- */
+
+        /* Remove the top border of the modal footer to get rid of the line above the buttons */
+        #renameModal .modal-footer {
+            border-top: none;
+        } 
+
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // --- Standalone Helper Functions (Global Scope) ---
+        // These functions are called directly from HTML onclick attributes,
+        // so they MUST be in the global scope.
+
+        // Function to populate and show the rename category modal
+        function showRenameCategoryModal(categoryId, categoryName, sortOrder) {
+            console.log('showRenameCategoryModal called for categoryId:', categoryId);
+            // Populate modal inputs with data from the clicked category row
+            document.getElementById('renameCategoryId').value = categoryId;
+            document.getElementById('newCategoryNameInput').value = categoryName;
+            document.getElementById('newSortOrderInput').value = sortOrder;
+
+            // Ensure the sort order input allows 0 or more (or 1 if you prefer)
+            document.getElementById('newSortOrderInput').setAttribute('min', '0');
+
+
+            // Initialize and show the Bootstrap modal
+            var renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
+            renameModal.show();
+        }
+
+        // Function to handle the category rename/sort order update form submission via Fetch API
+        // This function is called from the onclick of the modal's "Save Changes" button.
+        function submitCategoryRenameForm() {
+            console.log('submitCategoryRenameForm called');
+            // Get values from modal inputs
+            var categoryId = document.getElementById('renameCategoryId').value;
+            var newCategoryName = document.getElementById('newCategoryNameInput').value;
+            var newSortOrder = document.getElementById('newSortOrderInput').value;
+
+            var url = '@Url.Action("EditCategory", "PdfCategory")'; // Your existing EditCategory action URL
+
+            // Use FormData to easily collect and send data for the POST request
+            var formData = new FormData();
+            formData.append("CategoryID", categoryId); // Match parameter name expected by EditCategory action
+            formData.append("CategoryName", newCategoryName); // Match parameter name expected by EditCategory action
+            formData.append("SortOrder", newSortOrder); // Match parameter name expected by EditCategory action
+
+            // Get the Request Verification Token for security against CSRF
+            
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var headers = {};
+            if (token) {
+                 // For FormData, you might need to send the token in the header like this:
+                headers['RequestVerificationToken'] = token;
+                 // If EditCategory expects it in the body or cookie, adjust accordingly.
+                 // Sending in the header is a common pattern with Fetch/FormData.
+            }
+
+            // Perform the asynchronous HTTP POST request using the Fetch API
+            fetch(url, {
+                method: 'POST',
+                body: formData, // Send collected data. Fetch with FormData automatically sets Content-Type.
+                 headers: headers // Include the security token in headers
+            })
+            .then(response => {
+                // Check if the response was successful (HTTP status 2xx)
+                if (!response.ok) {
+                     // If not successful, try to read an error message from the response body
+                     return response.text().then(errorMessage => {
+                         // Throw an error that will be caught by the .catch() block
+                         throw new Error(errorMessage || 'Server returned an error.');
+                     });
+                }
+                // If successful, read the response body as text (assuming it returns a message or redirects)
+                // If your EditCategory action returns JSON, use response.json() instead.
+                return response.text();
+            })
+            .then(message => {
+                // Handle successful response
+                console.log('Request successful:', message);
+                // Reload the page to show the updated category list and order
+                window.location.reload();
+
+                // Alternatively, instead of reloading, you could hide the modal and update the table row directly
+                // var renameModal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
+                // renameModal.hide();
+                // Find the table row $('#display-row-' + categoryId) and update its cells with newCategoryName and newSortOrder
+            })
+            .catch(error => {
+                // Handle any errors during the fetch or from the server
+                console.error('Fetch error:', error);
+                // Display an error message to the user
+                alert('An error occurred while updating the category: ' + error.message);
+
+                // Optional: Close the modal on error
+                // var renameModal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
+                // renameModal.hide();
+            });
+        }
+
+
+        // Function to apply alternating row colors to the table body
+        function applyRowColors() {
+             // Target all table rows within the tbody that represent display rows
+             $('#manageCategoriesTableBody > tr[id^="display-row-"]:visible').each(function(index) {
+                 $(this).removeClass('even-row odd-row'); // Remove existing classes
+                 if (index % 2 === 0) {
+                     $(this).addClass('even-row'); // Apply even row class
+                 } else {
+                     $(this).addClass('odd-row'); // Apply odd row class
+                 }
+             });
+             // Ensure edit rows (which are now removed, but good practice if you add other hidden rows) don't interfere
+             // $('#manageCategoriesTableBody > tr[id^="edit-row-"]').removeClass('even-row odd-row'); // This line is no longer strictly necessary as edit rows are removed
+        }
+
+
+        // --- Document Ready Block ---
+        // This block runs once the entire DOM is loaded.
+        // Use it for initial setup and attaching event listeners that don't use onclick attributes.
+        $(document).ready(function() {
+
+            // --- Initial Setup ---
+            // Automatically apply colors to visible display rows on page load
+            applyRowColors();
+
+            // --- Event Listeners ---
+
+            // Add event listener for the category name cell click to open the modal
+            // Using event delegation on the tbody for performance and future-proofing
+            $('#manageCategoriesTableBody').on('click', '.category-name-cell', function() {
+                 var row = $(this).closest('tr'); // Find the parent table row
+                 // Retrieve category data stored in data attributes on the table row
+                 var categoryId = row.data('category-id');
+                 var categoryName = row.data('category-name');
+                 var sortOrder = row.data('sort-order');
+
+                 // Call the global function to show the modal, passing the retrieved data
+                 showRenameCategoryModal(categoryId, categoryName, sortOrder);
+            });
+
+             // Handle modal hidden event to remove the backdrop - Added this for consistency
+             $('#renameModal').on('hidden.bs.modal', function () {
+                  // Check if the modal backdrop element exists before trying to remove it
+                  if ($('.modal-backdrop').length) {
+                      $('.modal-backdrop').remove(); // Remove the backdrop to prevent scroll issues
+                  }
+             });
+
+             // Remove the header text hiding logic as inline editing is removed
+             // $('#EditHeader .header-text, #DeleteHeader .header-text').hide(); // Removed
+
+        }); // <-- Closing tag for the document ready block
+
+        
+
+    </script>
+}

@@ -1,0 +1,206 @@
+﻿@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL")!;
+   
+    ViewData["Title"] = "Contact Us";
+    ViewData["Canonical"] = siteURL + "/Info/Contact";
+    ViewData["OGDescription"] = "Contact Us through our Online Form";
+
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;    
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Logo Image -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded p-2 bg-gold-light">
+                <div class="card-body p-0">
+                    <div class="text-center mb-1 p-0">
+                        <h2 class="text-gold-darker pb-2">
+                            <i class="bi bi-envelope-fill"></i> Contact Us
+                        </h2>
+                        <p class="text-gold-darker fw-bold">Fill in the form below to send us an email.</p>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <!-- Contact Form -->
+                    <form action="@Url.Action("SendEmail", "Info")" method="post" class="needs-validation" novalidate>
+
+                        <!-- fullName -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="fullName" name="Name" required>
+                            <label for="fullName" class="form-label">Your Full Name</label>
+                            <div class="invalid-feedback">Please enter your full name.</div>
+                        </div>
+
+                        <!-- Emasil -->
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="Email" required>
+                            <label for="email" class="form-label">Your Email</label>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="subject" name="Subject" required>
+                            <label for="subject" class="form-label">Subject</label>
+                            <div class="invalid-feedback">Please enter a subject.</div>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="message" name="Message" rows="12" style="resize: vertical; min-height: 150px;" required></textarea>
+                            <label for="message" class="form-label">Message</label>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="phoneNumber" name="Phone Number (Opt.)">
+                            <label for="phoneNumber" class="form-label">Phone Number (Opt.)</label>
+                        </div>
+
+                        <!-- Spammy -->
+                        <div class="d-none">
+                            <label aria-label="Spam Protection: Please don't fill this in:">Spam Protection: Please don't fill this in:</label>
+                            <textarea name="Comment" rows="1" cols="1" aria-hidden="true"></textarea>
+                        </div>
+
+                        <!-- Send or Cancel -->
+                        <div class="d-flex justify-content-between">
+
+                            <!-- Cancel Button -->
+                            <a href="~/" class="btn btn-sm btn-secondary me-2" title="Discard Changes and Return Home">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </a>
+
+                            <!-- Reset Button -->
+                            <button type="reset" class="btn btn-sm btn-danger btn-sm me-2">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+
+                            <!-- Send Button -->
+                            <button type="submit" class="btn btn-sm btn-primary btn-sm">
+                                <i class="bi bi-check-lg"></i> Send
+                            </button>
+
+                        </div>
+                    </form>
+
+                    <!-- Contact Card -->
+                    <div class="mt-4 text-gold-darker">
+                        <div class="card shadow rounded p-3 bg-Card-Menu mx-auto" style="max-width: 350px;">
+                            <div class="d-flex flex-column">
+
+                                <div class="ps-3 mb-2">
+                                    <strong>Chad Pritchett, HOA President</strong><br>
+                                </div>
+
+                                <div class="ps-5 mb-3">
+                                    1515 Isis Lake Dr<br>
+                                    Avon Park FL 33825
+                                </div>
+
+                                <div class="ps-3 mb-1">
+                                    <strong>
+                                        To visit Oaks Village, enter the clubhouse address in your GPS:
+                                    </strong>
+                                </div>
+
+                                <div class="ps-5 pb-2">
+                                    1042 N Brainerd<br>
+                                    Avon Park FL 33825
+                                </div>
+
+                                <div class="ps-4 text-center">
+                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Open Google Maps">
+                                        <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
+                                                onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
+                                            <img style="height:32px; width:32px;" src="/Images/Svg/Buttons/Google-Square.svg" alt="Google Maps Icon">
+                                            <b>Google Maps</b>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const fullNameInput = document.getElementById('fullName');
+
+        if (phoneNumberInput) {
+            phoneNumberInput.addEventListener('input', function () {
+                let inputValue = this.value.replace(/\D/g, '');
+                if (inputValue.length > 10) {
+                    inputValue = inputValue.substring(0, 10);
+                }
+                if (inputValue.length > 0) {
+                    let formattedValue = '';
+                    if (inputValue.length > 0 && inputValue.length < 4) {
+                        formattedValue = inputValue;
+                    } else if (inputValue.length > 3 && inputValue.length < 7) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6);
+                    } else if (inputValue.length > 6) {
+                        formattedValue = '(' + inputValue.substring(0, 3) + ') ' + inputValue.substring(3, 6) + '-' + inputValue.substring(6, 10);
+                    }
+                    this.value = formattedValue;
+                }
+            });
+        }
+
+        if (fullNameInput) {
+            fullNameInput.addEventListener('input', function () {
+                let inputValue = this.value;
+                let words = inputValue.split(' ');
+                let capitalizedWords = words.map(word => {
+                    if (word.length > 0) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }
+                    return word;
+                });
+                this.value = capitalizedWords.join(' ');
+            });
+        }
+    });
+</script>

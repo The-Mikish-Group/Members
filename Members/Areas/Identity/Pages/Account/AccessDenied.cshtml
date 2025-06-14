@@ -1,0 +1,24 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow rounded p-4 bg-Card-Menu">
+                <div class="card-body text-center">
+                    <h1 class="text-danger mb-4">@ViewData["Title"]</h1>
+                    <p class="text-danger mb-4">You do not have access to this resource.</p>
+
+                    <a href="/" class="btn btn-sm btn-secondary"><i class="bi bi-house-fill"></i> Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

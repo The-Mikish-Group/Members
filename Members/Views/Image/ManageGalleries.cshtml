@@ -1,0 +1,238 @@
+﻿@model IEnumerable<Members.Models.GalleryViewModel>
+@using Members.Models
+
+@{
+    ViewData["Title"] = "Manage Image Galleries";
+}
+
+<div class="container row justify-content-center mx-auto p-1">
+    <div class="col-lg-8 col-md-10 m-1 p-1">
+
+        <h1 class="text-center text-gold-darker mt-4 mb-2"><i class="bi bi-images"></i> Manage Galleries</h1>
+
+        <div class="text-center mb-3">
+            <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Galleries</a>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {            
+            <div class="alert alert-success fade show auto-hide-alert" role="alert">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger fade show auto-hide-alert" role="alert">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="card shadow rounded border bg-Card-Menu mb-4">
+            <div class="card-body p-2">
+
+                <h2 class="text-start text-gold-darker my-2 ps-2"><i class="bi bi-folder-plus"></i> Create a New Gallery</h2>
+
+                <form asp-controller="Image" asp-action="CreateGallery" method="post" class="mb-4">
+
+                    <div class="input-group">
+
+                        <input type="text" name="GalleryName" class="form-control text-gold-darker shadow" placeholder="New Gallery Name" required>
+            
+                        <button type="submit" class="btn btn-primary shadow no-left-radius">
+                                <i class="bi bi-save"></i>
+                            </button>
+
+                    </div>
+
+                    <span class="text-danger">@Html.ValidationMessage("GalleryName")</span>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow rounded border bg-Card-Menu mb-4">
+            <div class="card-body p-2">
+
+                @if (Model != null && Model.Any())
+                {
+                    <h2 class="text-start text-gold-darker my-2 ps-2"><i class="bi bi-images"></i> Existing Galleries</h2>
+                    
+                    <table class="table table-striped table rounded shadow">
+                        <thead>
+                            <tr>
+                                <th class="text-gold-dark">
+                                    <div class="row align-items-center">
+                                        <div class="text-gold-dark col-6 d-flex justify-content-start">Manage Images</div>
+
+                                        <div class="text-gold-dark col-4 d-flex justify-content-center">Rename</div>
+                                        
+                                        <div class="text-gold-dark col-2 d-flex justify-content-end">Delete</div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var gallery in Model)
+                            {
+                                <tr>
+
+                                    <td class="text-gold-darker py-0">
+                                        <div class="row align-items-center">
+
+                                            <div class="col-6 d-flex justify-content-start">
+                                                <a asp-controller="Image" asp-action="ManageGalleryImages" asp-route-galleryName="@gallery.Name" 
+                                                    class="text-decoration-none text-gold-dark d-block"><i class="bi bi-images"></i> @gallery.Name (@gallery.ImageCount)</a>
+                                            </div>
+
+                                            <div class="col-4 d-flex justify-content-center">
+                                                <button type="button" 
+                                                    class="btn btn-sm btn-rename py-2 px-2"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#renameGalleryModal_@gallery.Name.Replace(" ", "-")"
+                                                    title="Rename Gallery">
+                                                        <i class="bi bi-pencil-square px-0"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="col-2 d-flex justify-content-end">
+                                                <form asp-controller="Image" 
+                                                    asp-action="DeleteGallery"
+                                                    method="post" 
+                                                    style="display:inline;" 
+                                                    onsubmit="return confirm('Are you sure you want to delete the gallery \'@gallery.Name\' and all its images?');">
+
+                                                    <input type="hidden" name="galleryName" value="@gallery.Name" />
+
+                                                    <button type="submit" class="btn btn-delete py-2 px-2 delete-button" title="Delete Gallery @gallery.Name">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>                                        
+
+                                                </form>
+                                            </div>
+                                        </div>                            
+                                    </td>                            
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    @foreach (var gallery in Model)
+                    {
+                        <!-- Modal Rename Form -->
+                        <div class="modal fade" id="renameGalleryModal_@gallery.Name.Replace(" ", "-")" tabindex="-1" aria-labelledby="renameGalleryModalLabel_@gallery.Name.Replace(" ", "-")" aria-hidden="true"> @* Fixed: Replaced spaces for modal ID *@
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+
+                                    <form asp-controller="Image" asp-action="RenameGallery" method="post">                                        
+
+                                        <div class="modal-body">
+
+                                            <!-- Old Name -->
+                                            <input type="hidden" name="oldGalleryName" value="@gallery.Name" />
+
+                                            <!-- New Name -->
+                                            <div class="mb-2">
+                                                <label for="newGalleryName_@gallery.Name.Replace(" ", "-")" class="form-label fw-bold">New Gallery Name:</label> @* Fixed: Replaced spaces for label 'for' attribute *@
+                                                <input type="text" class="form-control" id="newGalleryName_@gallery.Name.Replace(" ", "-")" name="newGalleryName" value="@gallery.Name" required> @* Fixed: Replaced spaces for input ID *@
+                                            </div>
+
+                                            <!-- Buttons -->
+                                            <div class="modal-footer p-0">
+
+                                                <!-- Cancel Button -->
+                                                <button type="button" class="btn btn-sm btn-secondary me-2" data-bs-dismiss="modal" aria-label="Cancel">
+                                                        <i class="bi bi-box-arrow-left"></i> Cancel
+                                                </button>
+
+                                                <!-- Rename Button -->
+                                                <button type="submit" class="btn btn-sm btn-primary" aria-label="Save Changees">
+                                                    <i class="bi bi-pencil-square px-0"></i> Save Changes
+                                                </button>
+
+                                            </div>
+
+                                        </div>                                        
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="row gx-1 gy-0 my-2">
+                        <div class="col-md-8 text-center text-gold-dark mx-auto">
+                            <p>No galleries exist yet. Create one above!</p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Styles {
+    <style>
+       /*  .even-row {
+            background-color: antiquewhite
+        }
+
+        .odd-row {
+            background-color: #ffffff;
+        }
+
+            .even-row > td,
+            .odd-row > td {
+                background-color: inherit !important;
+            } */
+
+        .delete-button i {
+            font-size: 0.9em;
+        }
+        
+
+        .btn-rename i {
+            font-size: 0.9em;
+        }
+                
+
+        #categoryFilesContainer {
+            overflow-x: auto; /* Enable horizontal scrolling */
+        }
+
+        a:hover,
+        a:focus {
+            color: forestgreen !important;
+        }
+
+        /* Remove the top border of the modal footer to get rid of the line above the buttons */
+        .modal-footer {
+            border-top: none;
+        } 
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // JavaScript to handle the auto-hide alert messages
+        document.addEventListener('DOMContentLoaded', function () {            
+            var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');
+            alertsToAutoHide.forEach(function(alertElement) {
+                setTimeout(function() {
+                    alertElement.classList.remove('show');
+                    alertElement.addEventListener('transitionend', function() {
+                        alertElement.remove();
+                    }, { once: true });
+                }, 2500);
+            });
+        });       
+
+    </script>
+}

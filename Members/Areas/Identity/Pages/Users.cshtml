@@ -1,0 +1,1353 @@
+﻿@page
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model Members.Areas.Identity.Pages.UsersModel
+@{
+    <!-- Page Title -->
+    ViewData["Title"] = "Manage Members";
+
+    <!-- Site Name -->
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
+}
+
+<!-- Title -->
+<head>
+    <title>@ViewData["Title"]</title>   
+</head>
+
+<!-- Must be an Admin or Manager -->
+@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+{
+    <div class="container mt-4 mb-2">
+        <div class="row mx-1 p-0">
+
+            <div class="col-12 mx-auto p-0 my-0">
+
+                <!-- Page Header with Title -->
+                <div class="row align-items-center mb-2">
+                    
+                    <!-- Page Title -->
+                    <div class="col-auto d-flex align-items-center mx-auto">
+                        <h1 class="text-center text-gold-darker"><i class="bi bi-people-fill"></i> Manage Members</h1>
+                    </div>
+
+                </div>
+
+                <!-- Shadow Card for Search Term and User Count -->
+                <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">                    
+                    <div class="card-body m-0 p-1">
+
+                        <!-- Searchterm input field and button -->
+                        <div class="mb-3">
+
+                            <!-- Comment out extra Search Term examples -->
+                            <h6 class="text-gold-darker mb-1 ps-2">(Also: billable, no role, and 'not confirmed')</h6>
+
+                            <!-- Search Term input field and button -->
+                            <form class="shadow" method="get" id="searchForm">
+
+                                <div class="input-group">
+
+                                    <button class="btn btn-sm btn-add" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
+                                    <input type="text" class="form-control text-gold-darker shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
+
+                                    <!-- Hidden fields for storing Table status  -->
+                                    <input type="hidden" asp-for="PageNumber" />
+                                    <input type="hidden" asp-for="PageSize" />
+                                    <input type="hidden" asp-for="SortColumn" />
+                                    <input type="hidden" asp-for="SortOrder" />
+                                    <input type="hidden" asp-for="ShowExtraFields" id="showExtraFieldsHidden" />
+
+                                    <!-- Clear Search Button -->                    
+                                    <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearSearch" style="display: none;">
+                                        <i class="bi bi-x text-black"></i>
+                                    </button>
+
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <!-- Member Count and Extra Fields Checkbox -->
+                        <div class="mb-2 d-flex align-items-center">
+                            <span id="userCount" class="me-3 pt-1 pb-1">Total Members: @Model.TotalUsers</span> <div class="form-check">
+                                <div class="form-check">
+                                    <input class="form-check-input custom-checkbox-green" type="checkbox" id="showExtraFieldsCheckbox"
+                                           @(Model.ShowExtraFields ? "checked" : "")>
+                                    <label class="form-check-label pt-1 ps-1" for="showExtraFieldsCheckbox">
+                                        Show All Fields
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row mx-1 p-0">
+            <div class="col-12 p-0 mt-2">            
+
+            <!-- Shadow Card for Manage Members Table -->
+            <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">                    
+                <div class="card-body m-0 p-0">
+
+                    <!-- Table Container for displaying users -->
+                    <div class="table-responsive mb-3" id="usersTableContainer">
+
+                        <!-- Row for Header: Manage Members -->
+                        <div class="row align-items-center mb-2">
+                    
+                            <!-- Header: Manage Members -->
+                            <div class="col-auto d-flex align-items-start">
+                                <h2 class="text-start text-gold-darker"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Table for displaying users -->
+                        <table class="table table-striped table-transparent table-bordered shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
+                
+                            <!-- Table Column Headings -->
+                            <thead>                   
+                                <tr>                       
+                                    <th>
+                                        <!-- Sort by Full Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="fullname"
+                                            data-sort-column="fullname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "fullname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Full Name                                            
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Email -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="email"
+                                            data-sort-column="email"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "email" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Email
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Email Confirmed -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="emailconfirmed"
+                                            data-sort-column="emailconfirmed"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "emailconfirmed" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Email Confirmed<i class="bi bi-check-lg text-success"></i>                                           
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Cell Phone -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="phonenumber"
+                                            data-sort-column="phonenumber"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumber" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Cell Phone
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Cell Phone Confirmed -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="phonenumberconfirmed"
+                                            data-sort-column="phonenumberconfirmed"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "phonenumberconfirmed" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Cell Confirmed <i class="bi bi-check-lg text-success"></i>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Is Billing Contact -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="isbillingcontact"
+                                            data-sort-column="isbillingcontact"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "isbillingcontact" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Billable <i class="bi bi-check-lg text-success"></i>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Roles -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="roles"
+                                            data-sort-column="roles"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "roles" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Roles
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <!-- Sort by Last Login -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="lastlogin"
+                                            data-sort-column="lastlogin"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastlogin" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Last Login
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by First Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="firstname"
+                                            data-sort-column="firstname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "firstname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            First Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Middle Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="middlename"
+                                            data-sort-column="middlename"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "middlename" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Middle Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Last Name -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="lastname"
+                                            data-sort-column="lastname"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "lastname" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Last Name
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Home Phone -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="homephonenumber"
+                                            data-sort-column="homephonenumber"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "homephonenumber" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Home Phone
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Address Line 1 -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="addressline1"
+                                            data-sort-column="addressline1"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline1" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Address 1
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Address Line 2 -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="addressline2"
+                                            data-sort-column="addressline2"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "addressline2" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Address 2
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by City -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="city"
+                                            data-sort-column="city"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "city" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            City
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by State -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="state"
+                                            data-sort-column="state"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "state" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            State
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Zip Code -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="zipcode"
+                                            data-sort-column="zipcode"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "zipcode" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Zip Code
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Plot -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="plot"
+                                            data-sort-column="plot"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Plot
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Birthday -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="birthday"
+                                            data-sort-column="birthday"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "birthday" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Birthday
+                                        </a>
+                                    </th>
+                                    <th class="extra-field">
+                                        <!-- Sort by Anniversary -->
+                                        <a class="nav-link"
+                                            asp-page="./Users"
+                                            asp-route-sortcolumn="anniversary"
+                                            data-sort-column="anniversary"
+                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "anniversary" ? "desc" : "asc")"
+                                            asp-route-searchterm="@Model.SearchTerm"
+                                            asp-route-pageNumber="@Model.PageNumber"
+                                            asp-route-pageSize="@Model.PageSize"
+                                            asp-route-showextrafields="@Model.ShowExtraFields">
+                                            Anniversary
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                
+                            <!-- Table Body -->
+                            <tbody id="userTableBody">
+
+                                <!-- Loop through User Rows -->
+                                @{  
+                                    int i = 0; // Declare and initialize the variable 'i' before the loop  
+                                }
+                                @foreach (var user in Model.Users)
+                                {
+                                    <!-- User Row -->
+                       
+                                    <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
+
+                                        <!-- Full Name -->
+                                        <td>@user.FullName</td>
+
+                                        <!-- Email -->
+                                        <td>@user.Email</td>
+
+                                        <!-- Email Confirmed -->
+                                        <td>
+                                            @if (user.EmailConfirmed)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+
+                                        <!-- Cell Phone -->
+                                        <td>@user.PhoneNumber</td>
+
+                                        <!-- Cell Phone Confirmed -->
+                                        <td>
+                                            @if (user.PhoneNumberConfirmed)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+
+                                        <!-- Is Billing Contact -->
+                                        <td>
+                                            @if (user.IsBillingContact)
+                                            {
+                                                <i class="bi bi-check-lg text-success"></i>
+                                            }
+                                        </td>
+                           
+                                        <!-- Roles -->
+                                        <td>
+                                            @if (user.Roles != null)
+                                            {
+                                                @foreach (var role in user.Roles)
+                                                {
+                                                    <span>@role</span>
+                                                    <br />
+                                                }
+                                            }
+                                        </td>
+
+                                        <!-- Last Login -->
+                                        <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                                            @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
+                                        </td>
+
+                                        <!-- Extra Fields -->
+                                        @if (Model.ShowExtraFields)
+                                        {
+                                            <td class="extra-field">@user.FirstName</td>
+                                            <td class="extra-field">@user.MiddleName</td>
+                                            <td class="extra-field">@user.LastName</td>
+                                            <td class="extra-field">@user.HomePhoneNumber</td>
+                                            <td class="extra-field">@user.AddressLine1</td>
+                                            <td class="extra-field">@user.AddressLine2</td>
+                                            <td class="extra-field">@user.City</td>
+                                            <td class="extra-field">@user.State</td>
+                                            <td class="extra-field">@user.ZipCode</td>
+                                            <td class="extra-field">@user.Plot</td>
+                                            <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
+                                            <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
+                                        }
+
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- Pagination Navigation -->
+                    @{
+                        var totalPages = Model.TotalPages;
+                        var currentPage = Model.PageNumber;
+
+                        <!-- Set the number of pages to display in the pagination -->
+                        var pageDisplayLimit = 5;
+
+                        <!-- Calculate the start and end pages to display -->
+                        var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
+                        var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
+
+                        <!-- Adjust startPage if endPage was capped by totalPages -->
+                        if (endPage - startPage + 1 < pageDisplayLimit)
+                        {
+                            startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
+                        }
+                    }
+
+                    <!-- Pagination Controls -->
+                    <nav navigation" id="paginationNav">
+                        <ul class="pagination justify-content-center">
+
+                            <!-- Previous Page Button -->
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage - 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage - 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()">
+                                    &laquo;
+                                </a>
+                            </li>
+
+                            <!-- Page Number Links -->
+                
+                            @for (var ii = startPage; ii <= endPage; ii++)
+                            {
+                                <li class="page-item @(ii == currentPage ? "active" : "")">
+                                    <a class="page-link" asp-page="./Users"
+                                        asp-route-PageNumber="@ii"
+                                        asp-route-PageSize="@Model.PageSize"
+                                        asp-route-SortColumn="@Model.SortColumn"
+                                        asp-route-SortOrder="@Model.SortOrder"
+                                        asp-route-SearchTerm="@Model.SearchTerm"
+                                        asp-route-showextrafields="@Model.ShowExtraFields"
+                                        data-page-number="@ii"
+                                        data-page-size="@Model.PageSize"
+                                        data-sort-column="@Model.SortColumn"
+                                        data-sort-order="@Model.SortOrder"
+                                        data-search-term="@Model.SearchTerm"
+                                        data-show-extra-fields="@Model.ShowExtraFields.ToString()">
+                                        @ii
+                                    </a>
+                                </li>
+                            }
+
+
+                            <!-- Next Page Button -->
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage + 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage + 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()"
+                                    aria-label="Next">
+                                    &raquo;
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Not an Admin or Manager -->
+    <div class="text-center mt-4">
+        <p class="mb-1 text-gold-darker">This is an Admin area of @siteName.</p>
+        <p class="mb-2 text-gold-darker">Please Login with Administration credentials.</p>
+        <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </div>
+} 
+
+@section Styles {
+    <style>
+
+       /* Alternating table row colors */
+
+        .table-striped > tbody > tr:nth-of-type(odd) > td {
+            background-color: antiquewhite !important; /* Your desired color for odd rows */
+        }
+
+        .table-striped > tbody > tr:nth-of-type(even) > td {
+            background-color: #ffffff !important; /* Your desired color for even rows */
+        }
+
+        /* Green Border around hovered row */
+        .table-striped tbody tr.user-row:nth-of-type(odd):hover,
+        .table-striped tbody tr.user-row:nth-of-type(even):hover,
+        tbody tr.user-row:hover {
+            cursor: pointer;
+            border: 2px solid green;
+        }
+
+        /* Hide columns when ShowExtraFields is false */
+        .hide-extra-fields th.extra-field,
+        .hide-extra-fields td.extra-field {
+            display: none;
+        }
+
+         /* Add some padding to the right of the table if it's scrollable */
+         /* This helps ensure the last column's sort arrow is visible when scrolled all the way right */
+        .table-responsive {
+            padding-bottom: .5em; /* Add padding to the bottom for horizontal scrollbar appearance */
+        }
+
+       /* Base styles for your custom checkboxes */
+        .form-check-input[type=checkbox].custom-checkbox-green {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.2em;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            /* --- ALIGNMENT NUDGE --- */
+            transform: translateY(1px); /* Nudge down by 1px. Adjust this value (e.g., 2px, 0px, -1px) as needed */
+        }
+
+
+        /* Styles when the checkbox is checked */
+        .form-check-input[type=checkbox].custom-checkbox-green:checked {
+            background-color: #fff; /* White background when checked */
+            border-color: #28a745; /* Green border when checked */
+        }
+
+        /* Styles for the checkmark itself when the checkbox is checked */
+        .form-check-input[type=checkbox].custom-checkbox-green:checked::before {
+            content: '\2713'; /* Unicode checkmark character */
+            display: block;
+            position: absolute;
+            /* Adjust top and left based on visual inspection.
+               Start with 50% and then fine-tune by a pixel or two if needed. */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centering trick */
+
+            /* Adjust font-size to make the checkmark fit well within the 1.2em box */
+            font-size: 1em; /* This is relative to the input's font-size, which might be default */
+            /* A fixed pixel size or a slightly larger em value often works better for icons */
+            /* Try 0.9em to make it slightly smaller than the box, or 16px if the box is 1.2em (approx 19px) */
+            /* Let's try to base it off the box height, but slightly smaller */
+            font-size: 1.1em; /* Increased slightly to better fill the 1.2em box */
+            line-height: 1; /* Prevent extra space above/below the checkmark character */
+            text-align: center; /* Ensures the character itself is centered within its pseudo-element box */
+            color: #28a745; /* Green checkmark */
+        }
+
+        /* Add focus styles to match the green theme */
+        .form-check-input[type=checkbox].custom-checkbox-green:focus {
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25); /* Greenish glow on focus */
+            outline: none; /* Remove default outline */
+        }
+
+         /* Field Border Color */
+        .form-control {
+            border-color: lightgray !important;
+        }
+
+            .form-control:focus,
+            .form-control:hover,
+            .form-control:active {
+                border-color: lightgray !important;
+                box-shadow: none !important;
+            }
+
+            .form-control:focus,
+            .form-control:hover,
+            .form-control:active {
+                border-color: lightgray !important;
+                box-shadow: none !important;
+            }
+
+
+
+        .page-link {
+            background-color: white !important;
+            border-color: darkgray !important;
+            color: #4E3802 !important;
+        }
+
+            .active>.page-link, .page-link.active { 
+            background-color: #DAA425 !important;
+            border-color: darkgray !important;
+            color: #fff !important;
+            }
+
+            .page-link:hover {
+                background-color: #F2CA46 !important;
+            }
+
+        .page-link a {
+            color: #4E3802;
+        }
+
+        .table-striped tbody tr.user-row:nth-of-type(odd):hover,
+        .table-striped tbody tr.user-row:nth-of-type(even):hover,
+        tbody tr.user-row:hover {
+            cursor: pointer;
+            border: 2px solid green;
+        }
+        .hide-extra-fields th.extra-field,
+        .hide-extra-fields td.extra-field {
+            display: none;
+        }
+
+        .table-responsive {
+            padding-bottom: .5em;                     
+        }
+
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Select elements at the top level of DOMContentLoaded.
+            // Use 'let' for elements that might be replaced or re-referenced.
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            const searchButton = document.getElementById('searchButton'); // Still needed for explicit click/Enter
+            const searchForm = document.getElementById('searchForm');
+            const userTable = document.getElementById('userTable'); // Ensure your <table> has this ID
+            const tableContainer = document.getElementById('usersTableContainer'); // Get the table container for scroll
+            const showExtraFieldsCheckbox = document.getElementById('showExtraFieldsCheckbox');
+            const showExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+            // These elements will be replaced by AJAX updates
+            // Select them at the top level if they exist initially
+            // Use 'let' as their reference will change after replacement
+            // Now we can select the initial tbody by its ID
+            let userTableBody = document.getElementById('userTableBody'); // Select initial tbody by ID
+            let paginationNavContainer = document.getElementById('paginationNav'); // Select initial pagination nav by ID
+            let userCountSpan = document.getElementById('userCount'); // Select initial user count span by ID
+
+            // Get hidden inputs for current state - these should be present in the initial HTML
+            // Use 'let' as their values will be updated frequently
+            let pageNumberInput = document.querySelector('input[name="PageNumber"]');
+            let pageSizeInput = document.querySelector('input[name="PageSize"]');
+            let sortColumnInput = document.querySelector('input[name="SortColumn"]');
+            let sortOrderInput = document.querySelector('input[name="SortOrder"]');
+            let searchTermInput = document.querySelector('input[name="SearchTerm"]');
+
+            // Initialize all event listeners for elements present on initial load
+
+            // --- Initial localization and display updates ---
+            localizeLastLoginTimes();
+            updateSortIndicators();
+            updateExtraFieldsDisplay();
+            restoreScrollPosition();
+
+            // --- Function Definitions (Define all functions here before any calls or listeners) ---
+
+            // --- New: Function to update common hidden fields from UI elements ---
+            function updateAllHiddenFields() {
+                if (searchInput && searchTermInput) {
+                    searchTermInput.value = searchInput.value;
+                }
+                if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                    showExtraFieldsHidden.value = showExtraFieldsCheckbox.checked ? "True" : "False";
+                }
+                // PageNumber, PageSize, SortColumn, SortOrder are managed by the specific event handlers
+                // before this function is called, if they need to change for that action.
+            }
+
+            // Function to save scroll position
+            function saveScrollPosition() {
+                if (tableContainer) {
+                    sessionStorage.setItem('usersTableScrollLeft', tableContainer.scrollLeft);
+                }
+            }
+
+            // Function to restore scroll position
+            function restoreScrollPosition() {
+                if (tableContainer) {
+                    const savedScrollLeft = sessionStorage.getItem('usersTableScrollLeft');
+                    if (savedScrollLeft !== null) {
+                        tableContainer.scrollLeft = parseInt(savedScrollLeft, 10);
+                    }
+                }
+            }
+
+            // Helper function to debounce inputs
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
+            }
+
+             // Localize Last Login Time
+            function localizeLastLoginTimes() {
+                 const lastLoginElements = document.querySelectorAll('.local-login-time');
+                 lastLoginElements.forEach(function (element) {
+                     // Avoid localizing twice if already done
+                     if (element.dataset.localized) {
+                          return;
+                     }
+                     const utcTimeString = element.getAttribute('data-utc-time');
+                     if (utcTimeString) {
+                         const date = new Date(utcTimeString);
+                         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
+                         try {
+                              const localTimeString = date.toLocaleString(undefined, options);
+                              element.textContent = localTimeString;
+                              element.dataset.localized = 'true'; // Mark as localized
+                         } catch (e) {
+                              // console.error("Error formatting date:", e);
+                              element.textContent = utcTimeString + " (UTC)";
+                         }
+                     } else {
+                         element.textContent = 'Never';
+                     }
+                 });
+            }
+
+            // Function to update sort indicators (arrows) on headers
+            function updateSortIndicators() {                
+                // Re-select elements here to ensure they are current after potential DOM updates
+                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
+
+                // Remove existing indicators from the *entire* table header
+                // Target the thead within the *current* userTable
+                const currentUserTable = document.getElementById('userTable'); // Re-select userTable
+                if (currentUserTable) {
+                    currentUserTable.querySelectorAll('thead .sort-indicator').forEach(span => {                        
+                        span.remove();
+                    });                   
+                }
+
+                if (sortColumn && currentUserTable) { // Check currentUserTable again
+                    // Find the header link for the current sort column using data attribute
+                    // Search within the *current* userTable structure
+                    const headerLink = currentUserTable.querySelector(`th a.nav-link[data-sort-column="${sortColumn.toLowerCase()}"]`); // Use lower case for matching
+
+                    if (headerLink) {
+                        const indicator = document.createElement('span');
+                        indicator.classList.add('sort-indicator', 'ms-1');
+                        if (sortOrder === 'asc') {
+                            indicator.innerHTML = '&uarr;'; // Up arrow
+                        } else {
+                            indicator.innerHTML = '&darr;'; // Down arrow
+                        }
+                        headerLink.appendChild(indicator); // Append to the link inside th
+                    } 
+                }
+            }
+
+            // Function to show/hide extra fields columns
+            function updateExtraFieldsDisplay() {
+                // console.log('updateExtraFieldsDisplay called. showExtraFieldsHidden.value:', document.getElementById('showExtraFieldsHidden').value); // REMOVED
+
+                // Re-select hidden input here to ensure it's current
+                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+                const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value === "True" : false; // Get boolean state
+
+                // Find the main table to toggle the class for column visibility
+                const currentUserTable = document.getElementById('userTable'); // Target the table itself
+                if (currentUserTable) {
+
+                    if (showExtraFields) {
+                        // console.log('Removing hide-extra-fields. Table classList before:', currentUserTable.classList); // REMOVED
+                        currentUserTable.classList.remove('hide-extra-fields');
+                    } else {
+                        // console.log('Adding hide-extra-fields. Table classList before:', currentUserTable.classList); // REMOVED
+                        currentUserTable.classList.add('hide-extra-fields');
+                    }
+                    // console.log('Table classList after:', currentUserTable.classList); // REMOVED
+                     
+                }
+
+            }
+
+            // Function to attach row click listeners (call this after table body update)
+            function attachRowClickListeners(targetElement) { // Accept target element
+
+                if (targetElement) {
+
+                     const userTableRows = targetElement.querySelectorAll('tr.user-row'); // Select rows within the target                     
+                     userTableRows.forEach(row => {
+                         // Remove any existing listeners by cloning and replacing
+                         const clonedRow = row.cloneNode(true);
+                         row.replaceWith(clonedRow);
+
+                         // Re-select the cloned row to attach the listener
+                         const newRow = clonedRow; // Use the new cloned row
+                         newRow.addEventListener('click', function (event) {
+
+                             // Prevent the default link behavior if the click was on a link inside the row
+                             if (event.target.tagName === 'A' || event.target.closest('a')) { // Also check if target is inside an <a>                                 
+                                  return;
+                             }
+                             
+                             // Exit if userId is not available
+                             const userId = this.dataset.userId;
+                             if (!userId) {
+                                 return; 
+                             }
+
+                             // Retrieve current state from hidden inputs and search input
+                             // Re-select inputs here to ensure they are current
+                             const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                             const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                             const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                             const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                             const currentSearchInput = document.getElementById('searchInput');
+                             const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+                             const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
+                             const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                             const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                             const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
+                             const searchTerm = currentSearchInput ? currentSearchInput.value : ''; // Get actual input value
+                             const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'False'; // Get actual hidden input value ('True' or 'False')
+
+                             let returnUrl = `${window.location.pathname}?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+                             if (sortColumn) {
+                                 returnUrl += `&SortColumn=${sortColumn}&SortOrder=${sortOrder}`;
+                             }
+
+                             // Ensure searchTerm is included if it has a value
+                             if (searchTerm && searchTerm.trim() !== '') {
+                                 returnUrl += `&SearchTerm=${encodeURIComponent(searchTerm.trim())}`;
+                             }
+                             returnUrl += `&ShowExtraFields=${showExtraFields}`;
+
+                             saveScrollPosition(); // Save before navigating
+                             const navigateUrl = `/Identity/EditUser?id=${userId}&returnUrl=${encodeURIComponent(returnUrl)}`;                             
+                             window.location.href = navigateUrl;
+
+                         });
+                     });
+                 }
+            }
+
+            // Function to attach pagination link listeners (call this after pagination update)
+            function attachPaginationLinkListeners(targetElement) { // Accept target element
+                 console.log("attachPaginationLinkListeners called with target:", targetElement);
+                 const paginationLinks = targetElement ? targetElement.querySelectorAll('a.page-link') : []; // Select links within the target
+                 
+                 paginationLinks.forEach(link => {
+
+                     // Remove any existing listeners by cloning and replacing
+                     const clonedLink = link.cloneNode(true);
+                     link.replaceWith(clonedLink);
+                     const newLink = clonedLink; // Use the new cloned link
+
+                     newLink.addEventListener('click', function(event) {
+                         event.preventDefault(); // Prevent default link navigation
+
+                         // Get all parameters from the clicked link's dataset
+                         const pageNumber = this.dataset.pageNumber;
+                         const pageSize = this.dataset.pageSize;
+                         const sortColumn = this.dataset.sortColumn || '';
+                         const sortOrder = this.dataset.sortOrder || '';
+                         const searchTerm = this.dataset.searchTerm || '';
+                         const showExtraFieldsString = this.dataset.showExtraFields; // Will be "True" or "False"
+                         const showExtraFieldsBool = (showExtraFieldsString === "True" || showExtraFieldsString === true);
+
+
+                         // Update hidden inputs for PageNumber, PageSize, SortColumn, SortOrder
+                         if (pageNumberInput) pageNumberInput.value = pageNumber;
+                         if (pageSizeInput) pageSizeInput.value = pageSize; // Ensure pageSizeInput is selected globally
+                         if (sortColumnInput) sortColumnInput.value = sortColumn;
+                         if (sortOrderInput) sortOrderInput.value = sortOrder;
+
+                         // Update UI elements for SearchTerm and ShowExtraFields
+                         if (searchInput) searchInput.value = searchTerm;
+                         if (showExtraFieldsCheckbox) showExtraFieldsCheckbox.checked = showExtraFieldsBool;
+                         
+                         // Now call updateAllHiddenFields to sync SearchTerm and ShowExtraFields hidden inputs
+                         // from their (now updated) UI counterparts.
+                         updateAllHiddenFields();
+                         
+                         saveScrollPosition();
+                         updateTableAjax(); // Call the AJAX update function
+                     });
+                 });                 
+            }
+
+            // --- AJAX Update Table Function (for Search Input) ---
+            // This function fetches and updates table content via AJAX for live search
+            async function updateTableAjax() {
+
+                // saveScrollPosition(); // Called by handlers before updateTableAjax now
+
+                // Get current state from the hidden inputs.
+                // Assumes hidden inputs are already correctly populated by handlers + updateAllHiddenFields()
+                const currentPageNumberInput = document.querySelector('input[name="PageNumber"]');
+                const currentPageSizeInput = document.querySelector('input[name="PageSize"]');
+                const currentSortColumnInput = document.querySelector('input[name="SortColumn"]');
+                const currentSortOrderInput = document.querySelector('input[name="SortOrder"]');
+                const currentSearchInput = document.getElementById('searchInput');
+                const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
+
+                const searchTerm = currentSearchInput ? currentSearchInput.value : '';
+                const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
+                const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
+                const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
+                const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'False';               
+
+                // Construct the URL with current parameters
+                const queryParams = new URLSearchParams({
+                    PageNumber: pageNumber,
+                    PageSize: pageSize,
+                    SortColumn: sortColumn,
+                    SortOrder: sortOrder,
+                    SearchTerm: searchTerm,
+                    ShowExtraFields: showExtraFields,
+                    handler: 'PartialTable' // Target the OnGetPartialTableAsync handler
+                });               
+
+                try {
+                    const response = await fetch(`${window.location.pathname}?${queryParams.toString()}`);
+                    if (!response.ok) {                        
+                        return;
+                    }
+
+                    const html = await response.text();
+
+                    // --- Parse HTML using a temporary div and getElementsByTagName ---
+                    const tempDiv = document.createElement('div');
+                    // Wrap the received HTML in a table to ensure tbody is parsed correctly
+                    tempDiv.innerHTML = '<table>' + html + '</table>';
+
+                    // Find the new elements within the temporary div
+                    // Use getElementsByTagName for tbody, then check for the ID
+                    const tempTbodies = tempDiv.getElementsByTagName('tbody');
+                    let newTableBody = null;
+                    if (tempTbodies.length > 0 && tempTbodies[0].id === 'userTableBody') {
+                         newTableBody = tempTbodies[0];
+                    }
+
+                    // Select other elements using querySelector on the tempDiv
+                    const newUserCountSpan = tempDiv.querySelector('#userCount');
+                    const newPaginationNav = tempDiv.querySelector('#paginationNav');
+
+                    // Re-select existing elements just before updating them
+                    // Select directly from the document to ensure we have the latest references
+                    const existingTableBody = document.getElementById('userTableBody'); // Select the existing tbody by ID
+                    const existingUserCountSpan = document.getElementById('userCount');
+                    const existingPaginationNav = document.getElementById('paginationNav');
+                   
+                    // Replace the existing tbody with the new tbody
+                    if (existingTableBody && newTableBody) { // Check for existence of both existing and new elements
+                         existingTableBody.replaceWith(newTableBody); // Use replaceWith()
+
+                         // After replacing, re-select the *new* tbody for listener attachment
+                         // The new tbody is now in the DOM and has the ID
+                         userTableBody = document.getElementById('userTableBody'); // Re-select the new one
+
+                         if (userTableBody) {
+                             attachRowClickListeners(userTableBody); // Pass the updated tbody to the attachment function
+                             localizeLastLoginTimes(); // Localize dates in new rows                             
+                         }
+
+                    }
+
+                    // Replace the user count span element
+                    if (existingUserCountSpan && newUserCountSpan) { 
+                        
+                        // Check for existence of both existing and new elements                        
+                        existingUserCountSpan.replaceWith(newUserCountSpan); // Use replaceWith()
+
+                         // Update the top-level userCountSpan variable to the new element
+                         userCountSpan = document.getElementById('userCount'); // Re-select the new one
+                    }
+
+                    // Replace the pagination nav element
+                    if (existingPaginationNav && newPaginationNav) { 
+                        
+                        // Check for existence of both existing and new elements                       
+                        existingPaginationNav.replaceWith(newPaginationNav); // Use replaceWith()
+
+                        // Update the top-level paginationNavContainer variable to the new element
+                        paginationNavContainer = document.getElementById('paginationNav'); // Re-select the new one
+                        if (paginationNavContainer) {
+                            
+                            // Pass the updated nav to the attachment function
+                            attachPaginationLinkListeners(paginationNavContainer); 
+                             
+                        }
+
+                    }
+
+                    // Update visual state after successful update
+                    // These can likely run immediately as they don't rely on the replaced elements' listeners
+                    updateSortIndicators(); // Update sort arrows on existing headers
+                    updateExtraFieldsDisplay(); // Show/hide columns based on state
+                    restoreScrollPosition(); // Restore scroll position
+
+                } catch (error) {                    
+                    // Optionally display a user-friendly error message
+                }
+            }
+
+            // --- Function to prepare and submit the form (for Toggle/Sort/Paginate) ---
+            // This function ensures all hidden inputs are updated before submitting.
+            // Primarily for non-AJAX fallback or specific scenarios.
+            function prepareAndSubmitForm() {
+                
+                // Call the consolidated function to ensure all common fields are updated
+                updateAllHiddenFields(); 
+                
+                // PageNumber, SortColumn etc. should have been set by the calling context if needed.
+                // For example, if a sort link (non-AJAX) were to use this, it would set sort order/column
+                // and PageNumber=1 before calling this.
+
+                saveScrollPosition(); // Save scroll before submitting
+                searchForm.submit(); // Submit the form
+            }
+            // --- End Function to prepare and submit the form ---
+
+            // --- Event Listeners (Attach listeners after functions are defined) ---
+
+            // Sync initial checkbox state with hidden input value
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden) {
+                 showExtraFieldsCheckbox.checked = showExtraFieldsHidden.value === "True";
+             }
+
+            // Handle Live Search Input (uses AJAX)
+            // Ensure necessary elements exist
+            if (searchInput && searchForm && pageNumberInput && searchTermInput && clearSearch) {
+                 // Use debounce to delay the AJAX request
+                 const debouncedAjaxUpdate = debounce(function() {
+
+                     // Reset to the first page on search input change
+                     if (pageNumberInput) pageNumberInput.value = '1';
+
+                     // updateAllHiddenFields will sync searchInput to searchTermInput
+                     updateAllHiddenFields();
+                     saveScrollPosition();
+                     updateTableAjax(); // Call the AJAX update function
+                 }, 100); // Adjust delay (milliseconds) as needed for live search responsiveness
+
+                 searchInput.addEventListener('input', function() {
+                     clearSearch.style.display = this.value ? 'block' : 'none';
+                     debouncedAjaxUpdate(); // Call the debounced AJAX update function
+                 });
+
+                 // Handle Enter key press on search input
+                 searchInput.addEventListener('keydown', function(event) {
+                     if (event.key === 'Enter') {
+                         
+                         // Prevent default form submission
+                         event.preventDefault(); 
+
+                         // Reset to the first page on Enter
+                         if (pageNumberInput) pageNumberInput.value = '1';
+                         
+                         // updateAllHiddenFields will sync searchInput to searchTermInput
+                         updateAllHiddenFields();
+                         saveScrollPosition();
+                         updateTableAjax(); // Trigger immediate AJAX update
+                     }
+                 });
+
+                 // Initial check on page load for clear button visibility
+                 clearSearch.style.display = searchInput.value ? 'block' : 'none';
+            }
+            // --- End Handle Live Search Input ---
+
+            // --- Handle Clear Search Button click (uses AJAX) ---
+            // Ensure necessary elements exist
+            if (clearSearch && searchInput && searchTermInput && pageNumberInput) {
+                clearSearch.addEventListener('click', function() {
+                    
+                    // Clear the visible input
+                    if (searchInput) searchInput.value = '';
+
+                    // Hide the clear button
+                    clearSearch.style.display = 'none';
+
+                    // Reset the page number to 1
+                    if (pageNumberInput) pageNumberInput.value = '1';
+                    
+                    // updateAllHiddenFields will sync the cleared searchInput to searchTermInput
+                    updateAllHiddenFields();
+                    saveScrollPosition();
+                    updateTableAjax();
+
+                });
+
+            }
+            // --- End Handle Clear Search Button click ---
+
+            // --- Handle Show Extra Fields Toggle (uses AJAX) ---
+            // Ensure necessary elements exist
+            if (showExtraFieldsCheckbox && showExtraFieldsHidden && pageNumberInput && searchTermInput && searchInput) {
+                showExtraFieldsCheckbox.addEventListener('change', function() {
+
+                    // Reset to the first page on toggle change
+                    if (pageNumberInput) pageNumberInput.value = '1';
+                    
+                    // updateAllHiddenFields will sync checkbox state to showExtraFieldsHidden
+                    // and also ensure searchTerm is synced.
+                    updateAllHiddenFields();
+                    saveScrollPosition(); 
+                    updateTableAjax();    // Call the AJAX update function
+                    
+                });
+            }
+
+            // --- End Handle Show Extra Fields Toggle ---
+
+            // Handle Row Click to Edit User
+            // This listener is attached once on DOMContentLoaded and re-attached after AJAX updates
+            // Ensure necessary elements exist
+            if (userTable && pageNumberInput && pageSizeInput && sortColumnInput && sortOrderInput && searchInput && showExtraFieldsHidden) {
+
+                 // Initial attachment
+                 const initialTableBody = userTable.querySelector('tbody');
+                 if (initialTableBody) {
+                     attachRowClickListeners(initialTableBody);
+                 } else {
+                     console.warn("Initial table body not found for row click listener setup.");
+                 }
+            }
+
+            // --- Handle Sorting Links (uses AJAX) ---
+            const sortLinks = document.querySelectorAll('#userTable thead a.nav-link'); // Select sort links
+
+            sortLinks.forEach(link => {
+                // Remove any existing listeners by cloning and replacing the link
+                // This is to prevent multiple event listeners if this script section is re-evaluated.
+                const clonedLink = link.cloneNode(true);
+                link.parentNode.replaceChild(clonedLink, link);
+
+                clonedLink.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default link navigation
+
+                    const clickedSortColumn = this.dataset.sortColumn; // Get from data-sort-column attribute
+                    const currentSortColumnValue = sortColumnInput ? sortColumnInput.value : '';
+                    const currentSortOrderValue = sortOrderInput ? sortOrderInput.value : 'asc'; // Default to 'asc'
+
+                    let newSortColumn;
+                    let newSortOrder;
+
+                    if (clickedSortColumn && clickedSortColumn.toLowerCase() === currentSortColumnValue.toLowerCase()) {
+                        // Same column clicked, toggle order
+                        newSortOrder = (currentSortOrderValue === 'asc' ? 'desc' : 'asc');
+                        newSortColumn = currentSortColumnValue; // Column remains the same
+                    } else {
+                        // New column clicked
+                        newSortColumn = clickedSortColumn;
+                        newSortOrder = 'asc'; // Default to ascending for new column
+                    }
+
+                    // Update hidden input fields for sorting
+                    if (sortColumnInput) sortColumnInput.value = newSortColumn;
+                    if (sortOrderInput) sortOrderInput.value = newSortOrder;
+                    if (pageNumberInput) pageNumberInput.value = '1'; // Reset to first page
+                    
+                    // updateAllHiddenFields will handle SearchTerm and ShowExtraFields
+                    updateAllHiddenFields();
+                    saveScrollPosition(); 
+                    updateTableAjax();    // Call the AJAX update function
+                });
+            });
+            // --- End Handle Sorting Links ---
+
+            // --- Handle Pagination Links (uses AJAX) ---
+            // The initial listeners are attached once on DOMContentLoaded and re-attached after AJAX updates
+            // Ensure necessary elements exist
+
+            // Check if the pagination nav exists on initial load
+            if (document.getElementById('paginationNav')) {
+                 // The attachPaginationLinkListeners function already converts these to AJAX.
+                 // It was previously misnamed or the comment was outdated.
+                 // It correctly uses event.preventDefault() and updateTableAjax().
+                 attachPaginationLinkListeners(document.getElementById('paginationNav'));
+            }
+            // --- End Handle Pagination Links ---
+
+            // Prevent default form submission for the search form
+            // This is needed because we are using AJAX for search updates initiated by the form controls.
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(event) {
+
+                    // Prevent default form submission to allow AJAX handling
+                    // This is important as various actions now call updateTableAjax() directly
+                    // instead of submitting the form.
+                    event.preventDefault();
+                    
+                    // Optionally, decide if the main search button should trigger AJAX or a full submit.
+                    // For consistency, it can also call updateTableAjax().
+                    // pageNumberInput.value = 1; // Reset to first page on manual form submit via button
+                    // searchTermInput.value = searchInput.value;
+                    // updateTableAjax();
+                });
+            }
+
+            // --- Re-attach sorting link listeners after AJAX updates ---
+            // Since the table headers might be part of the AJAX refresh (if ShowExtraFields changes them),
+            // we need a way to re-attach sort link listeners.
+            // However, the current `updateTableAjax` only replaces `tbody`, `userCount`, and `paginationNav`.
+            // The `thead` (where sort links are) is NOT replaced by `updateTableAjax`.
+            // So, the initial attachment of sort link listeners should be sufficient.
+            // If `thead` were to be replaced, we'd need a function like `attachSortLinkListeners`
+            // to be called in `updateTableAjax` similar to `attachPaginationLinkListeners`.
+
+            // --- Initial Setup Calls (Call functions after they are defined) ---
+
+            // Initial localization on page load
+            localizeLastLoginTimes();
+
+             // Restore scroll position on initial page load
+            restoreScrollPosition();
+
+            // Initial visual state updates on page load
+            updateSortIndicators(); // Display initial sort arrows
+            updateExtraFieldsDisplay(); // Set initial column visibility            
+
+        });
+    </script>
+}

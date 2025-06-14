@@ -1,0 +1,450 @@
+/* #region Default Stuff */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: scroll;
+    padding: 0;
+    margin: 0;
+    line-height: 1.4;
+    /* font-family: "Bell MT", serif;*/
+    /* font-size: 14px;*/
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+    background-color: cornsilk;
+    height: 100%;
+    width: 100%;
+    
+}
+
+/* General input and select focus styles */
+page-item:focus,
+page-link:focus,
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus, /* Targets standard Bootstrap form controls */
+.custom-select:focus /* Targets Bootstrap custom select elements */ {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
+}
+
+/* Specific styles for Select2 with Bootstrap 4 theme */
+.select2-container--bootstrap4.select2-container--focus .select2-selection {
+    box-shadow: none !important;
+    border-color: initial !important; /* Ensure Select2's specific border also resets */
+}
+
+/* For file input, which often has its own styling */
+.custom-file-input:focus ~ .custom-file-label {
+    box-shadow: none !important;
+    border-color: initial !important;
+}
+
+/* No Radius Right or  Left */
+.no-right-radius {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.no-left-radius {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+.video-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .list-group-item span.flex-grow-1 {
+        word-break: break-word;
+    }
+}
+
+.upload-button {    
+    position: static;
+    transform: none;
+    height: 100%; 
+    margin-left: -40px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.875rem;    
+    background-color: transparent;
+    line-height: 1.5;
+}
+
+    .upload-button:hover {
+        background-color: transparent;
+        color: white;
+    }
+
+    .upload-button i {
+        font-size: 1rem;
+    }
+
+.delete-button {
+    /*border-radius: 0.375rem;*/
+    position: static;
+    transform: none;
+    height: 100%;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.875rem;
+    /*border: 1px solid #ced4da;*/
+    background-color: transparent;
+    /*color: white;*/
+    line-height: 1.5;
+}
+
+    .delete-button:hover {
+        background-color: transparent;
+        color: white;
+    }
+
+    .delete-button i {
+        font-size: 2rem;
+    }
+
+.image-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+/* don't like padding and margins on elements by default */
+container, div, h1, h2, h3, h4, h5, p {
+    cursor: default;
+    padding: 0;
+    margin: 0;
+}
+
+/* make everything a borderbox */
+* {
+    box-sizing: border-box;
+}
+
+/* Cursors */
+.no-cursor {
+    cursor: none;
+}
+
+.pointer-cursor {
+    cursor: pointer;
+}
+
+header {
+    position: relative;
+    top: 0;
+    width: 100%;
+}
+
+html > body header {
+    width: 100%;
+}
+
+.navbar-overhang {
+    position: absolute;
+    top: 20px;
+    transform: translateY(-10%);
+}
+
+/* Adjust form styling within nav-item to prevent misalignment */
+.navbar-nav .nav-item form.form-inline {
+    margin: 0; /* Remove any default margin */
+    padding: 0; /* Remove any default padding */
+    display: block; /* Forms are block by default, but confirm */
+    /* You might need vertical-align depending on specific issue */
+    vertical-align: middle;
+}
+
+    /* Further adjustments to the button within the form if needed */
+    .navbar-nav .nav-item form.form-inline .btn.nav-link {
+        /* Ensure no extra margin/padding on the button itself that deviates from regular nav-links */
+        padding-top: .3rem; /* Match Bootstrap's default nav-link padding */
+        padding-bottom: .9rem; /* Match Bootstrap's default nav-link padding */
+        /* Check horizontal padding too if needed */
+    }
+
+
+.dropdown-menu {
+    min-width: 210px;
+}
+
+/*Dropdowns*/
+a#adminDropdown[aria-expanded="true"],
+a#welcomeDropdown[aria-expanded="true"],
+a#pdfDocumentsDropdown[aria-expanded="true"],
+a#adminPdfFoldersDropdown[aria-expanded="true"],
+a#adminEditMembersDropdown[aria-expanded="true"],
+a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#membersDropdown[aria-expanded="true"],
+a#membersfooterDropdown[aria-expanded="true"],
+a#adminCreateFilesDropdown[aria-expanded="true"] {
+    color: white !important;
+    /*background-color: rgba(0, 0, 0, 0.3) !important;*/
+}
+
+li.show > a#adminDropdown,
+li.show > a#welcomeDropdown,
+li.show > a#pdfDocumentsDropdown,
+li.show > a#adminPdfFoldersDropdown,
+li.show > a#adminEditMembersDropdown,
+li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#membersDropdown,
+li.show > a#membersfooterDropdown
+li.show > a#adminCreateFilesDropdown {
+    color: white !important;
+    /*background-color: rgba(0, 0, 0, 0.3) !important;*/
+}
+
+li .dropdown-menu .nav-link i {
+    color: var(--text-gold-dark) !important; 
+}
+.footer-spacing {
+    margin-bottom: 50px;
+}
+
+#pdf-viewer-container {
+    width: 100%; /* Use 100% width */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.uniform-card-height .card-body {
+    height: 75px; /* Adjust the height as needed */
+    display: flex; /* Flexbox for vertical centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally if needed */
+    text-align: center; /* Center text */
+}
+
+.uniform-card-height .card-title {
+    margin-bottom: 0; /* Remove default margin from card title */
+}
+
+.footer-logo {
+    height: 20px;
+}
+
+#footer {
+    padding: 0px;
+    position: inherit;
+}
+
+.table td, .table th {
+    white-space: nowrap;
+}
+
+.form-input-field {
+    max-width: 280px;
+}
+
+/* Main Container (Set for Auto Push of Footer) */
+#MainContainer {
+    flex: 1;
+    min-height: 100%;
+    margin-top: 0px;
+    margin-bottom: 70px;
+}
+
+/* Carousel item and images */
+#carousel-items, #carousel-item {    
+    height: auto !important;
+    width: 100%;
+}
+
+/* Svg Container (put Svg files inside a #container for scaling */
+svg, #container {
+    height: 100%;
+    width: 100%;
+}
+
+/* Set Horizontal Line */
+hr {
+    border: none;
+    border-top: 3px dotted #ffffff;
+}
+
+/* Set Image pointer and border transition */
+img {
+    cursor: pointer;
+    transition: border 0.3s ease-in-out;
+}
+
+/* #endregion */
+
+/* #region Menu */
+.menu-item {
+    min-width: 128px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menu-link {
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
+    padding: 8px;
+    display: inline-block;
+}
+
+    .menu-link:hover {
+        color: black !important;
+        font-weight: bold !important;
+    }
+
+    .menu-link.selected {
+        color: black !important;
+        font-weight: bold !important;
+    }
+
+.border-link {
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
+    padding: 8px;
+    display: inline-block;
+    border-color: darkgray !important;
+}
+
+    .border-link:hover {
+        color: black !important;
+        border-color: darkgray !important;
+        font-weight: bold !important;
+    }
+
+    .border-link.selected {
+        font-weight: bold !important;
+    }
+/* #endregion */
+
+/* #region Top Button */
+#top-button {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 99;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color: #C72D27; /* bg-red-dark*/
+    color: white;
+    cursor: pointer;
+    padding: 8px 24px;
+    border-radius: 4px;
+}
+
+    #top-button:hover {
+        background-color: #4A4B4C; /* bg-gray-dark */
+    }
+
+    #top-button:active {
+        background-color: #C72D27; /* bg-red-dark*/
+    }
+
+.siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
+    padding-left: 120px;   
+}
+
+/* #endregion */
+
+/* #region Slideshow bar buttons */
+#Previous {
+    border: 1px solid transparent;
+}
+
+    #Previous:hover,
+    #Previous:active,
+    #Previous:focus {
+        border: 1px solid black;
+    }
+
+#Next {
+    border: 1px solid transparent;
+}
+
+    #Next:hover,
+    #Next:active,
+    #Next:focus {
+        border: 1px solid black;
+    }
+
+#Copy {
+    border: 1px solid transparent;
+}
+
+    #Copy:hover,
+    #Copy:active,
+    #Copy:focus {
+        border: 1px solid black;
+    }
+
+.slideshow-button {
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+    .slideshow-button:hover,
+    .slideshow-button:hover,
+    .slideshow-button:hover {
+        border: 1px solid black;
+    }
+
+.slideshow-button-image {
+    width: 26px;
+    height: 26px;
+}
+
+/* #endregion */
+
+/* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Small tablet styles */
+@media (min-width: 575px) and (max-width: 768px) {
+    
+}
+
+/* #endregion */
+
+/* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
+@media (min-width: 768.01px) and (max-width: 991px) {
+
+    
+}
+/* #endregion */
+
+/* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
+@media (min-width: 992px) {
+   
+}
+
+/* #endregion */
+
+/* #region (min-width: 1200px) */
+@media (min-width: 1200px) {
+    
+}
+
+/* #endregion */
+
+/* #region (min-width: 1400px) */
+@media (min-width: 1400px) {
+
+}
+
+/* #endregion*/
+

@@ -1,0 +1,72 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.IO;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.ViewComponents;
+@using Microsoft.EntityFrameworkCore;
+@using System.Linq;
+@using System.Threading.Tasks;
+@using System.Collections.Generic
+@using Members.Data;
+@using Members.Models;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject Members.Data.ApplicationDbContext DbContext
+
+@{
+    // Only fetch UserProfile if user is signed in
+    Members.Models.UserProfile? userProfile = null; // Change to nullable type
+    if (SignInManager.IsSignedIn(User))
+    {
+        var userId = UserManager.GetUserId(User);
+        if (!string.IsNullOrEmpty(userId))
+        {
+            userProfile = DbContext.UserProfile.FirstOrDefault(up => up.UserId == userId);
+        }
+    }
+}
+
+@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<!-- Banner Logo -->
+<div class="mb-3">
+    <partial name="_PartialBannerLogo" />
+</div>
+
+<div class="container text-center ps-0 mb-2">
+    <div class="row gx-0 gy-0 justify-content-center">
+        <div class="col-md-3 pe-0">
+            <ul class="nav nav-pills flex-column ms-3 me-0 mb-2 text-start">
+                <li class="nav-item mb-1"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a></li>
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a></li>
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a></li>
+                
+                @* Take the following line out with the leading bracket (and ending bracket below) for Members to see *@
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member")))
+                    {
+                        <li class="nav-item my-1">
+                            <a class="nav-link" asp-area="Member" asp-page="/MyBilling" id="MyBilling" title="My Billing"><i class="bi bi-plus-circle"></i> My Billing</a>
+                        </li>
+                    }
+                } @* Take this closing bracket out for Members to see.*@
+            </ul>
+        </div>
+        <div class="container col-md-9 pe-0">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

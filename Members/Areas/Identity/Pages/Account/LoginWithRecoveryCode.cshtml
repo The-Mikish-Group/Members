@@ -1,0 +1,56 @@
+﻿@page
+@model LoginWithRecoveryCodeModel
+@{
+    ViewData["Title"] = "Recovery code verification";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow rounded m-4 p-4 bg-Card-Menu">
+                <div class="card-body">
+                    <h1 class="text-center mb-4 text-gold-darker">
+                        <i class="bi bi-key"></i> <i class="bi bi-arrow-clockwise"></i> @ViewData["Title"]
+                    </h1>
+                    <p class="text-center text-gold-darker">
+                        You have requested to log in with a recovery code. This login will not be remembered until you provide
+                        an authenticator app code at log in or disable 2FA and log in again.
+                    </p>
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="RecoveryCode" />
+                            <label asp-for="Input.RecoveryCode" class="form-label">Recovery Code</label>
+                            <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
+                        </div>
+
+                        <!-- Butons -->
+                        <div class="d-flex justify-content-between">
+
+                            <!-- Cancel -->
+                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </a>
+
+                            <!-- Log In -->
+                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                                <i class="bi bi-save"></i> Log in
+                            </button>                            
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,113 @@
+﻿@page "{userId?}"
+@model Members.Areas.Admin.Pages.Accounting.AddInvoiceModel
+@{
+    ViewData["Title"] = "Add New Invoice";
+    Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct for your project
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow mb-2 bg-Card-Menu">
+                <div class="card-header bg-gold-light text-white">
+                    <h4 class="mb-0 text-gold-darker">
+                        @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                         @if (Model.IsUserPreselected)
+                        {
+                            <input type="hidden" asp-for="Input.SelectedUserID" />
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-gold-darker">Member</label>
+                                <p class="shadow form-control">@Model.TargetUserName</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Input.SelectedUserID" class="form-label text-gold-darker"></label>
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
+                                    <option value="">-- Select User --</option>
+                                </select>
+                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                        {
+                            <input type="hidden" asp-for="ReturnUrl" />
+                        }
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label asp-for="Input.InvoiceDate" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.InvoiceDate" class="shadow form-control text-gold-darker" />
+                                <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Input.DueDate" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.DueDate" class="shadow form-control text-gold-darker" />
+                                <span asp-validation-for="Input.DueDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Description" class="form-label text-gold-darker"></label>
+                            <input asp-for="Input.Description" class="shadow form-control text-gold-darker" />
+                            <span asp-validation-for="Input.Description" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label asp-for="Input.AmountDue" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.AmountDue" class="shadow form-control text-gold-darker" />
+                                <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Input.Type" class="form-label text-gold-darker"></label>
+                                <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select text-gold-darker">
+                                </select>
+                                <span asp-validation-for="Input.Type" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mt-4">
+
+                            <div class="row justify-content-center">
+                                
+                                <div class="col-6 text-center">
+                                    @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                    {
+                                        <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                    }
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <button type="submit" class="shadow btn btn-sm btn-primary">Create Invoice</button>
+                                </div>
+                            </div>                                                      
+                            
+                        </div>
+                    </form>
+                </div>
+            </div> 
+        </div> 
+    </div>
+</div> 
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

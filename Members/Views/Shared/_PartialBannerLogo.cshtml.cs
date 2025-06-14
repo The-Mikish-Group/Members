@@ -1,0 +1,3 @@
+namespace Members.Views.Shared
+{
+}

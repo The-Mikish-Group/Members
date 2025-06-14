@@ -1,0 +1,515 @@
+﻿@model IEnumerable<Members.Models.CategoryFile>
+@using Members.Models
+
+@{
+    ViewData["Title"] = "Manage Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int? selectedCategoryId = ViewBag.SelectedCategoryId;
+    var pdfCategories = ViewBag.PDFCategories as IEnumerable<PDFCategory>;
+}
+
+<!-- Title -->
+<div class="d-flex justify-content-center text-gold-darker mt-4 mb-2">
+    <h1><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h1>
+</div>
+
+<!-- Category Selection Dropdown -->
+<div class="row justify-content-center my-2 mx-auto p-2">
+    <div class="shadow-none border rounded col-md-8 bg-Card-Menu p-2">
+        <div class="form-group mt-2">
+            <div class="pb-2">
+                <label for="categoryId" id="categoryLabel" class="fw-bold text-gold-darker">Select a Category:</label>
+            </div>
+            <div class="input-group" style="position: relative;">
+                <select id="categoryId" class="form-control rounded">
+                    <option value="">-- Select a Category --</option>
+                    @if (pdfCategories != null)
+                    {
+                        @foreach (var category in pdfCategories)
+                        {
+                            <option value="@category.CategoryID" selected="@(category.CategoryID == selectedCategoryId ? "selected" : null)">@category.CategoryName</option>
+                        }
+                    }
+                </select>
+                <i class="bi bi-caret-down-fill" id="fakedropdown"></i>
+            </div>
+        </div>
+    </div>
+</div>
+    
+@if (selectedCategoryId.HasValue)
+{
+    <div class="row justify-content-center my-2 mx-auto p-2">
+        <div class="shadow border rounded col-md-8 bg-Card-Menu p-2">
+
+            <!-- Add a New File Section -->
+            <div class="mt-2">
+                <div class="pb-2">
+                    <label for="file" class="fw-bold text-gold-darker">Add a New File:</label>
+                </div>
+
+                <form method="post" class="mx-auto" asp-action="UploadFileToCategory" asp-controller="PdfCategory" asp-route-categoryId="@ViewBag.SelectedCategoryId" enctype="multipart/form-data">
+
+                    <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategoryId" />
+                    
+                    <div class="row align-items-center">
+                        <div class="col-8 pe-0">
+                            <input type="file" name="file" class="form-control visually-hidden" id="chooseFile" />
+                            <div class="input-group">
+                                <label class="btn btn-search-fill no-right-radius" for="chooseFile"><i class="bi bi-search"></i></label>
+                                <input type="text" class="form-control no-left-radius no-right-radius shadow-none" id="fileNameDisplay" placeholder="--No file chosen--" readonly />
+                            </div>
+                        </div>
+                        <div class="col-2 px-0">
+                            <label for="sortOrder" class="form-label visually-hidden text-gold-darker">Sort Order</label>
+                            <input type="number" name="sortOrder" class="form-control no-left-radius no-right-radius shadow-none" min="1" id="sortOrder" />
+                        </div>
+                        <div class="col-2 ps-0">
+                            <div class="input-group">
+                                <button type="submit" class="btn btn-success w-100 h-100 no-left-radius">
+                                    <i class="bi bi-upload"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center my-2 mx-auto p-2">
+        <div class="shadow border rounded col-md-8 bg-Card-Menu p-2">
+
+            <!-- File List Section -->
+            <div class="mt-2">
+                <div id="categoryFilesContainer">
+                    @if (Model != null && Model.Any())
+                    {
+                        <table class="w-100">
+                            <thead>
+                                <tr>
+                                    <th class="text-gold-dark">Rename</th>
+                                    <th class="text-gold-dark">View</th>
+                                    <th class="text-gold-dark">Name</th>
+                                    <th class="text-gold-dark">Sort</th>
+                                    <th class="text-gold-dark text-end">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var file in Model)
+                                {
+                                    <tr id="display-row-@file.FileID"
+                                                            data-file-id="@file.FileID"
+                                                            data-file-name="@file.FileName"
+                                                            data-sort-order="@file.SortOrder"
+                                                            data-category-id="@ViewBag.CategoryId">
+
+                                        <td class="p-0">
+                                            <button type="button" class="btn btn-sm btn-rename py-2 px-2"
+                                                    data-bs-toggle="modal" data-bs-target="#renameModal"
+                                                    onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@ViewBag.CategoryId')">
+                                                <i class="bi bi-pencil-square px-0"></i>
+                                            </button>
+                                        </td>
+
+                                        <td class="p-0">
+                                            <a class="btn btn-sm btn-search py-2 px-2" href="/Identity/ViewPdf?fileName=@file.FileName">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                        <td class="filename-cell" style="cursor: pointer;">@System.IO.Path.GetFileNameWithoutExtension(file.FileName)</td>
+                                        <td>@file.SortOrder</td>
+                                        <td class="text-end p-0">
+                                            <form method="post" asp-action="DeleteFileFromCategory" asp-controller="PdfCategory" asp-route-id="@file.FileID" asp-route-categoryId="@ViewBag.SelectedCategoryId" class="d-inline">
+
+                                                <!-- Delete Button -->
+                                                <button type="submit" class="btn btn-delete py-2 px-2" onclick="return confirm('Are you sure you want to delete the file: @file.FileName?');">
+                                                    <i class="bi bi-trash-fill px-0"></i>
+                                                </button>
+
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {                        
+                        <div class="text-center text-gold-darker mt-2">
+                            No files found for this category.
+                        </div>
+                    }
+
+                    <!-- Rename Modal -->
+                    <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                
+                                <!-- Modal Body -->
+                                <div class="modal-body pb-0">
+
+                                    <!-- Hidden inputs to hold data passed to the modal -->
+                                    <input type="hidden" id="renameFileId" name="renameFileId" />
+                                    <input type="hidden" id="oldFileName" name="oldFileName" />
+
+                                    <!-- Form controls using Bootstrap grid within modal-body -->
+                                    <div class="row mb-2 align-items-center">
+                                        <div class="col-3">
+                                            <label for="newFileName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" id="newFileName" name="newFileName">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-1">
+                                        <div class="col-3">
+                                            <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="number" class="form-control" id="newSortOrder" name="newSortOrder" min="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <!-- Cancel -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="bi bi-box-arrow-left"></i> Cancel
+                                    </button>
+
+                                    <!-- Save -->
+                                    <button type="button" class="btn btn-primary" onclick="submitRenameForm()">
+                                        <i class="bi bi-save-fill me-1"></i> Save Changes
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        </div> 
+                    </div>
+
+                </div>             
+
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+        <!-- Display message if no category is selected -->
+        <!--  <div class="mt-2">Please select a category to manage files.</div> -->
+}
+
+<!-- Back to PDF Categories Link -->
+<div class="row justify-content-center mx-auto p-0">
+    <div class="col-md-8 bg-transparent pt-2 pe-2">
+        <div class="d-flex justify-content-end mb-3">
+            <a class="btn btn-back" href="/PdfCategory/ManageCategories">
+                <i class="bi bi-arrow-left text-gold-darker"></i> Edit PDF Categories
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- View Styles -->
+@section Styles {
+    <style>
+        /* Styles for the absolutely positioned dropdown icon */
+        #fakedropdown {
+            position: absolute;
+            top: 50%; /* Vertically center */
+            right: 10px; /* Position from the right edge (adjust as needed) */
+            transform: translateY(-50%); /* Fine-tune vertical centering */
+            z-index: 1; /* Ensure it's layered above the select */
+            pointer-events: none; /* Allow clicks to pass through to the select */
+            color: #495057; /* Optional: Match default input text color */
+        }
+
+        /* Hide the native dropdown arrow on the select element */
+        select.form-control {
+            -webkit-appearance: none; /* For Chrome, Safari, Edge */
+            -moz-appearance: none; /* For Firefox */
+            appearance: none; /* Standard property */
+            /* Add padding to the right to prevent text overlap with the icon */
+            padding-right: 2.5rem !important; /* Adjust value based on icon size and positioning */
+            background-image: none; /* Remove default arrow background */
+            /* Ensure rounding is correct if 'rounded' class is used */
+            border-radius: var(--bs-border-radius);
+        }
+
+        /* Ensure the input-group container has relative positioning for the icon */
+        .form-group .input-group {
+            position: relative;
+        }
+
+        /* --- File Upload Section Styles --- */
+        /* Add a pointer cursor to the file name display field */
+        #fileNameDisplay {
+            cursor: pointer;
+        }
+
+        /* --- Modal Specific Styles --- */
+
+        /* Remove the top border of the modal footer to get rid of the line above the buttons */
+        #renameModal .modal-footer {
+            border-top: none;
+        }
+
+        /* styles for alternating table rows */
+        #categoryFilesContainer table tbody tr.even-row {
+            background-color: antiquewhite !important;
+        }
+
+        #categoryFilesContainer table tbody tr.odd-row {
+            background-color: #ffffff !important; /* White */
+        } 
+
+        /* Delete button icon size */
+        .delete-button i {
+            font-size: 1.0em;
+        }
+
+        /* Rename button icon size */
+        .btn-rename i {
+            font-size: 1.0em;
+        }
+
+        /* Ensure the table container handles overflow */
+        /* This ID is present in this view */
+        #categoryFilesContainer {
+            overflow-x: auto; /* Enable horizontal scrolling */
+        }
+
+    </style>
+}
+
+
+@section Scripts {
+    <script>
+
+        // --- Standalone Helper Functions ---
+        // These functions are called directly from HTML onclick attributes,
+        // so they MUST be in the global scope (outside the $(function() { ... }); block).
+
+        // Function to populate and show the rename file modal
+        function showRenameModal(fileId, fileName, sortOrder, categoryId) {
+            console.log('showRenameModal called for fileId:', fileId);
+            // Populate modal inputs with data from the clicked table row
+            document.getElementById('renameFileId').value = fileId;
+            document.getElementById('oldFileName').value = fileName;
+            // Set the initial value of the new filename input, removing the extension
+            document.getElementById('newFileName').value = fileName.substring(0, fileName.lastIndexOf('.'));
+
+            var newSortOrderInput = document.getElementById('newSortOrder');
+            // Ensure the sort order input allows 0 or more (or 1 if you prefer)
+            newSortOrderInput.setAttribute('min', '0');
+            // Set the initial value of the new sort order input field
+            newSortOrderInput.value = sortOrder;
+
+            // If you need the categoryId within the modal for the form submission,
+            // ensure you have a hidden input in the modal HTML with id="modalCategoryId"
+            // For example: document.getElementById('modalCategoryId').value = categoryId;
+
+            // Initialize and show the Bootstrap modal
+            var renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
+            renameModal.show();
+        }
+
+        // Function to handle the rename/sort order update form submission via Fetch API
+        // This function is called from the onclick of the modal's "Save Changes" button.
+        function submitRenameForm() {
+            console.log('submitRenameForm called');
+            // Get values from modal inputs
+            var fileId = document.getElementById('renameFileId').value;
+            var oldFileName = document.getElementById('oldFileName').value;
+            var newFileNameInput = document.getElementById('newFileName');
+            // Append .pdf extension back for comparison and server action, assuming all managed files are PDFs
+            var newFileNameWithExtension = newFileNameInput.value + '.pdf';
+            var newSortOrder = document.getElementById('newSortOrder').value;
+
+            // Get the currently selected categoryId from the main select dropdown
+            // This is used to reload the page with the correct category filter after the action
+            var currentCategoryId = $('#categoryId').val();
+
+            var url;
+            // Use FormData to easily collect and send data for the POST request
+            var formData = new FormData();
+            formData.append("renameFileId", fileId);
+            formData.append("newSortOrder", newSortOrder);
+
+            // Determine which server action to call based on whether the filename changed
+            if (oldFileName !== newFileNameWithExtension) {
+                // Filename has changed, call the rename action
+                url = '@Url.Action("RenameFileInCategory", "PdfCategory")';
+                formData.append("oldFileName", oldFileName); // Send old name
+                formData.append("newFileName", newFileNameWithExtension); // Send new name
+            } else {
+                // Filename is the same, call the update sort order action
+                url = '@Url.Action("UpdateFileSortOrder", "PdfCategory")';
+                // The UpdateFileSortOrder action likely only requires fileId and newSortOrder,
+                // which are already in the formData.
+            }
+
+            // Get the Request Verification Token for security against CSRF            
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var headers = {};
+            if (token) {
+                headers['RequestVerificationToken'] = token;
+            }
+
+            // Perform the asynchronous HTTP POST request using the Fetch API
+            fetch(url, {
+                method: 'POST',
+                body: formData, // Send collected data. Fetch with FormData automatically sets Content-Type.
+                 headers: headers // Include the security token in headers
+            })
+            .then(response => {
+                // Check if the response was successful (HTTP status 2xx)
+                if (!response.ok) {
+                     // If not successful, try to read an error message from the response body
+                     return response.text().then(errorMessage => {
+                         // Throw an error that will be caught by the .catch() block
+                         throw new Error(errorMessage || 'Server returned an error.');
+                     });
+                }
+                // If successful, read the response body as text (assuming it returns a message or redirects)
+                // If your RenameFileInCategory or UpdateFileSortOrder actions return JSON, use response.json() instead.
+                return response.text();
+            })
+            .then(message => {
+                // Handle successful response
+                console.log('Request successful:', message);
+                // Reload the page to show the updated file list and order
+                window.location.href = '@Url.Action("ManageCategoryFiles", "PdfCategory")' + (currentCategoryId ? '?categoryId=' + currentCategoryId : '');
+
+                // Alternatively, instead of reloading, you could hide the modal and update the table row directly
+                // var renameModal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
+                // renameModal.hide();
+                // Find the table row $('#display-row-' + fileId) and update its cells with the new name and sort order
+            })
+            .catch(error => {
+                // Handle any errors during the fetch or from the server
+                console.error('Fetch error:', error);
+                // Display an error message to the user
+                alert('An error occurred while updating the file: ' + error.message);
+
+                // Optional: Close the modal on error
+                // var renameModal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
+                // renameModal.hide();
+            });
+        }
+
+
+        // Function to apply alternating row colors to the file list table
+        function applyRowColors() {
+             // Target all table rows within the tbody that represent display rows
+             $('#categoryFilesContainer table tbody tr[id^="display-row-"]:visible').each(function(index) {
+                 $(this).removeClass('even-row odd-row'); // Remove existing classes
+                 if (index % 2 === 0) {
+                     $(this).addClass('even-row'); // Apply even row class
+                 } else {
+                     $(this).addClass('odd-row'); // Apply odd row class
+                 }
+             });
+             // Ensure edit rows (if any are added) don't interfere
+             // $('#categoryFilesContainer table tbody tr[id^="edit-row-"]').removeClass('even-row odd-row'); // Uncomment if you add edit rows
+        }
+
+
+        // --- Document Ready Block ---
+        // This block runs once the entire DOM is loaded.
+        $(document).ready(function() {
+
+            // --- Initial Setup ---
+            var selectedCategoryId = '@ViewBag.SelectedCategoryId';
+            var categoryLabel = $('#categoryLabel');
+
+            // Update the category label text based on whether a category is selected
+            if (categoryLabel.length > 0) { // Check if the label element exists
+                 if (selectedCategoryId) {
+                      categoryLabel.text('Current Category:');
+                      // Fetch the next sort order for the upload form if a category is selected
+                      $.get('@Url.Action("GetNextSortOrder", "PdfCategory")', { categoryId: selectedCategoryId }, function (data) {
+                          $('#sortOrder').val(data);
+                      }).fail(function(jqXHR, textStatus, errorThrown) {
+                          console.error("Error fetching next sort order:", textStatus, errorThrown);
+                          $('#sortOrder').val(1); // Default to 1 on error
+                      });
+                 } else {
+                      categoryLabel.text('Select a Category:');
+                      $('#sortOrder').val(1); // Default sort order if no category selected
+                 }
+            } else {
+                 console.warn("#categoryLabel element not found on document ready.");
+            }
+
+            // Automatically apply colors to visible display rows on page load
+            applyRowColors();
+
+
+            // --- Event Listeners ---
+
+            // Category Dropdown Change Event: Listener for when the user selects a different category
+            $('#categoryId').change(function () {
+                var categoryId = $(this).val();
+                // categoryLabel is already defined above
+
+                if (categoryLabel.length > 0) { // Check if label exists
+                    if (categoryId) {
+                        categoryLabel.text('Current Category:');
+                        // Redirect to reload the page with the selected category filter
+                        window.location.href = '@Url.Action("ManageCategoryFiles")?categoryId=' + categoryId;
+                    } else {
+                        categoryLabel.text('Select a Category:');
+                        // Redirect to reload the page without a category filter
+                        window.location.href = '@Url.Action("ManageCategoryFiles")';
+                    }
+                } else {
+                    console.warn("#categoryLabel element not found in change handler.");
+                }
+            });
+
+
+            // Handle file input change for the upload form: Listener for when a file is selected
+            $('#chooseFile').on('change', function() {
+                var fileName = $(this).val().split('\\').pop(); // Extract just the file name
+                $('#fileNameDisplay').val(fileName || '--No file chosen--'); // Display the file name or default placeholder
+            });
+
+            // --- NEW: Event listener for clicking the file name display input ---
+            $('#fileNameDisplay').on('click', function() {
+                console.log('#fileNameDisplay clicked, triggering #chooseFile');
+                $('#chooseFile').trigger('click'); // Trigger a click on the hidden file input
+            });
+
+
+            // Event listener for clicking the filename cell (in the table) to open the rename modal
+            $('#categoryFilesContainer table tbody').on('click', '.filename-cell', function() {
+                 var row = $(this).closest('tr'); // Find the parent table row
+                 // Retrieve file data stored in data attributes on the table row
+                 var fileId = row.data('file-id');
+                 var fileName = row.data('file-name');
+                 var sortOrder = row.data('sort-order');
+                 // Assuming data-category-id exists on the row as well
+                 var categoryId = row.data('category-id');
+
+                 // Call the global function to show the modal, passing the retrieved data
+                 showRenameModal(fileId, fileName, sortOrder, categoryId);
+            });
+
+            // Handle modal hidden event to remove the backdrop - Listener for when the rename modal is fully hidden
+             $('#renameModal').on('hidden.bs.modal', function () {
+                  // Check if the modal backdrop element exists before trying to remove it
+                  if ($('.modal-backdrop').length) {
+                      $('.modal-backdrop').remove(); // Remove the backdrop to prevent scroll issues
+                  }
+             });
+
+        }); // <-- Closing tag for the document ready block
+
+    </script>
+}

@@ -1,0 +1,218 @@
+﻿@page
+@using System.IO
+@model Members.Areas.Identity.Pages.AdminFilesModel
+
+@{
+    ViewData["Title"] = "Delete Protected Files";
+}
+
+<div class="text-center mt-4 mb-2">
+    <h3><i class="bi bi-shield-lock-fill ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @Model.MessageType">@Model.Message</div>
+}
+
+<div class="row mx-0 p-0">
+    <div class="col-md-8 mx-auto p-2 mb-2 my-0">
+
+        <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">
+            <div class="card-body m-1 p-0">
+
+                @* <div class="text-center mt-2 mb-4">
+                    <h5 class="text-gold-darker"><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Upload a New PDF File</h5>
+                </div>
+
+                <div class="text-start">
+                    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                        <div class="mb-3 position-relative">
+                            <div class="d-flex align-items-center">
+                                <input type="file" class="form-control flex-grow-1 upload-file-input" id="uploadFile" name="uploadFile" required>
+                                <button type="submit" class="btn btn-upload upload-button"><i class="bi bi-upload"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Edit an Existing Row -->
+                <div class="text-center mb-0">
+                    <h5>
+                        <i class="bi bi-file-earmark-pdf-fill me-2 mb-2 text-gold-darker"></i> Edit an Existing PDF File
+                    </h5>
+                </div> *@
+
+                <div class="row mt-2">
+
+                    <!-- File Name -->
+                    <div class="col-6 text-start">
+                        <p class="ps-2 text-gold-darker"><strong>File Name</strong></p>
+                    </div>
+
+                    <!-- Delete -->
+                    <div class="col-6 text-end">
+                        <p class="pe-2 text-gold-darker">
+                            <strong>Delete</strong>
+                        </p>
+                    </div>
+
+                </div>
+
+                @if (Model.Files.Any())
+                {
+                    <div class="text-start">
+                        <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" id="AdminFiles">
+                            <ul class="list-group">
+                                @{
+                                    var fileIndex = 0;
+                                }
+                                @foreach (var file in Model.Files)
+                                {
+                                    var rowClass = fileIndex % 2 == 0 ? "even-row" : "odd-row";
+                                    <li class="list-group-item @rowClass">
+                                        <div class="row align-items-center">
+                                            
+                                            <div class="col d-flex align-items-center">
+                                                <span class="flex-grow-1 d-block text-gold-darker" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                                            </div>
+                                            <div class="col-auto d-flex align-items-center justify-content-end">
+                                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-delete py-2 px-2 delete-button" data-filename="@file">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                  
+                                    fileIndex++;
+                                }
+                            </ul>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <p>No files found.</p>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .even-row {
+            background-color: antiquewhite !important;
+        }
+
+        .odd-row {
+            background-color: #ffffff !important;
+        }
+
+            .even-row > td,
+            .odd-row > td {
+                background-color: inherit !important;
+            }
+
+        .delete-button i {
+            font-size: 1.0em;
+        }
+
+        .btn-rename i {
+            font-size: 1.0em;
+        }
+
+
+        #categoryFilesContainer {
+            overflow-x: auto; /* Enable horizontal scrolling */
+        }
+
+    </style>
+}
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-rename').on('click', function () {
+                var listItem = $(this).closest('li.list-group-item');
+                var fileNameSpan = listItem.find('span');
+                var fileName = fileNameSpan.text();
+                var renameInputListItem = listItem.next('li.list-group-item'); // Select the next list item
+                renameInputListItem.removeClass('d-none');
+                $(this).hide();
+
+                // Find the input field and set focus to it
+                var newFileNameInput = renameInputListItem.find('input[name="newFileName"]');
+                newFileNameInput.focus();
+            });
+
+            $('.cancel-rename').on('click', function () {
+                var fileName = $(this).data('file');
+                var renameInputListItem = $(this).closest('li.list-group-item'); // This is the rename input <li>
+                renameInputListItem.addClass('d-none'); // Hide the rename input
+
+                // Target the previous list item (which contains the original file info and the Rename button)
+                var originalListItem = renameInputListItem.prev('li.list-group-item');
+                // Find the Rename button within that previous list item and show it
+                originalListItem.find('div button.btn-rename').show(); // Updated selector here as well
+            });
+
+            // Handle the click event of the "Update Rename" button directly
+            $('.update-rename-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                var oldFileName = $(this).data('oldfilename');
+                var renameInputListItem = $(this).closest('.list-group-item'); // This should be the rename input li
+                var newFileNameInput = renameInputListItem.find('input[name="newFileName"]');
+                var newFileName = newFileNameInput.val();
+                if (!oldFileName || !newFileName) {
+                    alert('Both old and new file names must be provided.');
+                    return;
+                }
+
+                var url = `/Identity/AdminFiles?handler=UpdateRename&oldFileName=${encodeURIComponent(oldFileName)}`;
+
+                // Create form data
+                var formData = new FormData();
+                formData.append('newFileName', newFileName);
+
+                // Submit the form data using AJAX
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false, // Required for FormData
+                    processData: false, // Required for FormData
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (data) {
+                        if (data) {
+                            location.reload(); // Reload the page to show updated list and messages
+                        } else {
+                            alert('Error renaming file.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error renaming file:", error);
+                        alert('An error occurred while renaming the file.');
+                    }
+                });
+            });
+
+            // Handle the click event of the "X" (Delete) button with confirmation
+            $('.delete-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission of this button
+                var fileName = $(this).data('filename');
+                if (confirm('Are you sure you want to delete the file "' + fileName + '"?')) {
+                    // If the user confirms, submit the form to the DeleteSingle handler
+                    var form = document.getElementById('AdminFiles');
+                    form.action = '?handler=DeleteSingle&fileName=' + encodeURIComponent(fileName);
+                    form.method = 'post';
+                    form.submit();
+                }
+            });
+        });
+    </script>
+}

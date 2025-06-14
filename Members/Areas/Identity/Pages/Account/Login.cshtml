@@ -1,0 +1,108 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Logo Image -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card p-2 shadow rounded bg-Card-Menu">
+
+                <!-- Title -->
+                <h2 class="text-center mb-4 text-gold-darker">
+                    <i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]
+                </h2>
+
+                <section>
+
+                    <!-- Log in Form -->
+                    <form id="account" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
+
+                        <!-- Email -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input asp-for="Input.Password" id="password" type="password" class="form-control" autocomplete="off" aria-required="true" placeholder="password" />
+                                <button type="button" id="togglePassword" class="btn btn-sm btn-outline-secondary bg-red-lighter">
+                                    <i id="passwordIcon" class="bi bi-eye-slash-fill"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="form-check mb-3 text-gold-darker">
+                            <input class="form-check-input" asp-for="Input.RememberMe" id="rememberMe" />
+                            <label class="form-check-label" asp-for="Input.RememberMe" for="rememberMe">
+                                @Html.DisplayNameFor(m => m.Input.RememberMe)
+                            </label>
+                        </div>
+
+                        <!-- Forgot your Password -->
+                        <div class="form-floating mb-4">
+                            <a class="btn btn-sm btn-loglink border-0" asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot your password?</a>
+                        </div>
+                       
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+
+                            <!-- Cancel -->
+                            <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-secondary border-0 me-2" title="Cancel">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </a>
+
+                            <!-- Log In -->                            
+                            <button id="login-submit" type="submit" class="btn btn-sm btn-success border-0 me-2">
+                                <i class="bi bi-unlock"></i> Log in
+                            </button>                            
+
+                        </div>   
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordButton = document.getElementById('togglePassword');
+            const passwordIcon = document.getElementById('passwordIcon');
+
+            togglePasswordButton.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('bi-eye-slash-fill');
+                passwordIcon.classList.add('bi-eye-fill');
+                togglePasswordButton.style.backgroundColor = '#c8e6c9'; // Light green
+                togglePasswordButton.style.borderColor = '#a5d6a7';
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('bi-eye-fill');
+                passwordIcon.classList.add('bi-eye-slash-fill');
+                togglePasswordButton.style.backgroundColor = '#ecb3b8'; // Darker light red
+                togglePasswordButton.style.borderColor = '#e39aa0';
+            }
+            passwordInput.focus();
+        });
+        });
+    </script>
+}
