@@ -136,7 +136,7 @@
     <PackageReference Include="Syncfusion.Licensing" Version="29.2.7" />
     <PackageReference Include="Syncfusion.Pdf.Imaging.NET" Version="29.2.7" />
     <PackageReference Include="Syncfusion.Pdf.NET" Version="29.2.7" />
-    <PackageReference Include="System.Security.Permissions" Version="9.0.5" />
+    <PackageReference Include="System.Security.Permissions" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\Migrations\" />

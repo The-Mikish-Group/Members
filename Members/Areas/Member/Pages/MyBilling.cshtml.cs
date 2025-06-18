@@ -66,42 +66,52 @@ namespace Members.Areas.Member.Pages
         }
         public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
         {
-            _logger.LogInformation("MyBilling.OnGetAsync START - UserID: {userId}, ReturnUrl: {returnUrl}, SortOrder: {sortOrder}",userId,returnUrl, sortOrder);
+            // Enhanced initial logging
+            _logger.LogInformation("MyBilling.OnGetAsync START - Received UserID: {ReceivedUserId}, ReturnUrl: {ReceivedReturnUrl}, SortOrder: {ReceivedSortOrder}", userId, returnUrl, sortOrder);
+
             this.BackToEditUserUrl = returnUrl;
             IdentityUser? determinedTargetUser = null;
             var loggedInUser = await _userManager.GetUserAsync(User);
+
             if (loggedInUser == null)
             {
                 _logger.LogWarning("MyBilling.OnGetAsync: Current logged-in user is NULL. Challenging.");
-                return Challenge(); // Should not happen if [Authorize] is on the class
+                return Challenge(); 
             }
+            _logger.LogInformation("MyBilling.OnGetAsync: LoggedInUser: {LoggedInUserName} (ID: {LoggedInUserId})", loggedInUser.UserName, loggedInUser.Id);
+
+
             if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
             {
-                _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {userId}",userId);
+                _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {UserIdToFind}", userId);
                 determinedTargetUser = await _userManager.FindByIdAsync(userId);
                 if (determinedTargetUser == null)
                 {
-                    _logger.LogWarning("MyBilling.OnGetAsync: Admin/Manager provided UserID {userId}, but user was NOT FOUND. Defaulting to logged-in user for safety, but this is an error condition.", userId);
-                    // Forcing to load loggedInUser's data instead of erroring out, to see if page renders.
-                    // TempData["ErrorMessage"] = $"User with ID '{userId}' not found. Showing your own data if applicable.";
-                    determinedTargetUser = loggedInUser; // Fallback to current user
-                    IsViewingSelf = true; // Act as if viewing self to avoid null refs on targetUser specific items
+                    _logger.LogWarning("MyBilling.OnGetAsync: Admin/Manager provided UserID {ProvidedUserId}, but user was NOT FOUND. Defaulting to logged-in user for safety.", userId);
+                    determinedTargetUser = loggedInUser; 
+                    IsViewingSelf = true; 
                     ViewedUserId = loggedInUser.Id;
                 }
                 else
                 {
-                    _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager - TargetUser {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}) FOUND.", determinedTargetUser.UserName, determinedTargetUser.Id);
+                    _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager - TargetUser {TargetUserName} (ID: {TargetUserId}) FOUND.", determinedTargetUser.UserName, determinedTargetUser.Id);
                     IsViewingSelf = false;
                     ViewedUserId = determinedTargetUser.Id;
                 }
             }
             else
             {
-                _logger.LogInformation("MyBilling.OnGetAsync: Member viewing self, or Admin/Manager did not provide userId. Using LoggedInUser: {loggedInUser.UserName}", loggedInUser.UserName);
+                _logger.LogInformation("MyBilling.OnGetAsync: Member viewing self, or Admin/Manager did not provide userId. Using LoggedInUser: {UserNameToUse}", loggedInUser.UserName);
                 determinedTargetUser = loggedInUser;
                 IsViewingSelf = true;
                 ViewedUserId = determinedTargetUser.Id;
             }
+
+            // This line was already present from previous step, ensuring correct logging placement.
+            _logger.LogInformation("MyBilling.OnGetAsync: Determined Target User: {DeterminedUserName} (ID: {DeterminedUserId}), IsViewingSelf: {IsViewingSelfFlag}", determinedTargetUser.UserName, determinedTargetUser.Id, IsViewingSelf);
+            _logger.LogInformation("MyBilling.OnGetAsync: BackToEditUserUrl initially set to: {InitialReturnUrl}", this.BackToEditUserUrl);
+
+
             // Populate DisplayName and TargetUserIsBillingContact based on determinedTargetUser
             var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == determinedTargetUser.Id);
             if (IsViewingSelf)
@@ -164,6 +174,19 @@ namespace Members.Areas.Member.Pages
             // Apply Sorting
             string effectiveSort = sortOrder ?? "invoiceid_desc"; // Default to Invoice ID Descending
             this.CurrentSort = effectiveSort;
+
+            // Modify BackToEditUserUrl if conditions are met
+            if (!string.IsNullOrEmpty(this.BackToEditUserUrl) && 
+                !string.IsNullOrEmpty(this.ViewedUserId) && 
+                (this.BackToEditUserUrl.Contains("/Admin/Accounting/AdminBalances") || 
+                 this.BackToEditUserUrl.Contains("/Admin/Accounting/CurrentBalances") || // Future name
+                 this.BackToEditUserUrl.Contains("/Admin/Accounting/ReviewBatchInvoices") )) // New check
+            {
+                string separator = this.BackToEditUserUrl.Contains("?") ? "&" : "?";
+                this.BackToEditUserUrl = $"{this.BackToEditUserUrl}{separator}returnedFromUserId={this.ViewedUserId}";
+                _logger.LogInformation("Appended returnedFromUserId to BackToEditUserUrl for relevant admin page. New URL: {NewUrl}", this.BackToEditUserUrl);
+            }
+
             DateSort = (effectiveSort == "date_asc") ? "date_desc" : "date_asc";
             InvoiceIdSort = (effectiveSort == "invoiceid_asc") ? "invoiceid_desc" : "invoiceid_asc";
             DescriptionSort = (effectiveSort == "desc_asc") ? "desc_desc" : "desc_asc";

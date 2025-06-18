@@ -51,8 +51,8 @@ else
     app.UseHsts();
 }
 app.UseHttpsRedirection();
-app.UseRouting();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
+app.UseRouting(); 
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(

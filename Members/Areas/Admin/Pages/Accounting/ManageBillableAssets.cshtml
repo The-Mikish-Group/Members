@@ -1,0 +1,232 @@
+@page
+@model Members.Areas.Admin.Pages.Accounting.ManageBillableAssetsModel
+@{
+    ViewData["Title"] = "Manage Billable Assets";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center text-gold-darker my-4"><i class="bi bi-list"></i> @ViewData["Title"]</h2>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="mb-4">
+    <div class="">
+        <h5 class="text-gold-darker ms-2 mb-0">Add New Billable Asset</h5>
+    </div>
+    <div class="shadow card m-1 p-1 bg-Card-Menu">
+        <form method="post" asp-page-handler="AddAsset">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label asp-for="NewAssetInput.PlotID" class="ms-2 form-label text-gold-darker"></label>
+                    <input asp-for="NewAssetInput.PlotID" class="form-control shadow text-gold-darker" />
+                    <span asp-validation-for="NewAssetInput.PlotID" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="NewAssetInput.AssessmentFee" class="ms-2 form-label text-gold-darker"></label>
+                    <input asp-for="NewAssetInput.AssessmentFee" type="number" step="0.01" class="form-control shadow text-gold-darker" placeholder="0.00" />
+                    <span asp-validation-for="NewAssetInput.AssessmentFee" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="NewAssetInput.SelectedUserID" class="ms-2 form-label text-gold-darker"></label>
+                    <select asp-for="NewAssetInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow text-gold-darker">
+                        <option value="">-- Select Billing Contact --</option>
+                    </select>
+                    <span asp-validation-for="NewAssetInput.SelectedUserID" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="NewAssetInput.Description" class="ms-2 form-label text-gold-darker"></label>
+                    <input asp-for="NewAssetInput.Description" class="form-control shadow text-gold-darker" />
+                    <span asp-validation-for="NewAssetInput.Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-12 mt-3 mb-2 me-2 text-end">
+                <button type="submit" class="btn btn-sm shadow btn-success"><i class="bi bi-plus-circle"></i> Add Asset</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.ShowEditForm && Model.EditInput != null)
+{
+    <div class="card shadow-sm mb-4 border-primary"> 
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Edit Billable Asset: @Model.EditInput.PlotID</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="UpdateAsset">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="EditInput.BillableAssetID" />
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="EditInput.PlotID" class="form-label"></label>
+                        <input asp-for="EditInput.PlotID" class="form-control" />
+                        <span asp-validation-for="EditInput.PlotID" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EditInput.AssessmentFee" class="form-label"></label>
+                        <input asp-for="EditInput.AssessmentFee" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                        <span asp-validation-for="EditInput.AssessmentFee" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="EditInput.SelectedUserID" class="form-label"></label>
+                        <select asp-for="EditInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select">
+                            <option value="">-- Unassign / Select Contact --</option>
+                        </select>
+                        <span asp-validation-for="EditInput.SelectedUserID" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EditInput.Description" class="form-label"></label>
+                        <input asp-for="EditInput.Description" class="form-control" />
+                        <span asp-validation-for="EditInput.Description" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Update Asset
+                        </button>
+                        <a asp-page="./ManageBillableAssets" class="btn btn-secondary ms-2">
+                            <i class="bi bi-x-circle"></i> Cancel Edit
+                        </a>
+                    </div>
+                @* Removed superfluous div here *@
+            </form>
+        </div>
+    </div>
+}
+
+
+<div class="">
+    <h5 class="ms-2 mb-0 text-gold-darker">Existing Billable Assets</h5>
+</div>
+<div class="shadow card mx-1 mt-1 mb-4 p-1">
+    @if (!Model.Assets.Any())
+    {
+        <p class="p-3 text-center text-gold-darker">No billable assets found.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="w-100 mb-0">
+                <thead>
+                    <tr class="bg-gold-dark text-white">
+                            
+                        <th>
+                            <a asp-page="./ManageBillableAssets" 
+                                asp-route-CurrentSort="@Model.BillingContactSort"
+                                class="text-decoration-none text-white text-nowrap">Assigned Billing Contact</a>
+                            @if (Model.CurrentSort == "contact_asc") { <i class="bi bi-arrow-down"></i> }
+                            @if (Model.CurrentSort == "contact_desc") { <i class="bi bi-arrow-up"></i> }
+                        </th>
+                        <th class="ps-2 py-2">
+                            <a asp-page="./ManageBillableAssets"
+                                asp-route-CurrentSort="@Model.PlotIdSort"
+                                class="text-decoration-none text-white text-nowrap">Plot ID / Asset Identifier</a>
+                            @if (Model.CurrentSort == "plotid_asc") { <i class="bi bi-arrow-down"></i> }
+                            @if (Model.CurrentSort == "plotid_desc") { <i class="bi bi-arrow-up"></i> }
+                        </th>
+                        <th class="text-end text-nowrap">Assessment Fee</th> 
+                        <th>
+                            <a asp-page="./ManageBillableAssets" 
+                                asp-route-CurrentSort="@Model.DescriptionSort"
+                                class="text-decoration-none text-white text-nowrap">Description</a>
+                            @if (Model.CurrentSort == "desc_asc") { <i class="bi bi-arrow-down"></i> }
+                            @if (Model.CurrentSort == "desc_desc") { <i class="bi bi-arrow-up"></i> }
+                        </th>
+                        <th>
+                            <a asp-page="./ManageBillableAssets" 
+                                asp-route-CurrentSort="@Model.DateCreatedSort"
+                                class="text-decoration-none text-white text-nowrap">Date Created</a>
+                            @if (Model.CurrentSort == "created_asc") { <i class="bi bi-arrow-down"></i> }
+                            @if (Model.CurrentSort == "created_desc") { <i class="bi bi-arrow-up"></i> }
+                        </th>
+                        <th>
+                            <a asp-page="./ManageBillableAssets" 
+                                asp-route-CurrentSort="@Model.LastUpdatedSort"
+                                class="text-decoration-none text-white text-nowrap">Last Updated</a>
+                            @if (Model.CurrentSort == "updated_asc") { <i class="bi bi-arrow-down"></i> }
+                            @if (Model.CurrentSort == "updated_desc") { <i class="bi bi-arrow-up"></i> }
+                        </th>
+                        <th class="text-center pe-2 py-2 text-nowrap">Edit</th>
+                        <th class="text-center pe-2 py-2 text-nowrap">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int i = 0; }
+                    @foreach (var asset in Model.Assets)
+                    {
+                        <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
+                            <td class="text-nowrap">@(asset.BillingContactFullName)@(!string.IsNullOrEmpty(asset.BillingContactEmail) ? $" ({asset.BillingContactEmail})" : "")</td>
+                            <td class="text-nowrap ps-2 py-2">@asset.PlotID</td>
+                            <td class="text-nowrap text-end">@asset.AssessmentFee.ToString("C")</td>
+                            <td class="text-nowrap">@asset.Description</td>
+                            <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
+                            <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
+                            <td class="text-nowrap text-center pe-2 py-2">
+                                <a asp-page-handler="ShowEditForm" 
+                                    asp-route-assetId="@asset.BillableAssetID"
+                                    class="btn btn-sm btn-outline-primary me-1"
+                                    title="Edit Asset">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                            </td>
+                            <td class="text-nowrap text-center pe-2 py-2">
+                                <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            title="Delete Asset: @asset.PlotID"
+                                            onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+
+@section Styles {
+    <style>
+        .row-even { background-color: antiquewhite; }
+        .row-odd { background-color: #ffffff; }
+        .row-even > td, .row-odd > td { background-color: inherit !important; }
+        table th, table td {
+            vertical-align: middle;
+            padding: 0.5rem 0.5rem; 
+        }
+        thead th {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        .form-label {
+            font-weight: 500; /* Slightly bolder labels */
+        }
+        .table th a .bi { /* For sort indicators */
+            font-size: 0.9em;
+            margin-left: 0.25rem;
+        }
+    </style>
+}

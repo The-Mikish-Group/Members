@@ -354,21 +354,7 @@
                                             asp-route-showextrafields="@Model.ShowExtraFields">
                                             Zip Code
                                         </a>
-                                    </th>
-                                    <th class="extra-field">
-                                        <!-- Sort by Plot -->
-                                        <a class="nav-link"
-                                            asp-page="./Users"
-                                            asp-route-sortcolumn="plot"
-                                            data-sort-column="plot"
-                                            asp-route-sortorder="@(Model.SortOrder == "asc" && Model.SortColumn == "plot" ? "desc" : "asc")"
-                                            asp-route-searchterm="@Model.SearchTerm"
-                                            asp-route-pageNumber="@Model.PageNumber"
-                                            asp-route-pageSize="@Model.PageSize"
-                                            asp-route-showextrafields="@Model.ShowExtraFields">
-                                            Plot
-                                        </a>
-                                    </th>
+                                    </th>                                    
                                     <th class="extra-field">
                                         <!-- Sort by Birthday -->
                                         <a class="nav-link"
@@ -475,7 +461,6 @@
                                             <td class="extra-field">@user.City</td>
                                             <td class="extra-field">@user.State</td>
                                             <td class="extra-field">@user.ZipCode</td>
-                                            <td class="extra-field">@user.Plot</td>
                                             <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
                                             <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
                                         }
@@ -943,7 +928,7 @@ else
                              const currentShowExtraFieldsHidden = document.getElementById('showExtraFieldsHidden');
 
                              const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
-                             const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                             const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '20';
                              const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
                              const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
                              const searchTerm = currentSearchInput ? currentSearchInput.value : ''; // Get actual input value
@@ -1031,7 +1016,7 @@ else
 
                 const searchTerm = currentSearchInput ? currentSearchInput.value : '';
                 const pageNumber = currentPageNumberInput ? currentPageNumberInput.value : '1';
-                const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '10';
+                const pageSize = currentPageSizeInput ? currentPageSizeInput.value : '20';
                 const sortColumn = currentSortColumnInput ? currentSortColumnInput.value : '';
                 const sortOrder = currentSortOrderInput ? currentSortOrderInput.value : '';
                 const showExtraFields = currentShowExtraFieldsHidden ? currentShowExtraFieldsHidden.value : 'False';               

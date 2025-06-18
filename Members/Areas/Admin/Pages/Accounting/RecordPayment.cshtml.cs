@@ -277,10 +277,13 @@ namespace Members.Areas.Admin.Pages.Accounting
                 invoiceToApplyTo.Status = InvoiceStatus.Overdue;
             }
             _context.Invoices.Update(invoiceToApplyTo);
-            creditToApply.Amount -= actualAmountToApply;
+            creditToApply.Amount -= actualAmountToApply; // This updates creditToApply.Amount to the new remaining balance
             creditToApply.LastUpdated = DateTime.UtcNow;
-            creditToApply.ApplicationNotes = (creditToApply.ApplicationNotes ?? "") +
-                $"Applied {actualAmountToApply:C} to INV-{invoiceToApplyTo.InvoiceID:D5} on {DateTime.UtcNow:yyyy-MM-dd}. ";
+
+            string originalCreditAmountBeforeThisApplication = (creditToApply.Amount + actualAmountToApply).ToString("C");
+            string remainingCreditAmountAfterThisApplication = creditToApply.Amount.ToString("C");
+            creditToApply.ApplicationNotes = $"Applied {actualAmountToApply:C} to INV-{invoiceToApplyTo.InvoiceID:D5} on {DateTime.UtcNow:yyyy-MM-dd}. Original credit bal before this app: {originalCreditAmountBeforeThisApplication}. Remaining bal on this credit: {remainingCreditAmountAfterThisApplication}.";
+            
             if (creditToApply.Amount <= 0)
             {
                 creditToApply.IsApplied = true;
@@ -521,50 +524,59 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // For now, the provided UserCredit model has nullable SourcePaymentID.
                 // We will save all changes together at the end.
             }
+            _context.Invoices.Update(invoiceToPay); // Ensure invoice is marked for update
+
+            UserCredit? newCreditForOverpayment = null; // Renamed from userCredit for clarity in this block
+            if (overpaymentAmount > 0)
+            {
+                newCreditForOverpayment = new UserCredit
+                {                    
+                    UserID = Input.SelectedUserID,
+                    CreditDate = Input.PaymentDate!.Value, 
+                    Amount = overpaymentAmount,
+                    SourcePaymentID = null, 
+                    Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5}.", // Initial reason
+                    IsApplied = false,
+                    DateCreated = DateTime.UtcNow,
+                    LastUpdated = DateTime.UtcNow
+                };
+                _context.UserCredits.Add(newCreditForOverpayment);
+            }
+
             try
             {
-                _context.Invoices.Update(invoiceToPay);
-                await _context.SaveChangesAsync(); // Saves Payment, updated Invoice, and new UserCredit (if any)
-                // If UserCredit was created and you want to link its SourcePaymentID now
-                if (overpaymentAmount > 0 && payment.PaymentID > 0)
+                await _context.SaveChangesAsync(); // First main save (Payment, Invoice, potential UserCredit without SourcePaymentID)
+                _logger.LogInformation("Initial save successful for payment {PaymentAmount} to invoice {InvoiceId}. PaymentID: {PaymentId}", payment.Amount, invoiceToPay.InvoiceID, payment.PaymentID);
+
+                if (newCreditForOverpayment != null && payment.PaymentID > 0) // payment.PaymentID is now available
                 {
-                    var savedCredit = await _context.UserCredits.OrderByDescending(uc => uc.DateCreated).FirstOrDefaultAsync(uc => uc.UserID == Input.SelectedUserID && uc.Amount == overpaymentAmount && uc.SourcePaymentID == null);
-                    if (savedCredit != null)
-                    {
-                        savedCredit.SourcePaymentID = payment.PaymentID;
-                        savedCredit.Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5} from Payment ID: {payment.PaymentID}.";
-                        await _context.SaveChangesAsync(); // Save the update to UserCredit
-                    }
+                    newCreditForOverpayment.SourcePaymentID = payment.PaymentID;
+                    newCreditForOverpayment.Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5} from Payment ID: {payment.PaymentID}.";
+                    // EF Core should be tracking newCreditForOverpayment as it was just Added.
+                    // Explicitly marking it as Modified can be done if necessary, but often not if just updated.
+                    // _context.UserCredits.Update(newCreditForOverpayment); // Usually not needed if tracked
+                    await _context.SaveChangesAsync(); // Second save, specifically for UserCredit.SourcePaymentID and updated Reason
+                    _logger.LogInformation("Successfully linked UserCredit {UserCreditId} to PaymentID {PaymentId}", newCreditForOverpayment.UserCreditID, payment.PaymentID);
                 }
-                const string successLogTemplate = "Successfully processed payment ID {PaymentID}, updated invoice ID {InvoiceID}, and potentially created UserCredit for user.";
-                _logger.LogInformation(successLogTemplate, payment.PaymentID, invoiceToPay.InvoiceID); 
+
+                // All database operations successful, now set TempData
                 TempData["StatusMessage"] = $"Payment of {Input.Amount!.Value:C} applied. Invoice INV-{invoiceToPay.InvoiceID:D5} status: {invoiceToPay.Status}.";
                 if (overpaymentAmount > 0)
                 {
-                    TempData["StatusMessage"] += $"\nOverpayment of {overpaymentAmount:C} credited to account.";
+                    TempData["StatusMessage"] += $"\nOverpayment of {overpaymentAmount:C} credited to account (Credit ID: {newCreditForOverpayment?.UserCreditID}).";
                 }
+                _logger.LogInformation("Successfully processed payment ID {PaymentID}, updated invoice ID {InvoiceID}.", payment.PaymentID, invoiceToPay.InvoiceID);
             }
             catch (DbUpdateException ex)
             {
-                const string errorLogTemplate = "Error saving payment/invoice/credit.";
-                _logger.LogError(ex, errorLogTemplate);
-                ModelState.AddModelError(string.Empty, "An error occurred while saving data. See logs for details.");
+                _logger.LogError(ex, "Error saving payment/invoice/credit data for user {UserId}, invoice {InvoiceId}.", Input.SelectedUserID, Input.SelectedInvoiceID);
+                ModelState.AddModelError(string.Empty, "An error occurred while saving payment data. See logs for details.");
                 await OnGetAsync(Input.SelectedUserID, ReturnUrl); // Repopulate page data
                 return Page();
             }
-            if (invoiceToPay.AmountPaid >= invoiceToPay.AmountDue)
-            {
-                invoiceToPay.Status = InvoiceStatus.Paid;
-            }
-            else if (invoiceToPay.DueDate < DateTime.Today.AddDays(-1) && invoiceToPay.Status == InvoiceStatus.Due)
-            {
-                invoiceToPay.Status = InvoiceStatus.Overdue;
-            }
-            invoiceToPay.LastUpdated = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            const string finalLogTemplate = "Successfully saved payment ID {PaymentID} and updated invoice ID {InvoiceID} for user {UserName}.";
-            _logger.LogInformation(finalLogTemplate, payment.PaymentID, invoiceToPay.InvoiceID, user?.UserName);
-            TempData["StatusMessage"] = $"Payment of {payment.Amount:C} applied to invoice INV-{invoiceToPay.InvoiceID:D5} successfully for user {TargetUserName ?? user?.UserName}. Invoice status: {invoiceToPay.Status}.";
+            // Redundant SaveChangesAsync and TempData setting are removed from here.
+            // The status of invoiceToPay was already set before the main SaveChangesAsync.
+            
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
                 return Redirect(ReturnUrl);

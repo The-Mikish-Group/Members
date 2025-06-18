@@ -54,8 +54,7 @@ namespace Members.Areas.Identity.Pages
             AddressLine2 = string.Empty,
             City = string.Empty,
             State = string.Empty,
-            ZipCode = string.Empty,
-            Plot = string.Empty,
+            ZipCode = string.Empty,           
             Email = string.Empty,
             EmailConfirmed = true
         };
@@ -101,10 +100,7 @@ namespace Members.Areas.Identity.Pages
 
             [Required]
             [Display(Name = "ZipCode")]
-            public required string ZipCode { get; set; }
-
-            [Display(Name = "Plot")]
-            public string Plot { get; set; }
+            public required string ZipCode { get; set; }            
 
             [Required]
             [EmailAddress]
@@ -224,8 +220,7 @@ namespace Members.Areas.Identity.Pages
                         Anniversary = Input.Anniversary,
                         AddressLine1 = Input.AddressLine1,
                         AddressLine2 = Input.AddressLine2,
-                        ZipCode = Input.ZipCode,
-                        Plot = Input.Plot,
+                        ZipCode = Input.ZipCode,                       
                         City = Input.City,
                         State = Input.State,
                         User = user

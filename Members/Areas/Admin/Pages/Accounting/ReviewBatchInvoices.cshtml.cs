@@ -37,10 +37,24 @@ namespace Members.Areas.Admin.Pages.Accounting
         public List<InvoiceViewModel> DraftInvoices { get; set; } = new List<InvoiceViewModel>();
         [BindProperty(SupportsGet = true)] // To capture batchId from route and for post handlers
         public string? BatchId { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnedFromUserId { get; set; }
         public int TotalInvoiceCount { get; set; }
         [DataType(DataType.Currency)]
         public decimal TotalInvoiceAmount { get; set; }
         public string? BatchDescription { get; set; }
+
+        // Properties for Sort State
+        [BindProperty(SupportsGet = true)]
+        public string? CurrentSort { get; set; } // Captures current sort order from query string
+
+        public string? UserSort { get; set; }
+        public string? EmailSort { get; set; }
+        public string? DescriptionSort { get; set; }
+        public string? AmountDueSort { get; set; }
+        public string? InvoiceDateSort { get; set; }
+        public string? DueDateSort { get; set; }
+
         // ViewModel to include user's name along with invoice details
         public class InvoiceViewModel : Invoice
         {
@@ -49,7 +63,14 @@ namespace Members.Areas.Admin.Pages.Accounting
         }
         public async Task<IActionResult> OnGetAsync(string? batchId) // batchId comes from route/query or dropdown selection
         {
-            _logger.LogInformation($"ReviewBatchInvoices.OnGetAsync called. Initial batchId from route/query: {batchId}");
+            _logger.LogInformation("ReviewBatchInvoices.OnGetAsync called. Initial batchId from route/query: {BatchIdParm}", batchId); // Changed param name for clarity
+            if (!string.IsNullOrEmpty(ReturnedFromUserId))
+            {
+                _logger.LogInformation("ReviewBatchInvoices.OnGetAsync: ReturnedFromUserId = {ReturnedUserId}", ReturnedFromUserId);
+                // Placeholder for potential future use (e.g., highlighting)
+                // TempData["HighlightUserId"] = ReturnedFromUserId; 
+            }
+
             // Populate the dropdown of all available draft batches
             var draftBatchSummaries = await _context.Invoices
                 .Where(i => i.Status == InvoiceStatus.Draft && i.BatchID != null)
@@ -140,7 +161,68 @@ namespace Members.Areas.Admin.Pages.Accounting
             }).ToList();
             TotalInvoiceCount = DraftInvoices.Count;
             TotalInvoiceAmount = DraftInvoices.Sum(i => i.AmountDue);
-            _logger.LogInformation($"Displaying {TotalInvoiceCount} draft invoices for BatchID: {this.BatchId} with total amount {TotalInvoiceAmount:C}.");
+            _logger.LogInformation($"Displaying {TotalInvoiceCount} draft invoices for BatchID: {this.BatchId} with total amount {TotalInvoiceAmount:C} before sorting.", TotalInvoiceCount, this.BatchId, TotalInvoiceAmount);
+
+            // Initialize sorting properties
+            string defaultSortColumn = "user_asc"; 
+            string activeSort = CurrentSort ?? defaultSortColumn;
+            this.CurrentSort = activeSort; // Update CurrentSort to reflect the active sort
+
+            UserSort = activeSort == "user_asc" ? "user_desc" : "user_asc";
+            EmailSort = activeSort == "email_asc" ? "email_desc" : "email_asc";
+            DescriptionSort = activeSort == "desc_asc" ? "desc_desc" : "desc_asc";
+            AmountDueSort = activeSort == "amount_asc" ? "amount_desc" : "amount_asc";
+            InvoiceDateSort = activeSort == "invdate_asc" ? "invdate_desc" : "invdate_asc";
+            DueDateSort = activeSort == "duedate_asc" ? "duedate_desc" : "duedate_asc";
+
+            _logger.LogInformation("Sorting parameters initialized. CurrentSort/ActiveSort: {ActiveSort}, UserSort: {UserSortVal}, EmailSort: {EmailSortVal}, DescriptionSort: {DescSortVal}, AmountDueSort: {AmountSortVal}, InvoiceDateSort: {InvDateSortVal}, DueDateSort: {DueDateSortVal}",
+                activeSort, UserSort, EmailSort, DescriptionSort, AmountDueSort, InvoiceDateSort, DueDateSort);
+            
+            // Apply Sorting to DraftInvoices
+            switch (activeSort)
+            {
+                case "user_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.UserFullName ?? string.Empty).ToList();
+                    break;
+                case "user_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty).ToList();
+                    break;
+                case "email_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.UserName ?? string.Empty).ToList();
+                    break;
+                case "email_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserName ?? string.Empty).ToList();
+                    break;
+                case "desc_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.Description ?? string.Empty).ToList();
+                    break;
+                case "desc_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.Description ?? string.Empty).ToList();
+                    break;
+                case "amount_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.AmountDue).ToList();
+                    break;
+                case "amount_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.AmountDue).ToList();
+                    break;
+                case "invdate_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.InvoiceDate).ToList();
+                    break;
+                case "invdate_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.InvoiceDate).ToList();
+                    break;
+                case "duedate_desc":
+                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.DueDate).ToList();
+                    break;
+                case "duedate_asc":
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.DueDate).ToList();
+                    break;
+                default: // Default sort if activeSort doesn't match any case
+                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty).ToList(); 
+                    break;
+            }
+            _logger.LogInformation("DraftInvoices sorted by {ActiveSort}. Final Count: {Count}", activeSort, DraftInvoices.Count);
+
             return Page();
         }
         public async Task<IActionResult> OnPostFinalizeBatchAsync() // Removed batchId param, using bound BatchId

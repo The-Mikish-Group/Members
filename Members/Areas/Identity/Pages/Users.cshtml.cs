@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-
 namespace Members.Areas.Identity.Pages
 {
     // Using the primary constructor for dependency injection
@@ -46,7 +45,7 @@ namespace Members.Areas.Identity.Pages
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1; // Default to the first page
         [BindProperty(SupportsGet = true)]
-        public int PageSize { get; set; } = 10; // Default page size
+        public int PageSize { get; set; } = 20; // Default page size
         public int TotalUsers { get; set; } // Total number of users after filtering
         public int TotalPages { get; set; } // Total number of pages
         // Sorting Properties
@@ -63,7 +62,7 @@ namespace Members.Areas.Identity.Pages
         // --- End New Toggle Property ---
         // --- Your Original OnGetAsync (with ShowExtraFields added) ---
         // This handles the initial full page load.
-        public async Task<IActionResult> OnGetAsync(string? searchTerm, int pageNumber = 1, int pageSize = 10, string? sortColumn = null, string? sortOrder = null, bool showExtraFields = false)
+        public async Task<IActionResult> OnGetAsync(string? searchTerm, int pageNumber = 1, int pageSize = 20, string? sortColumn = null, string? sortOrder = null, bool showExtraFields = false)
         {
             SearchTerm = searchTerm;
             PageNumber = pageNumber;
@@ -77,7 +76,7 @@ namespace Members.Areas.Identity.Pages
         // --- End Original OnGetAsync ---
         // --- New Handler for AJAX Requests ---
         // This handler will be targeted by the JavaScript fetch call using ?handler=PartialTable
-        public async Task<PartialViewResult> OnGetPartialTableAsync(string? searchTerm, int pageNumber = 1, int pageSize = 10, string? sortColumn = null, string? sortOrder = null, bool showExtraFields = false)
+        public async Task<PartialViewResult> OnGetPartialTableAsync(string? searchTerm, int pageNumber = 1, int pageSize = 20, string? sortColumn = null, string? sortOrder = null, bool showExtraFields = false)
         {
             SearchTerm = searchTerm;
             PageNumber = pageNumber;
@@ -238,7 +237,6 @@ namespace Members.Areas.Identity.Pages
                 // Fix for CS1963: An expression tree may not contain a dynamic operation  
                 // The issue arises because LINQ-to-Entities does not support dynamic types in expression trees.  
                 // To resolve this, we need to materialize the query into memory using `.ToList()` or `.AsEnumerable()` before performing operations involving dynamic types.  
-
                 // Updated code for calculating `totalCharges` and `totalPayments`  
                 decimal totalCharges = _dbContext.Invoices
                     .AsEnumerable() // Materialize the query into memory  
@@ -249,7 +247,6 @@ namespace Members.Areas.Identity.Pages
                     .Where(p => p.UserID == user.Id)
                     .Sum(p => p.Amount);
                 decimal currentBalance = totalCharges - totalPayments;
-
                 Users.Add(new UserModel
                 {
                     Id = user.Id,

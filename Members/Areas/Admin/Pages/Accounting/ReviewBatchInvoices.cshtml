@@ -1,151 +1,236 @@
 ﻿@page "{batchId?}"  
 @model Members.Areas.Admin.Pages.Accounting.ReviewBatchInvoicesModel  
 @{  
-    ViewData["Title"] = $"Review Batch Invoices:"; 
+    ViewData["Title"] = $"Review Batch Invoices"; 
     Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout  
 }
 
 <div class="container">
 
-    @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())  
+    @if (!string.IsNullOrEmpty(Model.BatchId))  
+    {
+        <h1 class="mt-4 ms-2 mb-2 text-center text=gold-darker"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
+
+        <div class="shadow card rounded bg-Card-Menu p-1">
+
+            <h5 class="mt-2 mb-2 ms-2 d-flex align-items-start text-gold-darker"><i class="bi bi-list"></i> Select Draft Batch:</h5>
+
+            @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
+            {
+                <form method="get" id="selectBatchForm">
+                    <div class="row gx-0 gy-0 align-items-center mb-3">
+
+                        <div class="col-12 text-start">
+                            <label for="SelectedBatchId" class="form-label visually-hidden text-gold-darker">Select Batch:</label>
+                        </div>
+
+                        <div class="col-10 col-lg-11 text-start">
+
+                            <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">
+                                <option value="">-- Select a Batch to Review --</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-2 col-lg-1 text-end pe-2">
+                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i> View</button>
+                        </div>
+
+                    </div>
+                </form>
+            }
+            else if (string.IsNullOrEmpty(Model.BatchId)) // No batchId passed and no available drafts
+            {
+                <div class="alert alert-info" role="alert">
+                    There are currently no draft batches available for review.
+                </div>
+                <div class="mt-3">
+                    <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>
+                </div>
+                return; // Stop rendering if no batches exist at all and none selected
+            }
+
+        </div>
+
+    } 
+
+
+    @if (TempData["StatusMessage"] != null)  
     {  
-        <form method="get" id="selectBatchForm" class="row gx-0 gy-0 align-items-center mb-3">
-            
-            <div class="col-12 text-start ms-1">  
-                <label for="SelectedBatchId" class="form-label visually-hidden">Select Batch:</label>  
-            </div>  
-
-            <div class="col-10 ms-2 mt-4 text-start me-0">
-                
-                <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">  
-                    <option value="">-- Select a Batch to Review --</option>  
-                </select>
-
-            </div>
-            
-            <div class="col-2 ms-0">  
-                <button type="submit" class="btn btn-sm btn-outline-primary">View Batch</button>
-            </div>
-        </form>        
+        <div class="alert alert-success alert-dismissible fade show" role="alert">  
+            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))  
+            <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
+        </div>  
     }  
-    else if (string.IsNullOrEmpty(Model.BatchId)) // No batchId passed and no available drafts  
+
+    @if (TempData["ErrorMessage"] != null)  
+    {  
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">  
+            @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))  
+            <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
+        </div>  
+    }  
+
+    @if (TempData["WarningMessage"] != null)  
+    {  
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">  
+            @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))  
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
+        </div>  
+    }  
+
+    @if (Model.DraftInvoices == null || !Model.DraftInvoices.Any())  
     {  
         <div class="alert alert-info" role="alert">  
-            There are currently no draft batches available for review.  
+            No draft invoices found for this batch ID, or the batch has already been processed.  
         </div>  
         <div class="mt-3">  
             <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>  
-        </div>  
-        return; // Stop rendering if no batches exist at all and none selected  
-    } 
+        </div>
+        return; // Stop rendering if no invoices  
+    }
     
+    @if (!string.IsNullOrEmpty(Model.BatchDescription))  
+    { 
+        <!-- Cancel or Finalize Buttons -->
+        <div class="mt-4 mb-4">  
+            <div class="row justify-content-end gx-2">  
+                <div class="col-auto">  
+                    <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
+                            onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">  
+                        <button type="submit" class="btn btn-danger">  
+                            <i class="bi bi-x-circle"></i> Cancel & Delete Batch  
+                        </button>  
+                    </form>  
+                </div>  
+                <div class="col-auto">  
+                    <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
+                            onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">  
+                        <button type="submit" class="btn btn-success">  
+                            <i class="bi bi-check-circle"></i> Finalize Batch  
+                        </button>  
+                    </form>  
+                </div>  
+            </div>  
+        </div>
+        
+        <!-- Display Batch Summary -->
+        <div class="card shadow mb-4 bg-Card-Menu">
+            
+            <!-- Card Header Text -->
+            <div class="card-header"> 
+                
+                <!-- Description -->
+                <h4 class="mt-3 mb-2 text-gold-darker">Description: @Model.BatchDescription</h4>  
+                
+                <!-- Heading -->
+                <h5 class="mb-0 d-flex justify-content-between align-items-center text-gold-darker">  
+                    Draft Invoices in Batch  
+                    <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices totalling @Model.TotalInvoiceAmount.ToString("C")</span>  
+                </h5>
+                
+            </div>  
+            <div class="card-body p-1">  
+                <div class="table-responsive">  
+                    <table class="table-striped table-hover w-100 mb-0">  
+                        <thead>  
+                            <tr class="bg-gold-dark text-white">  
+                                <th>
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.UserSort"
+                                        class="text-decoration-none text-white text-nowrap">User</a>
+                                    @if (Model.CurrentSort == "user_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "user_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th>
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.EmailSort"
+                                        class="text-decoration-none text-white text-nowrap">Email</a>
+                                    @if (Model.CurrentSort == "email_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "email_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th>
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.DescriptionSort"
+                                        class="text-decoration-none text-white text-nowrap">Description</a>
+                                    @if (Model.CurrentSort == "desc_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "desc_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th class="text-end">
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.AmountDueSort"
+                                        class="text-decoration-none text-white text-nowrap">Amount Due</a>
+                                    @if (Model.CurrentSort == "amount_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "amount_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th>
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.InvoiceDateSort"
+                                        class="text-decoration-none text-white text-nowrap ps-2">Invoice Date</a>
+                                    @if (Model.CurrentSort == "invdate_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "invdate_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th>
+                                    <a asp-page="./ReviewBatchInvoices" 
+                                        asp-route-batchId="@Model.BatchId"
+                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
+                                        asp-route-CurrentSort="@Model.DueDateSort"
+                                        class="text-decoration-none text-white text-nowrap">Due Date</a>
+                                    @if (Model.CurrentSort == "duedate_asc") { <i class="bi bi-arrow-down"></i> }
+                                    @if (Model.CurrentSort == "duedate_desc") { <i class="bi bi-arrow-up"></i> }
+                                </th>  
+                                <th class="text-center">Actions</th> <!-- New Header -->
+                            </tr>  
+                        </thead>  
+                        <tbody>  
+                            @{ int i = 0; } @* Initialize counter for row styling *@
+                            @foreach (var invoice in Model.DraftInvoices)  
+                            {  
+                                <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">  
+                                    <td>@Html.DisplayFor(modelItem => invoice.UserFullName)</td>  
+                                    <td>@Html.DisplayFor(modelItem => invoice.UserName)</td> @* UserName is Email in this context usually *@  
+                                    <td>@Html.DisplayFor(modelItem => invoice.Description)</td>  
+                                    <td class="text-end">@invoice.AmountDue.ToString("C")</td>  
+                                    <td class="ps-2">@invoice.InvoiceDate.ToString("yyyy-MM-dd")</td>  
+                                    <td>@invoice.DueDate.ToString("yyyy-MM-dd")</td>  
+                                    <td class="text-center"> <!-- New Cell -->
+                                        @if (!string.IsNullOrEmpty(invoice.UserID))
+                                        {
+                                            <a asp-area="Member"
+                                                asp-page="/MyBilling"
+                                                asp-route-userId="@invoice.UserID"
+                                                asp-route-returnUrl="@Url.Page("./ReviewBatchInvoices", new { batchId = Model.BatchId, returnedFromUserId = Model.ReturnedFromUserId })"
+                                                class="btn btn-sm btn-outline-primary"
+                                                title="View User Billing Details">
+                                                <i class="bi bi-file-earmark-text"></i> View Billing
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                </tr>  
+                                i++; @* Increment counter *@
+                            }  
+                        </tbody>  
+                    </table>  
+                </div>  
+            </div> 
+        </div>  
+    }
+
 </div>
-
-@if (!string.IsNullOrEmpty(Model.BatchId))  
-{     
-    <h2 class="ms-2 mb-3">@ViewData["Title"]
-        <span><br />(ID-@Model.BatchId)</span>
-    </h2>    
-} 
-
-@if (!string.IsNullOrEmpty(Model.BatchDescription))  
-{  
-    <h4 class="text-muted ms-2 mb-3">Description: @Model.BatchDescription</h4>  
-}  
-
-@if (TempData["StatusMessage"] != null)  
-{  
-    <div class="alert alert-success alert-dismissible fade show" role="alert">  
-        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))  
-        <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
-    </div>  
-}  
-@if (TempData["ErrorMessage"] != null)  
-{  
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">  
-        @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))  
-        <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
-    </div>  
-}  
-@if (TempData["WarningMessage"] != null)  
-{  
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">  
-        @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))  
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
-    </div>  
-}  
-
-@if (Model.DraftInvoices == null || !Model.DraftInvoices.Any())  
-{  
-    <div class="alert alert-info" role="alert">  
-        No draft invoices found for this batch ID, or the batch has already been processed.  
-    </div>  
-    <div class="mt-3">  
-        <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>  
-    </div>  
-    return; // Stop rendering if no invoices  
-}  
-
-<div class="card shadow-sm mb-4">  
-    <div class="card-header">  
-        <h5 class="mb-0 d-flex justify-content-between align-items-center">  
-            Draft Invoices in Batch  
-            <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices totalling @Model.TotalInvoiceAmount.ToString("C")</span>  
-        </h5>  
-    </div>  
-    <div class="card-body p-0">  
-        <div class="table-responsive">  
-            <table class="table table-striped table-hover mb-0">  
-                <thead class="table-light">  
-                    <tr>  
-                        <th>User</th>  
-                        <th>Email</th>  
-                        <th>Description</th>  
-                        <th class="text-end">Amount Due</th>  
-                        <th>Invoice Date</th>  
-                        <th>Due Date</th>  
-                        @* Add more columns if needed for review, e.g., Plot ID *@  
-                    </tr>  
-                </thead>  
-                <tbody>  
-                    @foreach (var invoice in Model.DraftInvoices)  
-                    {  
-                        <tr>  
-                            <td>@Html.DisplayFor(modelItem => invoice.UserFullName)</td>  
-                            <td>@Html.DisplayFor(modelItem => invoice.UserName)</td> @* UserName is Email in this context usually *@  
-                            <td>@Html.DisplayFor(modelItem => invoice.Description)</td>  
-                            <td class="text-end">@invoice.AmountDue.ToString("C")</td>  
-                            <td>@invoice.InvoiceDate.ToString("yyyy-MM-dd")</td>  
-                            <td>@invoice.DueDate.ToString("yyyy-MM-dd")</td>  
-                            @* Add edit/delete links for individual draft invoices here if implementing that enhancement later *@  
-                        </tr>  
-                    }  
-                </tbody>  
-            </table>  
-        </div>  
-    </div>  
-</div>  
-
-<div class="mt-4 mb-4">  
-    <div class="row justify-content-end gx-2">  
-        <div class="col-auto">  
-            <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
-                    onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">  
-                <button type="submit" class="btn btn-danger">  
-                    <i class="bi bi-x-circle"></i> Cancel & Delete Batch  
-                </button>  
-            </form>  
-        </div>  
-        <div class="col-auto">  
-            <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
-                    onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">  
-                <button type="submit" class="btn btn-success">  
-                    <i class="bi bi-check-circle"></i> Finalize Batch  
-                </button>  
-            </form>  
-        </div>  
-    </div>  
-</div>  
 
 @section Scripts {  
     <partial name="_ValidationScriptsPartial" /> @* If you have any input fields that need validation later, otherwise optional *@  
@@ -165,4 +250,25 @@
         });  
     </script>  
 }
+
+@section Styles {  
+    <style>
+        .row-even {
+            background-color: antiquewhite; /* Or your preferred color */
+        }
+
+        .row-odd {
+            background-color: #ffffff; /* Or your preferred color */
+        }
+
+        /* Optional: to ensure td inherits from tr for these specific classes */
+        .row-even > td,
+        .row-odd > td {
+            background-color: inherit !important; 
+        }
+        .table th a .bi { /* For sort indicators */
+            font-size: 0.9em;
+            margin-left: 0.25rem;
+        }
+    </style>
 }

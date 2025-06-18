@@ -87,9 +87,9 @@ namespace Members.Areas.Identity.Pages
             [Required]
             [Display(Name = "Zip Code")]
             public string? ZipCode { get; set; }
-            [Display(Name = "Plot")]
-            public string? Plot { get; set; }
-            [Display(Name = "Is Billing Contact for Plot")]
+            // [Display(Name = "Plot")] // Removed
+            // public string? Plot { get; set; } // Removed
+            [Display(Name = "Is Billing Contact")] // DisplayName might need update if "for Plot" is no longer relevant
             public bool IsBillingContact { get; set; }
         }
         private async Task LoadUserAsync(IdentityUser user)
@@ -114,7 +114,7 @@ namespace Members.Areas.Identity.Pages
                 City = userProfile?.City,
                 State = userProfile?.State,
                 ZipCode = userProfile?.ZipCode,
-                Plot = userProfile?.Plot,
+                // Plot = userProfile?.Plot, // Removed
                 IsBillingContact = userProfile?.IsBillingContact ?? false
             };
             await PopulateRoleViewModelsAsync(user);
@@ -224,56 +224,15 @@ namespace Members.Areas.Identity.Pages
             userProfile.City = Input.City;
             userProfile.State = Input.State;
             userProfile.ZipCode = Input.ZipCode;
-            userProfile.Plot = Input.Plot;
+            // userProfile.Plot = Input.Plot; // Removed
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
-            // --- ADD/MODIFY THIS BLOCK for IsBillingContact ---
-            // --- SERVER-SIDE VALIDATION FOR IsBillingContact AND PLOT ---
-            if (Input.IsBillingContact && string.IsNullOrWhiteSpace(Input.Plot))
-            {
-                ModelState.AddModelError("Input.IsBillingContact", "A Plot must be assigned to set this user as a Billing Contact.");
-                // Ensure dependent properties for the page are repopulated if returning due to error
-                await PopulateRoleViewModelsAsync(user); // user should be the one fetched at the start of OnPostAsync
-                StatusMessage = "Error: Cannot set as Billing Contact without a Plot.";
-                return Page();
-            }
-            // --- END SERVER-SIDE VALIDATION ---
-            // --- EXISTING IsBillingContact CONFLICT CHECK AND ASSIGNMENT ---
-            if (Input.IsBillingContact)
-            {
-                // If admin is trying to set this user as the billing contact,
-                // check for conflicts on the same plot. Note: Input.Plot is used here.
-                if (!string.IsNullOrWhiteSpace(Input.Plot))
-                {
-                    var existingBillingContact = await _dbContext.UserProfile
-                        .FirstOrDefaultAsync(up => up.Plot == Input.Plot && // Use Input.Plot
-                                                    up.IsBillingContact &&
-                                                    up.UserId != userProfile.UserId);
-                    if (existingBillingContact != null)
-                    {
-                        var conflictingUserIdentity = await _userManager.FindByIdAsync(existingBillingContact.UserId);
-                        string conflictingUserName = conflictingUserIdentity?.UserName ?? "another user";
-                        ModelState.AddModelError("Input.IsBillingContact",
-                            $"Cannot set as billing contact. Plot '{Input.Plot}' already has {conflictingUserName} designated as the billing contact. " +
-                            "Please unassign the other user first if you want to make this change.");
-                        await PopulateRoleViewModelsAsync(user);
-                        StatusMessage = "Error: Could not save changes due to billing contact conflict for the same Plot.";
-                        return Page();
-                    }
-                }
-                // If we pass both validations (Plot is not empty, and no conflict on Plot)
-                userProfile.IsBillingContact = true;
-            }
-            else
-            {
-                userProfile.IsBillingContact = false;
-            }
-            await _dbContext.SaveChangesAsync();
+            
+            // Simplified IsBillingContact assignment
+            userProfile.IsBillingContact = Input.IsBillingContact;
+
+            await _dbContext.SaveChangesAsync(); // Consolidated SaveChanges
             StatusMessage = "User updated successfully.";
-            // --- END IsBillingContact BLOCK ---
-            await _dbContext.SaveChangesAsync();
-            StatusMessage = "User updated successfully.";
-            await _dbContext.SaveChangesAsync();
-            StatusMessage = "User updated successfully.";
+            
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
                 return Redirect(ReturnUrl);

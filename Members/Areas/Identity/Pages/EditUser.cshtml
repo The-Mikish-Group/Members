@@ -222,15 +222,8 @@
 
                     <div class="row gx-1">
 
-                        <!-- Plot -->
-                        <div class="col-6 form-floating mb-4">
-                            <input asp-for="Input.Plot" class="shadow form-control" placeholder="Plot" />
-                            <label asp-for="Input.Plot" class="form-label">Plot</label>
-                            <span asp-validation-for="Input.Plot" class="text-danger"></span>
-                        </div>
-
                         <!-- Is Billing Contact -->
-                        <div class="col-6 form-floating mb-4">
+                        <div class="col-12 mb-4"> <!-- Changed from col-6 form-floating -->
                             <div class="form-check ms-2">
                                 <input asp-for="Input.IsBillingContact" type="checkbox" class="shadow form-check-input isBillingContact-checkbox" id="IsBillingContactCheckbox" />
                                 <label asp-for="Input.IsBillingContact" class="form-check-label"></label>
@@ -559,59 +552,24 @@
                 });
             }
 
-            const isBillingContactCheckbox = document.getElementById('IsBillingContactCheckbox'); // Assuming this ID from your previous paste for the checkbox
-            const accountingActionsSection = document.getElementById('accountingActionsSection');
-            const plotInput = document.getElementById('Input_Plot'); // Default ID for asp-for="Input.Plot"
+            // const isBillingContactCheckbox = document.getElementById('IsBillingContactCheckbox'); // Plot related JS removed
+            // const accountingActionsSection = document.getElementById('accountingActionsSection'); // Plot related JS removed
+            // const plotInput = document.getElementById('Input_Plot'); // Plot related JS removed
 
-            function toggleBillingContactCheckboxability() {
-                if (plotInput && isBillingContactCheckbox) {
-                    if (plotInput.value.trim() === '') {
-                        isBillingContactCheckbox.checked = false; // Uncheck it if plot is empty
-                        isBillingContactCheckbox.disabled = true;
-                        // Also hide accounting actions if plot becomes empty and billing contact is disabled
-                        if (accountingActionsSection) {
-                            accountingActionsSection.style.display = 'none';
-                        }
-                    } else {
-                        isBillingContactCheckbox.disabled = false;
-                    }
-                }
-            }
+            // function toggleBillingContactCheckboxability() { // Plot related JS removed
+            // }
 
-            // Initial check on page load
-            toggleBillingContactCheckboxability();
+            // // Initial check on page load // Plot related JS removed
+            // toggleBillingContactCheckboxability();
 
-            // Event listener for Plot input field
-            if (plotInput) {
-                plotInput.addEventListener('input', function() {
-                    toggleBillingContactCheckboxability();
-                    // If plot becomes empty, IsBillingContact is unchecked, so ensure accounting actions hide
-                    if (isBillingContactCheckbox && !isBillingContactCheckbox.checked && accountingActionsSection) {
-                            accountingActionsSection.style.display = 'none';
-                    }
-                });
-            }
+            // // Event listener for Plot input field // Plot related JS removed
+            // if (plotInput) {
+            // }
 
-            // Modify existing IsBillingContact checkbox event listener
-            if (isBillingContactCheckbox && accountingActionsSection) {
-                // Original line for initial state based on checkbox (now handled by Razor and toggleBillingContactCheckboxability)
-                // accountingActionsSection.style.display = isBillingContactCheckbox.checked ? 'block' : 'none';
-
-                isBillingContactCheckbox.addEventListener('change', function() {
-                    if (this.checked && plotInput && plotInput.value.trim() === '') {
-                        // This case should ideally not happen if checkbox is disabled, but as a fallback:
-                        alert('A Plot must be assigned to set this user as a Billing Contact.');
-                        this.checked = false; // Revert checking
-                        return;
-                    }
-                    if (accountingActionsSection) {
-                        accountingActionsSection.style.display = this.checked ? 'block' : 'none';
-                    }
-                });
-            } else {
-                if (!isBillingContactCheckbox) console.error("IsBillingContactCheckbox not found for plot dependency!");
-                // if (!accountingActionsSection) console.error("accountingActionsSection not found!"); // Already logged
-            }
+            // // Modify existing IsBillingContact checkbox event listener // Plot related JS removed
+            // if (isBillingContactCheckbox && accountingActionsSection) {
+            // } else {
+            // }
         
         });
     </script>

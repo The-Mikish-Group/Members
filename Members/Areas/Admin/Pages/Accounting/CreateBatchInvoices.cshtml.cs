@@ -23,17 +23,14 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly ILogger<CreateBatchInvoicesModel> _logger = logger;
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
+        public int ActionableBillableAssetsCount { get; set; }
         public class InputModel
         {
             [Required]
             [StringLength(150, MinimumLength = 5)]
             [Display(Name = "Batch Description (e.g., Monthly Assessment)")]
             public string Description { get; set; } = string.Empty;
-            [Required]
-            [Range(0.01, 1000000.00)]
-            [DataType(DataType.Currency)]
-            [Display(Name = "Amount Due (per member)")]
-            public decimal AmountDue { get; set; }
+            // AmountDue removed from InputModel
             [Required]
             [DataType(DataType.Date)]
             [Display(Name = "Invoice Date")]
@@ -43,9 +40,13 @@ namespace Members.Areas.Admin.Pages.Accounting
             [Display(Name = "Due Date")]
             public DateTime DueDate { get; set; } = DateTime.Today.AddDays(30);
         }
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            _logger.LogInformation("CreateBatchInvoices.OnGet called.");
+            _logger.LogInformation("CreateBatchInvoices.OnGetAsync called.");
+            ActionableBillableAssetsCount = await _context.BillableAssets
+                                             .CountAsync(ba => ba.UserID != null && ba.UserID != "");
+            _logger.LogInformation("Found {Count} actionable billable assets (with assigned users).", ActionableBillableAssetsCount);
+
             // Default to creating assessments for the first of next month
             DateTime firstOfNextMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(1);
 
@@ -58,36 +59,40 @@ namespace Members.Areas.Admin.Pages.Accounting
         {
             if (!ModelState.IsValid)
             {
+                await OnGetAsync(); // Repopulate counts for display
                 return Page();
             }
-            const string logTemplate = "Attempting to create batch invoices: {Description}";
-            _logger.LogInformation(logTemplate, Input.Description);
-            var billingContacts = await _context.UserProfile
-                .Where(up => up.IsBillingContact)
-                .Include(up => up.User) // Include IdentityUser to get UserName/Email if needed for logging
-                .ToListAsync();
-            if (billingContacts.Count == 0)
+            _logger.LogInformation("Attempting to create batch invoices for description: {Description}", Input.Description);
+
+            var billableAssetsToInvoice = await _context.BillableAssets
+                .Where(ba => ba.UserID != null && ba.UserID != "") 
+                .ToListAsync(); 
+
+            if (!billableAssetsToInvoice.Any()) 
             {
-                const string warningTemplate = "CreateBatchInvoices: No BillingContacts found.";
-                ModelState.AddModelError(string.Empty, "No users found designated as 'Billing Contact'. Cannot create batch.");
-                _logger.LogWarning(warningTemplate);
+                ModelState.AddModelError(string.Empty, "No billable assets found with assigned billing contacts. Cannot create batch.");
+                _logger.LogWarning("CreateBatchInvoices: No billable assets with assigned users found.");
+                await OnGetAsync(); // Repopulate counts
                 return Page();
             }
+
             string newBatchId = $"BATCH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString()[..4]}";
-            const string batchLogTemplate = "Generated BatchID: {BatchID} for {BillingContactsCount} billing contacts.";
-            _logger.LogInformation(batchLogTemplate, newBatchId, billingContacts.Count);
+            // Log message will be updated after loop when total amount is known.
+            
             int invoicesCreatedCount = 0;
-            foreach (var profile in billingContacts)
+            decimal batchTotalAmount = 0; // Initialize batch total
+
+            foreach (var asset in billableAssetsToInvoice)
             {
                 var invoice = new Invoice
                 {
-                    UserID = profile.UserId,
+                    UserID = asset.UserID!, 
                     InvoiceDate = Input.InvoiceDate,
                     DueDate = Input.DueDate,
-                    Description = Input.Description, // Common description for all in batch
-                    AmountDue = Input.AmountDue,     // Common amount for all in batch
+                    Description = $"{Input.Description} - Plot: {asset.PlotID}", 
+                    AmountDue = asset.AssessmentFee, // Use asset's specific fee
                     AmountPaid = 0,
-                    Status = InvoiceStatus.Draft, // Initial status for batch invoices
+                    Status = InvoiceStatus.Draft, 
                     Type = InvoiceType.Dues,      // Assuming these are Dues/Assessments
                     BatchID = newBatchId,
                     DateCreated = DateTime.UtcNow,
@@ -95,20 +100,23 @@ namespace Members.Areas.Admin.Pages.Accounting
                 };
                 _context.Invoices.Add(invoice);
                 invoicesCreatedCount++;
+                batchTotalAmount += asset.AssessmentFee; // Accumulate total amount
             }
+            
+            _logger.LogInformation("Generated BatchID: {BatchID} for {BillableAssetsCount} billable assets, total amount {BatchTotalAmountC}.", newBatchId, billableAssetsToInvoice.Count, batchTotalAmount.ToString("C"));
+
             try
             {
                 await _context.SaveChangesAsync();
-                const string successTemplate = "Successfully created {InvoicesCreatedCount} draft invoices for BatchID: {BatchID}.";
-                _logger.LogInformation(successTemplate, invoicesCreatedCount, newBatchId);
-                TempData["StatusMessage"] = $"Draft batch '{newBatchId}' created with {invoicesCreatedCount} invoices for '{Input.Description}'. Please review and finalize.";
+                _logger.LogInformation("Successfully created {InvoicesCreatedCount} draft invoices (totaling {BatchTotalAmountC}) for BatchID: {BatchID}.", invoicesCreatedCount, batchTotalAmount.ToString("C"), newBatchId);
+                TempData["StatusMessage"] = $"Draft batch '{newBatchId}' created with {invoicesCreatedCount} invoices (for '{Input.Description}') totaling {batchTotalAmount:C}. One invoice per assigned billable asset. Please review and finalize.";
                 return RedirectToPage("./ReviewBatchInvoices", new { batchId = newBatchId });
             }
             catch (DbUpdateException ex)
             {
-                const string errorTemplate = "Error saving batch invoices to database.";
-                _logger.LogError(ex, errorTemplate);
+                _logger.LogError(ex, "Error saving batch invoices to database for BatchID {BatchId}", newBatchId);
                 ModelState.AddModelError(string.Empty, "An error occurred while saving the batch invoices. Please check logs.");
+                await OnGetAsync(); // Repopulate counts
                 return Page();
             }
         }
