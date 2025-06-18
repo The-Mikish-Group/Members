@@ -46,10 +46,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             ActionableBillableAssetsCount = await _context.BillableAssets
                                              .CountAsync(ba => ba.UserID != null && ba.UserID != "");
             _logger.LogInformation("Found {Count} actionable billable assets (with assigned users).", ActionableBillableAssetsCount);
-
             // Default to creating assessments for the first of next month
             DateTime firstOfNextMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(1);
-
             Input.Description = $"Monthly Assessment {firstOfNextMonth:MMMM yyyy}";
             Input.InvoiceDate = firstOfNextMonth;
             Input.DueDate = firstOfNextMonth; // Payable on the 1st, in advance
@@ -63,25 +61,20 @@ namespace Members.Areas.Admin.Pages.Accounting
                 return Page();
             }
             _logger.LogInformation("Attempting to create batch invoices for description: {Description}", Input.Description);
-
             var billableAssetsToInvoice = await _context.BillableAssets
                 .Where(ba => ba.UserID != null && ba.UserID != "") 
                 .ToListAsync(); 
-
-            if (!billableAssetsToInvoice.Any()) 
+            if (billableAssetsToInvoice.Count == 0) 
             {
                 ModelState.AddModelError(string.Empty, "No billable assets found with assigned billing contacts. Cannot create batch.");
                 _logger.LogWarning("CreateBatchInvoices: No billable assets with assigned users found.");
                 await OnGetAsync(); // Repopulate counts
                 return Page();
             }
-
             string newBatchId = $"BATCH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString()[..4]}";
             // Log message will be updated after loop when total amount is known.
-            
             int invoicesCreatedCount = 0;
             decimal batchTotalAmount = 0; // Initialize batch total
-
             foreach (var asset in billableAssetsToInvoice)
             {
                 var invoice = new Invoice
@@ -102,9 +95,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 invoicesCreatedCount++;
                 batchTotalAmount += asset.AssessmentFee; // Accumulate total amount
             }
-            
             _logger.LogInformation("Generated BatchID: {BatchID} for {BillableAssetsCount} billable assets, total amount {BatchTotalAmountC}.", newBatchId, billableAssetsToInvoice.Count, batchTotalAmount.ToString("C"));
-
             try
             {
                 await _context.SaveChangesAsync();

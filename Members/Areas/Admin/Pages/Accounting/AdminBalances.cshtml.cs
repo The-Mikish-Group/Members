@@ -18,9 +18,7 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<AdminBalancesModel> _logger = logger;
-
         private const int RecentFeeDaysThreshold = 7;
-
         // Inner class for results
         public class LateFeeApplicationResult
         {
@@ -32,32 +30,23 @@ namespace Members.Areas.Admin.Pages.Accounting
             public decimal? CreditsApplied { get; private set; }
             public int? InvoiceId { get; private set; }
             public InvoiceStatus? FinalInvoiceStatus { get; private set; }
-
             // Private constructor to enforce factory method usage
             private LateFeeApplicationResult() { }
-
             public static LateFeeApplicationResult UserNotFound(string userId) =>
                 new() { Success = false, UserId = userId, UserName = "N/A", Message = $"User with ID {userId} not found." };
-            
             public static LateFeeApplicationResult ProfileNotFound(string userId, string userName) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User profile for {userName} (ID: {userId}) not found." };
-
             public static LateFeeApplicationResult NotBillingContact(string userName, string userId) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) is not a billing contact." };
-
             public static LateFeeApplicationResult SkippedNoOutstandingBalance(string userName, string userId, decimal balance) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) has no outstanding balance ({balance:C}). Skipped." };
-
             public static LateFeeApplicationResult SkippedRecentFeeExists(string userName, string userId) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) already has a recent late fee. Skipped." };
-            
             public static LateFeeApplicationResult Error(string userName, string userId, string errorMessage, Exception? ex = null) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"Error applying late fee to {userName} (ID: {userId}): {errorMessage}{(ex != null ? " Details: " + ex.Message : "")}" };
-
             public static LateFeeApplicationResult FeeApplied(string userName, string userId, decimal feeAmount, int invoiceId, decimal creditsApplied, InvoiceStatus status) =>
                 new() { Success = true, UserId = userId, UserName = userName, FeeAmount = feeAmount, InvoiceId = invoiceId, CreditsApplied = creditsApplied, FinalInvoiceStatus = status, Message = $"User {userName} (ID: {userId}): Late fee of {feeAmount:C} applied. Invoice INV-{invoiceId:D5}. Credits applied: {creditsApplied:C}. Status: {status}." };
         }
-
         public List<MemberBalanceViewModel> MemberBalances { get; set; } = [];
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; }
@@ -77,7 +66,6 @@ namespace Members.Areas.Admin.Pages.Accounting
         public decimal TotalCreditBalance { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnedFromUserId { get; set; }
-
         private async Task<LateFeeApplicationResult> ApplyLateFeeToUserAsync(string userId, string? knownUserName = null)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -86,22 +74,18 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogWarning("ApplyLateFeeToUserAsync: User with ID {UserId} not found.", userId);
                 return LateFeeApplicationResult.UserNotFound(userId);
             }
-            
             var userNameForDisplay = knownUserName ?? user.UserName ?? user.Email ?? userId;
-
             var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == userId);
             if (userProfile == null)
             {
                 _logger.LogWarning("ApplyLateFeeToUserAsync: User profile for {UserName} (ID: {UserId}) not found.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.ProfileNotFound(userId, userNameForDisplay);
             }
-
             if (!userProfile.IsBillingContact)
             {
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) is not a billing contact.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.NotBillingContact(userNameForDisplay, userId);
             }
-
             decimal totalChargesFromInvoices = await _context.Invoices
                 .Where(i => i.UserID == userId && i.Status != InvoiceStatus.Cancelled)
                 .SumAsync(i => i.AmountDue);
@@ -109,13 +93,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                 .Where(i => i.UserID == userId && i.Status != InvoiceStatus.Cancelled)
                 .SumAsync(i => i.AmountPaid);
             decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
-
             if (currentBalance <= 0)
             {
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has no outstanding balance ({CurrentBalance:C}).", userNameForDisplay, userId, currentBalance);
                 return LateFeeApplicationResult.SkippedNoOutstandingBalance(userNameForDisplay, userId, currentBalance);
             }
-
             var latestOverdueDuesInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
                             i.Type == InvoiceType.Dues &&
@@ -124,7 +106,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                             i.DueDate < DateTime.Today)
                 .OrderByDescending(i => i.DueDate)
                 .FirstOrDefaultAsync();
-
             bool skipForRecentFee = false;
             if (latestOverdueDuesInvoice != null)
             {
@@ -146,13 +127,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                     skipForRecentFee = true;
                 }
             }
-
             if (skipForRecentFee)
             {
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) already has a recent late fee. Skipped.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.SkippedRecentFeeExists(userNameForDisplay, userId);
             }
-
             decimal lateFeeAmount;
             string feeCalculationDescription;
             if (latestOverdueDuesInvoice != null)
@@ -166,7 +145,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 lateFeeAmount = 25.00m;
                 feeCalculationDescription = "Standard $25.00 late fee applied (no specific overdue Dues/Assessment invoice found).";
             }
-
             var lateFeeInvoice = new Invoice
             {
                 UserID = userId,
@@ -181,24 +159,19 @@ namespace Members.Areas.Admin.Pages.Accounting
                 LastUpdated = DateTime.UtcNow
             };
             _context.Invoices.Add(lateFeeInvoice);
-
             decimal creditsAppliedToThisFee = 0;
             List<UserCredit> availableCredits = await _context.UserCredits
                 .Where(uc => uc.UserID == userId && !uc.IsApplied && !uc.IsVoided)
                 .OrderBy(uc => uc.CreditDate)
                 .ToListAsync();
-
             if (availableCredits.Count > 0) // CA1860
             {
                 foreach (var credit in availableCredits) // UserCredit objects that are !IsApplied and !IsVoided
                 {
                     if (lateFeeInvoice.AmountPaid >= lateFeeInvoice.AmountDue) break; // Stop if fee invoice is fully paid
-
                     // Calculate how much of this credit can be applied to the remaining fee amount
                     decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, lateFeeInvoice.AmountDue - lateFeeInvoice.AmountPaid);
-
                     if (amountToApplyFromThisCredit <= 0) continue; // Should not happen if credit.Amount > 0 and fee not paid
-
                     // Mark the entire credit as applied, as per the simplified logic without AmountUsed
                     credit.IsApplied = true; 
                     credit.AppliedDate = DateTime.UtcNow;
@@ -209,7 +182,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                     credit.ApplicationNotes = (credit.ApplicationNotes ?? "").Trim() + $" Applied {amountToApplyFromThisCredit:C} to Late Fee INV-0. Original credit amount: {credit.Amount:C}.";
                     credit.LastUpdated = DateTime.UtcNow;
                     _context.UserCredits.Update(credit);
-
                     lateFeeInvoice.AmountPaid += amountToApplyFromThisCredit;
                     creditsAppliedToThisFee += amountToApplyFromThisCredit;
                 }
@@ -219,9 +191,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     lateFeeInvoice.AmountPaid = lateFeeInvoice.AmountDue;
                 }
             }
-            
             await _context.SaveChangesAsync(); // Save Invoice and initial Credit updates
-
             bool neededCreditInvoiceIdUpdate = false;
             foreach (var credit in availableCredits.Where(c => c.AppliedToInvoiceID == 0 && c.ApplicationNotes != null && c.ApplicationNotes.Contains("Auto-applied portion to Late Fee INV-0")))
             {
@@ -234,12 +204,10 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 await _context.SaveChangesAsync(); // Save Credit updates with correct InvoiceID
             }
-            
             _logger.LogInformation("ApplyLateFeeToUserAsync: Fee applied for {UserName} (ID: {UserId}). Invoice INV-{InvoiceId}, Amount: {FeeAmount}, Credits: {CreditsApplied}, Status: {Status}", 
                 userNameForDisplay, userId, lateFeeInvoice.InvoiceID, lateFeeAmount, creditsAppliedToThisFee, lateFeeInvoice.Status);
             return LateFeeApplicationResult.FeeApplied(userNameForDisplay, userId, lateFeeAmount, lateFeeInvoice.InvoiceID, creditsAppliedToThisFee, lateFeeInvoice.Status);
         }
-
         public async Task<IActionResult> OnPostApplyLateFeeAsync(string userId)
         {
             _logger.LogInformation("OnPostApplyLateFeeAsync called for UserID: {UserId}", userId);
@@ -248,7 +216,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 TempData["ErrorMessage"] = "User ID was not provided.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
-
             try
             {
                 var result = await ApplyLateFeeToUserAsync(userId);
@@ -287,14 +254,12 @@ namespace Members.Areas.Admin.Pages.Accounting
         {
             _logger.LogInformation("OnGetAsync called for AdminBalancesModel. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowFilter}, ReturnedFromUserId: {ReturnedUserId}", 
                 sortOrder, showOnlyOutstanding, ReturnedFromUserId);
-
             if (!string.IsNullOrEmpty(ReturnedFromUserId))
             {
                 _logger.LogInformation("Returned to AdminBalances from MyBilling, last viewed user ID: {ReturnedUserId}", ReturnedFromUserId);
                 // Placeholder for potential future use:
                 // TempData["HighlightUserId"] = ReturnedFromUserId; 
             }
-
             CurrentSort = sortOrder;
             NameSort = string.IsNullOrEmpty(sortOrder) || sortOrder == "name_desc" ? "name_asc" : "name_desc";
             EmailSort = sortOrder == "email_asc" ? "email_desc" : "email_asc";
@@ -330,9 +295,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         fullName = userProfile.LastName;
                     }
-
                     _logger.LogInformation("Calculating balance for: {user.UserName} (ID: {user.Id})", user.UserName, user.Id);
-
                     // Log all invoices for the user
                     var userInvoices = await _context.Invoices
                         .Where(i => i.UserID == user.Id)
@@ -342,25 +305,20 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         _logger.LogInformation("User {UserName} - Invoice Detail: ID={InvoiceID}, AmountDue={AmountDue}, Status={Status}", user.UserName, inv.InvoiceID, inv.AmountDue, inv.Status);
                     }
-
                     decimal totalChargesFromInvoices = await _context.Invoices
                         .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled) // Include Paid invoices in charges
                         .SumAsync(i => i.AmountDue);
                     _logger.LogInformation("User {UserName} - Total Charges from Invoices: {TotalCharges}", user.UserName, totalChargesFromInvoices);
-
                     decimal totalAmountPaidOnInvoices = await _context.Invoices
                         .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
                         .SumAsync(i => i.AmountPaid);
                     _logger.LogInformation("User {UserName} - Total Amount Paid (from Invoices): {TotalAmountPaid}", user.UserName, totalAmountPaidOnInvoices);
-
                     decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
                     _logger.LogInformation("User {UserName} - Calculated Current Balance (Charges - Invoice.AmountPaid): {CurrentBalance}", user.UserName, currentBalance);
-
                     decimal unappliedCredits = await _context.UserCredits
                         .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
                         .SumAsync(uc => uc.Amount);
                     _logger.LogInformation("User {user.UserName} - Fetched Unapplied Credit Balance: {unappliedCredits}", user.UserName, unappliedCredits);
-
                     var memberVm = new MemberBalanceViewModel
                     {
                         UserId = user.Id,
@@ -369,16 +327,13 @@ namespace Members.Areas.Admin.Pages.Accounting
                         CurrentBalance = currentBalance,
                         CreditBalance = unappliedCredits
                     };
-
                     if (ShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0)
                     {
                         continue; // Skip if filtering and balance is not outstanding
                     }
-
                     memberBalancesTemp.Add(memberVm);
                 }
             }            
-            
             // Sorting logic
             MemberBalances = sortOrder switch
             {
@@ -393,20 +348,16 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _ => [.. memberBalancesTemp.OrderBy(s => s.FullName)],// Default sort
             };
             _logger.LogInformation("Populated MemberBalances. Count: {MemberBalances.Count}", MemberBalances.Count);
-
             TotalCurrentBalance = MemberBalances.Sum(mb => mb.CurrentBalance);
             TotalCreditBalance = MemberBalances.Sum(mb => mb.CreditBalance);
             _logger.LogInformation("Calculated totals: TotalCurrentBalance = {TotalCurrentBalance}, TotalCreditBalance = {TotalCreditBalance}", TotalCurrentBalance, TotalCreditBalance);
         }
-
         public async Task<IActionResult> OnGetExportCsvAsync(string? sortOrder, bool? showOnlyOutstanding)
         {
             _logger.LogInformation("OnGetExportCsvAsync called. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowOnlyOutstanding}", sortOrder, showOnlyOutstanding);
-
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
             var dataToExport = new List<MemberBalanceViewModel>();
-
             if (usersInMemberRole != null)
             {
                 foreach (var user in usersInMemberRole)
@@ -427,21 +378,16 @@ namespace Members.Areas.Admin.Pages.Accounting
                         {
                             fullName = userProfile.LastName;
                         }
-
                         decimal totalChargesFromInvoices = await _context.Invoices
                             .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
                             .SumAsync(i => i.AmountDue);
-
                         decimal totalAmountPaidOnInvoices = await _context.Invoices
                             .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
                             .SumAsync(i => i.AmountPaid);
-                        
                         decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
-
                         decimal userCreditBalance = await _context.UserCredits
                             .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
                             .SumAsync(uc => uc.Amount);
-
                         var memberVm = new MemberBalanceViewModel
                         {
                             UserId = user.Id,
@@ -450,7 +396,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                             CurrentBalance = currentBalance,
                             CreditBalance = userCreditBalance
                         };
-
                         bool effectiveShowOnlyOutstanding = showOnlyOutstanding ?? ShowOnlyOutstanding; // Use model's ShowOnlyOutstanding if parameter is null
                         if (effectiveShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0)
                         {
@@ -460,46 +405,39 @@ namespace Members.Areas.Admin.Pages.Accounting
                     }
                 }
             }
-
             string currentSortOrder = sortOrder ?? CurrentSort ?? "name_asc"; // Default or use passed/model sortOrder
             dataToExport = currentSortOrder switch
             {
-                "name_desc" => dataToExport.OrderByDescending(s => s.FullName).ToList(),
-                "name_asc" => dataToExport.OrderBy(s => s.FullName).ToList(),
-                "email_desc" => dataToExport.OrderByDescending(s => s.Email).ToList(),
-                "email_asc" => dataToExport.OrderBy(s => s.Email).ToList(),
-                "balance_desc" => dataToExport.OrderByDescending(s => s.CurrentBalance).ToList(),
-                "balance_asc" => dataToExport.OrderBy(s => s.CurrentBalance).ToList(),
-                "credit_desc" => dataToExport.OrderByDescending(s => s.CreditBalance).ToList(),
-                "credit_asc" => dataToExport.OrderBy(s => s.CreditBalance).ToList(),
-                _ => dataToExport.OrderBy(s => s.FullName).ToList(),
+                "name_desc" => [.. dataToExport.OrderByDescending(s => s.FullName)],
+                "name_asc" => [.. dataToExport.OrderBy(s => s.FullName)],
+                "email_desc" => [.. dataToExport.OrderByDescending(s => s.Email)],
+                "email_asc" => [.. dataToExport.OrderBy(s => s.Email)],
+                "balance_desc" => [.. dataToExport.OrderByDescending(s => s.CurrentBalance)],
+                "balance_asc" => [.. dataToExport.OrderBy(s => s.CurrentBalance)],
+                "credit_desc" => [.. dataToExport.OrderByDescending(s => s.CreditBalance)],
+                "credit_asc" => [.. dataToExport.OrderBy(s => s.CreditBalance)],
+                _ => [.. dataToExport.OrderBy(s => s.FullName)],
             };
             _logger.LogInformation("Data prepared for CSV export. Count: {Count}", dataToExport.Count);
-
             var sb = new StringBuilder();
             sb.AppendLine("\"Full Name\",\"Email\",\"Current Balance\",\"Credit Balance\"");
-
             foreach (var memberVm in dataToExport)
             {
                 sb.AppendLine($"\"{EscapeCsvField(memberVm.FullName)}\",\"{EscapeCsvField(memberVm.Email)}\",{memberVm.CurrentBalance.ToString("F2")},{memberVm.CreditBalance.ToString("F2")}");
             }
             _logger.LogInformation("CSV string generated. Length: {Length}", sb.Length);
-
             byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
             return File(csvBytes, "text/csv", $"member_balances_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
         }
-
-        private string EscapeCsvField(string? field)
+        private static string EscapeCsvField(string? field)
         {
             if (string.IsNullOrEmpty(field))
                 return string.Empty;
             return field.Replace("\"", "\"\"");
         }
-
         public async Task<IActionResult> OnPostBulkApplyLateFeesAsync()
         {
             _logger.LogInformation("OnPostBulkApplyLateFeesAsync START - Attempting to apply late fees to all eligible members.");
-
             int processedCount = 0;
             int successCount = 0;
             int skippedNoOutstandingBalance = 0;
@@ -508,10 +446,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             int errorCount = 0;
             var detailedErrorMessages = new List<string>();
             var successMessages = new List<string>();
-
             var memberRoleName = "Member";
             var allUsersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
-
             if (allUsersInMemberRole == null || allUsersInMemberRole.Count == 0)
             {
                 _logger.LogWarning("OnPostBulkApplyLateFeesAsync: No users found in '{MemberRoleName}' role to begin processing.", memberRoleName);
@@ -519,7 +455,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
             _logger.LogInformation("Fetched {AllUsersCount} users in member role. Filtering for billing contacts.", allUsersInMemberRole.Count);
-
             var billingContactsToProcess = new List<IdentityUser>();
             foreach (var user in allUsersInMemberRole)
             {
@@ -530,15 +465,12 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
             }
             _logger.LogInformation("Found {BillingContactsCount} billing contacts. Starting late fee application process.", billingContactsToProcess.Count); // Refined log
-
             if (billingContactsToProcess.Count == 0)
             {
                 TempData["WarningMessage"] = "No billing contacts found among users in the member role to process for late fees.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
-
             processedCount = billingContactsToProcess.Count; // Number of users for whom fee application will be attempted
-
             foreach (var user in billingContactsToProcess)
             {
                 LateFeeApplicationResult result;
@@ -555,7 +487,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                     _logger.LogError(ex, "Critical error in OnPostBulkApplyLateFeesAsync loop for UserID {UserId}", user.Id);
                     continue; // Skip to next user
                 }
-
                 if (result.Success)
                 {
                     successCount++;
@@ -584,10 +515,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
             }
             // Note: processedCount is set before the loop based on billingContactsToProcess.Count
-
             _logger.LogInformation("OnPostBulkApplyLateFeesAsync COMPLETE. Billing Contacts Targeted: {ProcessedCount}, Successful Applications: {SuccessCount}, Skipped (No Balance): {SkippedNoBalance}, Skipped (Recent Fee): {SkippedRecentFee}, Errors: {ErrorCount}",
                 processedCount, successCount, skippedNoOutstandingBalance, skippedRecentFeeExists, errorCount);
-
             var summaryMessage = new StringBuilder();
             summaryMessage.AppendLine($"Bulk late fee process summary:");
             summaryMessage.AppendLine($"- Billing contacts targeted for processing: {processedCount}");
@@ -595,7 +524,6 @@ namespace Members.Areas.Admin.Pages.Accounting
             summaryMessage.AppendLine($"- Skipped (No outstanding balance): {skippedNoOutstandingBalance}");
             summaryMessage.AppendLine($"- Skipped (Recent fee already exists): {skippedRecentFeeExists}");
             summaryMessage.AppendLine($"- Errors encountered (includes unexpected issues or profile mismatches): {errorCount}");
-
             if (successMessages.Count > 0)
             {
                 summaryMessage.AppendLine("\nSuccessful applications (first 5):");
@@ -605,7 +533,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 if (successMessages.Count > 5) summaryMessage.AppendLine($"...and {successMessages.Count - 5} more.");
             }
-
             if (detailedErrorMessages.Count > 0) // CA1860
             {
                 summaryMessage.AppendLine("\nError details (first 5):");
@@ -615,7 +542,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                  if (detailedErrorMessages.Count > 5) summaryMessage.AppendLine($"...and {detailedErrorMessages.Count - 5} more errors.");
             }
-            
             if (errorCount > 0)
             {
                 TempData["ErrorMessage"] = summaryMessage.ToString();
@@ -628,7 +554,6 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 TempData["WarningMessage"] = "Bulk late fee process ran, but no fees were applied or applicable to the targeted billing contacts.";
             }
-
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
     }

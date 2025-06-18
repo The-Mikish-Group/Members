@@ -14,27 +14,21 @@ using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class ReviewBatchInvoicesModel : PageModel
+    public class ReviewBatchInvoicesModel(
+        ApplicationDbContext context,
+        UserManager<IdentityUser> userManager,
+        ILogger<ReviewBatchInvoicesModel> logger) : PageModel
     {
         public class BatchSelectItem        
         {
         public string BatchId { get; set; } = string.Empty;
         public string DisplayText { get; set; } = string.Empty;
         }
-        public List<BatchSelectItem> AvailableDraftBatches { get; set; } = new List<BatchSelectItem>();
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager; // To get user names for display
-        private readonly ILogger<ReviewBatchInvoicesModel> _logger;
-        public ReviewBatchInvoicesModel(
-            ApplicationDbContext context,
-            UserManager<IdentityUser> userManager,
-            ILogger<ReviewBatchInvoicesModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
-        public List<InvoiceViewModel> DraftInvoices { get; set; } = new List<InvoiceViewModel>();
+        public List<BatchSelectItem> AvailableDraftBatches { get; set; } = [];
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager; // To get user names for display
+        private readonly ILogger<ReviewBatchInvoicesModel> _logger = logger;
+        public List<InvoiceViewModel> DraftInvoices { get; set; } = [];
         [BindProperty(SupportsGet = true)] // To capture batchId from route and for post handlers
         public string? BatchId { get; set; }
         [BindProperty(SupportsGet = true)]
@@ -43,18 +37,15 @@ namespace Members.Areas.Admin.Pages.Accounting
         [DataType(DataType.Currency)]
         public decimal TotalInvoiceAmount { get; set; }
         public string? BatchDescription { get; set; }
-
         // Properties for Sort State
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; } // Captures current sort order from query string
-
         public string? UserSort { get; set; }
         public string? EmailSort { get; set; }
         public string? DescriptionSort { get; set; }
         public string? AmountDueSort { get; set; }
         public string? InvoiceDateSort { get; set; }
         public string? DueDateSort { get; set; }
-
         // ViewModel to include user's name along with invoice details
         public class InvoiceViewModel : Invoice
         {
@@ -70,7 +61,6 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // Placeholder for potential future use (e.g., highlighting)
                 // TempData["HighlightUserId"] = ReturnedFromUserId; 
             }
-
             // Populate the dropdown of all available draft batches
             var draftBatchSummaries = await _context.Invoices
                 .Where(i => i.Status == InvoiceStatus.Draft && i.BatchID != null)
@@ -84,28 +74,28 @@ namespace Members.Areas.Admin.Pages.Accounting
                 })
                 .OrderByDescending(b => b.BatchCreateDate)
                 .ToListAsync();
-            AvailableDraftBatches = draftBatchSummaries.Select(s => new BatchSelectItem
+            AvailableDraftBatches = [.. draftBatchSummaries.Select(s => new BatchSelectItem
             {
                 BatchId = s.BatchId,
-                DisplayText = $"Batch {s.BatchId.Substring(s.BatchId.Length - Math.Min(4, s.BatchId.Length))} ({s.BatchCreateDate:yyyy-MM-dd HH:mm}) - {s.FirstInvoiceDescription} ({s.InvoiceCount} invoices)"
-            }).ToList();
-            _logger.LogInformation($"Found {AvailableDraftBatches.Count} distinct draft batches for dropdown.");
+                DisplayText = $"Batch {s.BatchId[^(Math.Min(4, s.BatchId.Length))..]} ({s.BatchCreateDate:yyyy-MM-dd HH:mm}) - {s.FirstInvoiceDescription} ({s.InvoiceCount} invoices)"
+            })];
+            _logger.LogInformation("Found {AvailableDraftBatches.Count} distinct draft batches for dropdown.", AvailableDraftBatches.Count);
             string? currentBatchIdToLoad = null;
             if (!string.IsNullOrEmpty(batchId) && AvailableDraftBatches.Any(b => b.BatchId == batchId))
             {
                 currentBatchIdToLoad = batchId; // Use batchId from parameter if valid and exists
-                _logger.LogInformation($"Using provided batchId: {currentBatchIdToLoad}");
+                _logger.LogInformation("Using provided batchId: {currentBatchIdToLoad}", currentBatchIdToLoad);
             }
-            else if (AvailableDraftBatches.Any())
+            else if (AvailableDraftBatches.Count != 0)
             {
                 currentBatchIdToLoad = AvailableDraftBatches.First().BatchId; // Default to the most recent one
-                _logger.LogInformation($"No valid batchId provided or found, defaulting to most recent: {currentBatchIdToLoad}");
+                _logger.LogInformation("No valid batchId provided or found, defaulting to most recent: {currentBatchIdToLoad}", currentBatchIdToLoad);
             }
             this.BatchId = currentBatchIdToLoad; // Set the PageModel's BatchId property
-            DraftInvoices = new List<InvoiceViewModel>(); // Clear previous
+            DraftInvoices = []; // Clear previous
             if (string.IsNullOrEmpty(this.BatchId))
             {
-                if (!AvailableDraftBatches.Any()) // No draft batches exist at all
+                if (AvailableDraftBatches.Count == 0) // No draft batches exist at all
                 {
                     TempData["WarningMessage"] = "No active draft batches found.";
                 }
@@ -119,14 +109,14 @@ namespace Members.Areas.Admin.Pages.Accounting
                 BatchDescription = "N/A";
                 return Page();
             }
-            _logger.LogInformation($"Loading details for BatchID: {this.BatchId}");
+            _logger.LogInformation("Loading details for BatchID: {this.BatchId}", this.BatchId);
             var invoicesInBatch = await _context.Invoices
                 .Where(i => i.BatchID == this.BatchId && i.Status == InvoiceStatus.Draft)
                 .Include(i => i.User)
                 .ToListAsync();
-            if (!invoicesInBatch.Any() && this.BatchId != null) // Check this.BatchId too
+            if (invoicesInBatch.Count == 0 && this.BatchId != null) // Check this.BatchId too
             {
-                _logger.LogWarning($"No draft invoices found for selected BatchID: {this.BatchId}. It might have been processed by another session.");
+                _logger.LogWarning("No draft invoices found for selected BatchID: {this.BatchId}. It might have been processed by another session.", this.BatchId);
                 TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{this.BatchId}'. It might have been recently processed or an error occurred.";
                 // Clear data for display
                 TotalInvoiceCount = 0;
@@ -135,8 +125,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // Optionally redirect or just show empty state with the message
                 return Page(); // Show the page, TempData message will appear
             }
-            if (invoicesInBatch.Any()) BatchDescription = invoicesInBatch.First().Description;
-            DraftInvoices = invoicesInBatch.Select(i => {
+            if (invoicesInBatch.Count != 0) BatchDescription = invoicesInBatch.First().Description;
+            DraftInvoices = [.. invoicesInBatch.Select(i => {
                 var userProfile = _context.UserProfile.FirstOrDefault(up => up.UserId == i.User.Id);
                 return new InvoiceViewModel
                 {
@@ -158,76 +148,46 @@ namespace Members.Areas.Admin.Pages.Accounting
                                    ? $"{userProfile.LastName}, {userProfile.FirstName}"
                                    : (i.User?.UserName ?? "N/A")
                 };
-            }).ToList();
+            })];
             TotalInvoiceCount = DraftInvoices.Count;
             TotalInvoiceAmount = DraftInvoices.Sum(i => i.AmountDue);
-            _logger.LogInformation($"Displaying {TotalInvoiceCount} draft invoices for BatchID: {this.BatchId} with total amount {TotalInvoiceAmount:C} before sorting.", TotalInvoiceCount, this.BatchId, TotalInvoiceAmount);
-
+            _logger.LogInformation("Displaying {TotalInvoiceCount} draft invoices for BatchID: {this.BatchId} with total amount {TotalInvoiceAmount:C} before sorting.", TotalInvoiceCount, this.BatchId, TotalInvoiceAmount);
             // Initialize sorting properties
             string defaultSortColumn = "user_asc"; 
             string activeSort = CurrentSort ?? defaultSortColumn;
             this.CurrentSort = activeSort; // Update CurrentSort to reflect the active sort
-
             UserSort = activeSort == "user_asc" ? "user_desc" : "user_asc";
             EmailSort = activeSort == "email_asc" ? "email_desc" : "email_asc";
             DescriptionSort = activeSort == "desc_asc" ? "desc_desc" : "desc_asc";
             AmountDueSort = activeSort == "amount_asc" ? "amount_desc" : "amount_asc";
             InvoiceDateSort = activeSort == "invdate_asc" ? "invdate_desc" : "invdate_asc";
             DueDateSort = activeSort == "duedate_asc" ? "duedate_desc" : "duedate_asc";
-
             _logger.LogInformation("Sorting parameters initialized. CurrentSort/ActiveSort: {ActiveSort}, UserSort: {UserSortVal}, EmailSort: {EmailSortVal}, DescriptionSort: {DescSortVal}, AmountDueSort: {AmountSortVal}, InvoiceDateSort: {InvDateSortVal}, DueDateSort: {DueDateSortVal}",
                 activeSort, UserSort, EmailSort, DescriptionSort, AmountDueSort, InvoiceDateSort, DueDateSort);
-            
             // Apply Sorting to DraftInvoices
-            switch (activeSort)
+            DraftInvoices = activeSort switch
             {
-                case "user_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.UserFullName ?? string.Empty).ToList();
-                    break;
-                case "user_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty).ToList();
-                    break;
-                case "email_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.UserName ?? string.Empty).ToList();
-                    break;
-                case "email_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserName ?? string.Empty).ToList();
-                    break;
-                case "desc_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.Description ?? string.Empty).ToList();
-                    break;
-                case "desc_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.Description ?? string.Empty).ToList();
-                    break;
-                case "amount_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.AmountDue).ToList();
-                    break;
-                case "amount_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.AmountDue).ToList();
-                    break;
-                case "invdate_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.InvoiceDate).ToList();
-                    break;
-                case "invdate_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.InvoiceDate).ToList();
-                    break;
-                case "duedate_desc":
-                    DraftInvoices = DraftInvoices.OrderByDescending(i => i.DueDate).ToList();
-                    break;
-                case "duedate_asc":
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.DueDate).ToList();
-                    break;
-                default: // Default sort if activeSort doesn't match any case
-                    DraftInvoices = DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty).ToList(); 
-                    break;
-            }
+                "user_desc" => [.. DraftInvoices.OrderByDescending(i => i.UserFullName ?? string.Empty)],
+                "user_asc" => [.. DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty)],
+                "email_desc" => [.. DraftInvoices.OrderByDescending(i => i.UserName ?? string.Empty)],
+                "email_asc" => [.. DraftInvoices.OrderBy(i => i.UserName ?? string.Empty)],
+                "desc_desc" => [.. DraftInvoices.OrderByDescending(i => i.Description ?? string.Empty)],
+                "desc_asc" => [.. DraftInvoices.OrderBy(i => i.Description ?? string.Empty)],
+                "amount_desc" => [.. DraftInvoices.OrderByDescending(i => i.AmountDue)],
+                "amount_asc" => [.. DraftInvoices.OrderBy(i => i.AmountDue)],
+                "invdate_desc" => [.. DraftInvoices.OrderByDescending(i => i.InvoiceDate)],
+                "invdate_asc" => [.. DraftInvoices.OrderBy(i => i.InvoiceDate)],
+                "duedate_desc" => [.. DraftInvoices.OrderByDescending(i => i.DueDate)],
+                "duedate_asc" => [.. DraftInvoices.OrderBy(i => i.DueDate)],
+                // Default sort if activeSort doesn't match any case
+                _ => [.. DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty)],
+            };
             _logger.LogInformation("DraftInvoices sorted by {ActiveSort}. Final Count: {Count}", activeSort, DraftInvoices.Count);
-
             return Page();
         }
         public async Task<IActionResult> OnPostFinalizeBatchAsync() // Removed batchId param, using bound BatchId
         {
-            _logger.LogInformation($"OnPostFinalizeBatchAsync called for BatchID: {BatchId}");
+            _logger.LogInformation("OnPostFinalizeBatchAsync called for BatchID: {BatchId}", BatchId);
             if (string.IsNullOrEmpty(BatchId))
             {
                 TempData["ErrorMessage"] = "Batch ID is missing. Cannot finalize.";
@@ -236,7 +196,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             var draftInvoicesInBatch = await _context.Invoices
                 .Where(i => i.BatchID == BatchId && i.Status == InvoiceStatus.Draft)
                 .ToListAsync();
-            if (!draftInvoicesInBatch.Any())
+            if (draftInvoicesInBatch.Count == 0)
             {
                 TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{BatchId}' to finalize.";
                 return RedirectToPage("./CreateBatchInvoices");
@@ -256,7 +216,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                         .Where(uc => uc.UserID == invoice.UserID && !uc.IsApplied && uc.Amount > 0)
                         .OrderBy(uc => uc.CreditDate)
                         .ToListAsync();
-                    if (availableCredits.Any())
+                    if (availableCredits.Count != 0)
                     {
                         foreach (var credit in availableCredits)
                         {
@@ -291,19 +251,19 @@ namespace Members.Areas.Admin.Pages.Accounting
             try
             {
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Successfully finalized {finalizedCount} invoices for BatchID: {BatchId}.");
+                _logger.LogInformation("Successfully finalized {finalizedCount} invoices for BatchID: {BatchId}.", finalizedCount, BatchId);
                 TempData["StatusMessage"] = $"{finalizedCount} invoices in batch '{BatchId}' have been finalized and are now Due (or Paid if credits applied).";
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, $"Error finalizing batch {BatchId}.");
+                _logger.LogError(ex, "Error finalizing batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error finalizing batch '{BatchId}'. See logs.";
             }
             return RedirectToPage("./CreateBatchInvoices"); // Or to an admin dashboard or invoice list
         }
         public async Task<IActionResult> OnPostCancelBatchAsync() // Removed batchId param, using bound BatchId
         {
-            _logger.LogInformation($"OnPostCancelBatchAsync called for BatchID: {BatchId}");
+            _logger.LogInformation("OnPostCancelBatchAsync called for BatchID: {BatchId}", BatchId);
             if (string.IsNullOrEmpty(BatchId))
             {
                 TempData["ErrorMessage"] = "Batch ID is missing. Cannot cancel.";
@@ -312,7 +272,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             var draftInvoicesInBatch = await _context.Invoices
                 .Where(i => i.BatchID == BatchId && i.Status == InvoiceStatus.Draft)
                 .ToListAsync();
-            if (!draftInvoicesInBatch.Any())
+            if (draftInvoicesInBatch.Count == 0)
             {
                 TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{BatchId}' to cancel.";
                 return RedirectToPage("./CreateBatchInvoices");
@@ -321,12 +281,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             try
             {
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Successfully cancelled/deleted {draftInvoicesInBatch.Count} draft invoices for BatchID: {BatchId}.");
+                _logger.LogInformation("Successfully cancelled/deleted {draftInvoicesInBatch.Count} draft invoices for BatchID: {BatchId}.", draftInvoicesInBatch.Count, BatchId);
                 TempData["StatusMessage"] = $"Draft batch '{BatchId}' with {draftInvoicesInBatch.Count} invoices has been cancelled.";
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, $"Error cancelling batch {BatchId}.");
+                _logger.LogError(ex, "Error cancelling batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error cancelling batch '{BatchId}'. See logs.";
             }
             return RedirectToPage("./CreateBatchInvoices"); // Or an admin dashboard

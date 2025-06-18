@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model Members.Areas.Admin.Pages.Accounting.ManageBillableAssetsModel
 @{
     ViewData["Title"] = "Manage Billable Assets";
@@ -23,210 +23,632 @@
     </div>
 }
 
+<button type="button" class="btn btn-primary mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-circle"></i> Add New Billable Asset</button>
+
 <div class="mb-4">
     <div class="">
-        <h5 class="text-gold-darker ms-2 mb-0">Add New Billable Asset</h5>
+        <h5 class="text-gold-darker ms-2 mb-0">Filter Assets</h5>
     </div>
-    <div class="shadow card m-1 p-1 bg-Card-Menu">
-        <form method="post" asp-page-handler="AddAsset">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label asp-for="NewAssetInput.PlotID" class="ms-2 form-label text-gold-darker"></label>
-                    <input asp-for="NewAssetInput.PlotID" class="form-control shadow text-gold-darker" />
-                    <span asp-validation-for="NewAssetInput.PlotID" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="NewAssetInput.AssessmentFee" class="ms-2 form-label text-gold-darker"></label>
-                    <input asp-for="NewAssetInput.AssessmentFee" type="number" step="0.01" class="form-control shadow text-gold-darker" placeholder="0.00" />
-                    <span asp-validation-for="NewAssetInput.AssessmentFee" class="text-danger"></span>
-                </div>
+    <div class="shadow card m-1 p-2 bg-Card-Menu">
+        <form method="get" id="filterAssetsForm">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control shadow-sm text-gold-darker" placeholder="Search by Plot ID, Description, Contact Name/Email..." asp-for="SearchTerm" id="assetsSearchInput" />
+                <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearAssetsSearch" style="display: none;">
+                    <i class="bi bi-x text-black"></i>
+                </button>
+                <button class="btn btn-sm btn-primary" type="submit" id="assetsSearchButton"><i class="bi bi-search"></i> Search</button>
             </div>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="NewAssetInput.SelectedUserID" class="ms-2 form-label text-gold-darker"></label>
-                    <select asp-for="NewAssetInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow text-gold-darker">
-                        <option value="">-- Select Billing Contact --</option>
-                    </select>
-                    <span asp-validation-for="NewAssetInput.SelectedUserID" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="NewAssetInput.Description" class="ms-2 form-label text-gold-darker"></label>
-                    <input asp-for="NewAssetInput.Description" class="form-control shadow text-gold-darker" />
-                    <span asp-validation-for="NewAssetInput.Description" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-12 mt-3 mb-2 me-2 text-end">
-                <button type="submit" class="btn btn-sm shadow btn-success"><i class="bi bi-plus-circle"></i> Add Asset</button>
-            </div>
+            <input type="hidden" asp-for="PageNumber" />
+            <input type="hidden" asp-for="PageSize" />
+            <input type="hidden" asp-for="CurrentSort" />
         </form>
+        <div class="mt-1 ps-1">
+            <span id="assetCountSpan" class="text-gold-darker">Total Assets: @Model.TotalAssets</span>
+        </div>
     </div>
 </div>
-
-@if (Model.ShowEditForm && Model.EditInput != null)
-{
-    <div class="card shadow-sm mb-4 border-primary"> 
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Edit Billable Asset: @Model.EditInput.PlotID</h5>
-        </div>
-        <div class="card-body">
-            <form method="post" asp-page-handler="UpdateAsset">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                <input type="hidden" asp-for="EditInput.BillableAssetID" />
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="EditInput.PlotID" class="form-label"></label>
-                        <input asp-for="EditInput.PlotID" class="form-control" />
-                        <span asp-validation-for="EditInput.PlotID" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="EditInput.AssessmentFee" class="form-label"></label>
-                        <input asp-for="EditInput.AssessmentFee" type="number" step="0.01" class="form-control" placeholder="0.00" />
-                        <span asp-validation-for="EditInput.AssessmentFee" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label asp-for="EditInput.SelectedUserID" class="form-label"></label>
-                        <select asp-for="EditInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select">
-                            <option value="">-- Unassign / Select Contact --</option>
-                        </select>
-                        <span asp-validation-for="EditInput.SelectedUserID" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="EditInput.Description" class="form-label"></label>
-                        <input asp-for="EditInput.Description" class="form-control" />
-                        <span asp-validation-for="EditInput.Description" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-12 mt-3">
-                    <button type="submit" class="btn btn-success">
-                            <i class="bi bi-save"></i> Update Asset
-                        </button>
-                        <a asp-page="./ManageBillableAssets" class="btn btn-secondary ms-2">
-                            <i class="bi bi-x-circle"></i> Cancel Edit
-                        </a>
-                    </div>
-                @* Removed superfluous div here *@
-            </form>
-        </div>
-    </div>
-}
-
 
 <div class="">
     <h5 class="ms-2 mb-0 text-gold-darker">Existing Billable Assets</h5>
 </div>
 <div class="shadow card mx-1 mt-1 mb-4 p-1">
-    @if (!Model.Assets.Any())
-    {
-        <p class="p-3 text-center text-gold-darker">No billable assets found.</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="w-100 mb-0">
-                <thead>
-                    <tr class="bg-gold-dark text-white">
-                            
-                        <th>
-                            <a asp-page="./ManageBillableAssets" 
-                                asp-route-CurrentSort="@Model.BillingContactSort"
-                                class="text-decoration-none text-white text-nowrap">Assigned Billing Contact</a>
-                            @if (Model.CurrentSort == "contact_asc") { <i class="bi bi-arrow-down"></i> }
-                            @if (Model.CurrentSort == "contact_desc") { <i class="bi bi-arrow-up"></i> }
-                        </th>
-                        <th class="ps-2 py-2">
-                            <a asp-page="./ManageBillableAssets"
-                                asp-route-CurrentSort="@Model.PlotIdSort"
-                                class="text-decoration-none text-white text-nowrap">Plot ID / Asset Identifier</a>
-                            @if (Model.CurrentSort == "plotid_asc") { <i class="bi bi-arrow-down"></i> }
-                            @if (Model.CurrentSort == "plotid_desc") { <i class="bi bi-arrow-up"></i> }
-                        </th>
-                        <th class="text-end text-nowrap">Assessment Fee</th> 
-                        <th>
-                            <a asp-page="./ManageBillableAssets" 
-                                asp-route-CurrentSort="@Model.DescriptionSort"
-                                class="text-decoration-none text-white text-nowrap">Description</a>
-                            @if (Model.CurrentSort == "desc_asc") { <i class="bi bi-arrow-down"></i> }
-                            @if (Model.CurrentSort == "desc_desc") { <i class="bi bi-arrow-up"></i> }
-                        </th>
-                        <th>
-                            <a asp-page="./ManageBillableAssets" 
-                                asp-route-CurrentSort="@Model.DateCreatedSort"
-                                class="text-decoration-none text-white text-nowrap">Date Created</a>
-                            @if (Model.CurrentSort == "created_asc") { <i class="bi bi-arrow-down"></i> }
-                            @if (Model.CurrentSort == "created_desc") { <i class="bi bi-arrow-up"></i> }
-                        </th>
-                        <th>
-                            <a asp-page="./ManageBillableAssets" 
-                                asp-route-CurrentSort="@Model.LastUpdatedSort"
-                                class="text-decoration-none text-white text-nowrap">Last Updated</a>
-                            @if (Model.CurrentSort == "updated_asc") { <i class="bi bi-arrow-down"></i> }
-                            @if (Model.CurrentSort == "updated_desc") { <i class="bi bi-arrow-up"></i> }
-                        </th>
-                        <th class="text-center pe-2 py-2 text-nowrap">Edit</th>
-                        <th class="text-center pe-2 py-2 text-nowrap">Delete</th>
+    <div class="table-responsive">
+        <table class="w-100 mb-0" id="mainAssetsTable">
+            <thead>
+                <tr class="bg-gold-dark text-white">
+                    <th>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="contact" data-sort-value="contact">Assigned Billing Contact</a>
+                        @if (Model.CurrentSort == "contact_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "contact_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th class="ps-2 py-2">
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="plotid" data-sort-value="plotid">Plot ID / Asset Identifier</a>
+                        @if (Model.CurrentSort == "plotid_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "plotid_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th class="text-end text-nowrap">
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
+                        @if (Model.CurrentSort == "fee_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "fee_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
+                        @if (Model.CurrentSort == "desc_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "desc_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
+                        @if (Model.CurrentSort == "created_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "created_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
+                        @if (Model.CurrentSort == "updated_asc")
+                        {
+                            <i class="bi bi-arrow-down text-white ms-1"></i>
+                        }
+                        else if (Model.CurrentSort == "updated_desc")
+                        {
+
+                            <i class="bi bi-arrow-up text-white ms-1"></i>
+                        }
+                    </th>
+                    <th class="text-center pe-2 py-2 text-nowrap">Edit</th>
+                    <th class="text-center pe-2 py-2 text-nowrap">Delete</th>
+                </tr>
+            </thead>
+            <tbody id="assetsTableBodyPlaceholder">
+                @{
+                    int i = 0;
+                }
+                @foreach (var asset in Model.Assets)
+                {
+                    <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
+                        <td class="text-nowrap">@(asset.BillingContactFullName)@(!string.IsNullOrEmpty(asset.BillingContactEmail) ? $" ({asset.BillingContactEmail})" : "")</td>
+                        <td class="text-nowrap ps-2 py-2">@asset.PlotID</td>
+                        <td class="text-nowrap text-end">@asset.AssessmentFee.ToString("C")</td>
+                        <td class="text-nowrap">@asset.Description</td>
+                        <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
+                        <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
+                        <td class="text-nowrap text-center pe-2 py-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1 edit-asset-button" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i> Edit</button>
+                        </td>
+                        <td class="text-nowrap text-center pe-2 py-2">
+                            <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i> Delete</button></form>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @{ int i = 0; }
-                    @foreach (var asset in Model.Assets)
-                    {
-                        <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
-                            <td class="text-nowrap">@(asset.BillingContactFullName)@(!string.IsNullOrEmpty(asset.BillingContactEmail) ? $" ({asset.BillingContactEmail})" : "")</td>
-                            <td class="text-nowrap ps-2 py-2">@asset.PlotID</td>
-                            <td class="text-nowrap text-end">@asset.AssessmentFee.ToString("C")</td>
-                            <td class="text-nowrap">@asset.Description</td>
-                            <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
-                            <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
-                            <td class="text-nowrap text-center pe-2 py-2">
-                                <a asp-page-handler="ShowEditForm" 
-                                    asp-route-assetId="@asset.BillableAssetID"
-                                    class="btn btn-sm btn-outline-primary me-1"
-                                    title="Edit Asset">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                            </td>
-                            <td class="text-nowrap text-center pe-2 py-2">
-                                <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                            title="Delete Asset: @asset.PlotID"
-                                            onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        i++;
+                    i++;
+                }
+            </tbody>
+        </table>
+    </div>
+    <div id="assetsPaginationPlaceholder" class="mt-3 px-1">
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Assets pagination">
+                <ul class="pagination justify-content-center">
+                    @{
+                        var prevDisabled = Model.PageNumber <= 1 ? "disabled" : "";
+                        var nextDisabled = Model.PageNumber >= Model.TotalPages ? "disabled" : "";
+                        const int pageDisplayLimit = 5;
+                        var startPage = Math.Max(1, Model.PageNumber - (int)Math.Floor((double)pageDisplayLimit / 2));
+                        var endPage = Math.Min(Model.TotalPages, startPage + pageDisplayLimit - 1);
+                        if (endPage - startPage + 1 < pageDisplayLimit && startPage > 1) { startPage = Math.Max(1, endPage - pageDisplayLimit + 1); }
                     }
-                </tbody>
-            </table>
-        </div>
-    }
+                    <li class="page-item @prevDisabled"><a class="page-link assets-page-link" href="#" data-page-number="@(Model.PageNumber - 1)">&laquo;</a></li>
+                    @for (var p = startPage; p <= endPage; p++)
+                    {
+                        <li class="page-item @(p == Model.PageNumber ? "active" : "")"><a class="page-link assets-page-link" href="#" data-page-number="@p">@p</a></li>
+                    }
+                    <li class="page-item @nextDisabled"><a class="page-link assets-page-link" href="#" data-page-number="@(Model.PageNumber + 1)">&raquo;</a></li>
+                </ul>
+            </nav>
+        }
+    </div>
+    <div id="assetsTableAjaxResponseContainer" style="display:none;"></div>
 </div>
 
+<div class="modal fade" id="addAssetModal" tabindex="-1" aria-labelledby="addAssetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddAsset">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAssetModalLabel">Add New Billable Asset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="NewAssetInput.PlotID" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="NewAssetInput.PlotID" class="form-control shadow text-gold-darker" />
+                            <span asp-validation-for="NewAssetInput.PlotID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewAssetInput.AssessmentFee" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="NewAssetInput.AssessmentFee" type="number" step="0.01" class="form-control shadow text-gold-darker" placeholder="0.00" />
+                            <span asp-validation-for="NewAssetInput.AssessmentFee" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="NewAssetInput.SelectedUserID" class="ms-2 form-label text-gold-darker"></label>
+                            <select asp-for="NewAssetInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow text-gold-darker">
+                                <option value="">-- Select Billing Contact --</option>
+                            </select>
+                            <span asp-validation-for="NewAssetInput.SelectedUserID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NewAssetInput.Description" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="NewAssetInput.Description" class="form-control shadow text-gold-darker" />
+                            <span asp-validation-for="NewAssetInput.Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> <!-- End of addAssetModal -->
+
+<div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="UpdateAsset">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAssetModalLabel">Edit Billable Asset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="EditInput.BillableAssetID" />
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="EditInput.PlotID" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="EditInput.PlotID" class="form-control shadow text-gold-darker" />
+                            <span asp-validation-for="EditInput.PlotID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EditInput.AssessmentFee" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="EditInput.AssessmentFee" type="number" step="0.01" class="form-control shadow text-gold-darker" placeholder="0.00" />
+                            <span asp-validation-for="EditInput.AssessmentFee" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="EditInput.SelectedUserID" class="ms-2 form-label text-gold-darker"></label>
+                            <select asp-for="EditInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow text-gold-darker">
+                                <option value="">-- Unassign / Select Contact --</option>
+                            </select>
+                            <span asp-validation-for="EditInput.SelectedUserID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EditInput.Description" class="ms-2 form-label text-gold-darker"></label>
+                            <input asp-for="EditInput.Description" class="form-control shadow text-gold-darker" />
+                            <span asp-validation-for="EditInput.Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Update Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Styles {
     <style>
-        .row-even { background-color: antiquewhite; }
-        .row-odd { background-color: #ffffff; }
-        .row-even > td, .row-odd > td { background-color: inherit !important; }
+        /* Pagination Styles to match Users.cshtml */
+        .pagination .page-link {
+            background-color: white !important;
+            border-color: darkgray !important;
+            color: #4E3802 !important; /* text-gold-darker */
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #DAA425 !important; /* text-gold (active bg) */
+            border-color: darkgray !important;
+            color: #fff !important; /* white text for active */
+        }
+
+        .pagination .page-link:hover {
+            background-color: #F2CA46 !important; /* text-gold-lighter (hover bg) */
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #f8f9fa !important;
+            border-color: darkgray !important;
+            color: #6c757d !important;
+        }
+
+        /* Existing styles from ManageBillableAssets.cshtml */
+        .row-even {
+            background-color: antiquewhite;
+        }
+
+        .row-odd {
+            background-color: #ffffff;
+        }
+
+            .row-even > td, .row-odd > td {
+                background-color: inherit !important;
+            }
+
         table th, table td {
             vertical-align: middle;
-            padding: 0.5rem 0.5rem; 
+            padding: 0.5rem 0.5rem;
         }
+
         thead th {
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
         }
-        .form-label {
-            font-weight: 500; /* Slightly bolder labels */
+
+        .form-label { /* This was for modal labels, might not be needed if not used elsewhere */
+            font-weight: 500;
         }
-        .table th a .bi { /* For sort indicators */
+        /* This rule for sort indicators in table headers is good to keep */
+        #mainAssetsTable thead th .bi {
             font-size: 0.9em;
             margin-left: 0.25rem;
         }
     </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Common elements
+            var addNewAssetButton = $('button[data-bs-target="#addAssetModal"]');
+
+            // Add Asset Modal
+            var addAssetModalElement = document.getElementById('addAssetModal');
+            var addAssetModal = null;
+            if (addAssetModalElement) {
+                addAssetModal = new bootstrap.Modal(addAssetModalElement);
+            }
+
+            // Edit Asset Modal
+            var editAssetModalElement = document.getElementById('editAssetModal');
+            var editAssetModal = null;
+            if (editAssetModalElement) {
+                editAssetModal = new bootstrap.Modal(editAssetModalElement);
+            }
+
+            // Modal Exclusivity & Cleanup
+            if (addAssetModalElement) {
+                addAssetModalElement.addEventListener('show.bs.modal', function () {
+                    if (editAssetModalElement && editAssetModalElement.classList.contains('show')) {
+                        editAssetModal.hide();
+                    }
+                });
+
+                addAssetModalElement.addEventListener('hidden.bs.modal', function() {
+                    // This logic ensures that if no modals are open, the Add button is enabled.
+                    if (!(editAssetModalElement && editAssetModalElement.classList.contains('show'))) {
+                         if (addNewAssetButton.length > 0) {
+                            addNewAssetButton.prop('disabled', false).removeAttr('title');
+                        }
+                    }
+                     // Clear Add Asset modal form fields
+                    $('#addAssetModal #NewAssetInput_PlotID').val('');
+                    $('#addAssetModal #NewAssetInput_AssessmentFee').val('');
+                    $('#addAssetModal #NewAssetInput_SelectedUserID').val('');
+                    $('#addAssetModal #NewAssetInput_Description').val('');
+                    // Clear validation messages
+                    $('#addAssetModal .text-danger').text('');
+                    $('#addAssetModal .is-invalid').removeClass('is-invalid');
+                });
+            }
+
+            if (editAssetModalElement) {
+                editAssetModalElement.addEventListener('show.bs.modal', function () {
+                    if (addAssetModalElement && addAssetModalElement.classList.contains('show')) {
+                        addAssetModal.hide();
+                    }
+                    // Disable the main "Add New Billable Asset" button
+                    if (addNewAssetButton.length > 0) {
+                        addNewAssetButton.prop('disabled', true).attr('title', 'Close the Edit Asset modal before adding a new asset.');
+                    }
+                });
+
+                editAssetModalElement.addEventListener('hidden.bs.modal', function () {
+                    // Re-enable the "Add New Billable Asset" button when edit modal is closed
+                    if (addNewAssetButton.length > 0) {
+                        addNewAssetButton.prop('disabled', false).removeAttr('title');
+                    }
+                    // Clear form fields in edit modal after closing to prevent stale data on reopen for a different item
+                    $('#editAssetModal #EditInput_BillableAssetID').val('');
+                    $('#editAssetModal #EditInput_PlotID').val('');
+                    $('#editAssetModal #EditInput_AssessmentFee').val('');
+                    $('#editAssetModal #EditInput_SelectedUserID').val(''); // Reset dropdown
+                    $('#editAssetModal #EditInput_Description').val('');
+                    $('#editAssetModalLabel').text('Edit Billable Asset'); // Reset title
+                    // Clear validation messages if any (more complex, might need a generic approach)
+                     $('#editAssetModal .text-danger').text(''); // Clears all validation spans within edit modal
+                     $('#editAssetModal .is-invalid').removeClass('is-invalid'); // Clears is-invalid classes
+                });
+            }
+
+            // Define debounce if not already defined from previous scripts for modals
+            if (typeof debounce !== 'function') {
+                function debounce(func, delay) {
+                    let timeoutId;
+                    return function(...args) {
+                        clearTimeout(timeoutId);
+                        timeoutId = setTimeout(() => {
+                            func.apply(this, args);
+                        }, delay);
+                    };
+                }
+            }
+
+           // Variables for Search and Pagination
+           const assetsSearchInput = $('#assetsSearchInput');
+           const clearAssetsSearch = $('#clearAssetsSearch');
+           const filterAssetsForm = $('#filterAssetsForm');
+           const assetCountSpan = $('#assetCountSpan');
+
+           const assetsTableBodyPlaceholder = $('#assetsTableBodyPlaceholder');
+           const assetsPaginationPlaceholder = $('#assetsPaginationPlaceholder');
+           const assetsTableAjaxResponseContainer = $('#assetsTableAjaxResponseContainer');
+
+           function updateAssetsTableAjax() {
+               const searchTerm = assetsSearchInput.val();
+               const pageNumber = $('input[name="PageNumber"]').val();
+               const pageSize = $('input[name="PageSize"]').val() || 20;
+               const currentSort = $('input[name="CurrentSort"]').val();
+
+               assetsTableBodyPlaceholder.html('<tr><td colspan="8" class="text-center p-3">Loading...</td></tr>');
+               assetsPaginationPlaceholder.html('');
+
+               $.ajax({
+                   url: '?handler=PartialTable',
+                   type: 'GET',
+                   data: {
+                       searchTerm: searchTerm,
+                       pageNumber: pageNumber,
+                       pageSize: pageSize,
+                       currentSort: currentSort
+                   },
+                   success: function(response) {
+                       console.log('[RAW RESPONSE]', response);
+
+                       // ---- START DOMParser / jQuery Fallback Test ----
+                       let paginationControlsHtmlFromDirectParse = undefined;
+                       let paginationControlsOuterHtmlFromDirectParse = undefined;
+                       let foundLengthFromDirectParse = 0;
+
+                       try {
+                           const parser = new DOMParser();
+                           const doc = parser.parseFromString(response, "text/html");
+                           const foundElement = doc.getElementById("assetsPaginationControls");
+
+                           if (foundElement) {
+                               foundLengthFromDirectParse = 1;
+                               paginationControlsHtmlFromDirectParse = foundElement.innerHTML;
+                               paginationControlsOuterHtmlFromDirectParse = foundElement.outerHTML;
+                               console.log('[DEBUG] DOMParser found #assetsPaginationControls:', foundElement);
+                           } else {
+                               console.log('[DEBUG] DOMParser DID NOT find #assetsPaginationControls. Trying jQuery on temp container...');
+                               // Fallback to jQuery on temp container
+                               const tempContainer = $('<div>').html(response);
+                               const jqFound = tempContainer.find('#assetsPaginationControls');
+                               if (jqFound.length) {
+                                   foundLengthFromDirectParse = jqFound.length;
+                                   paginationControlsHtmlFromDirectParse = jqFound.first().html();
+                                   paginationControlsOuterHtmlFromDirectParse = jqFound.first()[0].outerHTML;
+                                   console.log('[DEBUG] Fallback jQuery on temp container found #assetsPaginationControls:', jqFound);
+                               } else {
+                                   console.log('[DEBUG] Fallback jQuery on temp container ALSO DID NOT find #assetsPaginationControls.');
+                               }
+                           }
+                       } catch (e) {
+                           console.error('[DEBUG] Error during DOMParser or fallback jQuery processing of response string:', e);
+                       }
+
+                       console.log('[DEBUG] Length found from direct parse (DOMParser/jQuery fallback):', foundLengthFromDirectParse);
+                       if (foundLengthFromDirectParse > 0) {
+                           console.log('[DEBUG] HTML from direct parse:', paginationControlsHtmlFromDirectParse);
+                           console.log('[DEBUG] outerHTML from direct parse:', paginationControlsOuterHtmlFromDirectParse);
+                       }
+                       // ---- END DOMParser / jQuery Fallback Test ----
+
+                       assetsTableAjaxResponseContainer.html(response);
+
+                       const newTbodyContent = assetsTableAjaxResponseContainer.find('#assetsTableBody').html();
+                       assetsTableBodyPlaceholder.html(newTbodyContent || '<tr><td colspan="8" class="text-center p-3">No assets found matching your criteria.</td></tr>');
+
+                       // ---- START 기존 DEBUGGING PAGINATION (assetsTableAjaxResponseContainer.find) ----
+                       const paginationControlsSource = assetsTableAjaxResponseContainer.find('#assetsPaginationControls');
+                       console.log('[DEBUG] (Original Check) Pagination Source Element in AJAX response after .html():', paginationControlsSource);
+                       if (paginationControlsSource.length) {
+                           console.log('[DEBUG] (Original Check) Pagination Source HTML (first element):', paginationControlsSource.first().html());
+                           console.log('[DEBUG] (Original Check) Pagination Source outerHTML (first element):', paginationControlsSource.first()[0].outerHTML);
+                       } else {
+                           console.log('[DEBUG] (Original Check) #assetsPaginationControls NOT FOUND in AJAX response after .html().');
+                       }
+
+                       // THE KEY CHANGE IS HERE:
+                       const newPaginationContent = paginationControlsHtmlFromDirectParse; // USE THE DOMPARSER RESULT
+                       console.log('[DEBUG] Using newPaginationContent from DOMParser/fallback:', newPaginationContent); // Added log for clarity
+
+                       assetsPaginationPlaceholder.html(newPaginationContent || '');
+                       console.log('[DEBUG] (Original Check) assetsPaginationPlaceholder HTML after update:', assetsPaginationPlaceholder.html());
+                       // ---- END 기존 DEBUGGING PAGINATION ----
+
+                       const totalAssetsFromPartial = assetsTableAjaxResponseContainer.find('#partialTotalAssets').val();
+                       if (totalAssetsFromPartial) {
+                           assetCountSpan.text('Total Assets: ' + totalAssetsFromPartial);
+                       }
+                       $('input[name="PageNumber"]').val(assetsTableAjaxResponseContainer.find('#partialPageNumber').val());
+
+                       attachEditAssetButtonListeners_Assets();
+                       attachAssetsPaginationListeners();
+                       updateAssetsSortIndicators($('input[name="CurrentSort"]').val());
+                   },
+                   error: function(xhr, status, error) {
+                       console.error("Error updating assets table:", error, xhr.responseText);
+                       assetsTableBodyPlaceholder.html('<tr><td colspan="8" class="text-center text-danger p-3">Error loading data. Please try again.</td></tr>');
+                   }
+               });
+           }
+
+           function attachAssetsPaginationListeners() {
+               assetsPaginationPlaceholder.find('.assets-page-link').off('click').on('click', function(e) {
+                   e.preventDefault();
+                   $('input[name="PageNumber"]').val($(this).data('page-number'));
+                   updateAssetsTableAjax();
+               });
+           }
+
+           function attachAssetsSortLinkListeners() {
+               $('#mainAssetsTable thead .asset-sort-link').off('click').on('click', function(e) {
+                   e.preventDefault();
+                   const baseColumnKey = $(this).data('column-key'); // e.g., "plotid", from data-column-key
+                   const currentSortHiddenInput = $('input[name="CurrentSort"]');
+                   const currentFullSort = currentSortHiddenInput.val(); // e.g., "plotid_asc" or "contact_desc"
+
+                   let newSortValue;
+                   if (currentFullSort === baseColumnKey + "_asc") {
+                       newSortValue = baseColumnKey + "_desc";
+                   } else if (currentFullSort === baseColumnKey + "_desc") {
+                       // If current sort is already descending for this column, toggle to ascending
+                       newSortValue = baseColumnKey + "_asc";
+                   }
+                   else {
+                       // If it's a new column being clicked, or if current sort is not set for this column, default to ascending
+                       newSortValue = baseColumnKey + "_asc";
+                   }
+
+                   currentSortHiddenInput.val(newSortValue);
+                   $('input[name="PageNumber"]').val(1); // Reset to page 1 on sort
+                   updateAssetsTableAjax();
+               });
+           }
+
+           function updateAssetsSortIndicators(currentSortActual) {
+                $('#mainAssetsTable thead .asset-sort-link + i.bi').remove();
+                $('#mainAssetsTable thead .asset-sort-link').each(function() {
+                    const sortLink = $(this);
+                    const columnKey = sortLink.data('column-key');
+                    if (!columnKey) return;
+
+                    let iconHtml = '';
+                    if (currentSortActual === columnKey + '_asc') {
+                        iconHtml = '<i class="bi bi-arrow-down text-white ms-1"></i>';
+                    } else if (currentSortActual === columnKey + '_desc') {
+                        iconHtml = '<i class="bi bi-arrow-up text-white ms-1"></i>';
+                    }
+
+                    if (iconHtml) {
+                        sortLink.after(iconHtml);
+                    }
+                });
+            }
+
+           assetsSearchInput.on('input', debounce(function() {
+               $('input[name="PageNumber"]').val(1);
+               updateAssetsTableAjax();
+               clearAssetsSearch.toggle(!!assetsSearchInput.val());
+           }, 500));
+
+           clearAssetsSearch.on('click', function() {
+               assetsSearchInput.val('');
+               $('input[name="PageNumber"]').val(1);
+               updateAssetsTableAjax();
+               clearAssetsSearch.hide();
+           });
+
+           filterAssetsForm.on('submit', function(e) {
+               e.preventDefault();
+               $('input[name="PageNumber"]').val(1);
+               updateAssetsTableAjax();
+           });
+
+           function attachEditAssetButtonListeners_Assets() {
+                assetsTableBodyPlaceholder.find('.edit-asset-button').off('click').on('click', function () {
+                    var assetId = $(this).data('asset-id');
+                    var plotId = $(this).data('plot-id');
+                    var addAssetModalElement = document.getElementById('addAssetModal');
+                    var addAssetModalInstance = addAssetModalElement ? bootstrap.Modal.getInstance(addAssetModalElement) : null;
+                    var editAssetModalElement = document.getElementById('editAssetModal');
+                    var editAssetModalInstance = editAssetModalElement ? bootstrap.Modal.getInstance(editAssetModalElement) : null;
+
+                    if (addAssetModalInstance && addAssetModalElement && addAssetModalElement.classList.contains('show')) {
+                        addAssetModalInstance.hide();
+                    }
+                    var url = `${window.location.pathname}?handler=ShowEditForm&assetId=${assetId}`;
+                    $.ajax({
+                        url: url, type: 'GET',
+                        success: function (data) {
+                            if (data) {
+                                $('#editAssetModal #EditInput_BillableAssetID').val(data.billableAssetID);
+                                $('#editAssetModal #EditInput_PlotID').val(data.plotID);
+                                $('#editAssetModal #EditInput_AssessmentFee').val(data.assessmentFee.toFixed(2));
+                                $('#editAssetModal #EditInput_SelectedUserID').val(data.selectedUserID);
+                                $('#editAssetModal #EditInput_Description').val(data.description);
+                                $('#editAssetModalLabel').text('Edit Billable Asset: ' + plotId);
+                                if(editAssetModalInstance) editAssetModalInstance.show();
+                            } else { alert('Error: Could not retrieve asset data.'); }
+                        },
+                        error: function (jqXHR) {
+                            console.error("AJAX error fetching asset for edit: ", jqXHR.responseText);
+                            alert('Error loading asset data for editing. ' + (jqXHR.responseJSON ? jqXHR.responseJSON.message : 'Check console.'));
+                        }
+                    });
+                });
+            }
+
+           // Initial setup on page load
+           // $(document).ready(function() { // This is already inside a document.ready, so no need to nest.
+               clearAssetsSearch.toggle(!!assetsSearchInput.val());
+               attachAssetsSortLinkListeners();
+               updateAssetsSortIndicators($('input[name="CurrentSort"]').val());
+               attachEditAssetButtonListeners_Assets();
+               attachAssetsPaginationListeners();
+           // });
+        });
+    </script>
 }

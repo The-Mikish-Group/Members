@@ -15,32 +15,31 @@ using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class ManageBillableAssetsModel : PageModel
+    public class ManageBillableAssetsModel(ApplicationDbContext context, UserManager<IdentityUser> userManager, ILogger<ManageBillableAssetsModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<ManageBillableAssetsModel> _logger;
-        public ManageBillableAssetsModel(ApplicationDbContext context, UserManager<IdentityUser> userManager, ILogger<ManageBillableAssetsModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
-        public List<BillableAssetViewModel> Assets { get; set; } = new List<BillableAssetViewModel>();
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<ManageBillableAssetsModel> _logger = logger;
+        public List<BillableAssetViewModel> Assets { get; set; } = [];
         [BindProperty]
         public AddBillableAssetInputModel NewAssetInput { get; set; } = new AddBillableAssetInputModel();
         [BindProperty]
         public EditAssetInputModel? EditInput { get; set; }
-        public bool ShowEditForm { get; set; } = false;
         public SelectList? BillingContactUsersSL { get; set; }
+        // Search Property
+        [BindProperty(SupportsGet = true)]
+        public string? SearchTerm { get; set; }
+        // Pagination Properties
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 20; // Default page size to 20
+        public int TotalAssets { get; set; }
+        public int TotalPages { get; set; }
         // Properties for Sort State
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; }
-        public string? PlotIdSort { get; set; }
-        public string? BillingContactSort { get; set; }
-        public string? DescriptionSort { get; set; }
-        public string? DateCreatedSort { get; set; }
-        public string? LastUpdatedSort { get; set; }
+        // Individual XyzSort properties removed
         public class EditAssetInputModel
         {
             [Required]
@@ -110,99 +109,119 @@ namespace Members.Areas.Admin.Pages.Accounting
             }).ToList();
             BillingContactUsersSL = new SelectList(selectListItems, "Value", "Text");
         }
-        public async Task OnGetAsync()
+        private async Task LoadAssetsDataAsync()
         {
-            _logger.LogInformation("Loading ManageBillableAssets page.");
-            var assetsFromDb = await _context.BillableAssets
-                                   .Include(ba => ba.User) // Eager load User for email access
-                                   .OrderBy(ba => ba.PlotID)
-                                   .ToListAsync();
-            var userIdsForAssets = assetsFromDb
-                                   .Where(a => a.UserID != null)
-                                   .Select(a => a.UserID!) // Use null-forgiving operator as we checked for null
-                                   .Distinct()
-                                   .ToList();
-            var userProfilesForAssets = await _context.UserProfile
-                                        .Where(up => userIdsForAssets.Contains(up.UserId))
-                                        .ToDictionaryAsync(up => up.UserId);
-            Assets = new List<BillableAssetViewModel>();
-            foreach (var asset in assetsFromDb)
+            _logger.LogInformation("LoadAssetsDataAsync called. SearchTerm: {SearchTerm}, PageNumber: {PageNumber}, PageSize: {PageSize}, CurrentSort: {CurrentSort}", SearchTerm, PageNumber, PageSize, CurrentSort);
+            // Start with BillableAssets
+            IQueryable<BillableAsset> baseAssetQuery = _context.BillableAssets;
+            // Join with IdentityUser (for ba.User)
+            var queryWithUser = baseAssetQuery
+                .Select(ba => new {
+                    BillableAsset = ba,
+                    ba.User // This is the IdentityUser linked to BillableAsset
+                });
+            // Now, GroupJoin with UserProfile on User.Id == UserProfile.UserId
+            var queryWithJoinedData = queryWithUser
+                .GroupJoin(
+                    _context.UserProfile, // Changed to singular UserProfile
+                    outer => outer.User != null ? outer.User.Id : null,
+                    userProfile => userProfile.UserId,
+                    (outer, profiles) => new {
+                        outer.BillableAsset,
+                        outer.User, // IdentityUser
+                        UserProfile = profiles.FirstOrDefault() // UserProfile or null
+                    }
+                );
+            // Apply Filtering
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
+                string searchTermLower = SearchTerm.ToLower().Trim();
+                queryWithJoinedData = queryWithJoinedData.Where(item =>
+                    (item.BillableAsset.PlotID != null && item.BillableAsset.PlotID.ToLower().Contains(searchTermLower)) ||
+                    (item.BillableAsset.Description != null && item.BillableAsset.Description.ToLower().Contains(searchTermLower)) ||
+                    (item.UserProfile != null && (
+                        (item.UserProfile.FirstName != null && item.UserProfile.FirstName.ToLower().Contains(searchTermLower)) ||
+                        (item.UserProfile.LastName != null && item.UserProfile.LastName.ToLower().Contains(searchTermLower))
+                    )) ||
+                    (item.User != null && item.User.Email != null && item.User.Email.ToLower().Contains(searchTermLower))
+                );
+            }
+            TotalAssets = await queryWithJoinedData.CountAsync();
+            _logger.LogInformation("Total assets after filtering: {TotalAssets}", TotalAssets);
+            TotalPages = (int)Math.Ceiling(TotalAssets / (double)PageSize);
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageNumber > TotalPages && TotalPages > 0) PageNumber = TotalPages;
+            else if (TotalPages == 0) PageNumber = 1;
+            _logger.LogInformation("[BACKEND_DEBUG] LoadAssetsDataAsync - TotalAssets: {TotalAssets}, PageSize: {PageSize}, Calculated TotalPages: {TotalPages}, Final PageNumber: {PageNumber}", TotalAssets, PageSize, TotalPages, PageNumber);
+            string activeSort = CurrentSort ?? "contact_asc"; // Default sort
+            this.CurrentSort = activeSort; // Ensure CurrentSort property is set for UI links
+            var assetsSortableQuery = queryWithJoinedData;
+            var orderedQueryable = activeSort switch
+            {
+                "plotid_desc" => assetsSortableQuery.OrderByDescending(item => item.BillableAsset.PlotID),
+                "plotid_asc" => assetsSortableQuery.OrderBy(item => item.BillableAsset.PlotID),
+                "contact_desc" => assetsSortableQuery.OrderByDescending(item => item.UserProfile != null && item.UserProfile.LastName != null && item.UserProfile.FirstName != null ? (item.UserProfile.LastName + ", " + item.UserProfile.FirstName) : (item.User != null ? item.User.Email : null)),
+                "contact_asc" => assetsSortableQuery.OrderBy(item => item.UserProfile != null && item.UserProfile.LastName != null && item.UserProfile.FirstName != null ? (item.UserProfile.LastName + ", " + item.UserProfile.FirstName) : (item.User != null ? item.User.Email : null)),
+                "desc_desc" => assetsSortableQuery.OrderByDescending(item => item.BillableAsset.Description),
+                "desc_asc" => assetsSortableQuery.OrderBy(item => item.BillableAsset.Description),
+                "created_desc" => assetsSortableQuery.OrderByDescending(item => item.BillableAsset.DateCreated),
+                "created_asc" => assetsSortableQuery.OrderBy(item => item.BillableAsset.DateCreated),
+                "updated_desc" => assetsSortableQuery.OrderByDescending(item => item.BillableAsset.LastUpdated),
+                "updated_asc" => assetsSortableQuery.OrderBy(item => item.BillableAsset.LastUpdated),
+                "fee_desc" => assetsSortableQuery.OrderByDescending(item => item.BillableAsset.AssessmentFee),
+                "fee_asc" => assetsSortableQuery.OrderBy(item => item.BillableAsset.AssessmentFee),
+                _ => assetsSortableQuery.OrderBy(item => item.UserProfile != null && item.UserProfile.LastName != null && item.UserProfile.FirstName != null ? (item.UserProfile.LastName + ", " + item.UserProfile.FirstName) : (item.User != null ? item.User.Email : null)) // Default
+            };
+            _logger.LogInformation("Applied IQueryable sorting based on: {ActiveSort}", activeSort);
+            var paginatedResults = await orderedQueryable
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+            _logger.LogInformation("Fetched {PaginatedCount} assets after pagination.", paginatedResults.Count);
+            Assets = [];
+            foreach (var item in paginatedResults)
+            {
+                var assetEntity = item.BillableAsset;
+                var user = item.User;
+                var userProfile = item.UserProfile;
                 string? contactFullName = null;
                 string? contactEmail = null;
-                if (asset.User != null) // User is populated from Include()
+                if (user != null)
                 {
-                    userProfilesForAssets.TryGetValue(asset.User.Id, out UserProfile? userProfile);
-                    contactFullName = (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
-                                      ? $"{userProfile.LastName}, {userProfile.FirstName}"
-                                      : asset.User?.UserName; // Use ?.
-                    contactEmail = asset.User?.Email; // Use ?.
+                    contactEmail = user.Email;
+                    if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                    {
+                        contactFullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                    }
+                    else
+                    {
+                        contactFullName = user.UserName;
+                    }
                 }
                 Assets.Add(new BillableAssetViewModel
                 {
-                    BillableAssetID = asset.BillableAssetID,
-                    PlotID = asset.PlotID,
-                    UserID = asset.UserID,
+                    BillableAssetID = assetEntity.BillableAssetID,
+                    PlotID = assetEntity.PlotID,
+                    UserID = assetEntity.UserID,
                     BillingContactFullName = contactFullName ?? "N/A (Unassigned)",
                     BillingContactEmail = contactEmail,
-                    DateCreated = asset.DateCreated,
-                    LastUpdated = asset.LastUpdated,
-                    Description = asset.Description,
-                    AssessmentFee = asset.AssessmentFee
+                    DateCreated = assetEntity.DateCreated,
+                    LastUpdated = assetEntity.LastUpdated,
+                    Description = assetEntity.Description,
+                    AssessmentFee = assetEntity.AssessmentFee
                 });
             }
-            _logger.LogInformation("Loaded {AssetCount} billable assets before sorting.", Assets.Count);
-            // Initialize sorting properties
-            string defaultSortColumn = "contact_asc";
-            string activeSort = CurrentSort ?? defaultSortColumn;
-            this.CurrentSort = activeSort;
-            PlotIdSort = activeSort == "plotid_asc" ? "plotid_desc" : "plotid_asc";
-            BillingContactSort = activeSort == "contact_asc" ? "contact_desc" : "contact_asc";
-            DescriptionSort = activeSort == "desc_asc" ? "desc_desc" : "desc_asc";
-            DateCreatedSort = activeSort == "created_asc" ? "created_desc" : "created_asc";
-            LastUpdatedSort = activeSort == "updated_asc" ? "updated_desc" : "updated_asc";
-            _logger.LogInformation("Sorting parameters initialized. CurrentSort/ActiveSort: {ActiveSort}, PlotIdSort: {PlotSortVal}, BillingContactSort: {ContactSortVal}, DescriptionSort: {DescSortVal}, DateCreatedSort: {CreatedSortVal}, LastUpdatedSort: {UpdatedSortVal}",
-                activeSort, PlotIdSort, BillingContactSort, DescriptionSort, DateCreatedSort, LastUpdatedSort);
-            // Apply Sorting to Assets list
-            switch (activeSort)
-            {
-                case "plotid_desc":
-                    Assets = Assets.OrderByDescending(a => a.PlotID).ToList();
-                    break;
-                case "plotid_asc":
-                    Assets = Assets.OrderBy(a => a.PlotID).ToList();
-                    break;
-                case "contact_desc":
-                    Assets = Assets.OrderByDescending(a => a.BillingContactFullName ?? string.Empty).ToList();
-                    break;
-                case "contact_asc":
-                    Assets = Assets.OrderBy(a => a.BillingContactFullName ?? string.Empty).ToList();
-                    break;
-                case "desc_desc":
-                    Assets = Assets.OrderByDescending(a => a.Description ?? string.Empty).ToList();
-                    break;
-                case "desc_asc":
-                    Assets = Assets.OrderBy(a => a.Description ?? string.Empty).ToList();
-                    break;
-                case "created_desc":
-                    Assets = Assets.OrderByDescending(a => a.DateCreated).ToList();
-                    break;
-                case "created_asc":
-                    Assets = Assets.OrderBy(a => a.DateCreated).ToList();
-                    break;
-                case "updated_desc":
-                    Assets = Assets.OrderByDescending(a => a.LastUpdated).ToList();
-                    break;
-                case "updated_asc":
-                    Assets = Assets.OrderBy(a => a.LastUpdated).ToList();
-                    break;
-                default:
-                    Assets = Assets.OrderBy(a => a.PlotID).ToList();
-                    break;
-            }
-            _logger.LogInformation("Assets list sorted by {ActiveSort}. Final Count: {Count}", activeSort, Assets.Count);
+            _logger.LogInformation("Populated BillableAssetViewModel with {AssetCount} assets.", Assets.Count);
+        }
+        public async Task OnGetAsync()
+        {
+            _logger.LogInformation("ManageBillableAssets OnGetAsync called.");
+            await LoadAssetsDataAsync();
+            // Logic for setting individual XyzSort properties removed.
+            // CurrentSort is the single source of truth, managed by LoadAssetsDataAsync and client-side.
+            _logger.LogInformation("Sorting state for OnGetAsync. CurrentSort: {CurrentSort}", CurrentSort);
             await PopulateBillingContactUsersSL();
-            _logger.LogInformation("Finished OnGetAsync. Loaded {AssetCount} billable assets and {UserCount} potential billing contacts after sorting.", Assets.Count, BillingContactUsersSL?.Count() ?? 0);
+            _logger.LogInformation("Finished OnGetAsync. Loaded {AssetCount} billable assets for display. TotalAssets: {TotalOverallAssets}, TotalPages: {TotalPageCount}", Assets.Count, TotalAssets, TotalPages);
         }
         public async Task<IActionResult> OnPostAddAssetAsync()
         {
@@ -286,9 +305,9 @@ namespace Members.Areas.Admin.Pages.Accounting
             // Also, NewAssetInput.PlotID has passed the string.IsNullOrWhiteSpace check
             // (otherwise ModelState would be invalid and we would have returned Page()).
             // Therefore, NewAssetInput.PlotID is a non-null, non-whitespace string here.
-            #pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             string trimmedPlotId = NewAssetInput.PlotID!.Trim();
-            #pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             // Check for duplicate PlotID
             if (await _context.BillableAssets.AnyAsync(ba => ba.PlotID == trimmedPlotId))
             {
@@ -297,7 +316,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 await PopulateBillingContactUsersSL();
                 await OnGetAsync();
                 NewAssetInput.PlotID = trimmedPlotId;
-                ShowEditForm = false;
+                // ShowEditForm = false; // Removed
                 return Page();
             }
             var newAsset = new BillableAsset
@@ -336,27 +355,23 @@ namespace Members.Areas.Admin.Pages.Accounting
         }
         public async Task<IActionResult> OnGetShowEditFormAsync(int assetId)
         {
-            _logger.LogInformation("OnGetShowEditFormAsync called for assetId: {AssetId}", assetId);
+            _logger.LogInformation("OnGetShowEditFormAsync called for assetId: {AssetId} to fetch data for modal", assetId);
             var assetToEdit = await _context.BillableAssets.FindAsync(assetId);
             if (assetToEdit == null)
             {
                 _logger.LogWarning("Asset with ID {AssetId} not found for editing.", assetId);
-                TempData["ErrorMessage"] = "Selected billable asset not found.";
-                return RedirectToPage();
+                return NotFound(new { message = "Selected billable asset not found." });
             }
-            // this.PlotIdBeingEdited = assetToEdit.PlotID; // Property removed
-            EditInput = new EditAssetInputModel
+            var editInputData = new EditAssetInputModel
             {
                 BillableAssetID = assetToEdit.BillableAssetID,
-                PlotID = assetToEdit.PlotID, // ADD THIS LINE BACK
+                PlotID = assetToEdit.PlotID,
                 SelectedUserID = assetToEdit.UserID,
                 Description = assetToEdit.Description,
                 AssessmentFee = assetToEdit.AssessmentFee
             };
-            ShowEditForm = true;
-            await OnGetAsync();
-            _logger.LogInformation("Populated EditInput for AssetID {AssetId} (PlotID: {PlotID_Bound}) and set ShowEditForm to true.", assetId, EditInput.PlotID);
-            return Page();
+            _logger.LogInformation("Returning Json data for AssetID {AssetId} (PlotID: {PlotID_Bound})", assetId, editInputData.PlotID);
+            return new JsonResult(editInputData);
         }
         public async Task<IActionResult> OnPostUpdateAssetAsync()
         {
@@ -417,11 +432,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         foreach (var error in modelStateVal.Errors)
                         {
-                            _logger.LogWarning($"ModelState Key: {modelStateKey}, Error: {error.ErrorMessage}, Exception: {error.Exception?.Message}");
+                            _logger.LogWarning("ModelState Key: {modelStateKey}, Error: {error.ErrorMessage}, Exception: {error.Exception?.Message}", modelStateKey, error.ErrorMessage, error.Exception?.Message);
                         }
                     }
                 }
-                ShowEditForm = true;
+                // ShowEditForm = true; // Removed
                 await OnGetAsync(); // Reload full asset list
                 return Page();
             }
@@ -443,7 +458,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     ModelState.AddModelError("EditInput.PlotID", "This Plot ID / Asset Identifier already exists for another asset.");
                     _logger.LogWarning("Update asset failed: Duplicate PlotID {PlotID} attempt for AssetID {AssetId}.",
                         newTrimmedPlotId, EditInput.BillableAssetID);
-                    ShowEditForm = true;
+                    // ShowEditForm = true; // Removed
                     await PopulateBillingContactUsersSL();
                     // EditInput still holds the attempted (duplicate) PlotID, so the form will show it for correction.
                     // We need to ensure the main Assets list is also reloaded for the page.
@@ -467,14 +482,14 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 _logger.LogError(ex, "Concurrency error updating billable asset {PlotID} (ID: {AssetID}). It may have been modified or deleted by another user.", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating asset due to a concurrency conflict. Please refresh and try again.";
-                ShowEditForm = false;
+                // ShowEditForm = false; // Removed
                 return RedirectToPage();
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Database error updating billable asset {PlotID} (ID: {AssetID})", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating billable asset. Check logs for details.";
-                ShowEditForm = true;
+                // ShowEditForm = true; // Removed
                 await OnGetAsync();
                 return Page();
             }
@@ -511,6 +526,18 @@ namespace Members.Areas.Admin.Pages.Accounting
                 TempData["ErrorMessage"] = $"Error deleting Billable Asset '{assetToDelete.PlotID}'. It might be referenced by other records, or a database error occurred. Check logs.";
             }
             return RedirectToPage();
+        }
+        public async Task<PartialViewResult> OnGetPartialTableAsync(string? searchTerm, int pageNumber, int pageSize, string? currentSort)
+        {
+            // Set model properties from parameters
+            SearchTerm = searchTerm;
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+            CurrentSort = currentSort;
+            _logger.LogInformation("OnGetPartialTableAsync called. SearchTerm: {SearchTerm}, PageNumber: {PageNumber}, PageSize: {PageSize}, CurrentSort: {CurrentSort}", SearchTerm, PageNumber, PageSize, CurrentSort);
+            await LoadAssetsDataAsync();
+            _logger.LogInformation("[BACKEND_DEBUG] OnGetPartialTableAsync - Passing to partial - TotalAssets: {TotalAssets}, TotalPages: {TotalPages}, PageNumber: {PageNumber}, PageSize: {PageSize}, SearchTerm: {SearchTerm}, CurrentSort: {CurrentSort}", this.TotalAssets, this.TotalPages, this.PageNumber, this.PageSize, this.SearchTerm, this.CurrentSort);
+            return Partial("_AssetsTablePartial", this);
         }
     }
 }

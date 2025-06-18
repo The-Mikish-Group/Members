@@ -1,0 +1,76 @@
+@model Members.Areas.Admin.Pages.Accounting.ManageBillableAssetsModel
+
+<tbody id="assetsTableBody">
+    @{
+        int i = 0;
+    }
+    @foreach (var asset in Model.Assets)
+    {
+        <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
+            <td class="text-nowrap">@(asset.BillingContactFullName)@(!string.IsNullOrEmpty(asset.BillingContactEmail) ? $" ({asset.BillingContactEmail})" : "")</td>
+            <td class="text-nowrap ps-2 py-2">@asset.PlotID</td>
+            <td class="text-nowrap text-end">@asset.AssessmentFee.ToString("C")</td>
+            <td class="text-nowrap">@asset.Description</td>
+            <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
+            <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
+            <td class="text-nowrap text-center pe-2 py-2">
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary me-1 edit-asset-button"
+                        data-asset-id="@asset.BillableAssetID"
+                        data-plot-id="@asset.PlotID"
+                        title="Edit Asset @asset.PlotID">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </button>
+            </td>
+            <td class="text-nowrap text-center pe-2 py-2">
+                <form method="post" action="/Admin/Accounting/ManageBillableAssets?handler=DeleteAsset&assetId=@asset.BillableAssetID" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                            title="Delete Asset: @asset.PlotID"
+                            onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        i++;
+    }
+</tbody>
+@* <p>[MARKER_AFTER_TBODY]</p> *@ @* Optionally remove this marker - REMOVED FOR CLEANLINESS *@
+
+<div id="assetsPaginationControls" class="mt-3">
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Assets pagination">
+            <ul class="pagination justify-content-center">
+                @{
+                    var prevDisabled = Model.PageNumber <= 1 ? "disabled" : "";
+                    var nextDisabled = Model.PageNumber >= Model.TotalPages ? "disabled" : "";
+                    const int pageDisplayLimit = 5;
+                    var startPage = Math.Max(1, Model.PageNumber - (int)Math.Floor((double)pageDisplayLimit / 2));
+                    var endPage = Math.Min(Model.TotalPages, startPage + pageDisplayLimit - 1);
+                    if (endPage - startPage + 1 < pageDisplayLimit && startPage > 1)
+                    {
+                        startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
+                    }
+                }
+                <li class="page-item @prevDisabled">
+                    <a class="page-link assets-page-link" href="#" data-page-number="@(Model.PageNumber - 1)">&laquo;</a>
+                </li>
+                @for (var p = startPage; p <= endPage; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link assets-page-link" href="#" data-page-number="@p">@p</a>
+                    </li>
+                }
+                <li class="page-item @nextDisabled">
+                    <a class="page-link assets-page-link" href="#" data-page-number="@(Model.PageNumber + 1)">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+<input type="hidden" id="partialTotalAssets" value="@Model.TotalAssets" />
+<input type="hidden" id="partialPageNumber" value="@Model.PageNumber" />
+<input type="hidden" id="partialTotalPages" value="@Model.TotalPages" />

@@ -68,19 +68,15 @@ namespace Members.Areas.Member.Pages
         {
             // Enhanced initial logging
             _logger.LogInformation("MyBilling.OnGetAsync START - Received UserID: {ReceivedUserId}, ReturnUrl: {ReceivedReturnUrl}, SortOrder: {ReceivedSortOrder}", userId, returnUrl, sortOrder);
-
             this.BackToEditUserUrl = returnUrl;
             IdentityUser? determinedTargetUser = null;
             var loggedInUser = await _userManager.GetUserAsync(User);
-
             if (loggedInUser == null)
             {
                 _logger.LogWarning("MyBilling.OnGetAsync: Current logged-in user is NULL. Challenging.");
                 return Challenge(); 
             }
             _logger.LogInformation("MyBilling.OnGetAsync: LoggedInUser: {LoggedInUserName} (ID: {LoggedInUserId})", loggedInUser.UserName, loggedInUser.Id);
-
-
             if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
             {
                 _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {UserIdToFind}", userId);
@@ -106,12 +102,9 @@ namespace Members.Areas.Member.Pages
                 IsViewingSelf = true;
                 ViewedUserId = determinedTargetUser.Id;
             }
-
             // This line was already present from previous step, ensuring correct logging placement.
             _logger.LogInformation("MyBilling.OnGetAsync: Determined Target User: {DeterminedUserName} (ID: {DeterminedUserId}), IsViewingSelf: {IsViewingSelfFlag}", determinedTargetUser.UserName, determinedTargetUser.Id, IsViewingSelf);
             _logger.LogInformation("MyBilling.OnGetAsync: BackToEditUserUrl initially set to: {InitialReturnUrl}", this.BackToEditUserUrl);
-
-
             // Populate DisplayName and TargetUserIsBillingContact based on determinedTargetUser
             var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == determinedTargetUser.Id);
             if (IsViewingSelf)
@@ -174,7 +167,6 @@ namespace Members.Areas.Member.Pages
             // Apply Sorting
             string effectiveSort = sortOrder ?? "invoiceid_desc"; // Default to Invoice ID Descending
             this.CurrentSort = effectiveSort;
-
             // Modify BackToEditUserUrl if conditions are met
             if (!string.IsNullOrEmpty(this.BackToEditUserUrl) && 
                 !string.IsNullOrEmpty(this.ViewedUserId) && 
@@ -182,11 +174,10 @@ namespace Members.Areas.Member.Pages
                  this.BackToEditUserUrl.Contains("/Admin/Accounting/CurrentBalances") || // Future name
                  this.BackToEditUserUrl.Contains("/Admin/Accounting/ReviewBatchInvoices") )) // New check
             {
-                string separator = this.BackToEditUserUrl.Contains("?") ? "&" : "?";
+                string separator = this.BackToEditUserUrl.Contains('?') ? "&" : "?";
                 this.BackToEditUserUrl = $"{this.BackToEditUserUrl}{separator}returnedFromUserId={this.ViewedUserId}";
                 _logger.LogInformation("Appended returnedFromUserId to BackToEditUserUrl for relevant admin page. New URL: {NewUrl}", this.BackToEditUserUrl);
             }
-
             DateSort = (effectiveSort == "date_asc") ? "date_desc" : "date_asc";
             InvoiceIdSort = (effectiveSort == "invoiceid_asc") ? "invoiceid_desc" : "invoiceid_asc";
             DescriptionSort = (effectiveSort == "desc_asc") ? "desc_desc" : "desc_asc";
