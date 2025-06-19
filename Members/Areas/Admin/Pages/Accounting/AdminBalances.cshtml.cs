@@ -282,18 +282,22 @@ namespace Members.Areas.Admin.Pages.Accounting
                 var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
                 if (userProfile != null && userProfile.IsBillingContact)
                 {
-                    string fullName = user.UserName ?? "N/A"; // Fallback to UserName
-                    if (!string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                    string fullName;
+                    if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
                     {
-                        fullName = $"{userProfile.FirstName} {userProfile.LastName}";
-                    }
-                    else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
-                    {
-                        fullName = userProfile.FirstName;
+                        fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
                     }
                     else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
                     {
-                        fullName = userProfile.LastName;
+                        fullName = userProfile.LastName; // Only LastName available
+                    }
+                    else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                    {
+                        fullName = userProfile.FirstName; // Only FirstName available
+                    }
+                    else
+                    {
+                        fullName = user.UserName ?? "N/A"; // Fallback to UserName
                     }
                     _logger.LogInformation("Calculating balance for: {user.UserName} (ID: {user.Id})", user.UserName, user.Id);
                     // Log all invoices for the user
@@ -365,18 +369,22 @@ namespace Members.Areas.Admin.Pages.Accounting
                     var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
                     if (userProfile != null && userProfile.IsBillingContact)
                     {
-                        string fullName = user.UserName ?? "N/A"; // Fallback to UserName
-                        if (!string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                        string fullName;
+                        if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
                         {
-                            fullName = $"{userProfile.FirstName} {userProfile.LastName}";
-                        }
-                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
-                        {
-                            fullName = userProfile.FirstName;
+                            fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
                         }
                         else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
                         {
-                            fullName = userProfile.LastName;
+                            fullName = userProfile.LastName; // Only LastName available
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = userProfile.FirstName; // Only FirstName available
+                        }
+                        else
+                        {
+                            fullName = user.UserName ?? "N/A"; // Fallback to UserName
                         }
                         decimal totalChargesFromInvoices = await _context.Invoices
                             .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)

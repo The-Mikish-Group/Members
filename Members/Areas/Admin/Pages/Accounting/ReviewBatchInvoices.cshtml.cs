@@ -221,30 +221,46 @@ namespace Members.Areas.Admin.Pages.Accounting
                         foreach (var credit in availableCredits)
                         {
                             if (remainingAmountDueOnInvoice <= 0) break;
-                            decimal amountToApplyFromThisCredit;
-                            if (credit.Amount >= remainingAmountDueOnInvoice)
+
+                            decimal originalCreditAmountBeforeThisApplication = credit.Amount; // Store original amount for notes
+                            decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnInvoice);
+
+                            // Update invoice
+                            invoice.AmountPaid += amountToApplyFromThisCredit;
+                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
+
+                            // Update credit
+                            credit.Amount -= amountToApplyFromThisCredit;
+                            credit.AppliedToInvoiceID = invoice.InvoiceID;
+                            credit.LastUpdated = DateTime.UtcNow;
+                            credit.AppliedDate = DateTime.UtcNow; // Records the date of this specific application
+
+                            if (credit.Amount <= 0)
                             {
-                                amountToApplyFromThisCredit = remainingAmountDueOnInvoice;
                                 credit.IsApplied = true;
-                                credit.ApplicationNotes = $"Fully used to auto-pay finalized invoice INV-{invoice.InvoiceID:D5} (Batch: {BatchId}). Original credit: {credit.Amount:C}.";
+                                credit.Amount = 0; // Ensure it doesn't go negative
+                                credit.ApplicationNotes = $"Fully applied to INV-{invoice.InvoiceID:D5} (Batch: {BatchId}). Original credit amount was {originalCreditAmountBeforeThisApplication:C}. No balance remaining.";
                             }
                             else
                             {
-                                amountToApplyFromThisCredit = credit.Amount;
-                                credit.IsApplied = true;
-                                credit.ApplicationNotes = $"Fully applied to finalized invoice INV-{invoice.InvoiceID:D5} (Batch: {BatchId}).";
+                                credit.IsApplied = false; // Explicitly keep it false as it's partially applied
+                                credit.ApplicationNotes = $"Partially applied {amountToApplyFromThisCredit:C} to INV-{invoice.InvoiceID:D5} (Batch: {BatchId}). Original credit amount was {originalCreditAmountBeforeThisApplication:C}. Remaining balance: {credit.Amount:C}.";
                             }
-                            credit.AppliedDate = DateTime.UtcNow;
-                            credit.AppliedToInvoiceID = invoice.InvoiceID;
                             _context.UserCredits.Update(credit);
-                            invoice.AmountPaid += amountToApplyFromThisCredit;
-                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
                         }
-                        if (invoice.AmountPaid >= invoice.AmountDue) { invoice.Status = InvoiceStatus.Paid; invoice.AmountPaid = invoice.AmountDue; }
-                        else if (invoice.DueDate < DateTime.Today.AddDays(-1)) { invoice.Status = InvoiceStatus.Overdue; } // If already past due
                     }
                 }
-                // --- END CREDIT APPLICATION ---
+                // After iterating through credits (or if no credits were available/applicable), update invoice status
+                if (invoice.AmountPaid >= invoice.AmountDue)
+                {
+                    invoice.Status = InvoiceStatus.Paid;
+                    invoice.AmountPaid = invoice.AmountDue; // Cap at AmountDue
+                }
+                else if (invoice.Status == InvoiceStatus.Due && invoice.DueDate < DateTime.UtcNow.Date) // Check if it's currently Due and past due date
+                {
+                    invoice.Status = InvoiceStatus.Overdue;
+                }
+                // --- END CREDIT APPLICATION & INVOICE STATUS UPDATE ---
                 _context.Invoices.Update(invoice); // Mark invoice for update
                 finalizedCount++;
             }
@@ -259,7 +275,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogError(ex, "Error finalizing batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error finalizing batch '{BatchId}'. See logs.";
             }
-            return RedirectToPage("./CreateBatchInvoices"); // Or to an admin dashboard or invoice list
+            return RedirectToPage("./AdminBalances");
         }
         public async Task<IActionResult> OnPostCancelBatchAsync() // Removed batchId param, using bound BatchId
         {
