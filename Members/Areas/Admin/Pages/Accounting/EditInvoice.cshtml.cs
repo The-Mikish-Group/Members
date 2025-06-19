@@ -10,7 +10,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
-
 namespace Members.Areas.Admin.Pages.Accounting
 {
     public class EditInvoiceModel(
@@ -21,58 +20,45 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<EditInvoiceModel> _logger = logger;
-
         [BindProperty(SupportsGet = true)]
         public int InvoiceId { get; set; }
-
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-
         [BindProperty]
         public InputModel? Input { get; set; }
-
         // For display purposes on the form, if needed
         public string? ViewedUserId { get; set; }
         public string? BatchId { get; set; }
-
-
         public class InputModel
         {
             [Required]
             [DataType(DataType.Date)]
             [Display(Name = "Due Date")]
             public DateTime DueDate { get; set; }
-
             [Required]
             [StringLength(200)]
             public string Description { get; set; } = string.Empty;
-
             [Required]
             [DataType(DataType.Currency)]
-            [Range(0.01, 1000000.00, ErrorMessage = "Amount must be greater than 0.")]
+            [Range(0.00, 1000000.00, ErrorMessage = "Amount must be 0 or greater.")]
             [Display(Name = "Amount Due")]
             public decimal AmountDue { get; set; }
-
             [Required]
             [Display(Name = "Status")]
             public string Status { get; set; } = string.Empty;
         }
-
         public async Task<IActionResult> OnGetAsync()
         {
             if (string.IsNullOrEmpty(ReturnUrl))
             {
                 ReturnUrl = Url.Page("./Index"); // Default return URL
             }
-
             var invoice = await _context.Invoices.FindAsync(InvoiceId);
-
             if (invoice == null)
             {
                 _logger.LogWarning("Invoice with ID {InvoiceId} not found.", InvoiceId);
                 return NotFound($"Unable to load invoice with ID {InvoiceId}.");
             }
-
             Input = new InputModel
             {
                 DueDate = invoice.DueDate,
@@ -80,20 +66,16 @@ namespace Members.Areas.Admin.Pages.Accounting
                 AmountDue = invoice.AmountDue,
                 Status = invoice.Status.ToString() // Assuming Invoice.Status is an enum
             };
-
             ViewedUserId = invoice.UserID;
             BatchId = invoice.BatchID;
-
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-
             if (Input == null)
             {
                 _logger.LogWarning("Input model was null in OnPostAsync after ModelState validation passed. This should not happen.");
@@ -105,12 +87,10 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 return Page();
             }
-
             if (string.IsNullOrEmpty(ReturnUrl))
             {
                 ReturnUrl = Url.Page("./Index"); // Default return URL
             }
-
             if (!ModelState.IsValid)
             {
                 var originalInvoiceForDisplay = await _context.Invoices.AsNoTracking().FirstOrDefaultAsync(i => i.InvoiceID == InvoiceId);
@@ -121,32 +101,25 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 return Page();
             }
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return Challenge(); // Or RedirectToPage("/Account/Login")
             }
-
             var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
             var isManager = await _userManager.IsInRoleAsync(user, "Manager");
-
             if (!isAdmin && !isManager)
             {
                 _logger.LogWarning("User {Email} attempted to edit invoice {InvoiceId} without authorization.", user.Email, InvoiceId);
                 return Forbid();
             }
-
             var invoiceToUpdate = await _context.Invoices.FindAsync(InvoiceId);
-
             if (invoiceToUpdate == null)
             {
                 _logger.LogWarning("Invoice with ID {InvoiceId} not found during POST.", InvoiceId);
                 return NotFound($"Unable to load invoice with ID {InvoiceId}.");
             }
-
             _logger.LogWarning("Attempt to edit invoice {InvoiceId} with status {Status} denied.", InvoiceId, invoiceToUpdate.Status);
-
             if (invoiceToUpdate.Status != InvoiceStatus.Draft && invoiceToUpdate.Status != InvoiceStatus.Due)
             {
                 _logger.LogWarning("Attempt to edit invoice {InvoiceId} with status {invoiceToUpdate.Status} denied.", invoiceToUpdate.Status, InvoiceId);
@@ -155,11 +128,9 @@ namespace Members.Areas.Admin.Pages.Accounting
                 BatchId = invoiceToUpdate.BatchID;
                 return Page();
             }
-
             invoiceToUpdate.DueDate = Input.DueDate;
             invoiceToUpdate.Description = Input.Description;
             invoiceToUpdate.AmountDue = Input.AmountDue;
-
             if (Enum.TryParse<InvoiceStatus>(Input.Status, out var newStatus))
             {
                 invoiceToUpdate.Status = newStatus;
@@ -172,9 +143,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 BatchId = invoiceToUpdate.BatchID;
                 return Page();
             }
-
             invoiceToUpdate.LastUpdated = DateTime.UtcNow;
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -197,12 +166,10 @@ namespace Members.Areas.Admin.Pages.Accounting
                 BatchId = invoiceToUpdate.BatchID;
                 return Page();
             }
-
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
                 return LocalRedirect(ReturnUrl);
             }
-
             return RedirectToPage("./Index"); // Ensure a return value for all code paths
         }
     }
