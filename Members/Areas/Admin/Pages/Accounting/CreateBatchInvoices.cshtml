@@ -5,22 +5,22 @@
     Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout
 }
 
-<div class="container mt-4">
+<div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-dark">
-                    <h4 class="mb-0">@ViewData["Title"]</h4>
+            <div class="card shadow bg-Card-Menu">
+                <div class="card-header bg-gold-light text-dark">
+                    <h4 class="mb-0 text-gold-darker">@ViewData["Title"]</h4>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">
+                    <p class="card-text mb-2 text-gold-darker">
                         Use this form to generate a batch of draft assessment invoices (e.g., for monthly assessments)
                         for all <strong>billable assets</strong> that have an assigned billing contact. 
                         One invoice will be created per asset.
                     </p>
                     @if (Model.ActionableBillableAssetsCount > 0)
                     {
-                        <p class="alert alert-info">
+                        <p class="bg-gold-lighter text-gold-darker rounded p-2 mb-2">
                             Currently, there are <strong>@Model.ActionableBillableAssetsCount</strong> billable asset(s) with assigned contacts that will be processed. The specific 'Assessment Fee' set for each individual asset will be used to determine the amount for each invoice.
                         </p>
                     }
@@ -31,7 +31,7 @@
                             Please <a asp-page="./ManageBillableAssets">assign contacts to assets</a> first.
                         </p>
                     }
-                    <p class="card-text">
+                    <p class="card-text text-gold-darker">
                         These invoices will be created with a 'Draft' status and can be reviewed and finalized 
                         via the 'Review Batch Invoices' page before they become active.
                     </p>
@@ -41,14 +41,14 @@
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close shadow" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
                     @if (TempData["ErrorMessage"] != null)
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close shadow" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
 
@@ -56,8 +56,8 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Description" class="form-label"></label>
-                            <input asp-for="Input.Description" class="form-control" />
+                            <label asp-for="Input.Description" class="form-label text-gold-darker"></label>
+                            <input asp-for="Input.Description" class="shadow form-control text-gold-darker" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>
 
@@ -65,20 +65,20 @@
 
                         <div class="row mb-3">
                             <div class="col-sm-6">
-                                <label asp-for="Input.InvoiceDate" class="form-label"></label>
-                                <input asp-for="Input.InvoiceDate" class="form-control" type="date" />
+                                <label asp-for="Input.InvoiceDate" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.InvoiceDate" class="shadow form-control text-gold-darker" type="date" />
                                 <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
-                                <label asp-for="Input.DueDate" class="form-label"></label>
-                                <input asp-for="Input.DueDate" class="form-control" type="date" />
+                                <label asp-for="Input.DueDate" class="form-label text-gold-darker"></label>
+                                <input asp-for="Input.DueDate" class="shadow form-control text-gold-darker" type="date" />
                                 <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-files"></i> Create Draft Invoice Batch
+                            <button type="submit" class="shadow btn btn-sm btn-success">
+                                <i class="bi bi-files"></i> Create a Draft Invoice Batch
                             </button>
                         </div>
                     </form>

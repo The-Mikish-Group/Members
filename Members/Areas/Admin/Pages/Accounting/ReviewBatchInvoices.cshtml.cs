@@ -19,10 +19,10 @@ namespace Members.Areas.Admin.Pages.Accounting
         UserManager<IdentityUser> userManager,
         ILogger<ReviewBatchInvoicesModel> logger) : PageModel
     {
-        public class BatchSelectItem        
+        public class BatchSelectItem
         {
-        public string BatchId { get; set; } = string.Empty;
-        public string DisplayText { get; set; } = string.Empty;
+            public string BatchId { get; set; } = string.Empty;
+            public string DisplayText { get; set; } = string.Empty;
         }
         public List<BatchSelectItem> AvailableDraftBatches { get; set; } = [];
         private readonly ApplicationDbContext _context = context;
@@ -153,7 +153,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             TotalInvoiceAmount = DraftInvoices.Sum(i => i.AmountDue);
             _logger.LogInformation("Displaying {TotalInvoiceCount} draft invoices for BatchID: {this.BatchId} with total amount {TotalInvoiceAmount:C} before sorting.", TotalInvoiceCount, this.BatchId, TotalInvoiceAmount);
             // Initialize sorting properties
-            string defaultSortColumn = "user_asc"; 
+            string defaultSortColumn = "user_asc";
             string activeSort = CurrentSort ?? defaultSortColumn;
             this.CurrentSort = activeSort; // Update CurrentSort to reflect the active sort
             UserSort = activeSort == "user_asc" ? "user_desc" : "user_asc";
@@ -224,10 +224,9 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                             decimal originalCreditAmountBeforeThisApplication = credit.Amount; // Store original amount for notes
                             decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnInvoice);
-
                             // Update invoice
                             invoice.AmountPaid += amountToApplyFromThisCredit;
-                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
+                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;                            
 
                             // Update credit
                             credit.Amount -= amountToApplyFromThisCredit;

@@ -26,7 +26,7 @@ namespace Members.Areas.Admin.Pages.Accounting
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
         ILogger<RecordPaymentModel> logger) : PageModel
-    {        
+    {
         private readonly ApplicationDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
         private readonly UserManager<IdentityUser> _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         private readonly ILogger<RecordPaymentModel> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -158,7 +158,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
         }
         private async Task PopulateUserSelectList()
-        {                       
+        {
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
             const string populationUserSelectListTemplate = "RecordPayment: {UserCount} users found in role {RoleName}.";
@@ -185,7 +185,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
             }
             UserSelectList = new SelectList(userListItems.OrderBy(item => item.Text), "Value", "Text");
-        }      
+        }
         public async Task<IActionResult> OnPostApplyCreditAsync()
         {
             _logger.LogInformation("OnPostApplyCreditAsync called. User: {SelectedUserID}, Invoice: {SelectedInvoiceID}, Credit: {SelectedUserCreditID}, Amount: {AmountToApplyFromCredit}",
@@ -283,7 +283,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             string originalCreditAmountBeforeThisApplication = (creditToApply.Amount + actualAmountToApply).ToString("C");
             string remainingCreditAmountAfterThisApplication = creditToApply.Amount.ToString("C");
             creditToApply.ApplicationNotes = $"Applied {actualAmountToApply:C} to INV-{invoiceToApplyTo.InvoiceID:D5} on {DateTime.UtcNow:yyyy-MM-dd}. Original credit bal before this app: {originalCreditAmountBeforeThisApplication}. Remaining bal on this credit: {remainingCreditAmountAfterThisApplication}.";
-            
+
             if (creditToApply.Amount <= 0)
             {
                 creditToApply.IsApplied = true;
@@ -450,7 +450,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 await OnGetAsync(Input.SelectedUserID, ReturnUrl);
                 return Page();
             }
-            decimal amountToApplyToInvoice = Input.Amount!.Value;            
+            decimal amountToApplyToInvoice = Input.Amount!.Value;
             decimal overpaymentAmount = 0;
             decimal amountRemainingOnInvoice = invoiceToPay.AmountDue - invoiceToPay.AmountPaid;
             if (Input.Amount!.Value > amountRemainingOnInvoice)
@@ -548,7 +548,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             // Redundant SaveChangesAsync and TempData setting are removed from here.
             // The status of invoiceToPay was already set before the main SaveChangesAsync.
-            
+
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
                 return Redirect(ReturnUrl);
