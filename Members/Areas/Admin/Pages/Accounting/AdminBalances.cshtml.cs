@@ -173,7 +173,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, lateFeeInvoice.AmountDue - lateFeeInvoice.AmountPaid);
                     if (amountToApplyFromThisCredit <= 0) continue; // Should not happen if credit.Amount > 0 and fee not paid
                     // Mark the entire credit as applied, as per the simplified logic without AmountUsed
-                    credit.IsApplied = true; 
+                    credit.IsApplied = true;
                     credit.AppliedDate = DateTime.UtcNow;
                     credit.AppliedToInvoiceID = 0; // Placeholder, will be updated after invoice is saved
                     // Note: ApplicationNotes should reflect that the *entire* credit is considered "used" or "allocated" by this application,
@@ -204,7 +204,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 await _context.SaveChangesAsync(); // Save Credit updates with correct InvoiceID
             }
-            _logger.LogInformation("ApplyLateFeeToUserAsync: Fee applied for {UserName} (ID: {UserId}). Invoice INV-{InvoiceId}, Amount: {FeeAmount}, Credits: {CreditsApplied}, Status: {Status}", 
+            _logger.LogInformation("ApplyLateFeeToUserAsync: Fee applied for {UserName} (ID: {UserId}). Invoice INV-{InvoiceId}, Amount: {FeeAmount}, Credits: {CreditsApplied}, Status: {Status}",
                 userNameForDisplay, userId, lateFeeInvoice.InvoiceID, lateFeeAmount, creditsAppliedToThisFee, lateFeeInvoice.Status);
             return LateFeeApplicationResult.FeeApplied(userNameForDisplay, userId, lateFeeAmount, lateFeeInvoice.InvoiceID, creditsAppliedToThisFee, lateFeeInvoice.Status);
         }
@@ -226,7 +226,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 else
                 {
                     // Distinguish between skips and actual errors for TempData type
-                    if (result.Message.Contains("Error") || result.Message.Contains("not found")) 
+                    if (result.Message.Contains("Error") || result.Message.Contains("not found"))
                         TempData["ErrorMessage"] = result.Message;
                     else // Skips like no balance, recent fee, not billing contact
                         TempData["WarningMessage"] = result.Message;
@@ -252,7 +252,7 @@ namespace Members.Areas.Admin.Pages.Accounting
         }
         public async Task OnGetAsync(string? sortOrder, bool? showOnlyOutstanding) // Made parameters nullable to match typical OnGetAsync patterns if they can be optional
         {
-            _logger.LogInformation("OnGetAsync called for AdminBalancesModel. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowFilter}, ReturnedFromUserId: {ReturnedUserId}", 
+            _logger.LogInformation("OnGetAsync called for AdminBalancesModel. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowFilter}, ReturnedFromUserId: {ReturnedUserId}",
                 sortOrder, showOnlyOutstanding, ReturnedFromUserId);
             if (!string.IsNullOrEmpty(ReturnedFromUserId))
             {
@@ -282,18 +282,22 @@ namespace Members.Areas.Admin.Pages.Accounting
                 var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
                 if (userProfile != null && userProfile.IsBillingContact)
                 {
-                    string fullName = user.UserName ?? "N/A"; // Fallback to UserName
-                    if (!string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                    string fullName;
+                    if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
                     {
-                        fullName = $"{userProfile.FirstName} {userProfile.LastName}";
-                    }
-                    else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
-                    {
-                        fullName = userProfile.FirstName;
+                        fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
                     }
                     else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
                     {
-                        fullName = userProfile.LastName;
+                        fullName = userProfile.LastName; // Only LastName available
+                    }
+                    else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                    {
+                        fullName = userProfile.FirstName; // Only FirstName available
+                    }
+                    else
+                    {
+                        fullName = user.UserName ?? "N/A"; // Fallback to UserName
                     }
                     _logger.LogInformation("Calculating balance for: {user.UserName} (ID: {user.Id})", user.UserName, user.Id);
                     // Log all invoices for the user
@@ -333,7 +337,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     }
                     memberBalancesTemp.Add(memberVm);
                 }
-            }            
+            }
             // Sorting logic
             MemberBalances = sortOrder switch
             {
@@ -365,18 +369,22 @@ namespace Members.Areas.Admin.Pages.Accounting
                     var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
                     if (userProfile != null && userProfile.IsBillingContact)
                     {
-                        string fullName = user.UserName ?? "N/A"; // Fallback to UserName
-                        if (!string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                        string fullName;
+                        if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
                         {
-                            fullName = $"{userProfile.FirstName} {userProfile.LastName}";
-                        }
-                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
-                        {
-                            fullName = userProfile.FirstName;
+                            fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
                         }
                         else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
                         {
-                            fullName = userProfile.LastName;
+                            fullName = userProfile.LastName; // Only LastName available
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = userProfile.FirstName; // Only FirstName available
+                        }
+                        else
+                        {
+                            fullName = user.UserName ?? "N/A"; // Fallback to UserName
                         }
                         decimal totalChargesFromInvoices = await _context.Invoices
                             .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
@@ -503,7 +511,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         errorCount++;
                         detailedErrorMessages.Add($"UserID: {result.UserId}, Name: {result.UserName} - Unexpectedly failed pre-filter checks: {result.Message}");
-                         _logger.LogWarning("Unexpected issue for UserID {UserId} ({UserName}) after pre-filtering: {ResultMessage}", result.UserId, result.UserName, result.Message);
+                        _logger.LogWarning("Unexpected issue for UserID {UserId} ({UserName}) after pre-filtering: {ResultMessage}", result.UserId, result.UserName, result.Message);
                     }
                     else if (result.Message.Contains("no outstanding balance")) { skippedNoOutstandingBalance++; }
                     else if (result.Message.Contains("recent late fee")) { skippedRecentFeeExists++; }
@@ -527,7 +535,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (successMessages.Count > 0)
             {
                 summaryMessage.AppendLine("\nSuccessful applications (first 5):");
-                foreach(var msg in successMessages.Take(5))
+                foreach (var msg in successMessages.Take(5))
                 {
                     summaryMessage.AppendLine($"- {msg}");
                 }
@@ -536,17 +544,17 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (detailedErrorMessages.Count > 0) // CA1860
             {
                 summaryMessage.AppendLine("\nError details (first 5):");
-                foreach(var err in detailedErrorMessages.Take(5))
+                foreach (var err in detailedErrorMessages.Take(5))
                 {
                     summaryMessage.AppendLine($"- {err}");
                 }
-                 if (detailedErrorMessages.Count > 5) summaryMessage.AppendLine($"...and {detailedErrorMessages.Count - 5} more errors.");
+                if (detailedErrorMessages.Count > 5) summaryMessage.AppendLine($"...and {detailedErrorMessages.Count - 5} more errors.");
             }
             if (errorCount > 0)
             {
                 TempData["ErrorMessage"] = summaryMessage.ToString();
             }
-            else if (successCount > 0 || processedCount > 0 || skippedNoOutstandingBalance > 0 || skippedRecentFeeExists > 0) 
+            else if (successCount > 0 || processedCount > 0 || skippedNoOutstandingBalance > 0 || skippedRecentFeeExists > 0)
             {
                 TempData["StatusMessage"] = summaryMessage.ToString();
             }
