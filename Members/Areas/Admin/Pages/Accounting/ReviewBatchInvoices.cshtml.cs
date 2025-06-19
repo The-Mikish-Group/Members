@@ -221,16 +221,19 @@ namespace Members.Areas.Admin.Pages.Accounting
                         foreach (var credit in availableCredits)
                         {
                             if (remainingAmountDueOnInvoice <= 0) break;
+
                             decimal originalCreditAmountBeforeThisApplication = credit.Amount; // Store original amount for notes
                             decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnInvoice);
                             // Update invoice
                             invoice.AmountPaid += amountToApplyFromThisCredit;
-                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
+                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;                            
+
                             // Update credit
                             credit.Amount -= amountToApplyFromThisCredit;
                             credit.AppliedToInvoiceID = invoice.InvoiceID;
                             credit.LastUpdated = DateTime.UtcNow;
                             credit.AppliedDate = DateTime.UtcNow; // Records the date of this specific application
+
                             if (credit.Amount <= 0)
                             {
                                 credit.IsApplied = true;
