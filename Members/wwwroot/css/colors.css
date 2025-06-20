@@ -388,7 +388,7 @@ a {
     .btn-success:hover {
         color: lightgray;
         border-color: lightgreen;
-        background-color: darkgreen;
+        background-color: lightgreen;
     }
 
 /*  btn-add Defaults */
