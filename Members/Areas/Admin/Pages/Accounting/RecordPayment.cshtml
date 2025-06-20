@@ -134,12 +134,11 @@
                                 <label asp-for="Input.Notes" class="form-label text-gold-darker"></label>
                                 <textarea asp-for="Input.Notes" class="shadow form-control text-gold-darker" rows="3"></textarea>
                                 <span asp-validation-for="Input.Notes" class="text-danger"></span>
-                            </div>
-                            <div class="d-grid gap-2 mt-0">
+                            </div>                            
 
-                                <div class="row justify-content-center">
-                                
-                                    <div class="col-6 text-center">
+                            <div class="d-grid gap-2 mt-4">
+                                <div class="row gy-2 justify-content-center">
+                                    <div class="col-md-auto mb-2 text-center">
                                         @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                                         {
                                             <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"><i class="bi bi-arrow-left"> </i> Billing History</a>
@@ -149,27 +148,19 @@
                                             <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
                                         }
                                     </div>
-
-                                   <div class="d-grid gap-2 mt-4">
-                                        <div class="row justify-content-center">
-                                            <div class="col-md-auto mb-2 text-center">
-                                                @* Your Cancel/Back to Billing History link *@
-                                            </div>
-                                            <div class="col-md-auto mb-2 text-center">
-                                                <button type="submit" asp-page-handler="RecordNewPayment" class="shadow btn btn-sm btn-primary">
-                                                    <i class="bi bi-cash-coin"></i> Record New Payment
-                                                </button>
-                                            </div>
-                                            @if (Model.AvailableUserCredits.Any())
-                                            {
-                                                <div class="col-md-auto mb-2 text-center">
-                                                    <button type="submit" asp-page-handler="ApplyCredit" class="shadow btn btn-sm btn-success">
-                                                        <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
-                                                    </button>
-                                                </div>
-                                            }
-                                        </div>
+                                    <div class="col-md-auto mb-2 text-center">
+                                        <button type="submit" asp-page-handler="RecordNewPayment" class="shadow btn btn-sm btn-primary">
+                                            <i class="bi bi-cash-coin"></i> Record New Payment
+                                        </button>
                                     </div>
+                                    @if (Model.AvailableUserCredits.Any())
+                                    {
+                                        <div class="col-md-auto mb-2 text-center">
+                                            <button type="submit" asp-page-handler="ApplyCredit" class="shadow btn btn-sm btn-success">
+                                                <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             

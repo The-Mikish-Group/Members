@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="col-2 col-lg-1 text-end pe-2">
-                            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i> View</button>
+                            <button type="submit" class="btn btn-sm"><i class="bi bi-search"></i></button>
                         </div>
 
                     </div>
@@ -94,11 +94,11 @@
     { 
         <!-- Cancel or Finalize Buttons -->
         <div class="mt-4 mb-4">  
-            <div class="row justify-content-end gx-2">  
+            <div class="row gy-2 justify-content-end gx-2">  
                 <div class="col-auto">  
                     <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
                             onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">  
-                        <button type="submit" class="btn btn-danger">  
+                        <button type="submit" class="btn btn-sm btn-danger">  
                             <i class="bi bi-x-circle"></i> Cancel & Delete Batch  
                         </button>  
                     </form>  
@@ -106,7 +106,7 @@
                 <div class="col-auto">  
                     <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"  
                             onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">  
-                        <button type="submit" class="btn btn-success">  
+                        <button type="submit" class="btn btn-sm btn-success">  
                             <i class="bi bi-check-circle"></i> Finalize Batch  
                         </button>  
                     </form>  
@@ -121,12 +121,12 @@
             <div class="card-header"> 
                 
                 <!-- Description -->
-                <h4 class="mt-3 mb-2 text-gold-darker">Description: @Model.BatchDescription</h4>  
+                <h4 class="mt-3 mb-2 text-gold-darker">@Model.BatchDescription</h4>  
                 
                 <!-- Heading -->
                 <h5 class="mb-0 d-flex justify-content-between align-items-center text-gold-darker">  
-                    Draft Invoices in Batch  
-                    <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices totalling @Model.TotalInvoiceAmount.ToString("C")</span>  
+                    Invoices in Batch  
+                    <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices @Model.TotalInvoiceAmount.ToString("C")</span>  
                 </h5>
                 
             </div>  
@@ -185,7 +185,7 @@
                                         asp-route-batchId="@Model.BatchId"
                                         asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                         asp-route-CurrentSort="@Model.DueDateSort"
-                                        class="text-decoration-none text-white text-nowrap">Due Date</a>
+                                        class="my-2 text-decoration-none text-white text-nowrap">Due Date</a>
                                     @if (Model.CurrentSort == "duedate_asc") { <i class="bi bi-arrow-down"></i> }
                                     @if (Model.CurrentSort == "duedate_desc") { <i class="bi bi-arrow-up"></i> }
                                 </th>  
@@ -197,13 +197,13 @@
                             @foreach (var invoice in Model.DraftInvoices)  
                             {  
                                 <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">  
-                                    <td>@Html.DisplayFor(modelItem => invoice.UserFullName)</td>  
-                                    <td>@Html.DisplayFor(modelItem => invoice.UserName)</td> @* UserName is Email in this context usually *@  
-                                    <td>@Html.DisplayFor(modelItem => invoice.Description)</td>  
-                                    <td class="text-end">@invoice.AmountDue.ToString("C")</td>  
-                                    <td class="ps-2">@invoice.InvoiceDate.ToString("yyyy-MM-dd")</td>  
-                                    <td>@invoice.DueDate.ToString("yyyy-MM-dd")</td>  
-                                    <td class="text-center"> <!-- New Cell -->
+                                    <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.UserFullName)</td>
+                                    <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.UserName)</td> @* UserName is Email in this context usually *@  
+                                    <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.Description)</td>  
+                                    <td class="text-nowrap text-end">@invoice.AmountDue.ToString("C")</td>  
+                                    <td class="test-nowrap ps-2">@invoice.InvoiceDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="my-2 text-nowrap">@invoice.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-nowrap text-center"> <!-- New Cell -->
                                         @if (!string.IsNullOrEmpty(invoice.UserID))
                                         {
                                             <a asp-area="Member"
