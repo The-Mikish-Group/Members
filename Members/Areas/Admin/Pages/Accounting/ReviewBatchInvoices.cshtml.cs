@@ -21,8 +21,8 @@ namespace Members.Areas.Admin.Pages.Accounting
     {
         public class BatchSelectItem
         {
-            public string BatchId { get; set; } = string.Empty;
-            public string DisplayText { get; set; } = string.Empty;
+        public string BatchId { get; set; } = string.Empty;
+        public string DisplayText { get; set; } = string.Empty;
         }
         public List<BatchSelectItem> AvailableDraftBatches { get; set; } = [];
         private readonly ApplicationDbContext _context = context;
@@ -224,9 +224,10 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                             decimal originalCreditAmountBeforeThisApplication = credit.Amount; // Store original amount for notes
                             decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnInvoice);
+
                             // Update invoice
                             invoice.AmountPaid += amountToApplyFromThisCredit;
-                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;                            
+                            remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
 
                             // Update credit
                             credit.Amount -= amountToApplyFromThisCredit;

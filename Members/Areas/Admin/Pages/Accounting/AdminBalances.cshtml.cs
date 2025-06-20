@@ -511,7 +511,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     {
                         errorCount++;
                         detailedErrorMessages.Add($"UserID: {result.UserId}, Name: {result.UserName} - Unexpectedly failed pre-filter checks: {result.Message}");
-                        _logger.LogWarning("Unexpected issue for UserID {UserId} ({UserName}) after pre-filtering: {ResultMessage}", result.UserId, result.UserName, result.Message);
+                         _logger.LogWarning("Unexpected issue for UserID {UserId} ({UserName}) after pre-filtering: {ResultMessage}", result.UserId, result.UserName, result.Message);
                     }
                     else if (result.Message.Contains("no outstanding balance")) { skippedNoOutstandingBalance++; }
                     else if (result.Message.Contains("recent late fee")) { skippedRecentFeeExists++; }
@@ -535,7 +535,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (successMessages.Count > 0)
             {
                 summaryMessage.AppendLine("\nSuccessful applications (first 5):");
-                foreach (var msg in successMessages.Take(5))
+                foreach(var msg in successMessages.Take(5))
                 {
                     summaryMessage.AppendLine($"- {msg}");
                 }
@@ -544,11 +544,11 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (detailedErrorMessages.Count > 0) // CA1860
             {
                 summaryMessage.AppendLine("\nError details (first 5):");
-                foreach (var err in detailedErrorMessages.Take(5))
+                foreach(var err in detailedErrorMessages.Take(5))
                 {
                     summaryMessage.AppendLine($"- {err}");
                 }
-                if (detailedErrorMessages.Count > 5) summaryMessage.AppendLine($"...and {detailedErrorMessages.Count - 5} more errors.");
+                 if (detailedErrorMessages.Count > 5) summaryMessage.AppendLine($"...and {detailedErrorMessages.Count - 5} more errors.");
             }
             if (errorCount > 0)
             {
