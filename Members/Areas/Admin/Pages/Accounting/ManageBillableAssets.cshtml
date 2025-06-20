@@ -23,7 +23,9 @@
     </div>
 }
 
-<button type="button" class="btn btn-primary mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-circle"></i> Add New Billable Asset</button>
+<div class="text-center mb-4">
+    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-circle"></i> Add New Billable Asset</button>
+</div>
 
 <div class="mb-4">
     <div class="">
@@ -69,7 +71,7 @@
                         }
                     </th>
                     <th class="ps-2 py-2">
-                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="plotid" data-sort-value="plotid">Plot ID / Asset Identifier</a>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="plotid" data-sort-value="plotid">Asset Identifier</a>
                         @if (Model.CurrentSort == "plotid_asc")
                         {
                             <i class="bi bi-arrow-down text-white ms-1"></i>
@@ -221,8 +223,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Asset</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i> Add Asset</button>
                 </div>
             </form>
         </div>
@@ -269,8 +271,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Update Asset</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-save"></i> Update Asset</button>
                 </div>
             </form>
         </div>
