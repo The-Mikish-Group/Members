@@ -387,8 +387,8 @@ a {
     .btn-success:focus,
     .btn-success:hover {
         color: lightgray;
-        border-color: lightgreen;
-        background-color: lightgreen;
+        border-color: darkgray;
+        background-color: green;
     }
 
 /*  btn-add Defaults */

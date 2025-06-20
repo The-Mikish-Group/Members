@@ -138,12 +138,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 decimal fivePercentOfDues = latestOverdueDuesInvoice.AmountDue * 0.05m;
                 lateFeeAmount = Math.Max(25.00m, fivePercentOfDues);
-                feeCalculationDescription = $"Late fee based on overdue dues INV-{latestOverdueDuesInvoice.InvoiceID:D5} ({latestOverdueDuesInvoice.AmountDue:C} due {latestOverdueDuesInvoice.DueDate:yyyy-MM-dd}). Fee: Max($25, 5% = {fivePercentOfDues:C}) = {lateFeeAmount:C}.";
+                feeCalculationDescription = $"Late fee on overdue INV-{latestOverdueDuesInvoice.InvoiceID:D5} ({latestOverdueDuesInvoice.AmountDue:C} due {latestOverdueDuesInvoice.DueDate:yyyy-MM-dd})."; /*Fee: Max($25, 5 % = { fivePercentOfDues: C}) = { lateFeeAmount: C}.*/
             }
             else
             {
                 lateFeeAmount = 25.00m;
-                feeCalculationDescription = "Standard $25.00 late fee applied (no specific overdue Dues/Assessment invoice found).";
+                feeCalculationDescription = "Standard $25.00 late fee applied.";
             }
             var lateFeeInvoice = new Invoice
             {

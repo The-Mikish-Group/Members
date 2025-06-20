@@ -11,7 +11,7 @@
         <div class="col-12 mx-auto p-0 my-0">
 
             <h2 class="mb-2 text-center text-gold-darker"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
-            
+
             @if (TempData["ErrorMessage"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -19,7 +19,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            
+
             @if (TempData["WarningMessage"] != null)
             {
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -27,7 +27,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-           
+
             @if (TempData["StatusMessage"] != null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -48,52 +48,56 @@
             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 var accountingActionsDisplayStyle = Model.TargetUserIsBillingContact ? "block" : "none";
-                var myBillingReturnUrl = Url.Page("/MyBilling", 
-                    new { 
-                        area = "Member", 
-                        userId = Model.ViewedUserId, 
-                        returnUrl = Model.BackToEditUserUrl 
-                    });
+                var myBillingReturnUrl = Url.Page("/MyBilling",
+                new
+                {
+                    area = "Member",
+                    userId = Model.ViewedUserId,
+                    returnUrl = Model.BackToEditUserUrl
+                });
 
-                <div id="accountingActionsSectionOnMyBilling" style="display: @accountingActionsDisplayStyle;" class="mb-0"> @* Added mb-4 for spacing *@
-                    
+                <div id="accountingActionsSectionOnMyBilling" style="display: @accountingActionsDisplayStyle;" class="mb-0">
+                    @* Added mb-4 for spacing *@
+
                     @* <h5 class="text-center text-gold-darker mt-4 mb-3">Accounting Actions for @Model.DisplayName.Replace("'s","")</h5> *@
-                    <div class="row gx-2 gy-2 mb-3 justify-content-center"> @* Reduced bottom margin here *@
-                        
+                    <div class="row gx-2 gy-2 mb-3 justify-content-center">
+                        @* Reduced bottom margin here *@
+
                         <div class="col-auto">
                             <a asp-area="Admin" asp-page="/Accounting/AddInvoice"
-                                asp-route-userId="@Model.ViewedUserId"
-                                asp-route-returnUrl="@myBillingReturnUrl"
-                                class="btn btn-sm btn-primary shadow">
+                               asp-route-userId="@Model.ViewedUserId"
+                               asp-route-returnUrl="@myBillingReturnUrl"
+                               class="btn btn-sm btn-primary shadow">
                                 <i class="bi bi-file-earmark-plus"></i> Invoice
                             </a>
                         </div>
-                        
+
                         <div class="col-auto">
                             <a asp-area="Admin" asp-page="/Accounting/RecordPayment"
-                                asp-route-userId="@Model.ViewedUserId"
-                                asp-route-returnUrl="@myBillingReturnUrl"
-                                class="btn btn-sm btn-success shadow">
+                               asp-route-userId="@Model.ViewedUserId"
+                               asp-route-returnUrl="@myBillingReturnUrl"
+                               class="btn btn-sm btn-success shadow">
                                 <i class="bi bi-cash-coin"></i> Payment
                             </a>
                         </div>
-                        
+
                         <div class="col-auto">
                             <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@Model.ViewedUserId" style="display:inline;">
                                 <button type="submit" class="btn btn-sm btn-warning shadow"
                                         title="Apply Late Fee if Dues/Assessments are overdue"
-                                        onclick="return confirm('Are you sure you want to attempt to apply a late fee for @Model.DisplayName.Replace("'s","")? This will check for overdue Dues/Assessments and apply a fee if appropriate.');"
-                                        @(Model.TargetUserIsBillingContact ? "" : "disabled")> @* Button is disabled if user is not a billing contact *@
+                                        onclick="return confirm('Are you sure you want to attempt to apply a late fee for @Model.DisplayName.Replace("'s", "")? This will check for overdue Dues/Assessments and apply a fee if appropriate.');"
+                                        @(Model.TargetUserIsBillingContact ? "" : "disabled")>
+                                    @* Button is disabled if user is not a billing contact *@
                                     <i class="bi bi-alarm"></i> Apply Late Fee
                                 </button>
                             </form>
                         </div>
 
                     </div>
-                    
+
                 </div>
-            }            
-            
+            }
+
             <div class="card shadow bg-Card-Menu mb-4">
 
                 <!-- Card header with title: Current Balance for -->
@@ -153,14 +157,6 @@
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <span>
                                             Credit on @credit.CreditDate.ToString("yyyy-MM-dd"): @credit.Reason
-                                           @*  @if (credit.SourcePaymentID.HasValue)
-                                            {
-                                                <i class="text-muted">(from Payment ID: @credit.SourcePaymentID)</i>
-                                            } *@
-                                           @*  @if (credit.SourcePaymentID != null)  
-                                            {  
-                                                <i class="text-muted">(from Payment ID: @credit.SourcePaymentID)</i>  
-                                            } *@
                                         </span>
                                         <span class="badge bg-success rounded-pill">@credit.Amount.ToString("C")</span>
                                     </li>
@@ -186,23 +182,26 @@
                     {
                         <div class="table-responsive m-1">
                             <table class="w-100 shadow">
-                                 <thead class="table-light">
+                                <thead class="table-light">
                                     <tr class="bg-gold-dark text-white py-1">
                                         <th class="text-nowrap text-white ps-1 py-1">
-                                            <a asp-page="./MyBilling" 
+                                            <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.DateSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
                                                class="text-decoration-none text-white">Date</a>
                                             @if (Model.CurrentSort == "date_asc" || Model.CurrentSort == "date_desc" || string.IsNullOrEmpty(Model.CurrentSort))
-                                            {<i class="bi @(Model.CurrentSort == "date_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
+                                            {
+                                                <i class="bi @(Model.CurrentSort == "date_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                            }
                                         </th>
                                         <th class="text-nowrap text-white ps-1 py-1">
                                             <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.InvoiceIdSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
-                                               class="text-white text-decoration-none"> @* text-decoration-none added here directly for clarity *@
+                                               class="text-white text-decoration-none">
+                                                @* text-decoration-none added here directly for clarity *@
                                                 Invoice #
                                             </a>
                                             @if (Model.CurrentSort == "invoiceid_asc" || Model.CurrentSort == "invoiceid_desc")
@@ -211,43 +210,64 @@
                                             }
                                         </th>
                                         <th class="text-nowrap text-white py-1">
-                                            <a asp-page="./MyBilling" 
+                                            <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.DescriptionSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
                                                class="text-decoration-none text-white">Description</a>
                                             @if (Model.CurrentSort == Model.DescriptionSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.DescriptionSort?.Replace("_desc", "_asc"))
-                                            {<i class="bi @(Model.DescriptionSort == "desc_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
+                                            {
+                                                <i class="bi @(Model.DescriptionSort == "desc_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                            }
                                         </th>
+
+                                        <!-- Charge -->
                                         <th class="text-nowrap text-white py-1 text-end">
-                                            <a asp-page="./MyBilling" 
+                                            <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.ChargeSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
                                                class="text-decoration-none text-white">Charge</a>
                                             @if (Model.CurrentSort == Model.ChargeSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.ChargeSort?.Replace("_desc", "_asc"))
-                                            {<i class="bi @(Model.ChargeSort == "charge_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
+                                            {
+                                                <i class="bi @(Model.ChargeSort == "charge_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                            }
                                         </th>
+
+                                        <!-- Payment -->
                                         <th class="text-nowrap text-white pe-2 py-1 text-end">
-                                            <a asp-page="./MyBilling" 
+                                            <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.PaymentSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
                                                class="text-decoration-none text-white">Payment</a>
                                             @if (Model.CurrentSort == Model.PaymentSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.PaymentSort?.Replace("_desc", "_asc"))
-                                            {<i class="bi @(Model.PaymentSort == "payment_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
+                                            {
+                                                <i class="bi @(Model.PaymentSort == "payment_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                            }
                                         </th>
+
+                                        <!-- Type -->
                                         <th class="text-nowrap text-white py-1">
-                                            <a asp-page="./MyBilling" 
+                                            <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.TypeSort"
                                                asp-route-userId="@Model.ViewedUserId"
                                                asp-route-returnUrl="@Model.BackToEditUserUrl"
-                                               class="text-decoration-none text-white">Type</a>
+                                               class="text-decoration-none text-white">Status/Method</a>
                                             @if (Model.CurrentSort == Model.TypeSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.TypeSort?.Replace("_desc", "_asc"))
-                                            {<i class="bi @(Model.TypeSort == "type_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>}
+                                            {
+                                                <i class="bi @(Model.TypeSort == "type_asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                                            }
                                         </th>
-                                        <th class="text-decoration-none text-nowrap text-center text-white py-1">Status/Method</th> @* Not made sortable by default *@
-                                        <th class="text-nowrap text-white py-1 text-center">Actions</th>
+
+                                        <!-- Status/Method -->
+                                        @* <th class="text-decoration-none text-nowrap text-center text-white py-1">Status/Method</th> *@
+                                        
+                                        <!-- Edit Invoice -->
+                                        <th class="text-nowrap text-white py-1 text-center">Edit</th>
+                                        
+                                        <!-- Void Invoice -->
+                                        <th class="text-nowrap text-white py-1 text-center">Void</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -269,9 +289,12 @@
                                                     @($"INV-{trans.InvoiceID:D5}-Pmt")
                                                 }
                                             </td>
-                                            <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
+                                            <td class="text-wrap text-gold-darker py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
                                             <td class="text-nowrap text-gold-darker text-end py-1">@trans.ChargeAmount?.ToString("C")</td>
                                             <td class="text-nowrap text-gold-darker text-end pe-1 py-1">@trans.PaymentAmount?.ToString("C")</td>
+                                            
+
+                                            <!-- Voided or Status/Method -->
                                             <td class="text-nowrap text-gold-darker text-center py-1">
                                                 @if (trans.Type == "Payment" && trans.IsVoided)
                                                 {
@@ -282,8 +305,13 @@
                                                     @Html.DisplayFor(modelItem => trans.StatusOrMethod)
                                                 }
                                             </td>
-                                            <td class="text-nowrap text-gold-darker text-center py-1">@Html.DisplayFor(modelItem => trans.StatusOrMethod)</td>
-                                            
+
+                                            <!-- Status/Method -->
+                                            @* <td class="text-nowrap text-gold-darker text-center py-1">
+                                                @Html.DisplayFor(modelItem => trans.StatusOrMethod)
+                                            </td> *@
+
+                                            <!-- Edit Invoice -->
                                             <td class="text-nowrap text-gold-darker text-center py-1">
 
                                                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
@@ -299,19 +327,28 @@
                                                         </a>
                                                     }
 
-                                                    @if (trans.Type == "Invoice" && trans.InvoiceID.HasValue &&
-                                                                                            trans.StatusOrMethod != InvoiceStatus.Cancelled.ToString())
+                                                }
+                                            </td>
+
+                                            <!-- Void Invoice -->
+                                            <td class="text-nowrap text-gold-darker text-center py-1">
+
+                                                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                                {
+                                                    @if (trans.Type == "Invoice" && trans.InvoiceID.HasValue && trans.StatusOrMethod != InvoiceStatus.Cancelled.ToString())
                                                     {
                                                         <form method="post" asp-page-handler="VoidInvoice" style="display:inline;"
                                                               onsubmit="return handleVoidInvoice('@trans.InvoiceID.Value.ToString()');">
-                                                            @* Corrected: removed comma *@
-                                                            <input type="hidden" name="invoiceId" value="@trans.InvoiceID.Value" /> @* Corrected: name is now 'invoiceId' *@
-                                                            <input type="hidden" name="voidReason" id="voidReason_@trans.InvoiceID.Value.ToString()" /> @* Corrected: id is now 'voidReason_' *@
+                                                           
+                                                            <input type="hidden" name="invoiceId" value="@trans.InvoiceID.Value" />
+                                                            <input type="hidden" name="voidReason" id="voidReason_@trans.InvoiceID.Value.ToString()" />
                                                             <input type="hidden" name="ViewedUserId" value="@Model.ViewedUserId" />
                                                             <input type="hidden" name="BackToEditUserUrl" value="@Model.BackToEditUserUrl" />
+
                                                             <button type="submit" class="btn btn-sm btn-danger ms-1" title="Void Invoice INV-@trans.InvoiceID.Value.ToString().PadLeft(5, '0')">
                                                                 <i class="bi bi-x-circle"></i> Void
                                                             </button>
+
                                                         </form>
                                                     }
 
@@ -329,10 +366,11 @@
                                                             <button type="submit" class="btn btn-sm btn-warning ms-1" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
                                                                 <i class="bi bi-eraser"></i> Void Pmt
                                                             </button>
+
                                                         </form>
                                                     }
                                                 }
-                                            </td>
+                                            </td>                                            
                                         </tr>
                                         i++;
                                     }
@@ -384,41 +422,42 @@
     </style>
 }
 
-@section Scripts {  
-    <script>  
-        function handleVoidInvoice(invoiceIdString) {  
-            if (confirm('Are you sure you want to void invoice INV-' + invoiceIdString.padStart(5, '0') + '?')) {  
-                const reason = prompt("Please enter the reason for voiding this invoice:");  
-                if (reason && reason.trim() !== "") {  
-                    document.getElementById('voidReason_' + invoiceIdString).value = reason;  
-                    return true; // Proceed with form submission  
-                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace  
-                    alert("A reason is required to void an invoice.");  
-                    return false; // Prevent form submission  
-                }  
-                // If reason is null (User clicked Cancel on prompt), also prevent submission  
-                return false;  
-            }  
-            return false; // Prevent form submission if not confirmed  
-        }  
+@section Scripts {
+    <script>
 
-        function handleVoidPayment(paymentIdString, paymentDescription) {  
-            alert("DEBUG: handleVoidPayment called for payment ID: " + paymentIdString);  
-            alert("handleVoidPayment called. ID: " + paymentIdString);  
-            const confirmationMessage = 'Are you sure you want to void payment ID: ' + paymentIdString + ' (' + paymentDescription + ')?';  
-            if (confirm(confirmationMessage)) {  
-                const reason = prompt("Please enter the reason for voiding this payment:");  
-                if (reason && reason.trim() !== "") {  
-                    document.getElementById('voidPaymentReason_' + paymentIdString).value = reason;  
-                    return true; // Proceed with form submission  
-                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace  
-                    alert("A reason is required to void a payment.");  
-                    return false; // Prevent form submission  
-                }  
-                // If reason is null (User clicked Cancel on prompt), also prevent submission  
-                return false;  
-            }  
-            return false; // Prevent form submission if not confirmed  
-        }  
-    </script>  
+        function handleVoidInvoice(invoiceIdString) {
+            if (confirm('Are you sure you want to void invoice INV-' + invoiceIdString.padStart(5, '0') + '?')) {
+                const reason = prompt("Please enter the reason for voiding this invoice:");
+                if (reason && reason.trim() !== "") {
+                    document.getElementById('voidReason_' + invoiceIdString).value = reason;
+                    return true; // Proceed with form submission
+                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace
+                    alert("A reason is required to void an invoice.");
+                    return false; // Prevent form submission
+                }
+                // If reason is null (User clicked Cancel on prompt), also prevent submission
+                return false;
+            }
+            return false; // Prevent form submission if not confirmed
+        }
+
+        function handleVoidPayment(paymentIdString, paymentDescription) {
+            alert("DEBUG: handleVoidPayment called for payment ID: " + paymentIdString);
+            alert("handleVoidPayment called. ID: " + paymentIdString);
+            const confirmationMessage = 'Are you sure you want to void payment ID: ' + paymentIdString + ' (' + paymentDescription + ')?';
+            if (confirm(confirmationMessage)) {
+                const reason = prompt("Please enter the reason for voiding this payment:");
+                if (reason && reason.trim() !== "") {
+                    document.getElementById('voidPaymentReason_' + paymentIdString).value = reason;
+                    return true; // Proceed with form submission
+                } else if (reason !== null) { // User clicked OK but entered no reason or only whitespace
+                    alert("A reason is required to void a payment.");
+                    return false; // Prevent form submission
+                }
+                // If reason is null (User clicked Cancel on prompt), also prevent submission
+                return false;
+            }
+            return false; // Prevent form submission if not confirmed
+        }
+    </script>
 }
