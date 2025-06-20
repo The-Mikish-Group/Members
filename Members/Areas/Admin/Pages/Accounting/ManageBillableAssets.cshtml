@@ -24,12 +24,12 @@
 }
 
 <div class="text-center mb-4">
-    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-circle"></i> Add New Billable Asset</button>
+    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus"></i> Add New Billable Asset</button>
 </div>
 
 <div class="mb-4">
     <div class="">
-        <h5 class="text-gold-darker ms-2 mb-0">Filter Assets</h5>
+        <h5 class="text-gold-darker ms-2 mb-0"><i class="bi bi-funnel-fill"></i> Filter Assets</h5>
     </div>
     <div class="shadow card m-1 p-2 bg-Card-Menu">
         <form method="get" id="filterAssetsForm">
@@ -38,7 +38,7 @@
                 <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearAssetsSearch" style="display: none;">
                     <i class="bi bi-x text-black"></i>
                 </button>
-                <button class="btn btn-sm btn-primary" type="submit" id="assetsSearchButton"><i class="bi bi-search"></i> Search</button>
+                <button class="btn btn-sm btn-primary" type="submit" id="assetsSearchButton"><i class="bi bi-search"></i></button>
             </div>
             <input type="hidden" asp-for="PageNumber" />
             <input type="hidden" asp-for="PageSize" />
@@ -51,7 +51,7 @@
 </div>
 
 <div class="">
-    <h5 class="ms-2 mb-0 text-gold-darker">Existing Billable Assets</h5>
+    <h5 class="ms-2 mb-0 text-gold-darker"><i class="bi bi-list"></i> Existing Billable Assets</h5>
 </div>
 <div class="shadow card mx-1 mt-1 mb-4 p-1">
     <div class="table-responsive">
@@ -224,7 +224,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Close</button>
-                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i><i class="bi bi-plus"></i>  Add Asset</button>
+                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-plus"></i> Add Asset</button>
                 </div>
             </form>
         </div>
