@@ -9,11 +9,14 @@
 
     @if (!string.IsNullOrEmpty(Model.BatchId))
     {
-        <h1 class="mt-4 ms-2 mb-2 text-center text=gold-darker"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
+        <!-- Title -->
+        <h1 class="text=gold-darker mb-2 ms-2 mt-4 text-center"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
 
-        <div class="shadow card rounded bg-Card-Menu p-1">
 
-            <h5 class="mt-2 mb-2 ms-2 d-flex align-items-start text-gold-darker"><i class="bi bi-list"></i> Select Draft Batch:</h5>
+        <!-- Heading: Select Draft Batch -->
+        <div class="card bg-Card-Menu rounded p-1 shadow">
+
+            <h5 class="d-flex align-items-start text-gold-darker mb-2 ms-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
 
             @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
             {
@@ -24,17 +27,22 @@
                             <label for="SelectedBatchId" class="form-label visually-hidden text-gold-darker">Select Batch:</label>
                         </div>
 
-                        <div class="col-10 col-lg-11 text-start">
-
-                            <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">
-                                <option value="">-- Select a Batch to Review --</option>
-                            </select>
-
+                        <div class="col-12 text-start">
+                            <div class="row gx-0 gy-0 align-items-center">
+                                <div class="col-12">
+                                    <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">
+                                        <option value="">-- Select a Batch to Review --</option>
+                                    </select>
+                                </div>
+                                @* <div class="col-1">
+                                    <button type="submit" class="btn btn-sm"><i class="bi bi-search"></i></button>
+                                </div> *@
+                            </div>
                         </div>
 
-                        <div class="col-2 col-lg-1 text-end pe-2">
-                            <button type="submit" class="btn btn-sm"><i class="bi bi-search"></i></button>
-                        </div>
+                        @* <div class="col-2 col-lg-1 pe-2 text-end">
+                            
+                        </div> *@
 
                     </div>
                 </form>
@@ -56,23 +64,23 @@
 
     @if (TempData["StatusMessage"] != null)
     {
-        <div class="mt-4 alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
             @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("", "<br />"))
-            <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn sm btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="mt-4 alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
             @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("", "<br />"))
-            <button type="button" class="ms-2 btn sm btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn sm btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["WarningMessage"] != null)
     {
-        <div class="mt-4 alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
             @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -80,7 +88,7 @@
 
     @if (Model.DraftInvoices == null || !Model.DraftInvoices.Any())
     {
-        <div class="mt-4 alert alert-info" role="alert">
+        <div class="alert alert-info mt-4" role="alert">
             No draft invoices found for this batch ID, or the batch has already been processed.
         </div>
         <div class="mt-3">
@@ -92,7 +100,7 @@
     @if (!string.IsNullOrEmpty(Model.BatchDescription))
     {
         <!-- Cancel or Finalize Buttons -->
-        <div class="mt-4 mb-4">
+        <div class="mb-4 mt-4">
             <div class="row gy-2 justify-content-end gx-2">
                 <div class="col-auto">
                     <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
@@ -114,24 +122,24 @@
         </div>
 
         <!-- Display Batch Summary -->
-        <div class="card shadow mb-4 bg-Card-Menu">
+        <div class="card bg-Card-Menu mb-4 shadow">
 
             <!-- Card Header Text -->
             <div class="card-header"> 
 
                 <!-- Flex Container for Description and Export Button -->
-                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3 mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2 mt-3 flex-wrap">
 
-                    <h4 class="text-gold-darker mt-2 mb-0">@Model.BatchDescription</h4>
+                    <h4 class="text-gold-darker mb-0 mt-2">@Model.BatchDescription</h4>
 
-                    <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="shadow mt-2 btn btn-sm btn-success">
+                    <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="btn btn-sm btn-success mt-2 shadow">
                         <i class="bi bi-download"></i> Export to CSV
                     </a>
                 </div>
 
                 <!-- Heading -->
-                <h5 class="mb-0 d-flex justify-content-between align-items-center text-gold-darker">
-                    <span><i class="bi bi-list"></i> Invoices in Batch</span>
+                <h5 class="d-flex justify-content-between align-items-center text-gold-darker mb-0">
+                    <span><i class="bi bi-list"></i> Invoices</span>
                     <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices @Model.TotalInvoiceAmount.ToString("C")</span>
                 </h5>
 
@@ -146,7 +154,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.UserSort"
-                                       class="text-decoration-none text-white text-nowrap">User</a>
+                                       class="text-decoration-none text-nowrap text-white">User</a>
                                     @if (Model.CurrentSort == "user_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -161,7 +169,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.EmailSort"
-                                       class="text-decoration-none text-white text-nowrap">Email</a>
+                                       class="text-decoration-none text-nowrap text-white">Email</a>
                                     @if (Model.CurrentSort == "email_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -176,7 +184,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.DescriptionSort"
-                                       class="text-decoration-none text-white text-nowrap">Description</a>
+                                       class="text-decoration-none text-nowrap text-white">Description</a>
                                     @if (Model.CurrentSort == "desc_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -191,7 +199,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.AmountDueSort"
-                                       class="text-decoration-none text-white text-nowrap">Amount Due</a>
+                                       class="text-decoration-none text-nowrap text-white">Amount Due</a>
                                     @if (Model.CurrentSort == "amount_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -206,7 +214,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.InvoiceDateSort"
-                                       class="text-decoration-none text-white text-nowrap ps-2">Invoice Date</a>
+                                       class="text-decoration-none text-nowrap ps-2 text-white">Invoice Date</a>
                                     @if (Model.CurrentSort == "invdate_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -221,7 +229,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.DueDateSort"
-                                       class="my-2 text-decoration-none text-white text-nowrap">Due Date</a>
+                                       class="text-decoration-none my-2 text-nowrap text-white">Due Date</a>
                                     @if (Model.CurrentSort == "duedate_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -255,7 +263,7 @@
                                                asp-page="/MyBilling"
                                                asp-route-userId="@invoice.UserID"
                                                asp-route-returnUrl="@Url.Page("./ReviewBatchInvoices", new { batchId = Model.BatchId, returnedFromUserId = Model.ReturnedFromUserId })"
-                                               class="btn btn-sm btn-rename"
+                                               class="btn btn-sm btn-billing"
                                                title="View User Billing Details">
                                                 <i class="bi bi-file-earmark-text"></i>
                                             </a>

@@ -6,8 +6,8 @@
     ViewData["Title"] = "Delete Protected Files";
 }
 
-<div class="text-center mt-4 mb-2">
-    <h3><i class="bi bi-shield-lock-fill ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
+<div class="mb-2 mt-4 text-center">
+    <h3><i class="bi bi-shield-lock-fill text-gold-darker ms-2"></i> @ViewData["Title"]</h3>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -16,18 +16,18 @@
 }
 
 <div class="row mx-0 p-0">
-    <div class="col-md-8 mx-auto p-2 mb-2 my-0">
+    <div class="col-md-8 mx-auto my-0 mb-2 p-2">
 
-        <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">
+        <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">
             <div class="card-body m-1 p-0">
 
-                @* <div class="text-center mt-2 mb-4">
-                    <h5 class="text-gold-darker"><i class="bi bi-file-earmark-pdf-fill me-2 mb-2"></i> Upload a New PDF File</h5>
+                @* <div class="mb-4 mt-2 text-center">
+                    <h5 class="text-gold-darker"><i class="bi bi-file-earmark-pdf-fill mb-2 me-2"></i> Upload a New PDF File</h5>
                 </div>
 
                 <div class="text-start">
                     <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-                        <div class="mb-3 position-relative">
+                        <div class="position-relative mb-3">
                             <div class="d-flex align-items-center">
                                 <input type="file" class="form-control flex-grow-1 upload-file-input" id="uploadFile" name="uploadFile" required>
                                 <button type="submit" class="btn btn-upload upload-button"><i class="bi bi-upload"></i></button>
@@ -37,9 +37,9 @@
                 </div>
 
                 <!-- Edit an Existing Row -->
-                <div class="text-center mb-0">
+                <div class="mb-0 text-center">
                     <h5>
-                        <i class="bi bi-file-earmark-pdf-fill me-2 mb-2 text-gold-darker"></i> Edit an Existing PDF File
+                        <i class="bi bi-file-earmark-pdf-fill text-gold-darker mb-2 me-2"></i> Edit an Existing PDF File
                     </h5>
                 </div> *@
 
@@ -47,12 +47,12 @@
 
                     <!-- File Name -->
                     <div class="col-6 text-start">
-                        <p class="ps-2 text-gold-darker"><strong>File Name</strong></p>
+                        <p class="text-gold-darker ps-2"><strong>File Name</strong></p>
                     </div>
 
                     <!-- Delete -->
                     <div class="col-6 text-end">
-                        <p class="pe-2 text-gold-darker">
+                        <p class="text-gold-darker pe-2">
                             <strong>Delete</strong>
                         </p>
                     </div>
@@ -76,8 +76,8 @@
                                             <div class="col d-flex align-items-center">
                                                 <span class="flex-grow-1 d-block text-gold-darker" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
                                             </div>
-                                            <div class="col-auto d-flex align-items-center justify-content-end">
-                                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-delete py-2 px-2 delete-button" data-filename="@file">
+                                            <div class="d-flex align-items-center justify-content-end col-auto">
+                                                <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-delete delete-button px-2 py-2" data-filename="@file">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </div>
@@ -99,38 +99,6 @@
         </div>
     </div>
 </div>
-
-@section Styles {
-    <style>
-        .even-row {
-            background-color: antiquewhite !important;
-        }
-
-        .odd-row {
-            background-color: #ffffff !important;
-        }
-
-            .even-row > td,
-            .odd-row > td {
-                background-color: inherit !important;
-            }
-
-        .delete-button i {
-            font-size: 1.0em;
-        }
-
-        .btn-rename i {
-            font-size: 1.0em;
-        }
-
-
-        #categoryFilesContainer {
-            overflow-x: auto; /* Enable horizontal scrolling */
-        }
-
-    </style>
-}
-
 
 @section Scripts {
     <script>

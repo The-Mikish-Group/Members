@@ -4,12 +4,22 @@
 }
 
 /* Buttons */
+.delete-button i {
+    font-size: 1.0em;
+}
+
+.btn-rename i {
+    font-size: 1.0em;
+}
+
 .page-button-size {
     width: 220px;
 }
+
 .back-button-image-size {
     height: 18px;
 }
+
 .group-button-size {
     min-width: 42px;
     height: 35px;
@@ -30,10 +40,10 @@
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
 @media (min-width: 575px) and (max-width: 768px) {
-
     #mainContainer {
         margin-top: 30px;
     }
+
     .nbLogo {
         height: 18px;
     }
@@ -57,13 +67,11 @@
     .nav-text-fs {
         font-size: 18px;
     }
-
 }
 /* #endregion  */
 
 /* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
 @media (min-width: 768.01px) and (max-width: 991px) {
-
     #mainContainer {
         margin-top: 30px;
     }
@@ -93,7 +101,6 @@
 
 /* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
 @media (min-width: 992px) {
-
     #mainContainer {
         margin-top: 30px;
     }
@@ -118,7 +125,6 @@
     .nav-text-fs {
         font-size: 24px;
     }
-      
 }
 /* #endregion*/
 
@@ -129,5 +135,5 @@
 
 /* #region (BS - xlg- ) (min-width: 1399.98px) Large Desktop */
 @media (min-width: 1399.98px) {
- }
+}
 /* #endregion */

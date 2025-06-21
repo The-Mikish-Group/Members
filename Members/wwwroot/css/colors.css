@@ -176,9 +176,11 @@
 text-red-lighter {
     color: #ecb3b8
 }
+
 .bg-red-lighter {
     background-color: #ecb3b8;
 }
+
 .text-red-light {
     color: #F2644E;
 }
@@ -257,6 +259,7 @@ text-red-lighter {
 .text-gold-footer {
     color: #BEB08D;
 }
+
 .bg-gold-footer {
     background-color: #BEB08D /*#dec383;*/
 }
@@ -264,6 +267,7 @@ text-red-lighter {
 .text-gold-lighter {
     color: #F2CA46;
 }
+
 .bg-gold-lighter {
     background-color: #F2CA46;
 }
@@ -271,6 +275,7 @@ text-red-lighter {
 .text-gold-light {
     color: #DAA425;
 }
+
 .bg-gold-light {
     background-color: #DAA425;
 }
@@ -278,6 +283,7 @@ text-red-lighter {
 .text-gold {
     color: #AD8003;
 }
+
 .bg-gold {
     background-color: #AD8003;
 }
@@ -285,6 +291,7 @@ text-red-lighter {
 .text-gold-dark {
     color: #8C6412;
 }
+
 .bg-gold-dark {
     background-color: #8C6412;
 }
@@ -292,6 +299,7 @@ text-red-lighter {
 .text-gold-darker {
     color: #4E3802;
 }
+
 .bg-gold-darker {
     background-color: #4E3802;
 }
@@ -335,11 +343,11 @@ text-red-lighter {
         background-color: inherit !important;
     }
 
-
 .bg-Card-Menu {
     /*background-color: #F2CA46;*/
     background-color: floralwhite;
 }
+
 .bg-PDF-Menu {
     background-color: floralwhite
 }
@@ -352,7 +360,7 @@ a {
 
     a:hover,
     a:focus {
-        color: #DEDFE0; 
+        color: #DEDFE0;
     }
 
 /* link */
@@ -377,18 +385,18 @@ a {
         color: #8E774D !important;
     }
 
-    .nav-pills .nav-link.active,
-    .nav-pills .show > .nav-link {
-        background-color: #28a745; /* Green background color */
-        color: white; /* White text color when active */
-    }
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: #28a745; /* Green background color */
+    color: white; /* White text color when active */
+}
 
 .nav-pills .nav-link {
     color: #28a745; /* Green text color */
 }
 
     .nav-pills .nav-link:hover {
-        color: white; 
+        color: white;
         background-color: lightgreen;
     }
 
@@ -415,11 +423,12 @@ a {
     }
 
 /*  btn-success Defaults */
-.btn-success {    
+.btn-success {
     color: white;
     border-color: darkgray;
     background-color: #4DAF7C;
 }
+
     .btn-success:focus,
     .btn-success:hover {
         color: lightgray;
@@ -429,7 +438,7 @@ a {
 
 /*  btn-add Defaults */
 .btn-add {
-    color: black;    
+    color: black;
     border-color: darkgray;
     background-color: lightgreen;
 }
@@ -454,16 +463,16 @@ a {
     .btn-upload:hover {
         border-bottom-left-radius: 0px;
         border-top-left-radius: 0px;
-        border-color:darkgray;        
+        border-color: darkgray;
         background-color: lightgreen;
         color: black;
     }
 
 /* btn-back Defaults */
-.btn-back {   
+.btn-back {
     border-color: transparent;
     color: #4E3802;
-    background-color: #BEB08D; /* footer color */    
+    background-color: #BEB08D; /* footer color */
 }
 
     .btn-back:focus,
@@ -473,7 +482,6 @@ a {
         background-color: #AD8003 !important;
     }
 
-
 /*  btn-rename Defaults */
 .btn-rename {
     border-color: transparent;
@@ -482,12 +490,25 @@ a {
 }
 
     .btn-rename:focus,
-    .btn-rename:hover {        
+    .btn-rename:hover {
         border-color: transparent;
         color: darkgreen;
         background-color: lightgreen
     }
 
+/*  btn-billing Defaults */
+.btn-billing {
+    border-color: transparent;
+    background-color: transparent;
+    color: blue;
+}
+
+    .btn-billing:focus,
+    .btn-billing:hover {
+        border-color: transparent;
+        color: blue;
+        background-color: lightblue
+    }
 
 /*  btn-delete Defaults */
 .btn-delete {
@@ -546,13 +567,14 @@ a {
 /*  btn-warning Defaults */
 .btn-warning {
     color: #705103;
-    background-color: goldenrod; 
-    border-color: #414042; 
+    background-color: goldenrod;
+    border-color: #414042;
 }
+
     .btn-warning:focus,
     .btn-warning:hover {
         color: #705103;
-        background-color: #dec383; 
+        background-color: #dec383;
         border-color: #7d7e81; /* gray */
     }
 
@@ -592,7 +614,7 @@ a {
     .btn-loglink:focus,
     .btn-loglink:hover {
         color: #705103;
-        background-color: #dec383;        
+        background-color: #dec383;
     }
 
 /* #endregion */
@@ -621,7 +643,6 @@ a {
     #top-button:active {
         background-color: #C72D27; /* bg-red-dark*/
     }
-
 
 /* Responsive Nav colors */
 .siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
