@@ -2,7 +2,7 @@
 @model Members.Areas.Admin.Pages.Accounting.AdminBalancesModel
 @{
     ViewData["Title"] = "Member Balances";
-    Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
@@ -11,7 +11,7 @@
 
     @if (TempData["StatusMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="mt-4 alert alert-success alert-dismissible fade show" role="alert">
             @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -19,7 +19,7 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="mt-4 alert alert-danger alert-dismissible fade show" role="alert">
             @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -27,45 +27,14 @@
 
     @if (TempData["WarningMessage"] != null)
     {
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="mt-4 alert alert-warning alert-dismissible fade show" role="alert">
             @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
 
-    <div class="row mb-3">
-    <div class="col-md-6">
-        <form method="get" class="mb-2">
-            <div class="form-check">
-                <input asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-input" onchange="this.form.submit()" />
-                <label asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-label">Show Only Members with Outstanding Balances</label>
-            </div>
-            <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
-        </form>
-    </div>
-    <div class="col-md-6 text-md-end">
-        <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block; margin-right: 5px;">
-            <button type="submit" class="btn btn-sm btn-warning"
-                    onclick="return confirm('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances? This may take a moment.');">
-                <i class="bi bi-cash-stack me-2"></i>Apply Late Fees to All Eligible
-            </button>
-        </form>
-
-        @if (Model.MemberBalances.Any())
-        {
-            <div style="display: inline-block;">
-                 <a asp-page="./AdminBalances" 
-                   asp-page-handler="ExportCsv" 
-                   asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding"
-                   asp-route-sortOrder="@Model.CurrentSort"
-                   class="btn btn-sm btn-primary">
-                    <i class="bi bi-download me-2"></i>Export to CSV
-                </a>
-            </div>
-        }
-    </div>
-</div>
+    
 
     @if (!Model.MemberBalances.Any())
     {
@@ -75,128 +44,192 @@
     }
     else
     {
-        <div class="table-responsive">
-            <table class="w-100 shadow">
+        <div class="shadow card m-1 p-1">
 
-                <thead>
+            <div class="row mb-3">
 
-                    <tr class="bg-gold-dark text-white">
-                        <th class="text-nowrap ps-1 py-1">
-                            <a asp-page="./AdminBalances"
-                               asp-route-sortOrder="@Model.NameSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()" 
-                               class="text-white text-decoration-none">Name</a>
-                            @if (Model.CurrentSort == Model.NameSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.NameSort?.Replace("_desc", "_asc") || (string.IsNullOrEmpty(Model.CurrentSort) && Model.NameSort == "name_desc"))
-                            {
-                                <i class="bi @(Model.NameSort == "name_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
-                            }
-                        </th>
-                        <th class="text-nowrap py-1">
-                            <a asp-page="./AdminBalances"
-                               asp-route-sortOrder="@Model.EmailSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
-                               class="text-white text-decoration-none">Email</a>
-                            @if (Model.CurrentSort == Model.EmailSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.EmailSort?.Replace("_desc", "_asc"))
-                            {
-                                <i class="bi @(Model.EmailSort == "email_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
-                            }
-                        </th>
-                        <th class="text-nowrap py-1 text-end">
-                            <a asp-page="./AdminBalances"
-                               asp-route-sortOrder="@Model.BalanceSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
-                               class="text-white text-decoration-none">Current Balance</a>
-                            @if (Model.CurrentSort == Model.BalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.BalanceSort?.Replace("_desc", "_asc"))
-                            {
-                                <i class="bi @(Model.BalanceSort == "balance_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
-                            }
-                        </th>
-                        <th class="text-nowrap py-1 text-end">
-                            <a asp-page="./AdminBalances"
-                               asp-route-sortOrder="@Model.CreditBalanceSort"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
-                               class="text-white text-decoration-none">Credit Balance</a>
-                            @if (Model.CurrentSort == Model.CreditBalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.CreditBalanceSort?.Replace("_desc", "_asc"))
-                            {
-                                <i class="bi @(Model.CreditBalanceSort == "credit_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
-                            }
-                        </th>
-                        <th class="text-nowrap text-white text-decoration-none text-end pe-2 py-1">Fees</th>
-                        <th class="text-nowrap text-white text-decoration-none text-end pe-2 py-1">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+                <!-- Checkbox -->
+                <div class="col-md-6">
+                    <form method="get" class="my-2">
+                        <div class="form-check">
+                            <input asp-for="ShowOnlyOutstanding" class="shadow text-gold-darker form-check-input" onchange="this.form.submit()" />
+                            <label asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-label">Show Only Members with Outstanding Balances</label>
+                        </div>
+                        <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
+                    </form>
+                </div>
 
-                   @{  
-                        int i = 0; // Declare and initialize the variable 'i' before the loop  
-                    }
+                <!-- Apply Late Fee and Export to CVS Buttons -->
+                <div class="col-md-6 text-md-end">
 
-                    @foreach (var member in Model.MemberBalances)
+                    <!-- Apply Late Fee -->
+                    <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block; margin-right: 5px;" class="my-2">
+                        <button type="submit" class="btn btn-sm btn-subtle-danger"
+                                onclick="return confirm('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances? This may take a moment.');">
+                            <i class="bi bi-clock-history"></i> Apply Late Fees to All Eligible
+                        </button>
+                    </form>
+
+                    <!-- Export to CVS -->
+                    @if (Model.MemberBalances.Any())
                     {
-                        <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
-                            <td class="text-nowrap text-gold-darker ps-1 py-1">@Html.DisplayFor(modelItem => member.FullName)</td>
-                            <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => member.Email)</td>
-                            <td class="text-nowrap text-gold-darker py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
-                                @member.CurrentBalance.ToString("C")
-                            </td>
-                            <td class="text-nowrap text-gold-darker py-1 text-end @(member.CreditBalance > 0 ? "text-success fw-bold" : "")">
-                                @Html.DisplayFor(modelItem => member.CreditBalance)
-                            </td>
-                            <td class="text-nowrap text-gold-darker py-1 pe-2 text-end">
-                                @if (member.CurrentBalance > 0 || member.CreditBalance > 0) // Also consider CreditBalance for enabling actions
-                                {
-                                    <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
-                                        @* We might need to pass sourceInvoiceId if we refine the logic later *@
-                                        @* <input type="hidden" name="sourceInvoiceId" value="THE_ID_OF_OVERDUE_DUES_INVOICE" /> *@
-                                        <button type="submit" class="btn btn-sm btn-warning @(member.CurrentBalance <= 0 ? "disabled" : "")"
-                                        title="Apply Late Fee if Dues are Overdue"
-                                        onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue Dues invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
-                                            Apply Late Fee
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <p>N/A</p>
-                                }
-                            </td>
-                            <td class="text-nowrap text-gold-darker py-1 text-end pe-2">
-                                @if (!string.IsNullOrEmpty(member.UserId))
-                                {
-                                    <a asp-area="Member"
-                                       asp-page="/MyBilling"
-                                       asp-route-userId="@member.UserId"
-                                       asp-route-returnUrl="@Url.Page("./AdminBalances", new { sortOrder = Model.CurrentSort, showOnlyOutstanding = Model.ShowOnlyOutstanding.ToString() })"
-                                       class="btn btn-sm btn-outline-primary"
-                                       title="View Billing Details">
-                                        <i class="bi bi-file-earmark-text"></i> View Billing
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">User ID missing</span>
-                                }
-                            </td>
-                        </tr>
-
-                        i++; 
+                        <div style="display: inline-block;">
+                            <a asp-page="./AdminBalances"
+                               asp-page-handler="ExportCsv"
+                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding"
+                               asp-route-sortOrder="@Model.CurrentSort"
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-download me-2"></i>Export to CSV
+                            </a>
+                        </div>
                     }
-                </tbody>
-                <tfoot class="border-top">
-                    <tr class="bg-light">
-                        <td colspan="2" class="text-end fw-bold pe-2 py-1">Totals:</td>
-                        <td class="text-nowrap text-gold-darker py-1 text-end fw-bold @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
-                            @Model.TotalCurrentBalance.ToString("C")
-                        </td>
-                        <td class="text-nowrap text-gold-darker py-1 text-end fw-bold @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
-                            @Model.TotalCreditBalance.ToString("C")
-                        </td>
-                        <td class="py-1"></td> <!-- Empty cell for 'Fees' column -->
-                        <td class="py-1"></td> <!-- Empty cell for new 'Actions' column -->
-                    </tr>
-                </tfoot>
-            </table>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="w-100 shadow">
+
+                    <thead>
+
+                        <tr class="bg-gold-dark text-white">
+                            <th class="text-nowrap ps-1 py-1">
+                                <a asp-page="./AdminBalances"
+                                   asp-route-sortOrder="@Model.NameSort"
+                                   asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                                   class="text-white text-decoration-none">Name</a>
+                                @if (Model.CurrentSort == Model.NameSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.NameSort?.Replace("_desc", "_asc") || (string.IsNullOrEmpty(Model.CurrentSort) && Model.NameSort == "name_desc"))
+                                {
+                                    <i class="bi @(Model.NameSort == "name_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                                }
+                            </th>
+                            <th class="text-nowrap py-1">
+                                <a asp-page="./AdminBalances"
+                                   asp-route-sortOrder="@Model.EmailSort"
+                                   asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                                   class="text-white text-decoration-none">Email</a>
+                                @if (Model.CurrentSort == Model.EmailSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.EmailSort?.Replace("_desc", "_asc"))
+                                {
+                                    <i class="bi @(Model.EmailSort == "email_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                                }
+                            </th>
+
+                            <!-- Current Balance -->
+                            <th class="text-nowrap py-1 text-end">
+                                <a asp-page="./AdminBalances"
+                                   asp-route-sortOrder="@Model.BalanceSort"
+                                   asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                                   class="text-white text-decoration-none">Current Balance</a>
+                                @if (Model.CurrentSort == Model.BalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.BalanceSort?.Replace("_desc", "_asc"))
+                                {
+                                    <i class="bi @(Model.BalanceSort == "balance_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                                }
+                            </th>
+
+                            <!-- Credit Balance -->
+                            <th class="text-nowrap py-1 text-end">
+                                <a asp-page="./AdminBalances"
+                                   asp-route-sortOrder="@Model.CreditBalanceSort"
+                                   asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding.ToString()"
+                                   class="text-white text-decoration-none">Credit Balance</a>
+                                @if (Model.CurrentSort == Model.CreditBalanceSort?.Replace("_asc", "_desc") || Model.CurrentSort == Model.CreditBalanceSort?.Replace("_desc", "_asc"))
+                                {
+                                    <i class="bi @(Model.CreditBalanceSort == "credit_asc" ? "bi-arrow-down" : "bi-arrow-up")"></i>
+                                }
+                            </th>
+
+                            <th class="text-nowrap text-white text-decoration-none text-end pe-2 py-1">Apply Late Fee</th>
+                            <th class="text-nowrap text-white text-decoration-none text-end pe-2 py-1">Billing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @{
+                            int i = 0; // Declare and initialize the variable 'i' before the loop
+                        }
+
+                        @foreach (var member in Model.MemberBalances)
+                        {
+                            <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
+                                <td class="text-nowrap text-gold-darker ps-1 py-1">@Html.DisplayFor(modelItem => member.FullName)</td>
+                                <td class="text-nowrap text-gold-darker py-1">@Html.DisplayFor(modelItem => member.Email)</td>
+                                <td class="text-nowrap text-gold-darker py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
+                                    @member.CurrentBalance.ToString("C")
+                                </td>
+                                <td class="text-nowrap text-gold-darker py-1 text-end @(member.CreditBalance > 0 ? "text-success fw-bold" : "")">
+                                    @Html.DisplayFor(modelItem => member.CreditBalance)
+                                </td>
+
+                                <!-- Apply Late Fee -->
+                                <td class="text-nowrap text-gold-darker py-1 pe-2 text-center">
+                                    @if (member.CurrentBalance > 0 || member.CreditBalance > 0) // Also consider CreditBalance for enabling actions
+                                    {
+                                        <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
+
+                                            @* We might need to pass sourceInvoiceId if we refine the logic later *@
+                                            @* <input type="hidden" name="sourceInvoiceId" value="THE_ID_OF_OVERDUE_DUES_INVOICE" /> *@
+
+                                            <button type="submit" class="btn btn-sm btn-delete @(member.CurrentBalance <= 0 ? "disabled" : "")"
+                                                    title="Apply Late Fee if Dues are Overdue"
+                                                    onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue Dues invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
+                                                <i class="bi bi-clock-history"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <p>N/A</p>
+                                    }
+                                </td>
+
+                                <!-- Billing History -->
+                                <td class="text-nowrap text-gold-darker py-1 text-center pe-2">
+                                    @if (!string.IsNullOrEmpty(member.UserId))
+                                    {
+                                        <a asp-area="Member"
+                                           asp-page="/MyBilling"
+                                           asp-route-userId="@member.UserId"
+                                           asp-route-returnUrl="@Url.Page("./AdminBalances", new { sortOrder = Model.CurrentSort, showOnlyOutstanding = Model.ShowOnlyOutstanding.ToString() })"
+                                           class="btn btn-sm btn-rename"
+                                           title="View Billing Details">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">User ID missing</span>
+                                    }
+                                </td>
+                            </tr>
+
+                            i++;
+                        }
+                    </tbody>
+
+                    <!-- Table Footer Totals -->
+                    <tfoot class="border-top">
+                        <tr class="bg-light">
+                            <td colspan="2" class="text-end fw-bold pe-2 py-1">Totals:</td>
+                            
+                            <!-- Current Balance Total -->
+                            <td class="text-nowrap text-gold-darker py-1 text-end fw-bold @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
+                                @Model.TotalCurrentBalance.ToString("C")
+                            </td>
+
+                            <!-- Credit Balance Total -->
+                            <td class="text-nowrap text-gold-darker py-1 text-end fw-bold @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
+                                @Model.TotalCreditBalance.ToString("C")
+                            </td>
+                            <td class="py-1"></td>
+                            <td class="py-1"></td> 
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
         </div>
+        
         
     }
 

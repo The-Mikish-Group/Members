@@ -10,7 +10,7 @@
 @if (TempData["StatusMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+        @Html.Raw(TempData["StatusMessage"]?.ToString())
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
@@ -18,42 +18,50 @@
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
+        @Html.Raw(TempData["ErrorMessage"]?.ToString())
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<div class="text-center mb-4">
-    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus"></i> Add New Billable Asset</button>
+<div class="text-center">
+    <button type="button" class="btn btn-sm btn-success mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus"></i> Add A New Billable Asset</button>
 </div>
 
-<div class="mb-4">
-    <div class="">
-        <h5 class="text-gold-darker ms-2 mb-0"><i class="bi bi-funnel-fill"></i> Filter Assets</h5>
-    </div>
+<div class="mb-4"> 
+    
     <div class="shadow card m-1 p-2 bg-Card-Menu">
+
+        <h5 class="text-gold-darker ms-2 my-2"><i class="bi bi-filter"></i> Filter Assets</h5>
+
         <form method="get" id="filterAssetsForm">
             <div class="input-group mb-2">
                 <input type="text" class="form-control shadow-sm text-gold-darker" placeholder="Search by Plot ID, Description, Contact Name/Email..." asp-for="SearchTerm" id="assetsSearchInput" />
                 <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearAssetsSearch" style="display: none;">
                     <i class="bi bi-x text-black"></i>
                 </button>
-                <button class="btn btn-sm btn-primary" type="submit" id="assetsSearchButton"><i class="bi bi-search"></i></button>
+                <button class="btn btn-sm" type="submit" id="assetsSearchButton"><i class="bi bi-search"></i></button>
             </div>
             <input type="hidden" asp-for="PageNumber" />
             <input type="hidden" asp-for="PageSize" />
             <input type="hidden" asp-for="CurrentSort" />
         </form>
+
         <div class="mt-1 ps-1">
             <span id="assetCountSpan" class="text-gold-darker">Total Assets: @Model.TotalAssets</span>
         </div>
+
     </div>
 </div>
 
-<div class="">
-    <h5 class="ms-2 mb-0 text-gold-darker"><i class="bi bi-list"></i> Existing Billable Assets</h5>
-</div>
 <div class="shadow card mx-1 mt-1 mb-4 p-1">
+
+    <div class="d-flex justify-content-between align-items-center ms-2 mb-0">
+        <h5 class="text-gold-darker my-2"><i class="bi bi-list"></i> Existing Billable Assets</h5>
+        <a asp-page-handler="ExportCsv" class="shadow me-2 my-2 btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Export to CSV
+        </a>
+    </div>
+
     <div class="table-responsive">
         <table class="w-100 mb-0" id="mainAssetsTable">
             <thead>
@@ -71,7 +79,7 @@
                         }
                     </th>
                     <th class="ps-2 py-2">
-                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="plotid" data-sort-value="plotid">Asset Identifier</a>
+                        <a class="asset-sort-link text-decoration-none text-white text-nowrap" href="#" data-column-key="plotid" data-sort-value="plotid">Plot ID / Asset Identifier</a>
                         @if (Model.CurrentSort == "plotid_asc")
                         {
                             <i class="bi bi-arrow-down text-white ms-1"></i>
@@ -148,10 +156,10 @@
                         <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
                         <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
                         <td class="text-nowrap text-center pe-2 py-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary me-1 edit-asset-button" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <button type="button" class="btn btn-sm me-1 btn-rename edit-asset-button" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i></button>
                         </td>
                         <td class="text-nowrap text-center pe-2 py-2">
-                            <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i> Delete</button></form>
+                            <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i></button></form>
                         </td>
                     </tr>
                     i++;
@@ -190,7 +198,7 @@
         <div class="modal-content">
             <form method="post" asp-page-handler="AddAsset">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addAssetModalLabel"><i class="bi bi-plus"></i> Add New Billable Asset</h5>
+                    <h5 class="modal-title text-gold-darker" id="addAssetModalLabel"><i class="bi bi-plus"></i> Add A New Billable Asset</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -223,8 +231,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Close</button>
-                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-plus"></i> Add Asset</button>
+                    <button type="button" class="shadow btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="my-card-footer-bible bi-arrow-left"></i> Cancel</button>
+                    <button type="submit" class="shadow btn btn-sm btn-success"><i class="bi bi-plus"></i> Add Asset</button>
                 </div>
             </form>
         </div>
@@ -236,7 +244,7 @@
         <div class="modal-content">
             <form method="post" asp-page-handler="UpdateAsset">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editAssetModalLabel"><i class="bi bi-pencil-square"></i> Edit Billable Asset</h5>
+                    <h5 class="modal-title text-gold-darker" id="editAssetModalLabel"><i class="bi bi-box-pencil"></i> Edit Billable Asset</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -271,72 +279,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-save"></i> Update Asset</button>
+                    <button type="button" class="shadow btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
+                    <button type="submit" class="shadow btn btn-sm btn-success"><i class="bi bi-save"></i> Update Asset</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@section Styles {
-    <style>
-        /* Pagination Styles to match Users.cshtml */
-        .pagination .page-link {
-            background-color: white !important;
-            border-color: darkgray !important;
-            color: #4E3802 !important; /* text-gold-darker */
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #DAA425 !important; /* text-gold (active bg) */
-            border-color: darkgray !important;
-            color: #fff !important; /* white text for active */
-        }
-
-        .pagination .page-link:hover {
-            background-color: #F2CA46 !important; /* text-gold-lighter (hover bg) */
-        }
-
-        .pagination .page-item.disabled .page-link {
-            background-color: #f8f9fa !important;
-            border-color: darkgray !important;
-            color: #6c757d !important;
-        }
-
-        /* Existing styles from ManageBillableAssets.cshtml */
-        .row-even {
-            background-color: antiquewhite;
-        }
-
-        .row-odd {
-            background-color: #ffffff;
-        }
-
-            .row-even > td, .row-odd > td {
-                background-color: inherit !important;
-            }
-
-        table th, table td {
-            vertical-align: middle;
-            padding: 0.5rem 0.5rem;
-        }
-
-        thead th {
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-        }
-
-        .form-label { /* This was for modal labels, might not be needed if not used elsewhere */
-            font-weight: 500;
-        }
-        /* This rule for sort indicators in table headers is good to keep */
-        #mainAssetsTable thead th .bi {
-            font-size: 0.9em;
-            margin-left: 0.25rem;
-        }
-    </style>
-}
 
 @section Scripts {
     <script>
@@ -389,14 +338,14 @@
                     if (addAssetModalElement && addAssetModalElement.classList.contains('show')) {
                         addAssetModal.hide();
                     }
-                    // Disable the main "Add New Billable Asset" button
+                    // Disable the main "Add a New Billable Asset" button
                     if (addNewAssetButton.length > 0) {
                         addNewAssetButton.prop('disabled', true).attr('title', 'Close the Edit Asset modal before adding a new asset.');
                     }
                 });
 
                 editAssetModalElement.addEventListener('hidden.bs.modal', function () {
-                    // Re-enable the "Add New Billable Asset" button when edit modal is closed
+                    // Re-enable the "Add a New Billable Asset" button when edit modal is closed
                     if (addNewAssetButton.length > 0) {
                         addNewAssetButton.prop('disabled', false).removeAttr('title');
                     }
@@ -571,7 +520,7 @@
            }
 
            function updateAssetsSortIndicators(currentSortActual) {
-                $('#mainAssetsTable thead .asset-sort-link + i.bi').remove();
+                $('#mainAssetsTable thead th .bi').remove();
                 $('#mainAssetsTable thead .asset-sort-link').each(function() {
                     const sortLink = $(this);
                     const columnKey = sortLink.data('column-key');

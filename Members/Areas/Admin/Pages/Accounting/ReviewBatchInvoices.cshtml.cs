@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations; // Not strictly needed for this PageModel if no input model, but good practice
 using System.Linq;
+using System.Text; // Added for StringBuilder
 using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages.Accounting
 {
@@ -21,8 +22,8 @@ namespace Members.Areas.Admin.Pages.Accounting
     {
         public class BatchSelectItem
         {
-        public string BatchId { get; set; } = string.Empty;
-        public string DisplayText { get; set; } = string.Empty;
+            public string BatchId { get; set; } = string.Empty;
+            public string DisplayText { get; set; } = string.Empty;
         }
         public List<BatchSelectItem> AvailableDraftBatches { get; set; } = [];
         private readonly ApplicationDbContext _context = context;
@@ -306,6 +307,88 @@ namespace Members.Areas.Admin.Pages.Accounting
                 TempData["ErrorMessage"] = $"Error cancelling batch '{BatchId}'. See logs.";
             }
             return RedirectToPage("./CreateBatchInvoices"); // Or an admin dashboard
+        }
+
+        private static string EscapeCsvField(string? field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return string.Empty;
+            // Replace double quotes with two double quotes
+            return field.Replace("\"", "\"\"");
+        }
+
+        public async Task<IActionResult> OnGetExportCsvAsync(string batchId)
+        {
+            _logger.LogInformation("OnGetExportCsvAsync called for BatchID: {BatchId}", batchId);
+
+            if (string.IsNullOrEmpty(batchId))
+            {
+                _logger.LogWarning("OnGetExportCsvAsync: BatchId is null or empty.");
+                TempData["ErrorMessage"] = "Batch ID is required to export.";
+                return RedirectToPage(new { this.BatchId, this.CurrentSort }); // Redirect to current page view
+            }
+
+            var invoicesInBatch = await _context.Invoices
+                .Where(i => i.BatchID == batchId && i.Status == InvoiceStatus.Draft)
+                .Include(i => i.User) // Include User for email and fallback username
+                .ToListAsync();
+
+            if (invoicesInBatch == null || invoicesInBatch.Count == 0)
+            {
+                _logger.LogWarning("OnGetExportCsvAsync: No draft invoices found for BatchID: {BatchId}", batchId);
+                TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{batchId}' to export.";
+                return RedirectToPage(new { BatchId = batchId, this.CurrentSort });
+            }
+
+            // Efficiently get UserProfiles for all users in the batch
+            var userIdsInBatch = invoicesInBatch.Select(i => i.UserID).Distinct().ToList();
+            var userProfiles = await _context.UserProfile
+                                        .Where(up => userIdsInBatch.Contains(up.UserId))
+                                        .ToDictionaryAsync(up => up.UserId);
+
+            var invoicesToExportDetails = invoicesInBatch.Select(i => {
+                userProfiles.TryGetValue(i.UserID, out UserProfile? profile);
+                string fullName = (profile != null && !string.IsNullOrWhiteSpace(profile.FirstName) && !string.IsNullOrWhiteSpace(profile.LastName))
+                                   ? $"{profile.LastName}, {profile.FirstName}"
+                                   : (profile?.LastName ?? profile?.FirstName ?? i.User?.UserName ?? "N/A");
+                return new
+                {
+                    i.InvoiceID,
+                    UserFullName = fullName,
+                    UserName = i.User?.Email ?? "N/A", // UserName here is effectively Email
+                    i.Description,
+                    i.AmountDue,
+                    i.AmountPaid,
+                    i.InvoiceDate,
+                    i.DueDate,
+                    Status = i.Status.ToString(), // Convert enums to string for CSV
+                    Type = i.Type.ToString(),     // Convert enums to string for CSV
+                    i.BatchID
+                };
+            }).ToList();
+
+            var sb = new StringBuilder();
+            // Header row
+            sb.AppendLine("\"Invoice ID\",\"User Full Name\",\"User Email\",\"Description\",\"Amount Due\",\"Amount Paid\",\"Invoice Date\",\"Due Date\",\"Status\",\"Type\",\"Batch ID\"");
+
+            foreach (var invoice in invoicesToExportDetails)
+            {
+                sb.AppendFormat("\"{0}\",", invoice.InvoiceID);
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(invoice.UserFullName));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(invoice.UserName));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(invoice.Description));
+                sb.AppendFormat("{0},", invoice.AmountDue.ToString("F2")); // Currency
+                sb.AppendFormat("{0},", invoice.AmountPaid.ToString("F2")); // Currency
+                sb.AppendFormat("\"{0}\",", invoice.InvoiceDate.ToString("yyyy-MM-dd"));
+                sb.AppendFormat("\"{0}\",", invoice.DueDate.ToString("yyyy-MM-dd"));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(invoice.Status.ToString()));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(invoice.Type.ToString()));
+                sb.AppendLine($"\"{EscapeCsvField(invoice.BatchID)}\"");
+            }
+
+            byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
+            _logger.LogInformation("CSV file generated for BatchID: {BatchId}. Byte length: {Length}", batchId, csvBytes.Length);
+            return File(csvBytes, "text/csv", $"batch_{batchId}_invoices_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
         }
     }
 }

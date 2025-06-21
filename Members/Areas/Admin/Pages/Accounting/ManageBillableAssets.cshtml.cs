@@ -11,6 +11,7 @@ using System; // Added for DateTime
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text; // Added for StringBuilder
 using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages.Accounting
 {
@@ -44,9 +45,9 @@ namespace Members.Areas.Admin.Pages.Accounting
         {
             [Required]
             public int BillableAssetID { get; set; }
-            [Required(ErrorMessage = "Plot ID / Asset Identifier is required.")]
+            [Required(ErrorMessage = "Asset Identifier is required.")]
             [StringLength(100)]
-            [Display(Name = "Plot ID / Asset Identifier")]
+            [Display(Name = "Asset Identifier")]
             public string PlotID { get; set; } = string.Empty;
             [Display(Name = "Assign to Billing Contact")]
             public string? SelectedUserID { get; set; }
@@ -73,18 +74,17 @@ namespace Members.Areas.Admin.Pages.Accounting
             public decimal AssessmentFee { get; set; }
         }
         public class AddBillableAssetInputModel
-        {
-            // [Required(ErrorMessage = "Plot ID / Asset Identifier is required.")] // Commented out
+        {           
             [StringLength(100)]
-            [Display(Name = "Plot ID / Asset Identifier")]
+            [Display(Name = "Asset Identifier")]
             public string PlotID { get; set; } = string.Empty;
-            // [Required(ErrorMessage = "A Billing Contact must be selected.")] // Commented out
+            
             [Display(Name = "Assign to Billing Contact")]
             public string SelectedUserID { get; set; } = string.Empty;
             [StringLength(250)]
             [Display(Name = "Optional Description")]
             public string? Description { get; set; }
-            // [Required(ErrorMessage = "Assessment Fee is required.")] // Commented out
+            
             [DataType(DataType.Currency)]
             [Range(0.00, 1000000.00, ErrorMessage = "Assessment Fee must be a non-negative value (0.00 is allowed).")]
             [Display(Name = "Assessment Fee")]
@@ -447,21 +447,17 @@ namespace Members.Areas.Admin.Pages.Accounting
                 TempData["ErrorMessage"] = "Selected billable asset not found for update.";
                 return RedirectToPage();
             }
-            string newTrimmedPlotId = EditInput.PlotID!.Trim(); // PlotID is [Required], non-null if ModelState valid.
-            // Only perform unique check and update if the PlotID has actually changed
+            string newTrimmedPlotId = EditInput.PlotID!.Trim();
             if (assetToUpdate.PlotID != newTrimmedPlotId)
             {
                 _logger.LogInformation("PlotID changed for AssetID {AssetID}. Old: '{OldPlotID}', New attempt: '{NewPlotID}'. Checking for duplicates.",
                     EditInput.BillableAssetID, assetToUpdate.PlotID, newTrimmedPlotId);
                 if (await _context.BillableAssets.AnyAsync(ba => ba.PlotID == newTrimmedPlotId && ba.BillableAssetID != EditInput.BillableAssetID))
                 {
-                    ModelState.AddModelError("EditInput.PlotID", "This Plot ID / Asset Identifier already exists for another asset.");
-                    _logger.LogWarning("Update asset failed: Duplicate PlotID {PlotID} attempt for AssetID {AssetId}.",
+                    ModelState.AddModelError("EditInput.PlotID", "This Asset Identifier already exists for another asset.");
+                    _logger.LogWarning("Update asset failed: Duplicate Asset Identifier {PlotID} attempt for AssetID {AssetId}.",
                         newTrimmedPlotId, EditInput.BillableAssetID);
-                    // ShowEditForm = true; // Removed
                     await PopulateBillingContactUsersSL();
-                    // EditInput still holds the attempted (duplicate) PlotID, so the form will show it for correction.
-                    // We need to ensure the main Assets list is also reloaded for the page.
                     await OnGetAsync(); // Reloads Assets list
                     return Page();
                 }
@@ -482,14 +478,14 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 _logger.LogError(ex, "Concurrency error updating billable asset {PlotID} (ID: {AssetID}). It may have been modified or deleted by another user.", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating asset due to a concurrency conflict. Please refresh and try again.";
-                // ShowEditForm = false; // Removed
+                
                 return RedirectToPage();
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Database error updating billable asset {PlotID} (ID: {AssetID})", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating billable asset. Check logs for details.";
-                // ShowEditForm = true; // Removed
+                
                 await OnGetAsync();
                 return Page();
             }
@@ -520,9 +516,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Error deleting billable asset {PlotID} (ID: {AssetID}). It might be in use or a database error occurred.", assetToDelete.PlotID, assetToDelete.BillableAssetID);
-                // Check for specific foreign key constraint issues if BillableAsset is linked elsewhere
-                // For now, a general message:
+                _logger.LogError(ex, "Error deleting billable asset {PlotID} (ID: {AssetID}). It might be in use or a database error occurred.", assetToDelete.PlotID, assetToDelete.BillableAssetID);                
                 TempData["ErrorMessage"] = $"Error deleting Billable Asset '{assetToDelete.PlotID}'. It might be referenced by other records, or a database error occurred. Check logs.";
             }
             return RedirectToPage();
@@ -538,6 +532,79 @@ namespace Members.Areas.Admin.Pages.Accounting
             await LoadAssetsDataAsync();
             _logger.LogInformation("[BACKEND_DEBUG] OnGetPartialTableAsync - Passing to partial - TotalAssets: {TotalAssets}, TotalPages: {TotalPages}, PageNumber: {PageNumber}, PageSize: {PageSize}, SearchTerm: {SearchTerm}, CurrentSort: {CurrentSort}", this.TotalAssets, this.TotalPages, this.PageNumber, this.PageSize, this.SearchTerm, this.CurrentSort);
             return Partial("_AssetsTablePartial", this);
+        }
+
+        private static string EscapeCsvField(string? field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return string.Empty;
+            return field.Replace("\"", "\"\"");
+        }
+
+        public async Task<IActionResult> OnGetExportCsvAsync()
+        {
+            _logger.LogInformation("OnGetExportCsvAsync called to export all billable assets.");
+
+            // Fetch all BillableAssets with related User and UserProfile data
+            var allAssetsQuery = _context.BillableAssets
+                .Select(ba => new {
+                    BillableAsset = ba,
+                    ba.User // IdentityUser linked to BillableAsset
+                })
+                .GroupJoin(
+                    _context.UserProfile,
+                    outer => outer.User != null ? outer.User.Id : null,
+                    userProfile => userProfile.UserId,
+                    (outer, profiles) => new {
+                        outer.BillableAsset,
+                        outer.User, // IdentityUser
+                        UserProfile = profiles.FirstOrDefault() // UserProfile or null
+                    }
+                );
+
+            // Execute the query to get all data
+            var assetsToExportData = await allAssetsQuery.ToListAsync();
+
+            var sb = new StringBuilder();
+            // Header row
+            sb.AppendLine("\"BillableAssetID\",\"PlotID\",\"BillingContactFullName\",\"BillingContactEmail\",\"AssessmentFee\",\"Description\",\"DateCreated\",\"LastUpdated\"");
+
+            foreach (var item in assetsToExportData)
+            {
+                var assetEntity = item.BillableAsset;
+                var user = item.User;
+                var userProfile = item.UserProfile;
+
+                string? contactFullName = "N/A (Unassigned)";
+                string? contactEmail = null;
+
+                if (user != null)
+                {
+                    contactEmail = user.Email; // Email from IdentityUser
+                    if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                    {
+                        contactFullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                    }
+                    else
+                    {
+                        contactFullName = user.UserName; // Fallback to UserName if profile names are incomplete
+                    }
+                }
+
+                sb.AppendFormat("\"{0}\",", assetEntity.BillableAssetID);
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.PlotID));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(contactFullName));
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(contactEmail));
+                sb.AppendFormat("{0},", assetEntity.AssessmentFee.ToString("F2")); // Currency format
+                sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.Description));
+                sb.AppendFormat("\"{0}\",", assetEntity.DateCreated.ToString("yyyy-MM-dd"));
+                sb.AppendFormat("\"{0}\"", assetEntity.LastUpdated.ToString("yyyy-MM-dd")); // Last field, so use AppendLine
+                sb.AppendLine(); // Add newline character
+            }
+
+            byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
+            _logger.LogInformation("CSV file generated for all billable assets. Byte length: {Length}", csvBytes.Length);
+            return File(csvBytes, "text/csv", $"billable_assets_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
         }
     }
 }

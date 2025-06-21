@@ -299,6 +299,42 @@ text-red-lighter {
 
 /* #endregion */
 
+/* Pagination Styles to match Users.cshtml */
+.pagination .page-link {
+    background-color: white !important;
+    border-color: darkgray !important;
+    color: #4E3802 !important; /* text-gold-darker */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #DAA425 !important; /* text-gold (active bg) */
+    border-color: darkgray !important;
+    color: #fff !important; /* white text for active */
+}
+
+.pagination .page-link:hover {
+    background-color: #F2CA46 !important; /* text-gold-lighter (hover bg) */
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa !important;
+    border-color: darkgray !important;
+    color: #6c757d !important;
+}
+
+/* Existing styles from ManageBillableAssets.cshtml */
+.row-even {
+    background-color: antiquewhite;
+}
+
+.row-odd {
+    background-color: #ffffff;
+}
+
+    .row-even > td, .row-odd > td {
+        background-color: inherit !important;
+    }
+
 
 .bg-Card-Menu {
     /*background-color: #F2CA46;*/

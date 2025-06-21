@@ -31,6 +31,34 @@ textarea:focus,
     border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
 }
 
+/* Table settings */
+table th, table td {
+    vertical-align: middle;
+    padding: 0.5rem 0.5rem;
+}
+
+thead th {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.table th a .bi { /* For sort indicators */
+    font-size: 0.9em;
+    margin-left: 0.25rem;
+}
+
+.form-label { /* This was for modal labels, might not be needed if not used elsewhere */
+    font-weight: 500;
+}
+/* This rule for sort indicators in table headers is good to keep */
+#mainAssetsTable thead th .bi {
+    font-size: 0.9em;
+    margin-left: 0.25rem;
+}
+
+
+
+
 /* Specific styles for Select2 with Bootstrap 4 theme */
 .select2-container--bootstrap4.select2-container--focus .select2-selection {
     box-shadow: none !important;
