@@ -23,13 +23,6 @@
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 }
-.my-card-footer-bible {
-    border-top-left-radius: 0;
-    border-top-right-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    border-color: transparent;
-}
 .my-card-contact-footer-gray-light {
     border-radius: 0;
     background-color: #4a4b4c; /* bg-gray-light */
