@@ -1,8 +1,8 @@
 ﻿@page "{batchId?}"
 @model Members.Areas.Admin.Pages.Accounting.ReviewBatchInvoicesModel
 @{
-    ViewData["Title"] = $"Review Batch Invoices";
-    Layout = "/Views/Shared/_Layout.cshtml"; 
+    ViewData["Title"] = $"Manage Batch Invoices";
+    Layout = "/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container">
@@ -10,62 +10,14 @@
     @if (!string.IsNullOrEmpty(Model.BatchId))
     {
         <!-- Title -->
-        <h1 class="text=gold-darker mb-2 ms-2 mt-4 text-center"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
-
-
-        <!-- Heading: Select Draft Batch -->
-        <div class="card bg-Card-Menu rounded p-1 shadow">
-
-            <h5 class="d-flex align-items-start text-gold-darker mb-2 ms-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
-
-            @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
-            {
-                <form method="get" id="selectBatchForm">
-                    <div class="row gx-0 gy-0 align-items-center mb-3">
-
-                        <div class="col-12 text-start">
-                            <label for="SelectedBatchId" class="form-label visually-hidden text-gold-darker">Select Batch:</label>
-                        </div>
-
-                        <div class="col-12 text-start">
-                            <div class="row gx-0 gy-0 align-items-center">
-                                <div class="col-12">
-                                    <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">
-                                        <option value="">-- Select a Batch to Review --</option>
-                                    </select>
-                                </div>
-                                @* <div class="col-1">
-                                    <button type="submit" class="btn btn-sm"><i class="bi bi-search"></i></button>
-                                </div> *@
-                            </div>
-                        </div>
-
-                        @* <div class="col-2 col-lg-1 pe-2 text-end">
-                            
-                        </div> *@
-
-                    </div>
-                </form>
-            }
-            else if (string.IsNullOrEmpty(Model.BatchId))
-            {
-                <div class="alert alert-info" role="alert">
-                    There are currently no draft batches available for review.
-                </div>
-                <div class="mt-3">
-                    <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>
-                </div>
-                return; 
-            }
-
-        </div>
+        <h1 class="text=gold-darker mb-2 mt-4 text-center"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
 
     }
 
     @if (TempData["StatusMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("", "<br />"))
+            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn sm btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -73,7 +25,7 @@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-            @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("", "<br />"))
+            @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn sm btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -81,7 +33,7 @@
     @if (TempData["WarningMessage"] != null)
     {
         <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
-            @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("", "<br />"))
+            @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -99,43 +51,86 @@
 
     @if (!string.IsNullOrEmpty(Model.BatchDescription))
     {
-        <!-- Cancel or Finalize Buttons -->
-        <div class="mb-4 mt-4">
-            <div class="row gy-2 justify-content-end gx-2">
-                <div class="col-auto">
-                    <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
-                          onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">
-                        <button type="submit" class="btn btn-sm btn-danger">
-                            <i class="bi bi-x-circle"></i> Cancel & Delete Batch
-                        </button>
-                    </form>
-                </div>
-                <div class="col-auto">
-                    <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
-                          onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">
-                        <button type="submit" class="btn btn-sm btn-success">
-                            <i class="bi bi-check-circle"></i> Finalize Batch
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        
 
         <!-- Display Batch Summary -->
         <div class="card bg-Card-Menu mb-4 shadow">
 
             <!-- Card Header Text -->
-            <div class="card-header"> 
+            <div class="card-header">
 
-                <!-- Flex Container for Description and Export Button -->
-                <div class="d-flex justify-content-between align-items-center mb-2 mt-3 flex-wrap">
+                <h5 class="d-flex align-items-start text-gold-darker mb-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
 
-                    <h4 class="text-gold-darker mb-0 mt-2">@Model.BatchDescription</h4>
+                @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
+                {
+                    <form method="get" id="selectBatchForm">
+                        <div class="row mb-3">
 
-                    <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="btn btn-sm btn-success mt-2 shadow">
-                        <i class="bi bi-download"></i> Export to CSV
-                    </a>
+                            <div class="col-12 text-start">
+                                <label for="SelectedBatchId" class="form-label visually-hidden text-gold-darker">Select Batch:</label>
+                            </div>
+
+                            <div class="col-12 px-0">
+                                <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText"))" class="form-select">
+                                    <option value="">-- Select a Batch to Review --</option>
+                                </select>
+                            </div>
+
+                        </div>                        
+                    </form>
+                }
+                else if (string.IsNullOrEmpty(Model.BatchId))
+                {
+                    <div class="alert alert-info" role="alert">
+                        There are currently no draft batches available for review.
+                    </div>
+                    <div class="mt-3">
+                        <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>
+                    </div>
+                    return;
+                }
+
+                <!-- Add, Cancel, or Finalize Buttons -->
+                <div class="mb-4 mt-4">
+                    <div class="row gy-2 justify-content-center gx-2">
+
+                        <!-- Add a New Batch -->
+                        <div class="col-auto">
+                            <a asp-page="./CreateBatchInvoices" class="btn btn-sm btn-success shadow"><i class="bi bi-plus"></i> Create New Batch</a>
+                        </div>
+
+                        <!-- Cancel and Delete Batch -->
+                        <div class="col-auto">
+                            <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
+                                  onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">
+                                <button type="submit" class="btn btn-sm btn-danger shadow">
+                                    <i class="bi bi-x-circle"></i> Cancel & Delete Batch
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Finalize the Batch -->
+                        <div class="col-auto">
+                            <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
+                                  onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">
+                                <button type="submit" class="btn btn-sm btn-success shadow">
+                                    <i class="bi bi-check-circle"></i> Finalize Batch
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Export to CVS -->
+                        <div class="col-auto">
+                            <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="btn btn-sm btn-success shadow">
+                                <i class="bi bi-download"></i> Export to CSV
+                            </a>
+                        </div>
+                    </div>
                 </div>
+
+                
+
+
 
                 <!-- Heading -->
                 <h5 class="d-flex justify-content-between align-items-center text-gold-darker mb-0">
@@ -245,13 +240,13 @@
                         <tbody>
                             @{
                                 int i = 0;
-                            }     
+                            }
                             @foreach (var invoice in Model.DraftInvoices)
                             {
                                 <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
                                     <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.UserFullName)</td>
                                     <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.UserName)</td> @* UserName is Email in this context usually *@  
-                                            <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.Description)</td>
+                                                    <td class="text-nowrap">@Html.DisplayFor(modelItem => invoice.Description)</td>
                                     <td class="text-nowrap text-end">@invoice.AmountDue.ToString("C")</td>
                                     <td class="text-nowrap ps-2">@invoice.InvoiceDate.ToString("yyyy-MM-dd")</td>
                                     <td class="my-2 text-nowrap">@invoice.DueDate.ToString("yyyy-MM-dd")</td>
@@ -274,7 +269,7 @@
                                         }
                                     </td>
                                 </tr>
-                                i++;         
+                                i++;
                             }
                         </tbody>
                     </table>
@@ -287,7 +282,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" /> @* If you have any input fields that need validation later, otherwise optional *@  
-        <script>
+            <script>
 
         document.addEventListener('DOMContentLoaded', function () {
             const selectBatchDropdown = document.getElementById('SelectedBatchId');

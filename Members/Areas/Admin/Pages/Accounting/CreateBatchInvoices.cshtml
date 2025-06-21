@@ -1,26 +1,30 @@
 ﻿@page
 @model Members.Areas.Admin.Pages.Accounting.CreateBatchInvoicesModel
 @{
-    ViewData["Title"] = "Create Batch Assessment Invoices";
+    ViewData["Title"] = "Create Draft Batch Invoices";
     Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout
 }
 
 <div class="container my-4">
+
+    <!-- Title -->
+    <div class="mb-3 text-center">
+        <h3 class="text-gold-darker mb-0"><i class="bi bi-plus"></i> @ViewData["Title"]</h3>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7">
-            <div class="card shadow bg-Card-Menu">
-                <div class="card-header bg-gold-light text-dark">
-                    <h4 class="mb-0 text-gold-darker">@ViewData["Title"]</h4>
-                </div>
+            <div class="card bg-Card-Menu shadow">
+                
                 <div class="card-body">
-                    <p class="card-text mb-2 text-gold-darker">
+                    <p class="card-text text-gold-darker mb-2">
                         Use this form to generate a batch of draft assessment invoices (e.g., for monthly assessments)
                         for all <strong>billable assets</strong> that have an assigned billing contact. 
                         One invoice will be created per asset.
                     </p>
                     @if (Model.ActionableBillableAssetsCount > 0)
                     {
-                        <p class="bg-gold-lighter text-gold-darker rounded p-2 mb-2">
+                        <p class="bg-gold-lighter text-gold-darker mb-2 rounded p-2">
                             Currently, there are <strong>@Model.ActionableBillableAssetsCount</strong> billable asset(s) with assigned contacts that will be processed. The specific 'Assessment Fee' set for each individual asset will be used to determine the amount for each invoice.
                         </p>
                     }
@@ -33,7 +37,7 @@
                     }
                     <p class="card-text text-gold-darker">
                         These invoices will be created with a 'Draft' status and can be reviewed and finalized 
-                        via the 'Review Batch Invoices' page before they become active.
+                        via the 'Manage Batch Invoices' page before they become active.
                     </p>
                     <hr />
 
@@ -57,30 +61,35 @@
 
                         <div class="mb-3">
                             <label asp-for="Input.Description" class="form-label text-gold-darker"></label>
-                            <input asp-for="Input.Description" class="shadow form-control text-gold-darker" />
+                            <input asp-for="Input.Description" class="form-control text-gold-darker shadow" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>
-
-                        @* AmountDue input field removed *@
 
                         <div class="row mb-3">
                             <div class="col-sm-6">
                                 <label asp-for="Input.InvoiceDate" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.InvoiceDate" class="shadow form-control text-gold-darker" type="date" />
+                                <input asp-for="Input.InvoiceDate" class="form-control text-gold-darker shadow" type="date" />
                                 <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
                                 <label asp-for="Input.DueDate" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.DueDate" class="shadow form-control text-gold-darker" type="date" />
+                                <input asp-for="Input.DueDate" class="form-control text-gold-darker shadow" type="date" />
                                 <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="shadow btn btn-sm btn-success">
+                        <!-- Create a Batch Invoice Btton -->
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-sm btn-success shadow">
                                 <i class="bi bi-files"></i> Create a Draft Invoice Batch
                             </button>
                         </div>
+                        
+                        <!-- Back to Manage Batch Invoices Button -->
+                        <div class="mt-4 text-center">
+                            <a class="btn btn-sm btn-back shadow" href=".\reviewbatchinvoices"><i class="bi bi-arrow-left"></i> Back to Review batch Invoices</a>
+                        </div>
+
                     </form>
                 </div>
             </div>

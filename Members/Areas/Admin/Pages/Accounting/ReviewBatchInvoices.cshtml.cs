@@ -65,7 +65,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 .Select(g => new
                 { // Anonymous type for intermediate projection
                     BatchId = g.Key!,
-                    FirstInvoiceDescription = g.OrderBy(inv => inv.InvoiceID).FirstOrDefault()!.Description,
+                    //FirstInvoiceDescription = g.OrderBy(inv => inv.InvoiceID).FirstOrDefault()!.Description,
                     BatchCreateDate = g.Min(inv => inv.DateCreated),
                     InvoiceCount = g.Count()
                 })
@@ -74,7 +74,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             AvailableDraftBatches = [.. draftBatchSummaries.Select(s => new BatchSelectItem
             {
                 BatchId = s.BatchId,
-                DisplayText = $"Batch {s.BatchId[^(Math.Min(4, s.BatchId.Length))..]} ({s.BatchCreateDate:yyyy-MM-dd HH:mm}) - {s.FirstInvoiceDescription} ({s.InvoiceCount} invoices)"
+                DisplayText = $"Batch {s.BatchId[^(Math.Min(4, s.BatchId.Length))..]} ({s.BatchCreateDate:yyyy-MM-dd HH:mm}) ({s.InvoiceCount} invoices)"
             })];
             _logger.LogInformation("Found {AvailableDraftBatches.Count} distinct draft batches for dropdown.", AvailableDraftBatches.Count);
             string? currentBatchIdToLoad = null;
@@ -254,7 +254,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (string.IsNullOrEmpty(BatchId))
             {
                 TempData["ErrorMessage"] = "Batch ID is missing. Cannot cancel.";
-                return RedirectToPage("./CreateBatchInvoices");
+                return RedirectToPage("./ReviewBatchInvoices");
             }
             var draftInvoicesInBatch = await _context.Invoices
                 .Where(i => i.BatchID == BatchId && i.Status == InvoiceStatus.Draft)
@@ -262,7 +262,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (draftInvoicesInBatch.Count == 0)
             {
                 TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{BatchId}' to cancel.";
-                return RedirectToPage("./CreateBatchInvoices");
+                return RedirectToPage("./ReviewBatchInvoices");
             }
             _context.Invoices.RemoveRange(draftInvoicesInBatch);
             try
@@ -276,7 +276,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogError(ex, "Error cancelling batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error cancelling batch '{BatchId}'. See logs.";
             }
-            return RedirectToPage("./CreateBatchInvoices");
+            return RedirectToPage("./ReviewBatchInvoices");
         }
 
         public async Task<IActionResult> OnPostFinalizeBatchAsync()
@@ -285,7 +285,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (string.IsNullOrEmpty(BatchId))
             {
                 TempData["ErrorMessage"] = "Batch ID is missing. Cannot finalize.";
-                return RedirectToPage("./CreateBatchInvoices");
+                return RedirectToPage("./ReviewBatchInvoices");
             }
             var draftInvoicesInBatch = await _context.Invoices
                 .Where(i => i.BatchID == BatchId && i.Status == InvoiceStatus.Draft)
@@ -293,7 +293,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             if (draftInvoicesInBatch.Count == 0)
             {
                 TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{BatchId}' to finalize.";
-                return RedirectToPage("./CreateBatchInvoices");
+                return RedirectToPage("./ReviewBatchInvoices");
             }
             int finalizedCount = 0;
             foreach (var invoice in draftInvoicesInBatch)
