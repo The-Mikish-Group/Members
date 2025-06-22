@@ -1,13 +1,13 @@
 ﻿@page
 @model Members.Areas.Admin.Pages.Accounting.AdminBalancesModel
 @{
-    ViewData["Title"] = "Member Balances";
+    ViewData["Title"] = "Current Member Balances";
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
 
-    <h2 class="text-gold-darker mb-4 text-center"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
+    <h2 class="text-gold-darker mb-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
 
     @if (TempData["StatusMessage"] != null)
     {

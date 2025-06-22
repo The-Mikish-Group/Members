@@ -66,6 +66,8 @@
         <table class="w-100 mb-0" id="mainAssetsTable">
             <thead>
                 <tr class="bg-gold-dark text-white">
+
+                    <!-- Contact -->
                     <th>
                         <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="contact" data-sort-value="contact">Assigned Billing Contact</a>
                         @if (Model.CurrentSort == "contact_asc")
@@ -78,8 +80,10 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+
+                    <!-- Plot ID-->
                     <th class="py-2 ps-2">
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="plotid" data-sort-value="plotid">Plot ID / Asset Identifier</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="plotid" data-sort-value="Asset Identifier">Asset Identifier</a>
                         @if (Model.CurrentSort == "plotid_asc")
                         {
                             <i class="bi bi-arrow-down ms-1 text-white"></i>
@@ -90,6 +94,8 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+
+                    <!-- Assessment Fee -->
                     <th class="text-nowrap text-end">
                         <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
                         @if (Model.CurrentSort == "fee_asc")
@@ -102,6 +108,8 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+                    
+                    <!-- Description -->
                     <th>
                         <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
                         @if (Model.CurrentSort == "desc_asc")
@@ -114,6 +122,8 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+
+                    <!-- Created -->
                     <th>
                         <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
                         @if (Model.CurrentSort == "created_asc")
@@ -126,6 +136,8 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+
+                    <!-- Last Updated -->
                     <th>
                         <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
                         @if (Model.CurrentSort == "updated_asc")
@@ -138,8 +150,13 @@
                             <i class="bi bi-arrow-up ms-1 text-white"></i>
                         }
                     </th>
+
+                    <!-- Edit -->
                     <th class="text-nowrap py-2 pe-2 text-center">Edit</th>
+                    
+                    <!-- Delete -->
                     <th class="text-nowrap py-2 pe-2 text-center">Delete</th>
+
                 </tr>
             </thead>
             <tbody id="assetsTableBodyPlaceholder">
@@ -149,18 +166,35 @@
                 @foreach (var asset in Model.Assets)
                 {
                     <tr class="@(i % 2 == 0 ? "row-even" : "row-odd")">
+
+                        <!-- Contact -->
                         <td class="text-nowrap">@(asset.BillingContactFullName)@(!string.IsNullOrEmpty(asset.BillingContactEmail) ? $" ({asset.BillingContactEmail})" : "")</td>
+                        
+                        <!-- Plot ID -->
                         <td class="text-nowrap py-2 ps-2">@asset.PlotID</td>
+
+                        <!-- Assessment Fee -->
                         <td class="text-nowrap text-end">@asset.AssessmentFee.ToString("C")</td>
+                        
+                        <!-- Description -->
                         <td class="text-nowrap">@asset.Description</td>
+
+                        <!-- Created -->
                         <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
+
+                        <!-- Last Updated -->
                         <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
+
+                        <!-- Edit Asset -->
                         <td class="text-nowrap py-2 pe-2 text-center">
                             <button type="button" class="btn btn-sm btn-rename edit-asset-button me-1" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i></button>
                         </td>
+
+                        <!-- Delete Asset -->
                         <td class="text-nowrap py-2 pe-2 text-center">
                             <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i></button></form>
                         </td>
+
                     </tr>
                     i++;
                 }

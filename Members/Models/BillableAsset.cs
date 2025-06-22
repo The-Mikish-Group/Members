@@ -12,12 +12,12 @@ namespace Members.Models
 
         [Required]
         [StringLength(100)]
-        [Display(Name = "Plot ID / Asset Identifier")]
+        [Display(Name = "Asset Identifier")]
         public string PlotID { get; set; } = string.Empty;
 
         // Foreign Key to IdentityUser (represents the Billing Contact)
         // Nullable, as an asset might be unassigned or assignment might be pending
-        public string? UserID { get; set; } 
+        public string? UserID { get; set; }
 
         [ForeignKey("UserID")]
         public virtual IdentityUser? User { get; set; }
@@ -32,7 +32,7 @@ namespace Members.Models
 
         // Optional: A description for the asset itself
         [StringLength(250)]
-        public string? Description { get; set; } 
+        public string? Description { get; set; }
 
         // New Property for Assessment Fee
         [Required(ErrorMessage = "Assessment Fee is required.")]

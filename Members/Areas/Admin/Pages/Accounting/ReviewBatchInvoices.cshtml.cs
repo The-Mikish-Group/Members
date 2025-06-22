@@ -51,44 +51,67 @@ namespace Members.Areas.Admin.Pages.Accounting
 
         public async Task<IActionResult> OnGetAsync(string? batchId) // batchId comes from route/query or dropdown selection
         {
-            _logger.LogInformation("ReviewBatchInvoices.OnGetAsync called. Initial batchId from route/query: {BatchIdParm}", batchId); // Changed param name for clarity
+            _logger.LogInformation("ReviewBatchInvoices.OnGetAsync called. Received batchId parameter from route/query: '{BatchIdParam}'", batchId);
+
             if (!string.IsNullOrEmpty(ReturnedFromUserId))
             {
                 _logger.LogInformation("ReviewBatchInvoices.OnGetAsync: ReturnedFromUserId = {ReturnedUserId}", ReturnedFromUserId);
-                // Placeholder for potential future use (e.g., highlighting)
-                // TempData["HighlightUserId"] = ReturnedFromUserId;
             }
-            // Populate the dropdown of all available draft batches
+
+            // 1. Populate AvailableDraftBatches first. This list is needed to validate the batchId parameter.
             var draftBatchSummaries = await _context.Invoices
-                .Where(i => i.Status == InvoiceStatus.Draft && i.BatchID != null)
+                .Where(i => i.Status == InvoiceStatus.Draft && i.BatchID != null && i.BatchID != "") // Ensure BatchID is not null or empty
                 .GroupBy(i => i.BatchID)
                 .Select(g => new
-                { // Anonymous type for intermediate projection
+                {
                     BatchId = g.Key!,
-                    //FirstInvoiceDescription = g.OrderBy(inv => inv.InvoiceID).FirstOrDefault()!.Description,
                     BatchCreateDate = g.Min(inv => inv.DateCreated),
                     InvoiceCount = g.Count()
                 })
                 .OrderByDescending(b => b.BatchCreateDate)
                 .ToListAsync();
+
             AvailableDraftBatches = [.. draftBatchSummaries.Select(s => new BatchSelectItem
             {
                 BatchId = s.BatchId,
                 DisplayText = $"Batch {s.BatchId[^(Math.Min(4, s.BatchId.Length))..]} ({s.BatchCreateDate:yyyy-MM-dd HH:mm}) ({s.InvoiceCount} invoices)"
-            })];
-            _logger.LogInformation("Found {AvailableDraftBatches.Count} distinct draft batches for dropdown.", AvailableDraftBatches.Count);
-            string? currentBatchIdToLoad = null;
-            if (!string.IsNullOrEmpty(batchId) && AvailableDraftBatches.Any(b => b.BatchId == batchId))
+            })]; // Using ToList() for clarity, though .. is fine.
+            _logger.LogInformation("Populated AvailableDraftBatches. Count: {AvailableDraftBatchesCount}. Batch IDs: [{AvailableBatchIds}]",
+                AvailableDraftBatches.Count, string.Join(", ", AvailableDraftBatches.Select(b => b.BatchId)));
+
+            // 2. Determine the effective BatchId for this request.
+            //    Priority: batchId parameter from query string, if valid. Otherwise, default.
+            string? effectiveBatchIdToLoad = null;
+            bool isQueryBatchIdValid = !string.IsNullOrEmpty(batchId) && AvailableDraftBatches.Any(b => b.BatchId == batchId);
+
+            if (isQueryBatchIdValid)
             {
-                currentBatchIdToLoad = batchId;
-                _logger.LogInformation("Using provided batchId: {currentBatchIdToLoad}", currentBatchIdToLoad);
+                effectiveBatchIdToLoad = batchId;
+                _logger.LogInformation("Valid batchId ('{EffectiveBatchIdToLoad}') provided via query parameter. This will be used.", effectiveBatchIdToLoad);
             }
-            else if (AvailableDraftBatches.Count != 0)
+            else
             {
-                currentBatchIdToLoad = AvailableDraftBatches.First().BatchId;
-                _logger.LogInformation("No valid batchId provided or found, defaulting to most recent: {currentBatchIdToLoad}", currentBatchIdToLoad);
+                if (!string.IsNullOrEmpty(batchId))
+                {
+                    _logger.LogWarning("batchId ('{BatchIdParam}') was provided via query, but it's not found in AvailableDraftBatches or is invalid. Will attempt to default.", batchId);
+                }
+
+                if (AvailableDraftBatches.Count != 0)
+                {
+                    effectiveBatchIdToLoad = AvailableDraftBatches.First().BatchId;
+                    _logger.LogInformation("Defaulting to the most recent available batchId: '{EffectiveBatchIdToLoad}'.", effectiveBatchIdToLoad);
+                }
+                else
+                {
+                    _logger.LogInformation("No batchId provided via query and no available draft batches found. Effective batchId will be null.");
+                }
             }
-            this.BatchId = currentBatchIdToLoad;
+
+            // 3. Set the PageModel's BatchId property. This property is used by asp-for and for loading data.
+            this.BatchId = effectiveBatchIdToLoad;
+            _logger.LogInformation("Final this.BatchId (PageModel property) set to: '{PageModelBatchId}'", this.BatchId);
+
+            // 4. Load data based on this.BatchId
             DraftInvoices = [];
             if (string.IsNullOrEmpty(this.BatchId))
             {
@@ -178,6 +201,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _ => [.. DraftInvoices.OrderBy(i => i.UserFullName ?? string.Empty)],
             };
             _logger.LogInformation("DraftInvoices sorted by {ActiveSort}. Final Count: {Count}", activeSort, DraftInvoices.Count);
+
+            // Final pre-render logging
+            _logger.LogInformation("Exiting OnGetAsync. Final PageModel.BatchId: '{PageModelBatchId}'. AvailableBatchIds for dropdown: [{AvailableBatchIds}]",
+                this.BatchId, string.Join(", ", AvailableDraftBatches.Select(b => b.BatchId)));
+
             return Page();
         }
 
@@ -276,7 +304,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogError(ex, "Error cancelling batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error cancelling batch '{BatchId}'. See logs.";
             }
-            return RedirectToPage("./ReviewBatchInvoices");
+            return RedirectToPage("./CreateBatchInvoices");
         }
 
         public async Task<IActionResult> OnPostFinalizeBatchAsync()

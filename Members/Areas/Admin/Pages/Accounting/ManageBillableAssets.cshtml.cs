@@ -13,6 +13,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text; // Added for StringBuilder
 using System.Threading.Tasks;
+
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")]
@@ -22,44 +23,58 @@ namespace Members.Areas.Admin.Pages.Accounting
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<ManageBillableAssetsModel> _logger = logger;
         public List<BillableAssetViewModel> Assets { get; set; } = [];
+
         [BindProperty]
         public AddBillableAssetInputModel NewAssetInput { get; set; } = new AddBillableAssetInputModel();
+
         [BindProperty]
         public EditAssetInputModel? EditInput { get; set; }
+
         public SelectList? BillingContactUsersSL { get; set; }
+
         // Search Property
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
+
         // Pagination Properties
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;
+
         [BindProperty(SupportsGet = true)]
         public int PageSize { get; set; } = 20; // Default page size to 20
+
         public int TotalAssets { get; set; }
         public int TotalPages { get; set; }
+
         // Properties for Sort State
         [BindProperty(SupportsGet = true)]
         public string? CurrentSort { get; set; }
+
         // Individual XyzSort properties removed
         public class EditAssetInputModel
         {
             [Required]
             public int BillableAssetID { get; set; }
+
             [Required(ErrorMessage = "Asset Identifier is required.")]
             [StringLength(100)]
             [Display(Name = "Asset Identifier")]
             public string PlotID { get; set; } = string.Empty;
+
             [Display(Name = "Assign to Billing Contact")]
             public string? SelectedUserID { get; set; }
+
             [StringLength(250)]
             [Display(Name = "Optional Description")]
             public string? Description { get; set; }
+
             // [Required(ErrorMessage = "Assessment Fee is required.")] // Commented out
             [DataType(DataType.Currency)]
             [Range(0.00, 1000000.00, ErrorMessage = "Assessment Fee must be a non-negative value (0.00 is allowed).")]
             [Display(Name = "Assessment Fee")]
             public decimal AssessmentFee { get; set; }
         }
+
         public class BillableAssetViewModel
         {
             public int BillableAssetID { get; set; }
@@ -70,26 +85,30 @@ namespace Members.Areas.Admin.Pages.Accounting
             public DateTime DateCreated { get; set; }
             public DateTime LastUpdated { get; set; }
             public string? Description { get; set; }
+
             [DataType(DataType.Currency)]
             public decimal AssessmentFee { get; set; }
         }
+
         public class AddBillableAssetInputModel
-        {           
+        {
             [StringLength(100)]
             [Display(Name = "Asset Identifier")]
             public string PlotID { get; set; } = string.Empty;
-            
+
             [Display(Name = "Assign to Billing Contact")]
             public string SelectedUserID { get; set; } = string.Empty;
+
             [StringLength(250)]
             [Display(Name = "Optional Description")]
             public string? Description { get; set; }
-            
+
             [DataType(DataType.Currency)]
             [Range(0.00, 1000000.00, ErrorMessage = "Assessment Fee must be a non-negative value (0.00 is allowed).")]
             [Display(Name = "Assessment Fee")]
             public decimal AssessmentFee { get; set; }
         }
+
         private async Task PopulateBillingContactUsersSL()
         {
             var billingContactProfiles = await _context.UserProfile
@@ -109,6 +128,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }).ToList();
             BillingContactUsersSL = new SelectList(selectListItems, "Value", "Text");
         }
+
         private async Task LoadAssetsDataAsync()
         {
             _logger.LogInformation("LoadAssetsDataAsync called. SearchTerm: {SearchTerm}, PageNumber: {PageNumber}, PageSize: {PageSize}, CurrentSort: {CurrentSort}", SearchTerm, PageNumber, PageSize, CurrentSort);
@@ -116,7 +136,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             IQueryable<BillableAsset> baseAssetQuery = _context.BillableAssets;
             // Join with IdentityUser (for ba.User)
             var queryWithUser = baseAssetQuery
-                .Select(ba => new {
+                .Select(ba => new
+                {
                     BillableAsset = ba,
                     ba.User // This is the IdentityUser linked to BillableAsset
                 });
@@ -126,7 +147,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                     _context.UserProfile, // Changed to singular UserProfile
                     outer => outer.User != null ? outer.User.Id : null,
                     userProfile => userProfile.UserId,
-                    (outer, profiles) => new {
+                    (outer, profiles) => new
+                    {
                         outer.BillableAsset,
                         outer.User, // IdentityUser
                         UserProfile = profiles.FirstOrDefault() // UserProfile or null
@@ -213,6 +235,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             _logger.LogInformation("Populated BillableAssetViewModel with {AssetCount} assets.", Assets.Count);
         }
+
         public async Task OnGetAsync()
         {
             _logger.LogInformation("ManageBillableAssets OnGetAsync called.");
@@ -223,6 +246,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             await PopulateBillingContactUsersSL();
             _logger.LogInformation("Finished OnGetAsync. Loaded {AssetCount} billable assets for display. TotalAssets: {TotalOverallAssets}, TotalPages: {TotalPageCount}", Assets.Count, TotalAssets, TotalPages);
         }
+
         public async Task<IActionResult> OnPostAddAssetAsync()
         {
             ModelState.Remove("PlotID");
@@ -255,7 +279,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 if (string.IsNullOrWhiteSpace(NewAssetInput.PlotID))
                 {
-                    ModelState.AddModelError("NewAssetInput.PlotID", "Plot ID / Asset Identifier is required.");
+                    ModelState.AddModelError("NewAssetInput.PlotID", "Asset Identifier is required.");
                 }
                 if (string.IsNullOrWhiteSpace(NewAssetInput.SelectedUserID))
                 {
@@ -311,8 +335,8 @@ namespace Members.Areas.Admin.Pages.Accounting
             // Check for duplicate PlotID
             if (await _context.BillableAssets.AnyAsync(ba => ba.PlotID == trimmedPlotId))
             {
-                ModelState.AddModelError("NewAssetInput.PlotID", "This Plot ID / Asset Identifier already exists.");
-                _logger.LogWarning("Add new asset failed: Duplicate PlotID {PlotID}.", trimmedPlotId);
+                ModelState.AddModelError("NewAssetInput.PlotID", "This Asset Identifier already exists.");
+                _logger.LogWarning("Add new asset failed: Duplicate Asset Identifier {PlotID}.", trimmedPlotId);
                 await PopulateBillingContactUsersSL();
                 await OnGetAsync();
                 NewAssetInput.PlotID = trimmedPlotId;
@@ -341,7 +365,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // Check for unique constraint violation specifically if possible, though general message is okay too
                 if (ex.InnerException?.Message.Contains("Cannot insert duplicate key row") == true && ex.InnerException.Message.Contains("IX_BillableAssets_PlotID"))
                 {
-                    ModelState.AddModelError("NewAssetInput.PlotID", "This Plot ID / Asset Identifier already exists. It might have been added by someone else concurrently.");
+                    ModelState.AddModelError("NewAssetInput.PlotID", "This Asset Identifier already exists. It might have been added by someone else concurrently.");
                     TempData["ErrorMessage"] = "Error: This Plot ID already exists.";
                 }
                 else
@@ -353,6 +377,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             return RedirectToPage();
         }
+
         public async Task<IActionResult> OnGetShowEditFormAsync(int assetId)
         {
             _logger.LogInformation("OnGetShowEditFormAsync called for assetId: {AssetId} to fetch data for modal", assetId);
@@ -373,6 +398,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             _logger.LogInformation("Returning Json data for AssetID {AssetId} (PlotID: {PlotID_Bound})", assetId, editInputData.PlotID);
             return new JsonResult(editInputData);
         }
+
         public async Task<IActionResult> OnPostUpdateAssetAsync()
         {
             ModelState.Remove("PlotID");
@@ -478,19 +504,20 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 _logger.LogError(ex, "Concurrency error updating billable asset {PlotID} (ID: {AssetID}). It may have been modified or deleted by another user.", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating asset due to a concurrency conflict. Please refresh and try again.";
-                
+
                 return RedirectToPage();
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Database error updating billable asset {PlotID} (ID: {AssetID})", assetToUpdate.PlotID, assetToUpdate.BillableAssetID);
                 TempData["ErrorMessage"] = "Error updating billable asset. Check logs for details.";
-                
+
                 await OnGetAsync();
                 return Page();
             }
             return RedirectToPage();
         }
+
         public async Task<IActionResult> OnPostDeleteAssetAsync(int assetId)
         {
             _logger.LogInformation("OnPostDeleteAssetAsync called for assetId: {AssetId}", assetId);
@@ -516,11 +543,12 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Error deleting billable asset {PlotID} (ID: {AssetID}). It might be in use or a database error occurred.", assetToDelete.PlotID, assetToDelete.BillableAssetID);                
+                _logger.LogError(ex, "Error deleting billable asset {PlotID} (ID: {AssetID}). It might be in use or a database error occurred.", assetToDelete.PlotID, assetToDelete.BillableAssetID);
                 TempData["ErrorMessage"] = $"Error deleting Billable Asset '{assetToDelete.PlotID}'. It might be referenced by other records, or a database error occurred. Check logs.";
             }
             return RedirectToPage();
         }
+
         public async Task<PartialViewResult> OnGetPartialTableAsync(string? searchTerm, int pageNumber, int pageSize, string? currentSort)
         {
             // Set model properties from parameters
@@ -547,7 +575,8 @@ namespace Members.Areas.Admin.Pages.Accounting
 
             // Fetch all BillableAssets with related User and UserProfile data
             var allAssetsQuery = _context.BillableAssets
-                .Select(ba => new {
+                .Select(ba => new
+                {
                     BillableAsset = ba,
                     ba.User // IdentityUser linked to BillableAsset
                 })
@@ -555,7 +584,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                     _context.UserProfile,
                     outer => outer.User != null ? outer.User.Id : null,
                     userProfile => userProfile.UserId,
-                    (outer, profiles) => new {
+                    (outer, profiles) => new
+                    {
                         outer.BillableAsset,
                         outer.User, // IdentityUser
                         UserProfile = profiles.FirstOrDefault() // UserProfile or null

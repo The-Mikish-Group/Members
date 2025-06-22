@@ -403,8 +403,8 @@
         }
 
         function handleVoidPayment(paymentIdString, paymentDescription) {
-            alert("DEBUG: handleVoidPayment called for payment ID: " + paymentIdString);
-            alert("handleVoidPayment called. ID: " + paymentIdString);
+            // alert("DEBUG: handleVoidPayment called for payment ID: " + paymentIdString);
+            // alert("handleVoidPayment called. ID: " + paymentIdString);
             const confirmationMessage = 'Are you sure you want to void payment ID: ' + paymentIdString + ' (' + paymentDescription + ')?';
             if (confirm(confirmationMessage)) {
                 const reason = prompt("Please enter the reason for voiding this payment:");

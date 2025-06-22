@@ -86,7 +86,7 @@
                         </a>
 
                         <!-- Manage Dropdown Menu -->
-                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 200px;" aria-labelledby="adminDropdown">
+                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminDropdown">
 
                             <!-- Manage Members Dropdown -->
                             <li class="nav-item dropdown">
@@ -97,7 +97,7 @@
                                 </a>
 
                                 <!-- Manage Members Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 200px;" aria-labelledby="adminEditMembersDropdown" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminEditMembersDropdown" data-bs-auto-close="outside">
                                     <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Users" title="Manage Members"><i class="bi bi-person-gear"></i> Manage Members</a></li>
                                     <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/ResendEmailConfirmation"><i class="bi bi-envelope-check"></i> Re-Confirm Email</a></li>
                                     <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AddUser" title="Add Member"><i class="bi bi-plus-circle"></i> Add Member</a></li>
@@ -113,7 +113,7 @@
                                 </a>
 
                                 <!-- Manage PDF Folders Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 200px;" aria-labelledby="adminPdfFoldersDropdown" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminPdfFoldersDropdown" data-bs-auto-close="outside">
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategories" title="Manage PDF Categories"><i class="bi bi-file-earmark-pdf-fill text-gold-darker me-0"></i> Manage Categories</a></li>
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" title="Manage PDF Category Files"><i class="bi bi-list-ul text-gold-darker me-0"></i> Manage Documents</a></li>
                                     <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfGeneration" asp-action="CreatePdf" title="New Directory PDF"><i class="bi bi-file-earmark-plus text-gold-darker me-0"></i> New Directory PDF</a></li>
@@ -138,10 +138,10 @@
                                 </a>
 
                                 <!-- Manage Accounting Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 200px;" aria-labelledby="adminAccountingDropdown" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Billing Balances"><i class="bi bi-plus-circle"></i> Current Balances</a></li>
-                                    @* <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/CreateBatchInvoices" title="Batch Invoices"><i class="bi bi-plus-circle"></i> Create a Batch</a></li> *@
-                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ReviewBatchInvoices" title="Manage Batch Invoices"><i class="bi bi-list-check"></i> Manage Batches</a></li>
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminAccountingDropdown" data-bs-auto-close="outside">
+                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Billing Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
+                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/CreateBatchInvoices" title="Batch Invoices"><i class="bi bi-plus-circle"></i> Create a New Batch</a></li>
+                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ReviewBatchInvoices" title="Manage Batch Invoices"><i class="bi bi-list-check"></i> Manage Draft Batches</a></li>
                                     <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ManageBillableAssets" title="Manage Billable Assets"><i class="bi bi-list-check"></i> Billable Assets</a></li>
                                 </ul>
 
