@@ -116,7 +116,7 @@
 
                         <!-- Export to CVS -->
                         <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-success shadow"
+                            <button type="button" class="btn btn-sm btn-success shadow" id="exportReviewBatchInvoicesTriggerButton"
                                     data-bs-toggle="modal" data-bs-target="#exportReviewBatchInvoicesConfirmModal">
                                 <i class="bi bi-download"></i> Export to CSV
                             </button>
@@ -311,7 +311,10 @@
 
             // --- Export CSV Modal Logic for ReviewBatchInvoices ---
             const confirmReviewBatchExportButton = document.getElementById('confirmReviewBatchInvoicesExportButton');
-            if (confirmReviewBatchExportButton) {
+            const exportReviewBatchInvoicesModalElement = document.getElementById('exportReviewBatchInvoicesConfirmModal');
+            const exportReviewBatchInvoicesTriggerButton = document.getElementById('exportReviewBatchInvoicesTriggerButton');
+
+            if (confirmReviewBatchExportButton && exportReviewBatchInvoicesModalElement && exportReviewBatchInvoicesTriggerButton) {
                 confirmReviewBatchExportButton.addEventListener('click', function () {
                     const batchId = '@Model.BatchId';
 
@@ -319,19 +322,32 @@
                         const exportUrl = `@Url.Page("./ReviewBatchInvoices", "ExportCsv")&batchId=${encodeURIComponent(batchId)}`;
                         window.location.href = exportUrl;
 
-                        var modalElement = document.getElementById('exportReviewBatchInvoicesConfirmModal');
-                        if (modalElement) {
-                            var modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            if (modalInstance) {
-                                modalInstance.hide();
-                            }
+                        var modalInstance = bootstrap.Modal.getInstance(exportReviewBatchInvoicesModalElement);
+                        if (modalInstance) {
+                            modalInstance.hide();
                         }
+                        // Focus and inert handled by modal events
                     } else {
-                        // This case should ideally not be hit if the button is only shown when a batch is loaded.
-                        // However, as a fallback:
                         console.error("ReviewBatchInvoices.cshtml: BatchId is not available for export on button click.");
                         alert("Cannot export: Batch ID is missing. Please ensure a batch is selected.");
+                        // If error, modal might still be open or closing, ensure inert is handled if hide is called
+                        // and focus is managed by hidden.bs.modal.
                     }
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('show.bs.modal', function () {
+                    exportReviewBatchInvoicesModalElement.inert = false;
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('hide.bs.modal', function () {
+                    exportReviewBatchInvoicesModalElement.inert = true;
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (exportReviewBatchInvoicesTriggerButton && typeof exportReviewBatchInvoicesTriggerButton.focus === 'function') {
+                        exportReviewBatchInvoicesTriggerButton.focus();
+                    }
+                    exportReviewBatchInvoicesModalElement.inert = false;
                 });
             }
             // --- End Export CSV Modal Logic ---

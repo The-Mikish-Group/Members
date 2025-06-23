@@ -71,7 +71,7 @@
                     @if (Model.MemberBalances.Any())
                     {
                         <div style="display: inline-block;">
-                            <button type="button" class="btn btn-sm btn-primary"
+                            <button type="button" class="btn btn-sm btn-primary" id="exportAdminBalancesTriggerButton"
                                     data-bs-toggle="modal" data-bs-target="#exportAdminBalancesConfirmModal">
                                 <i class="bi bi-download me-2"></i>Export to CSV
                             </button>
@@ -252,46 +252,46 @@
 
 @section Scripts {
     <script>
-        // Ensure ALL OTHER SCRIPT in this @section Scripts is temporarily removed or commented out for this specific test.
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('AdminBalances Script: DOMContentLoaded has fired.'); // LOG A
+            const confirmAdminBalancesExportButton = document.getElementById('confirmAdminBalancesExportButton');
+            const exportAdminBalancesModalElement = document.getElementById('exportAdminBalancesConfirmModal');
+            const exportAdminBalancesTriggerButton = document.getElementById('exportAdminBalancesTriggerButton');
 
-            const confirmButton = document.getElementById('confirmAdminBalancesExportButton');
+            if (confirmAdminBalancesExportButton && exportAdminBalancesModalElement && exportAdminBalancesTriggerButton) {
+                confirmAdminBalancesExportButton.addEventListener('click', function () {
+                    const showOutstanding = '@Model.ShowOnlyOutstanding.ToString()';
+                    const sortOrder = '@Model.CurrentSort';
 
-            if (confirmButton) {
-                console.log('AdminBalances Script: Found confirmAdminBalancesExportButton.'); // LOG B
-                confirmButton.addEventListener('click', function () {
-                    console.log('AdminBalances Script: confirmAdminBalancesExportButton CLICKED.'); // LOG C
-                    alert('AdminBalances: Export confirm button clicked! Check console for URL next.');
-
-                    try {
-                        const showOutstanding = '@Model.ShowOnlyOutstanding.ToString()';
-                        const sortOrder = '@Model.CurrentSort';
-                        let exportUrl = `@Url.Page("./AdminBalances", "ExportCsv")`;
-                        const separator = exportUrl.includes('?') ? '&' : '?';
-                        exportUrl += `${separator}showOnlyOutstanding=${encodeURIComponent(showOutstanding)}`;
-                        if (sortOrder) {
-                            exportUrl += `&sortOrder=${encodeURIComponent(sortOrder)}`;
-                        }
-                        console.log("AdminBalances Export URL to be used:", exportUrl); // LOG D
-                        // window.location.href = exportUrl; // Temporarily disable navigation
-                        alert('AdminBalances: URL constructed: ' + exportUrl + '. Navigation is currently disabled for this test.');
-
-                        var modalElement = document.getElementById('exportAdminBalancesConfirmModal');
-                        if (modalElement) {
-                            var modalInstance = bootstrap.Modal.getInstance(modalElement);
-                            if (modalInstance) {
-                                modalInstance.hide();
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error in AdminBalances export click handler:', e);
-                        alert('Error in AdminBalances click handler: ' + e.message);
+                    let exportUrl = `@Url.Page("./AdminBalances", "ExportCsv")`;
+                    const separator = exportUrl.includes('?') ? '&' : '?';
+                    exportUrl += `${separator}showOnlyOutstanding=${encodeURIComponent(showOutstanding)}`;
+                    if (sortOrder) {
+                        exportUrl += `&sortOrder=${encodeURIComponent(sortOrder)}`;
                     }
+
+                    window.location.href = exportUrl;
+
+                    var modalInstance = bootstrap.Modal.getInstance(exportAdminBalancesModalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    // Focus and inert handled by modal events
                 });
-            } else {
-                console.error('AdminBalances Script: confirmAdminBalancesExportButton NOT found.'); // LOG E
-                alert('AdminBalances: confirmAdminBalancesExportButton was NOT found by the script.');
+
+                exportAdminBalancesModalElement.addEventListener('show.bs.modal', function () {
+                    exportAdminBalancesModalElement.inert = false;
+                });
+
+                exportAdminBalancesModalElement.addEventListener('hide.bs.modal', function () {
+                    exportAdminBalancesModalElement.inert = true;
+                });
+
+                exportAdminBalancesModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (exportAdminBalancesTriggerButton && typeof exportAdminBalancesTriggerButton.focus === 'function') {
+                        exportAdminBalancesTriggerButton.focus();
+                    }
+                    exportAdminBalancesModalElement.inert = false;
+                });
             }
         });
     </script>
