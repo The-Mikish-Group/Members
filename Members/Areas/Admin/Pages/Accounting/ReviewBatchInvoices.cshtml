@@ -116,15 +116,32 @@
 
                         <!-- Export to CVS -->
                         <div class="col-auto">
-                            <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="btn btn-sm btn-success shadow">
+                            <button type="button" class="btn btn-sm btn-success shadow" id="exportReviewBatchInvoicesTriggerButton"
+                                    data-bs-toggle="modal" data-bs-target="#exportReviewBatchInvoicesConfirmModal">
                                 <i class="bi bi-download"></i> Export to CSV
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                
-
+                <!-- Export Confirmation Modal -->
+                <div class="modal fade" id="exportReviewBatchInvoicesConfirmModal" tabindex="-1" aria-labelledby="exportReviewBatchInvoicesConfirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exportReviewBatchInvoicesConfirmModalLabel">Confirm Export</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to download the CSV export for this batch of invoices?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="confirmReviewBatchInvoicesExportButton">Yes, Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
                 <!-- Heading -->
@@ -291,6 +308,50 @@
                     selectBatchForm.submit();
                 });
             }
+
+            // --- Export CSV Modal Logic for ReviewBatchInvoices ---
+            const confirmReviewBatchExportButton = document.getElementById('confirmReviewBatchInvoicesExportButton');
+            const exportReviewBatchInvoicesModalElement = document.getElementById('exportReviewBatchInvoicesConfirmModal');
+            const exportReviewBatchInvoicesTriggerButton = document.getElementById('exportReviewBatchInvoicesTriggerButton');
+
+            if (confirmReviewBatchExportButton && exportReviewBatchInvoicesModalElement && exportReviewBatchInvoicesTriggerButton) {
+                confirmReviewBatchExportButton.addEventListener('click', function () {
+                    const batchId = '@Model.BatchId';
+
+                    if (batchId) {
+                        const exportUrl = `@Url.Page("./ReviewBatchInvoices", "ExportCsv")&batchId=${encodeURIComponent(batchId)}`;
+                        window.location.href = exportUrl;
+
+                        var modalInstance = bootstrap.Modal.getInstance(exportReviewBatchInvoicesModalElement);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                        // Focus and inert handled by modal events
+                    } else {
+                        console.error("ReviewBatchInvoices.cshtml: BatchId is not available for export on button click.");
+                        alert("Cannot export: Batch ID is missing. Please ensure a batch is selected.");
+                        // If error, modal might still be open or closing, ensure inert is handled if hide is called
+                        // and focus is managed by hidden.bs.modal.
+                    }
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('show.bs.modal', function () {
+                    exportReviewBatchInvoicesModalElement.inert = false;
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('hide.bs.modal', function () {
+                    exportReviewBatchInvoicesModalElement.inert = true;
+                });
+
+                exportReviewBatchInvoicesModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (exportReviewBatchInvoicesTriggerButton && typeof exportReviewBatchInvoicesTriggerButton.focus === 'function') {
+                        exportReviewBatchInvoicesTriggerButton.focus();
+                    }
+                    exportReviewBatchInvoicesModalElement.inert = false;
+                });
+            }
+            // --- End Export CSV Modal Logic ---
+
         });
     </script>
 }

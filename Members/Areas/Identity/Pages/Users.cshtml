@@ -35,6 +35,15 @@
 
                 </div>
 
+                <!-- Export to CSV Button -->
+                <div class="row mb-3">
+                    <div class="col-12 text-center">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportConfirmModal" id="exportCsvTriggerButton">
+                            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Shadow Card for Search Term and User Count -->
                 <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">                    
                     <div class="card-body m-0 p-1">
@@ -567,6 +576,25 @@
                 </div>
             </div>
         </div>
+        </div>
+    </div>
+
+    <!-- Export Confirmation Modal -->
+    <div class="modal fade" id="exportConfirmModal" tabindex="-1" aria-labelledby="exportConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportConfirmModalLabel">Confirm Export</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to download the CSV export?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmExportButton">Yes, Export</button>
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -1330,6 +1358,46 @@ else
             // Initial visual state updates on page load
             updateSortIndicators(); // Display initial sort arrows
             updateExtraFieldsDisplay(); // Set initial column visibility            
+
+            // --- Export CSV Modal Logic ---
+            const confirmExportButton = document.getElementById('confirmExportButton');
+            const exportModalElement = document.getElementById('exportConfirmModal');
+            const exportCsvTriggerButton = document.getElementById('exportCsvTriggerButton');
+
+            if (confirmExportButton && exportModalElement && exportCsvTriggerButton) {
+                const exportUrl = '@Url.Page("./Users", "ExportToCsv")';
+
+                confirmExportButton.addEventListener('click', function () {
+                    window.location.href = exportUrl; // Initiate download/navigation
+
+                    var modalInstance = bootstrap.Modal.getInstance(exportModalElement);
+                    if (modalInstance) {
+                        modalInstance.hide(); // Hide the modal
+                    }
+                    // Focus and inert attribute will be handled by modal events
+                });
+
+                exportModalElement.addEventListener('show.bs.modal', function () {
+                    exportModalElement.inert = false; // Ensure modal is not inert when shown
+                });
+
+                exportModalElement.addEventListener('hide.bs.modal', function () {
+                    exportModalElement.inert = true; // Make modal inert before it hides
+                });
+
+                // Add event listener for when the modal has been hidden
+                exportModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (exportCsvTriggerButton && typeof exportCsvTriggerButton.focus === 'function') {
+                        exportCsvTriggerButton.focus();
+                    }
+                    // It's important to remove inert after it's hidden and focus is shifted,
+                    // so it's ready for the next time it's shown.
+                    // However, if 'show.bs.modal' handles setting inert=false, this might be redundant
+                    // or could be placed there. Let's keep it simple for now:
+                    exportModalElement.inert = false;
+                });
+            }
+            // --- End Export CSV Modal Logic ---
 
         });
     </script>

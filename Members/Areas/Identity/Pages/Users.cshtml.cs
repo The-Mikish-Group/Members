@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Text; // Added for StringBuilder
+using System.Linq; // Added for Linq methods like OrderBy, ThenBy
 namespace Members.Areas.Identity.Pages
 {
     // Using the primary constructor for dependency injection
@@ -13,10 +15,10 @@ namespace Members.Areas.Identity.Pages
         private readonly ApplicationDbContext _dbContext = dbContext; // Inject ApplicationDbContext
         public class UserModel
         {
-            public required string Id { get; set; }
-            public required string UserName { get; set; }
+            public required string Id { get; set; } // Restored required
+            public required string UserName { get; set; } // Restored required
             public string? FullName { get; set; }
-            public required string Email { get; set; }
+            public required string Email { get; set; } // Restored required
             public bool EmailConfirmed { get; set; }
             public string? PhoneNumber { get; set; }
             public bool PhoneNumberConfirmed { get; set; }
@@ -92,6 +94,81 @@ namespace Members.Areas.Identity.Pages
             return Partial("_UsersTablePartial", this);
         }
         // --- End New Handler ---
+
+        // --- CSV Export Handler ---
+        public async Task<IActionResult> OnGetExportToCsvAsync()
+        {
+            // Fetch all users and their profiles
+            IQueryable<IdentityUser> usersQuery = _userManager.Users.AsQueryable();
+
+            var allUsersData = await usersQuery
+                .GroupJoin(
+                    _dbContext.UserProfile,
+                    user => user.Id,
+                    userProfile => userProfile.UserId,
+                    (user, userProfiles) => new { User = user, UserProfile = userProfiles.FirstOrDefault() }
+                )
+                .OrderBy(x => x.UserProfile != null ? x.UserProfile.LastName : null) // Primary sort by LastName
+                .ThenBy(x => x.UserProfile != null ? x.UserProfile.FirstName : null) // Secondary sort by FirstName
+                .ToListAsync(); // Fetch all data
+
+            var csvBuilder = new StringBuilder();
+
+            // Header Row
+            csvBuilder.AppendLine("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,Roles,FirstName,MiddleName,LastName,HomePhoneNumber,AddressLine1,AddressLine2,City,State,ZipCode,Plot,Birthday,Anniversary,IsBillingContact,LastLogin");
+
+            // Data Rows
+            foreach (var item in allUsersData)
+            {
+                var user = item.User;
+                var userProfile = item.UserProfile;
+                var roles = await _userManager.GetRolesAsync(user);
+                var rolesString = string.Join(";", roles); // Semicolon-separated if multiple roles
+
+                // Format each field, handling nulls and escaping commas/quotes
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(user.UserName));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(user.Email));
+                csvBuilder.AppendFormat("{0},", user.EmailConfirmed);
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(user.PhoneNumber));
+                csvBuilder.AppendFormat("{0},", user.PhoneNumberConfirmed);
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(rolesString));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.FirstName));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.MiddleName));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.LastName));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.HomePhoneNumber));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.AddressLine1));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.AddressLine2));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.City));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.State));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.ZipCode));
+                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.Plot));
+                csvBuilder.AppendFormat("\"{0}\",", userProfile?.Birthday?.ToShortDateString() ?? "");
+                csvBuilder.AppendFormat("\"{0}\",", userProfile?.Anniversary?.ToShortDateString() ?? "");
+                csvBuilder.AppendFormat("{0},", userProfile?.IsBillingContact ?? false);
+                csvBuilder.AppendFormat("\"{0}\"", userProfile?.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss") ?? ""); // Ensure consistent date format or handle as needed
+                csvBuilder.AppendLine();
+            }
+
+            byte[] fileBytes = Encoding.UTF8.GetBytes(csvBuilder.ToString());
+            return File(fileBytes, "text/csv", "members_export.csv");
+        }
+
+        private static string EscapeCsvField(string? field) // Made static
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                return "";
+            }
+            // If the field contains a comma, double quote, or newline, enclose in double quotes
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
+            {
+                // Replace any existing double quotes with two double quotes
+                return "\"" + field.Replace("\"", "\"\"") + "\"";
+            }
+            return field;
+        }
+        // --- End CSV Export Handler ---
+
         // --- Helper method to load users based on current properties (reused logic) ---
         private async Task LoadUsersDataAsync() // Renamed from LoadUsersAsync to differentiate
         {

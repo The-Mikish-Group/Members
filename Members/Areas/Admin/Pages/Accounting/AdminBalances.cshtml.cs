@@ -358,84 +358,137 @@ namespace Members.Areas.Admin.Pages.Accounting
         }
         public async Task<IActionResult> OnGetExportCsvAsync(string? sortOrder, bool? showOnlyOutstanding)
         {
-            _logger.LogInformation("OnGetExportCsvAsync called. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowOnlyOutstanding}", sortOrder, showOnlyOutstanding);
-            var memberRoleName = "Member";
-            var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
-            var dataToExport = new List<MemberBalanceViewModel>();
-            if (usersInMemberRole != null)
+            _logger.LogInformation("[AdminBalances Export CSV] Handler started. Received sortOrder: '{SortOrder}', showOnlyOutstanding: '{ShowOnlyOutstanding}'", sortOrder, showOnlyOutstanding);
+
+            try
             {
-                foreach (var user in usersInMemberRole)
+                var memberRoleName = "Member";
+                var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
+                _logger.LogInformation("[AdminBalances Export CSV] Found {UserCount} users in role '{MemberRoleName}'.", usersInMemberRole?.Count ?? 0, memberRoleName);
+
+                var dataToExport = new List<MemberBalanceViewModel>();
+                if (usersInMemberRole != null)
                 {
-                    var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
-                    if (userProfile != null && userProfile.IsBillingContact)
+                    foreach (var user in usersInMemberRole)
                     {
-                        string fullName;
-                        if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
+                        if (userProfile != null && userProfile.IsBillingContact)
                         {
-                            fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
-                        }
-                        else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
-                        {
-                            fullName = userProfile.LastName; // Only LastName available
-                        }
-                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
-                        {
-                            fullName = userProfile.FirstName; // Only FirstName available
+                            string fullName;
+                            if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
+                            {
+                                fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                            }
+                            else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
+                            {
+                                fullName = userProfile.LastName;
+                            }
+                            else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                            {
+                                fullName = userProfile.FirstName;
+                            }
+                            else
+                            {
+                                fullName = user.UserName ?? "N/A";
+                            }
+
+                            decimal totalChargesFromInvoices = await _context.Invoices
+                                .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
+                                .SumAsync(i => i.AmountDue);
+                            decimal totalAmountPaidOnInvoices = await _context.Invoices
+                                .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
+                                .SumAsync(i => i.AmountPaid);
+                            decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
+                            decimal userCreditBalance = await _context.UserCredits
+                                .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
+                                .SumAsync(uc => uc.Amount);
+
+                            var memberVm = new MemberBalanceViewModel
+                            {
+                                UserId = user.Id,
+                                FullName = fullName,
+                                Email = user.Email ?? "N/A",
+                                CurrentBalance = currentBalance,
+                                CreditBalance = userCreditBalance
+                            };
+
+                            // Use the 'showOnlyOutstanding' parameter directly from the method arguments.
+                            // The 'ShowOnlyOutstanding' property on the model might reflect the page's current state,
+                            // but the export should respect what was passed in the URL.
+                            bool effectiveShowOnlyOutstanding = showOnlyOutstanding ?? false; // Default to false if null
+                            _logger.LogTrace("[AdminBalances Export CSV] Processing user {UserName}. Balance: {CurrentBalance}, Credit: {UserCreditBalance}. EffectiveShowOutstanding: {EffectiveShowOutstanding}", user.UserName, currentBalance, userCreditBalance, effectiveShowOnlyOutstanding);
+
+
+                            if (effectiveShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0)
+                            {
+                                _logger.LogTrace("[AdminBalances Export CSV] Skipping user {UserName} due to ShowOnlyOutstanding filter.", user.UserName);
+                                continue;
+                            }
+                            dataToExport.Add(memberVm);
                         }
                         else
                         {
-                            fullName = user.UserName ?? "N/A"; // Fallback to UserName
+                            _logger.LogTrace("[AdminBalances Export CSV] Skipping user {UserName} as they are not a billing contact or profile is missing.", user.UserName);
                         }
-                        decimal totalChargesFromInvoices = await _context.Invoices
-                            .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
-                            .SumAsync(i => i.AmountDue);
-                        decimal totalAmountPaidOnInvoices = await _context.Invoices
-                            .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
-                            .SumAsync(i => i.AmountPaid);
-                        decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
-                        decimal userCreditBalance = await _context.UserCredits
-                            .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
-                            .SumAsync(uc => uc.Amount);
-                        var memberVm = new MemberBalanceViewModel
-                        {
-                            UserId = user.Id,
-                            FullName = fullName,
-                            Email = user.Email ?? "N/A",
-                            CurrentBalance = currentBalance,
-                            CreditBalance = userCreditBalance
-                        };
-                        bool effectiveShowOnlyOutstanding = showOnlyOutstanding ?? ShowOnlyOutstanding; // Use model's ShowOnlyOutstanding if parameter is null
-                        if (effectiveShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0)
-                        {
-                            continue;
-                        }
-                        dataToExport.Add(memberVm);
                     }
                 }
+                _logger.LogInformation("[AdminBalances Export CSV] Total users processed for potential export: {ProcessedCount}. Users matching criteria for export: {DataToExportCount}", usersInMemberRole?.Count ?? 0, dataToExport.Count);
+
+
+                if (dataToExport.Count == 0)
+                {
+                    _logger.LogWarning("[AdminBalances Export CSV] No data to export after filtering. Returning empty file or message.");
+                    // Consider returning a more informative message or an empty file as per requirements.
+                    // For now, let it proceed to create an empty CSV.
+                }
+
+                // Use the 'sortOrder' parameter directly. Fallback to CurrentSort (model property) then to default.
+                string currentSortOrder = sortOrder ?? CurrentSort ?? "name_asc";
+                _logger.LogInformation("[AdminBalances Export CSV] Applying sort order: '{CurrentSortOrder}'.", currentSortOrder);
+
+                dataToExport = currentSortOrder switch
+                {
+                    "name_desc" => [.. dataToExport.OrderByDescending(s => s.FullName)],
+                    "name_asc" => [.. dataToExport.OrderBy(s => s.FullName)],
+                    "email_desc" => [.. dataToExport.OrderByDescending(s => s.Email)],
+                    "email_asc" => [.. dataToExport.OrderBy(s => s.Email)],
+                    "balance_desc" => [.. dataToExport.OrderByDescending(s => s.CurrentBalance)],
+                    "balance_asc" => [.. dataToExport.OrderBy(s => s.CurrentBalance)],
+                    "credit_desc" => [.. dataToExport.OrderByDescending(s => s.CreditBalance)],
+                    "credit_asc" => [.. dataToExport.OrderBy(s => s.CreditBalance)],
+                    _ => [.. dataToExport.OrderBy(s => s.FullName)],
+                };
+                _logger.LogInformation("[AdminBalances Export CSV] Data sorted. Final count for CSV: {Count}", dataToExport.Count);
+
+                var sb = new StringBuilder();
+                sb.AppendLine("\"Full Name\",\"Email\",\"Current Balance\",\"Credit Balance\"");
+                foreach (var memberVm in dataToExport)
+                {
+                    sb.AppendLine($"\"{EscapeCsvField(memberVm.FullName)}\",\"{EscapeCsvField(memberVm.Email)}\",{memberVm.CurrentBalance.ToString("F2")},{memberVm.CreditBalance.ToString("F2")}");
+                }
+
+                byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
+                string fileName = $"member_balances_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+                _logger.LogInformation("[AdminBalances Export CSV] CSV string generated. Byte length: {Length}. Filename: {FileName}", csvBytes.Length, fileName);
+
+                if (csvBytes.Length <= sb.ToString().Split(Environment.NewLine)[0].Length + 2 && dataToExport.Count == 0) // Check if only header or empty
+                {
+                     _logger.LogWarning("[AdminBalances Export CSV] CSV is empty or contains only header. This might not trigger a download in some browsers.");
+                }
+
+                return File(csvBytes, "text/csv", fileName);
             }
-            string currentSortOrder = sortOrder ?? CurrentSort ?? "name_asc"; // Default or use passed/model sortOrder
-            dataToExport = currentSortOrder switch
+            catch (Exception ex)
             {
-                "name_desc" => [.. dataToExport.OrderByDescending(s => s.FullName)],
-                "name_asc" => [.. dataToExport.OrderBy(s => s.FullName)],
-                "email_desc" => [.. dataToExport.OrderByDescending(s => s.Email)],
-                "email_asc" => [.. dataToExport.OrderBy(s => s.Email)],
-                "balance_desc" => [.. dataToExport.OrderByDescending(s => s.CurrentBalance)],
-                "balance_asc" => [.. dataToExport.OrderBy(s => s.CurrentBalance)],
-                "credit_desc" => [.. dataToExport.OrderByDescending(s => s.CreditBalance)],
-                "credit_asc" => [.. dataToExport.OrderBy(s => s.CreditBalance)],
-                _ => [.. dataToExport.OrderBy(s => s.FullName)],
-            };
-            _logger.LogInformation("Data prepared for CSV export. Count: {Count}", dataToExport.Count);
-            var sb = new StringBuilder();
-            sb.AppendLine("\"Full Name\",\"Email\",\"Current Balance\",\"Credit Balance\"");
-            foreach (var memberVm in dataToExport)
-            {
-                sb.AppendLine($"\"{EscapeCsvField(memberVm.FullName)}\",\"{EscapeCsvField(memberVm.Email)}\",{memberVm.CurrentBalance.ToString("F2")},{memberVm.CreditBalance.ToString("F2")}");
+                _logger.LogError(ex, "[AdminBalances Export CSV] CRITICAL ERROR during CSV export generation. SortOrder: {SortOrder}, ShowOutstanding: {ShowOutstanding}", sortOrder, showOnlyOutstanding);
+                // Consider what to return to the user on critical error.
+                // For now, rethrow or return a specific error page/message.
+                // Returning a ContentResult might be better for AJAX, but for direct nav, this will be a server error.
+                TempData["ErrorMessage"] = "A critical error occurred while generating the CSV export for Admin Balances. Please check the logs.";
+                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding }); // Redirect back to the page with an error message
+                // Or, for more direct feedback without redirect:
+                // return Content($"Error generating CSV: {ex.Message}. Check server logs.", "text/plain");
             }
-            _logger.LogInformation("CSV string generated. Length: {Length}", sb.Length);
-            byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
-            return File(csvBytes, "text/csv", $"member_balances_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
         }
         private static string EscapeCsvField(string? field)
         {
