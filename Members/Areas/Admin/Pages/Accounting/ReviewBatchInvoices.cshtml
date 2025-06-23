@@ -116,15 +116,32 @@
 
                         <!-- Export to CVS -->
                         <div class="col-auto">
-                            <a asp-page-handler="ExportCsv" asp-route-batchId="@Model.BatchId" class="btn btn-sm btn-success shadow">
+                            <button type="button" class="btn btn-sm btn-success shadow"
+                                    data-bs-toggle="modal" data-bs-target="#exportReviewBatchInvoicesConfirmModal">
                                 <i class="bi bi-download"></i> Export to CSV
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                
-
+                <!-- Export Confirmation Modal -->
+                <div class="modal fade" id="exportReviewBatchInvoicesConfirmModal" tabindex="-1" aria-labelledby="exportReviewBatchInvoicesConfirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exportReviewBatchInvoicesConfirmModalLabel">Confirm Export</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to download the CSV export for this batch of invoices?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="confirmReviewBatchInvoicesExportButton">Yes, Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
                 <!-- Heading -->
@@ -291,6 +308,34 @@
                     selectBatchForm.submit();
                 });
             }
+
+            // --- Export CSV Modal Logic for ReviewBatchInvoices ---
+            const confirmReviewBatchExportButton = document.getElementById('confirmReviewBatchInvoicesExportButton');
+            if (confirmReviewBatchExportButton) {
+                confirmReviewBatchExportButton.addEventListener('click', function () {
+                    const batchId = '@Model.BatchId';
+
+                    if (batchId) {
+                        const exportUrl = `@Url.Page("./ReviewBatchInvoices", "ExportCsv")&batchId=${encodeURIComponent(batchId)}`;
+                        window.location.href = exportUrl;
+
+                        var modalElement = document.getElementById('exportReviewBatchInvoicesConfirmModal');
+                        if (modalElement) {
+                            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        }
+                    } else {
+                        // This case should ideally not be hit if the button is only shown when a batch is loaded.
+                        // However, as a fallback:
+                        console.error("ReviewBatchInvoices.cshtml: BatchId is not available for export on button click.");
+                        alert("Cannot export: Batch ID is missing. Please ensure a batch is selected.");
+                    }
+                });
+            }
+            // --- End Export CSV Modal Logic ---
+
         });
     </script>
 }

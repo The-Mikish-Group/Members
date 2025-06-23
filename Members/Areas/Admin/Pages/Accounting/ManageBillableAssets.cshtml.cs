@@ -571,70 +571,91 @@ namespace Members.Areas.Admin.Pages.Accounting
 
         public async Task<IActionResult> OnGetExportCsvAsync()
         {
-            _logger.LogInformation("OnGetExportCsvAsync called to export all billable assets.");
+            _logger.LogInformation("[ManageBillableAssets Export CSV] Handler started.");
 
-            // Fetch all BillableAssets with related User and UserProfile data
-            var allAssetsQuery = _context.BillableAssets
-                .Select(ba => new
-                {
-                    BillableAsset = ba,
-                    ba.User // IdentityUser linked to BillableAsset
-                })
-                .GroupJoin(
-                    _context.UserProfile,
-                    outer => outer.User != null ? outer.User.Id : null,
-                    userProfile => userProfile.UserId,
-                    (outer, profiles) => new
-                    {
-                        outer.BillableAsset,
-                        outer.User, // IdentityUser
-                        UserProfile = profiles.FirstOrDefault() // UserProfile or null
-                    }
-                );
-
-            // Execute the query to get all data
-            var assetsToExportData = await allAssetsQuery.ToListAsync();
-
-            var sb = new StringBuilder();
-            // Header row
-            sb.AppendLine("\"BillableAssetID\",\"PlotID\",\"BillingContactFullName\",\"BillingContactEmail\",\"AssessmentFee\",\"Description\",\"DateCreated\",\"LastUpdated\"");
-
-            foreach (var item in assetsToExportData)
+            try
             {
-                var assetEntity = item.BillableAsset;
-                var user = item.User;
-                var userProfile = item.UserProfile;
+                // Fetch all BillableAssets with related User and UserProfile data
+                var allAssetsQuery = _context.BillableAssets
+                    .Select(ba => new
+                    {
+                        BillableAsset = ba,
+                        ba.User // IdentityUser linked to BillableAsset
+                    })
+                    .GroupJoin(
+                        _context.UserProfile,
+                        outer => outer.User != null ? outer.User.Id : null,
+                        userProfile => userProfile.UserId,
+                        (outer, profiles) => new
+                        {
+                            outer.BillableAsset,
+                            outer.User, // IdentityUser
+                            UserProfile = profiles.FirstOrDefault() // UserProfile or null
+                        }
+                    );
 
-                string? contactFullName = "N/A (Unassigned)";
-                string? contactEmail = null;
+                var assetsToExportData = await allAssetsQuery.ToListAsync();
+                _logger.LogInformation("[ManageBillableAssets Export CSV] Fetched {AssetCount} assets for export.", assetsToExportData.Count);
 
-                if (user != null)
+                if (assetsToExportData.Count == 0)
                 {
-                    contactEmail = user.Email; // Email from IdentityUser
-                    if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
-                    {
-                        contactFullName = $"{userProfile.LastName}, {userProfile.FirstName}";
-                    }
-                    else
-                    {
-                        contactFullName = user.UserName; // Fallback to UserName if profile names are incomplete
-                    }
+                    _logger.LogWarning("[ManageBillableAssets Export CSV] No billable assets found to export.");
+                    // Let it proceed to generate an empty CSV for now.
                 }
 
-                sb.AppendFormat("\"{0}\",", assetEntity.BillableAssetID);
-                sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.PlotID));
-                sb.AppendFormat("\"{0}\",", EscapeCsvField(contactFullName));
-                sb.AppendFormat("\"{0}\",", EscapeCsvField(contactEmail));
-                sb.AppendFormat("{0},", assetEntity.AssessmentFee.ToString("F2")); // Currency format
-                sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.Description));
-                sb.AppendFormat("\"{0}\",", assetEntity.DateCreated.ToString("yyyy-MM-dd"));
-                sb.AppendFormat("\"{0}\"", assetEntity.LastUpdated.ToString("yyyy-MM-dd")); // Last field, so use AppendLine
-                sb.AppendLine(); // Add newline character
-            }
+                var sb = new StringBuilder();
+                sb.AppendLine("\"BillableAssetID\",\"PlotID\",\"BillingContactFullName\",\"BillingContactEmail\",\"AssessmentFee\",\"Description\",\"DateCreated\",\"LastUpdated\"");
 
-            byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
-            _logger.LogInformation("CSV file generated for all billable assets. Byte length: {Length}", csvBytes.Length);
-            return File(csvBytes, "text/csv", $"billable_assets_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
+                foreach (var item in assetsToExportData)
+                {
+                    var assetEntity = item.BillableAsset;
+                    var user = item.User;
+                    var userProfile = item.UserProfile;
+
+                    string? contactFullName = "N/A (Unassigned)";
+                    string? contactEmail = null;
+
+                    if (user != null)
+                    {
+                        contactEmail = user.Email;
+                        if (userProfile != null && !string.IsNullOrWhiteSpace(userProfile.FirstName) && !string.IsNullOrWhiteSpace(userProfile.LastName))
+                        {
+                            contactFullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                        }
+                        else
+                        {
+                            contactFullName = user.UserName;
+                        }
+                    }
+
+                    sb.AppendFormat("\"{0}\",", assetEntity.BillableAssetID);
+                    sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.PlotID));
+                    sb.AppendFormat("\"{0}\",", EscapeCsvField(contactFullName));
+                    sb.AppendFormat("\"{0}\",", EscapeCsvField(contactEmail));
+                    sb.AppendFormat("{0},", assetEntity.AssessmentFee.ToString("F2"));
+                    sb.AppendFormat("\"{0}\",", EscapeCsvField(assetEntity.Description));
+                    sb.AppendFormat("\"{0}\",", assetEntity.DateCreated.ToString("yyyy-MM-dd"));
+                    sb.AppendFormat("\"{0}\"", assetEntity.LastUpdated.ToString("yyyy-MM-dd"));
+                    sb.AppendLine();
+                }
+
+                byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
+                string fileName = $"billable_assets_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+                _logger.LogInformation("[ManageBillableAssets Export CSV] CSV string generated. Byte length: {Length}. Filename: {FileName}", csvBytes.Length, fileName);
+
+                if (csvBytes.Length <= sb.ToString().Split(Environment.NewLine)[0].Length + 2 && assetsToExportData.Count == 0)
+                {
+                     _logger.LogWarning("[ManageBillableAssets Export CSV] CSV is empty or contains only header. This might not trigger a download.");
+                }
+
+                return File(csvBytes, "text/csv", fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ManageBillableAssets Export CSV] CRITICAL ERROR during CSV export generation.");
+                TempData["ErrorMessage"] = "A critical error occurred while generating the CSV export for Billable Assets. Please check the logs.";
+                return RedirectToPage(); // Redirect back to the page with an error message
+            }
         }
     }
 }

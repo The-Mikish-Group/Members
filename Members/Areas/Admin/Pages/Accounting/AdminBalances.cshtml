@@ -71,13 +71,10 @@
                     @if (Model.MemberBalances.Any())
                     {
                         <div style="display: inline-block;">
-                            <a asp-page="./AdminBalances"
-                               asp-page-handler="ExportCsv"
-                               asp-route-showOnlyOutstanding="@Model.ShowOnlyOutstanding"
-                               asp-route-sortOrder="@Model.CurrentSort"
-                               class="btn btn-sm btn-primary">
+                            <button type="button" class="btn btn-sm btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#exportAdminBalancesConfirmModal">
                                 <i class="bi bi-download me-2"></i>Export to CSV
-                            </a>
+                            </button>
                         </div>
                     }
 
@@ -230,8 +227,72 @@
         
     }
 
+    <!-- Export Confirmation Modal -->
+    @if (Model.MemberBalances.Any())
+    {
+        <div class="modal fade" id="exportAdminBalancesConfirmModal" tabindex="-1" aria-labelledby="exportAdminBalancesConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exportAdminBalancesConfirmModalLabel">Confirm Export</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to download the Member Balances CSV export?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmAdminBalancesExportButton">Yes, Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts {
+    <script>
+        // Ensure ALL OTHER SCRIPT in this @section Scripts is temporarily removed or commented out for this specific test.
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('AdminBalances Script: DOMContentLoaded has fired.'); // LOG A
 
+            const confirmButton = document.getElementById('confirmAdminBalancesExportButton');
+
+            if (confirmButton) {
+                console.log('AdminBalances Script: Found confirmAdminBalancesExportButton.'); // LOG B
+                confirmButton.addEventListener('click', function () {
+                    console.log('AdminBalances Script: confirmAdminBalancesExportButton CLICKED.'); // LOG C
+                    alert('AdminBalances: Export confirm button clicked! Check console for URL next.');
+
+                    try {
+                        const showOutstanding = '@Model.ShowOnlyOutstanding.ToString()';
+                        const sortOrder = '@Model.CurrentSort';
+                        let exportUrl = `@Url.Page("./AdminBalances", "ExportCsv")`;
+                        const separator = exportUrl.includes('?') ? '&' : '?';
+                        exportUrl += `${separator}showOnlyOutstanding=${encodeURIComponent(showOutstanding)}`;
+                        if (sortOrder) {
+                            exportUrl += `&sortOrder=${encodeURIComponent(sortOrder)}`;
+                        }
+                        console.log("AdminBalances Export URL to be used:", exportUrl); // LOG D
+                        // window.location.href = exportUrl; // Temporarily disable navigation
+                        alert('AdminBalances: URL constructed: ' + exportUrl + '. Navigation is currently disabled for this test.');
+
+                        var modalElement = document.getElementById('exportAdminBalancesConfirmModal');
+                        if (modalElement) {
+                            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error in AdminBalances export click handler:', e);
+                        alert('Error in AdminBalances click handler: ' + e.message);
+                    }
+                });
+            } else {
+                console.error('AdminBalances Script: confirmAdminBalancesExportButton NOT found.'); // LOG E
+                alert('AdminBalances: confirmAdminBalancesExportButton was NOT found by the script.');
+            }
+        });
+    </script>
 }
