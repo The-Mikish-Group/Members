@@ -218,7 +218,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogWarning("[ReviewBatchInvoices Export CSV] BatchId is null or empty. Cannot export.");
                 TempData["ErrorMessage"] = "Batch ID is required to export.";
                 // Redirect to the current page view, preserving BatchId if it was part of the model, or a general page if not.
-                return RedirectToPage(new { BatchId = this.BatchId, CurrentSort = this.CurrentSort });
+                return RedirectToPage(new { this.BatchId, this.CurrentSort });
             }
 
             try
@@ -234,7 +234,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 {
                     _logger.LogWarning("[ReviewBatchInvoices Export CSV] No draft invoices found for BatchID: '{BatchId}' to export.", batchId);
                     TempData["WarningMessage"] = $"No draft invoices found for Batch ID '{batchId}' to export.";
-                    return RedirectToPage(new { BatchId = batchId, CurrentSort = this.CurrentSort });
+                    return RedirectToPage(new { BatchId = batchId, this.CurrentSort });
                 }
 
                 // Efficiently get UserProfiles for all users in the batch
@@ -299,7 +299,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 _logger.LogError(ex, "[ReviewBatchInvoices Export CSV] CRITICAL ERROR during CSV export for BatchID: '{BatchId}'.", batchId);
                 TempData["ErrorMessage"] = $"A critical error occurred while generating the CSV export for Batch ID '{batchId}'. Please check the logs.";
-                return RedirectToPage(new { BatchId = batchId, CurrentSort = this.CurrentSort });
+                return RedirectToPage(new { BatchId = batchId, this.CurrentSort });
             }
         }
 
