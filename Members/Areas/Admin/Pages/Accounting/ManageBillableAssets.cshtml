@@ -152,6 +152,9 @@
                         }
                     </th>
 
+                    <!-- Billing -->
+                    <th class="text-nowrap py-2 pe-2 text-center">Billing</th>
+
                     <!-- Edit -->
                     <th class="text-nowrap py-2 pe-2 text-center">Edit</th>
                     
@@ -185,6 +188,30 @@
 
                         <!-- Last Updated -->
                         <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
+
+                        <!-- Billing Link -->
+                        <td class="text-nowrap py-2 pe-2 text-center">
+                            @if (!string.IsNullOrEmpty(asset.UserID))
+                            {
+                                <a asp-area="Member" asp-page="/MyBilling"
+                                   asp-route-userId="@asset.UserID"
+                                   asp-route-returnUrl="@Url.Page("./ManageBillableAssets", new {
+                                                            searchTerm = Model.SearchTerm,
+                                                            pageNumber = Model.PageNumber,
+                                                            currentSort = Model.CurrentSort,
+                                                            pageSize = Model.PageSize
+                                                        })"
+                                   class="btn btn-sm btn-billing" title="View Billing for @asset.BillingContactFullName">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-sm btn-secondary" disabled title="No billing contact assigned">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </button>
+                            }
+                        </td>
 
                         <!-- Edit Asset -->
                         <td class="text-nowrap py-2 pe-2 text-center">

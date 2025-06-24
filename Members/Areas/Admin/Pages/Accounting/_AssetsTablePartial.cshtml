@@ -14,6 +14,28 @@
             <td class="text-nowrap">@asset.DateCreated.ToString("yyyy-MM-dd")</td>
             <td class="text-nowrap">@asset.LastUpdated.ToString("yyyy-MM-dd")</td>
             <td class="text-nowrap text-center pe-2 py-2">
+                @if (!string.IsNullOrEmpty(asset.UserID))
+                {
+                    <a asp-area="Member" asp-page="/MyBilling"
+                       asp-route-userId="@asset.UserID"
+                       asp-route-returnUrl="@Url.Page("./ManageBillableAssets", new {
+                                                searchTerm = Model.SearchTerm,
+                                                pageNumber = Model.PageNumber,
+                                                currentSort = Model.CurrentSort,
+                                                pageSize = Model.PageSize
+                                            })"
+                       class="btn btn-sm btn-billing" title="View Billing for @asset.BillingContactFullName">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </a>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-sm btn-secondary" disabled title="No billing contact assigned">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </button>
+                }
+            </td>
+            <td class="text-nowrap text-center pe-2 py-2">
                 <button type="button" class="btn btn-sm me-1 btn-rename edit-asset-button" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i></button>
             </td>
             <td class="text-nowrap text-center pe-2 py-2">
