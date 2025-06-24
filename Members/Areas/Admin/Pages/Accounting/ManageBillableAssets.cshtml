@@ -5,7 +5,7 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="text-gold-darker my-4 text-center"><i class="bi bi-list"></i> @ViewData["Title"]</h2>
+<h2 class="text-gold-darker my-4 text-center"><i class="bi bi-house"></i> @ViewData["Title"]</h2>
 
 @if (TempData["StatusMessage"] != null)
 {
@@ -59,7 +59,7 @@
         <h5 class="text-gold-darker my-2"><i class="bi bi-list"></i> Existing Billable Assets</h5>
         <button type="button" class="btn btn-sm btn-success my-2 me-2 shadow" id="exportManageBillableAssetsTriggerButton"
                 data-bs-toggle="modal" data-bs-target="#exportManageBillableAssetsConfirmModal">
-            <i class="bi bi-download"></i> Export to CSV
+            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
         </button>
     </div>
 

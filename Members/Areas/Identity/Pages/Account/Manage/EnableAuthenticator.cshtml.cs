@@ -10,14 +10,11 @@ using System.Text.Encodings.Web;
 
 namespace Members.Areas.Identity.Pages.Account.Manage
 {
-    public class EnableAuthenticatorModel(
-        UserManager<IdentityUser> userManager,
-        ILogger<EnableAuthenticatorModel> logger,
-        UrlEncoder urlEncoder) : PageModel
+    public class EnableAuthenticatorModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager = userManager;
-        private readonly ILogger<EnableAuthenticatorModel> _logger = logger;
-        private readonly UrlEncoder _urlEncoder = urlEncoder;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<EnableAuthenticatorModel> _logger;
+        private readonly UrlEncoder _urlEncoder;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -33,6 +30,17 @@ namespace Members.Areas.Identity.Pages.Account.Manage
 
         public InputModel Input { get; set; }
 
+        public EnableAuthenticatorModel(
+            UserManager<IdentityUser> userManager,
+            ILogger<EnableAuthenticatorModel> logger,
+            UrlEncoder urlEncoder)
+        {
+            _userManager = userManager;
+            _logger = logger;
+            _urlEncoder = urlEncoder;
+            Input = new InputModel();
+        }
+
         public class InputModel
         {
             [Required]
@@ -44,6 +52,8 @@ namespace Members.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            Input ??= new InputModel();
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -70,7 +80,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             }
 
             // Strip spaces and hyphens
-            var verificationCode = Input.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            string verificationCode = Input.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
             var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
                 user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
@@ -91,7 +101,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {
                 var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-                RecoveryCodes = [.. recoveryCodes];
+                RecoveryCodes = recoveryCodes.ToArray();
                 return RedirectToPage("./ShowRecoveryCodes");
             }
             else
@@ -138,7 +148,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             return string.Format(
                 CultureInfo.InvariantCulture,
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode("Microsoft.AspNetCore.Identity.UI"),
+                _urlEncoder.Encode("Members"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

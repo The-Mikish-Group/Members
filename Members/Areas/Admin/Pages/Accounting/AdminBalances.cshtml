@@ -56,7 +56,7 @@
                     </form>
                 </div>
 
-                <!-- Apply Late Fee and Export to CVS Buttons -->
+                <!-- Apply Late Fee and Export to CSV Buttons -->
                 <div class="col-md-6 text-md-end">
 
                     <!-- Apply Late Fee -->
@@ -67,13 +67,13 @@
                         </button>
                     </form>
 
-                    <!-- Export to CVS -->
+                    <!-- Export to CSV -->
                     @if (Model.MemberBalances.Any())
                     {
                         <div style="display: inline-block;">
                             <button type="button" class="btn btn-sm btn-primary" id="exportAdminBalancesTriggerButton"
                                     data-bs-toggle="modal" data-bs-target="#exportAdminBalancesConfirmModal">
-                                <i class="bi bi-download me-2"></i>Export to CSV
+                                <i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Export to CSV
                             </button>
                         </div>
                     }

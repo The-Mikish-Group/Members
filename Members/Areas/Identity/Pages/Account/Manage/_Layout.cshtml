@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿﻿@using Microsoft.AspNetCore.Identity
 @using System.IO;
 @using Microsoft.AspNetCore.Mvc;
 @using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -41,14 +41,15 @@
     <partial name="_PartialBannerLogo" />
 </div>
 
-<div class="container text-center ps-0 mb-2">
+<div class="container mb-2 ps-0 text-center">
     <div class="row gx-0 gy-0 justify-content-center">
         <div class="col-md-3 pe-0">
-            <ul class="nav nav-pills flex-column ms-3 me-0 mb-2 text-start">
+            <ul class="nav nav-pills flex-column mb-2 me-0 ms-3 text-start">
                 <li class="nav-item mb-1"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a></li>
                 <li class="nav-item my-1"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a></li>
                 <li class="nav-item my-1"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a></li>
-                
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi-shield-check"></i> Two-factor authentication</a></li>
+
                 @* Take the following line out with the leading bracket (and ending bracket below) for Members to see *@
                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                 {
@@ -61,7 +62,7 @@
                 } @* Take this closing bracket out for Members to see.*@
             </ul>
         </div>
-        <div class="container col-md-9 pe-0">
+        <div class="col-md-9 container pe-0">
             @RenderBody()
         </div>
     </div>

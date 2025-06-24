@@ -385,6 +385,17 @@ a {
         color: #8E774D !important;
     }
 
+/* my nav-link */
+.my-nav-link {
+    color: saddlebrown;
+}
+
+    .my-nav-link:active,
+    .my-nav-link:hover,
+    .my-nav-link:focus {
+        color: #8E774D !important;
+    }
+
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     background-color: #28a745; /* Green background color */
