@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure; // For IActionContextAccessor and ActionContextAccessor
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection; // Added for Data Protection
 var builder = WebApplication.CreateBuilder(args);
 // Register Syncfusion license
 string SYNCFUSION_KEY = Environment.GetEnvironmentVariable("SYNCFUSION_KEY")!;
@@ -30,6 +31,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()
     )
 );
+
+// Add DbContext for Data Protection
+builder.Services.AddDbContext<DataProtectionKeyDbContext>(options =>
+    options.UseSqlServer(
+        connectionString,
+        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()
+    )
+);
+
+// Configure Data Protection to use Entity Framework Core store
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<DataProtectionKeyDbContext>()
+    .SetApplicationName("MembersApplication"); // Unique name for the application
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()

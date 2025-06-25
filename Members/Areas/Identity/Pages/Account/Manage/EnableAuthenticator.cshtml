@@ -20,7 +20,7 @@
         <li class="text-gold-darker my-3 text-start">
             <span>Scan the QR Code or enter this key</span> <span>into your two factor authenticator app.</span><br /><br />
             <kbd id="sharedKey">@Model.SharedKey</kbd>
-            <button id="copyKeyButton" class="btn btn-sm btn-success my-2 ms-2" type="button">Copy</button>
+            <button id="copyKeyButton" class="btn btn-sm btn-success my-2 ms-2 shadow" type="button">Copy</button>
             <div class="my-4 text-center" id="qrCode"></div>
             <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
         </li>
