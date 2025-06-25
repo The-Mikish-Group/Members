@@ -18,7 +18,7 @@ namespace Members.Models
         public string? City { get; set; }
         public string? State { get; set; }
         public string? ZipCode { get; set; }
-        public string? Plot { get; set; }
+        //public string? Plot { get; set; }
         public string? HomePhoneNumber { get; set; }
         public DateTime? LastLogin { get; set; }
         [Display(Name = "Is Billing Contact")]

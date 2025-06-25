@@ -15,9 +15,9 @@
 <div class="container my-4">
      <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card shadow rounded p-2 bg-Card-Menu">
+            <div class="card bg-Card-Menu rounded p-2 shadow">
                 <form method="post">
-                    <h1 class="mb-4 text-gold-darker text-center">
+                    <h1 class="text-gold-darker mb-4 text-center">
                         <i class="bi bi-person-fill"></i> Add a New Member
                     </h1>
                     <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
@@ -144,7 +144,7 @@
                     <hr />
 
                     <!-- Email Sent notice -->
-                    <div class="text-center text-danger mb-4">
+                    <div class="text-danger mb-4 text-center">
                         <p>The user will be sent an email with a link to *Create* their password.</p>
                     </div>
 
@@ -152,7 +152,7 @@
                     <div class="d-flex justify-content-center mt-3">
 
                         <!-- Cancel Button -->
-                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
+                        <button type="button" onclick="window.location.href='/Identity/Users'" class="btn btn-sm btn-secondary me-2">
                             <i class="bi bi-box-arrow-left"></i> Cancel
                         </button>
 

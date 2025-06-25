@@ -77,8 +77,8 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Zip Code")] // Corrected the Display Name
             public string? ZipCode { get; set; }
 
-            [Display(Name = "Plot")]
-            public string? Plot { get; set; }
+            //[Display(Name = "Plot")]
+            //public string? Plot { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
@@ -103,7 +103,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
                 City = userProfile?.City,
                 State = userProfile?.State,
                 ZipCode = userProfile?.ZipCode,
-                Plot = userProfile?.Plot,
+                //Plot = userProfile?.Plot,
                 HomePhoneNumber = userProfile?.HomePhoneNumber
             };
         }
@@ -167,7 +167,7 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             userProfile.City = Input.City;
             userProfile.State = Input.State;
             userProfile.ZipCode = Input.ZipCode;
-            userProfile.Plot = Input.Plot;
+            //userProfile.Plot = Input.Plot;
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
 
             await _dbContext.SaveChangesAsync();

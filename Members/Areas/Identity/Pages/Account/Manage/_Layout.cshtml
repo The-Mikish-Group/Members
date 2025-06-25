@@ -48,7 +48,7 @@
                 <li class="nav-item mb-1"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a></li>
                 <li class="nav-item my-1"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a></li>
                 <li class="nav-item my-1"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a></li>
-                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi-shield-check"></i> Two-factor authentication</a></li>
+                <li class="nav-item my-1"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi bi-shield-fill-check"></i> Two-factor authentication</a></li>
 
                 @* Take the following line out with the leading bracket (and ending bracket below) for Members to see *@
                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))

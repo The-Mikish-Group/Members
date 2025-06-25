@@ -613,7 +613,7 @@ public class PdfGenerationController : Controller
                         g.First().Profile.HomePhoneNumber, // From UserProfile
                         g.First().Profile.Birthday,
                         g.First().Profile.Anniversary,
-                        g.First().Profile.Plot,
+                        //g.First().Profile.Plot,
                         g.First().Profile.LastLogin, // CORRECTED: Access from Profile (as in your file)
                         g.First().User.EmailConfirmed,
                         g.First().User.PhoneNumberConfirmed,
@@ -634,7 +634,7 @@ public class PdfGenerationController : Controller
             // Build the CSV content
             var builder = new StringBuilder();
 
-            builder.AppendLine("First Name,Middle Name,Last Name,Address Line 1,Address Line 2,City,State,Zip Code,Email,Gell Phone,Home Phone,Birthday,Anniversary,Plot,Last Login,Email Confirmed,Phone Number Confirmed,Roles"); // Updated Header
+            builder.AppendLine("First Name,Middle Name,Last Name,Address Line 1,Address Line 2,City,State,Zip Code,Email,Gell Phone,Home Phone,Birthday,Anniversary,Last Login,Email Confirmed,Phone Number Confirmed,Roles"); // Updated Header
 
             // Add Data Rows
             foreach (var user in userDataWithRoles)
@@ -659,7 +659,7 @@ public class PdfGenerationController : Controller
                     $"{EscapeCsv(user.HomePhoneNumber)}," +
                     $"{EscapeCsv(user.Birthday?.ToShortDateString())}," + // Format dates
                     $"{EscapeCsv(user.Anniversary?.ToShortDateString())}," + // Format dates
-                    $"{EscapeCsv(user.Plot)}," +
+                    //$"{EscapeCsv(user.Plot)}," +
                     $"{EscapeCsv(user.LastLogin?.ToString())}," + // Format DateTime
                     $"{EscapeCsv(user.EmailConfirmed)}," +
                     $"{EscapeCsv(user.PhoneNumberConfirmed)}," +

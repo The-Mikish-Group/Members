@@ -24,17 +24,17 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow rounded p-2 bg-Card-Menu">
+            <div class="card bg-Card-Menu rounded p-2 shadow">
                 <div class="card-body p-0">
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
 
                         <!-- Title -->
-                        <h2 class="text-center text-gold-darker mb-4">
+                        <h2 class="text-gold-darker mb-4 text-center">
                             <i class="bi bi-person-plus-fill"></i> Create your HOA account
                         </h2>
 
                         <!-- Email Field -->
-                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center" role="alert"></div>
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                             <label asp-for="Input.Email" class="form-label">Email</label>
@@ -149,11 +149,11 @@
                         <hr />
 
                         <!-- Plot -->
-                        <div class="form-floating mb-2">
+                        @* <div class="form-floating mb-2">
                             <input asp-for="Input.Plot" class="form-control" placeholder="Plot" />
                             <label asp-for="Input.Plot" class="form-label">Plot</label>
                             <span asp-validation-for="Input.Plot" class="text-danger"></span>
-                        </div>
+                        </div> *@
 
                         <hr />
 

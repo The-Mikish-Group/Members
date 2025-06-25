@@ -10,15 +10,15 @@
 
     <div class="col-lg-8">
 
-        <h1 class="text-center text-gold-darker pb-2">Manage your account</h1>
+        <h1 class="text-gold-darker pb-2 text-center">Manage your account</h1>
 
-        <div class="card p-2 mx-0 mb-2 shadow rounded bg-Card-Menu">
+        <div class="card bg-Card-Menu mx-0 mb-2 rounded p-2 shadow">
 
             <!-- Form -->
             <form id="profile-form" method="post">
 
                 <!-- Title -->
-                <h2 class="text-center mb-4">
+                <h2 class="mb-4 text-center">
                     <i class="bi bi-gear-fill"></i> @ViewData["Title"]
                 </h2>
 
@@ -139,11 +139,11 @@
                 <hr />
 
                 <!-- Plot Identifier -->
-                <div class="form-floating mb-3">
+                @* <div class="form-floating mb-3">
                     <input asp-for="Input.Plot" class="form-control" placeholder=" " />
                     <label asp-for="Input.Plot" class="form-label">Plot</label>
                     <span asp-validation-for="Input.Plot" class="text-danger"></span>
-                </div>
+                </div> *@
                 
                 <hr />
 

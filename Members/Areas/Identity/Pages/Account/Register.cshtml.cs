@@ -54,7 +54,7 @@ namespace Members.Areas.Identity.Pages.Account
                 City = string.Empty,
                 State = string.Empty,
                 ZipCode = string.Empty,
-                Plot = string.Empty,
+                //Plot = string.Empty,
                 Birthday = null,
                 Anniversary = null
             };
@@ -145,8 +145,8 @@ namespace Members.Areas.Identity.Pages.Account
             public string? ZipCode { get; set; }
 
             // Plot Identifier
-            [Display(Name = "Plot")]
-            public string? Plot { get; set; }
+            //[Display(Name = "Plot")]
+            //public string? Plot { get; set; }
         }
 
         public async Task OnGetAsync(string? returnUrl = null)
@@ -204,7 +204,7 @@ namespace Members.Areas.Identity.Pages.Account
                         City = Input.City,
                         State = Input.State,
                         ZipCode = Input.ZipCode,
-                        Plot = Input.Plot,
+                        //Plot = Input.Plot,
                         User = user
                     };
 

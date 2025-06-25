@@ -251,7 +251,6 @@ namespace Members.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Plot = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HomePhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsBillingContact = table.Column<bool>(type: "bit", nullable: false)

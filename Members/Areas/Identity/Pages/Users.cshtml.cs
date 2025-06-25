@@ -34,7 +34,7 @@ namespace Members.Areas.Identity.Pages
             public string? City { get; set; }
             public string? State { get; set; }
             public string? ZipCode { get; set; }
-            public string? Plot { get; set; }
+            //public string? Plot { get; set; }
             public DateTime? Birthday { get; set; }
             public DateTime? Anniversary { get; set; }
             public bool IsBillingContact { get; set; }
@@ -115,7 +115,7 @@ namespace Members.Areas.Identity.Pages
             var csvBuilder = new StringBuilder();
 
             // Header Row
-            csvBuilder.AppendLine("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,Roles,FirstName,MiddleName,LastName,HomePhoneNumber,AddressLine1,AddressLine2,City,State,ZipCode,Plot,Birthday,Anniversary,IsBillingContact,LastLogin");
+            csvBuilder.AppendLine("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,Roles,FirstName,MiddleName,LastName,HomePhoneNumber,AddressLine1,AddressLine2,City,State,ZipCode,Birthday,Anniversary,IsBillingContact,LastLogin");
 
             // Data Rows
             foreach (var item in allUsersData)
@@ -141,7 +141,6 @@ namespace Members.Areas.Identity.Pages
                 csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.City));
                 csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.State));
                 csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.ZipCode));
-                csvBuilder.AppendFormat("\"{0}\",", EscapeCsvField(userProfile?.Plot));
                 csvBuilder.AppendFormat("\"{0}\",", userProfile?.Birthday?.ToShortDateString() ?? "");
                 csvBuilder.AppendFormat("\"{0}\",", userProfile?.Anniversary?.ToShortDateString() ?? "");
                 csvBuilder.AppendFormat("{0},", userProfile?.IsBillingContact ?? false);
@@ -216,8 +215,7 @@ namespace Members.Areas.Identity.Pages
                             (ShowExtraFields && up.AddressLine2 != null && up.AddressLine2.ToLower().Contains(searchTerm)) ||
                             (ShowExtraFields && up.City != null && up.City.ToLower().Contains(searchTerm)) ||
                             (ShowExtraFields && up.State != null && up.State.ToLower().Contains(searchTerm)) ||
-                            (ShowExtraFields && up.ZipCode != null && up.ZipCode.ToLower().Contains(searchTerm)) ||
-                            (ShowExtraFields && up.Plot != null && up.Plot.ToLower().Contains(searchTerm))
+                            (ShowExtraFields && up.ZipCode != null && up.ZipCode.ToLower().Contains(searchTerm))
                         // --- End new fields to search filter ---
                         )
                     ));
@@ -285,7 +283,7 @@ namespace Members.Areas.Identity.Pages
                     "city" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.City : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.City : null),
                     "state" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.State : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.State : null),
                     "zipcode" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.ZipCode : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.ZipCode : null),
-                    "plot" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Plot : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Plot : null),
+                    //"plot" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Plot : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Plot : null),
                     "birthday" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Birthday : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Birthday : null),
                     "anniversary" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null ? x.UserProfile.Anniversary : null) : joinedQuery.OrderByDescending(x => x.UserProfile != null ? x.UserProfile.Anniversary : null),
                     "isbillingcontact" => SortOrder?.ToLower() == "asc" ? joinedQuery.OrderBy(x => x.UserProfile != null && x.UserProfile.IsBillingContact) : joinedQuery.OrderByDescending(x => x.UserProfile != null && x.UserProfile.IsBillingContact),
@@ -345,11 +343,11 @@ namespace Members.Areas.Identity.Pages
                     City = userProfile?.City,
                     State = userProfile?.State,
                     ZipCode = userProfile?.ZipCode,
-                    Plot = userProfile?.Plot,
+                    //Plot = userProfile?.Plot,
                     Birthday = userProfile?.Birthday,
                     Anniversary = userProfile?.Anniversary,
                     IsBillingContact = userProfile?.IsBillingContact ?? false,
-                    CurrentBalance = currentBalance
+                    //CurrentBalance = currentBalance
                     // --- End Map Additional UserProfile Fields ---
                 });
             }
@@ -361,7 +359,7 @@ namespace Members.Areas.Identity.Pages
             var extraFields = new List<string>
             {
                 "firstname", "middlename", "lastname", "homephonenumber", "addressline1", "addressline2",
-                "city", "state", "zipcode", "plot", "birthday", "anniversary"
+                "city", "state", "zipcode", "birthday", "anniversary"
             };
             return extraFields.Contains(sortColumn.ToLower());
         }

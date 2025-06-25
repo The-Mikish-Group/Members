@@ -333,8 +333,8 @@ namespace Members.Migrations
                     b.Property<string>("MiddleName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Plot")
-                        .HasColumnType("nvarchar(max)");
+                    //b.Property<string>("Plot")
+                    //    .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
