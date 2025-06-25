@@ -24,8 +24,8 @@
 
                 <!-- UserName -->
                 <div class="form-floating mb-3">
-                    <input asp-for="Username" class="form-control" disabled placeholder=" " />
-                    <label asp-for="Username" class="form-label">Username</label>
+                    <input asp-for="Username" class="form-control shadow" disabled placeholder=" " />
+                    <label asp-for="Username" class="form-label">Username</label>                    
                 </div>
 
                 <!-- Phone Row -->
@@ -33,14 +33,14 @@
 
                     <!-- Cell Phone -->
                     <div class="col-6 form-floating mb-3">
-                        <input asp-for="Input.PhoneNumber" class="form-control" id="phoneNumber" placeholder="Cell Phone" />
+                        <input asp-for="Input.PhoneNumber" class="form-control shadow" id="phoneNumber" placeholder="Cell Phone" />
                         <label asp-for="Input.PhoneNumber" class="form-label">Cell Phone</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
                     <!-- Home Phone -->
                     <div class="col-6 form-floating mb-3">
-                        <input asp-for="Input.HomePhoneNumber" class="form-control" id="homephoneNumber" placeholder="Home Phone" />
+                        <input asp-for="Input.HomePhoneNumber" class="form-control shadow" id="homephoneNumber" placeholder="Home Phone" />
                         <label asp-for="Input.HomePhoneNumber" class="form-label">Home Phone (Opt.)</label>
                         <span asp-validation-for="Input.HomePhoneNumber" class="text-danger"></span>
                     </div>
@@ -52,7 +52,7 @@
 
                     <!-- FistName-->
                     <div class="col-5 form-floating mb-2">
-                        <input asp-for="Input.FirstName" class="form-control" placeholder=" " />
+                        <input asp-for="Input.FirstName" class="form-control shadow" placeholder=" " />
                         <label asp-for="Input.FirstName" class="form-label">First Name</label>
                         <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                     </div>
@@ -60,7 +60,7 @@
                     <!-- MiddleName -->
                     <div class="col-2 form-floating mb-3">
                         <div class="form-floating mb-2">
-                            <input asp-for="Input.MiddleName" class="form-control" placeholder=" " />
+                            <input asp-for="Input.MiddleName" class="form-control shadow" placeholder=" " />
                             <!-- <label asp-for="Input.MiddleName" class="form-label"></label> -->
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
@@ -68,7 +68,7 @@
 
                     <!-- LastName -->
                     <div class="col-5 form-floating mb-2">
-                        <input asp-for="Input.LastName" class="form-control" placeholder=" " />
+                        <input asp-for="Input.LastName" class="form-control shadow" placeholder=" " />
                         <label asp-for="Input.LastName" class="form-label">Last Name</label>
                         <span asp-validation-for="Input.LastName" class="text-danger"></span>
                     </div>
@@ -80,14 +80,14 @@
 
                     <!-- Birthday -->
                     <div class="col-6 form-floating mb-2">
-                        <input asp-for="Input.Birthday" class="form-control" type="date" placeholder=" " />
+                        <input asp-for="Input.Birthday" class="form-control shadow" type="date" placeholder=" " />
                         <label asp-for="Input.Birthday" class="form-label">Birthday (Opt.)</label>
                         <span asp-validation-for="Input.Birthday" class="text-danger"></span>
                     </div>
 
                     <!-- Anniversary -->
                     <div class="col-6 form-floating mb-2">
-                        <input asp-for="Input.Anniversary" class="form-control" type="date" placeholder=" " />
+                        <input asp-for="Input.Anniversary" class="form-control shadow" type="date" placeholder=" " />
                         <label asp-for="Input.Anniversary" class="form-label">Anniversary (Opt.)</label>
                         <span asp-validation-for="Input.Anniversary" class="text-danger"></span>
                     </div>
@@ -98,14 +98,14 @@
 
                 <!-- AddressLine1 -->
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.AddressLine1" class="form-control" placeholder=" " />
+                    <input asp-for="Input.AddressLine1" class="form-control shadow" placeholder=" " />
                     <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
                     <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
                 </div>
 
                 <!-- AddressLine2 -->
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.AddressLine2" class="form-control" placeholder=" " />
+                    <input asp-for="Input.AddressLine2" class="form-control shadow" placeholder=" " />
                     <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Opt.)</label>
                     <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                 </div>
@@ -115,47 +115,36 @@
 
                     <!-- City -->
                     <div class="col-5 form-floating mb-3">
-                        <input asp-for="Input.City" class="form-control" placeholder=" " />
+                        <input asp-for="Input.City" class="form-control shadow" placeholder=" " />
                         <label asp-for="Input.City" class="form-label">City</label>
                         <span asp-validation-for="Input.City" class="text-danger"></span>
                     </div>
 
                     <!-- State -->
                     <div class="col-3 form-floating mb-3">
-                        <input asp-for="Input.State" class="form-control" placeholder=" " />
+                        <input asp-for="Input.State" class="form-control shadow" placeholder=" " />
                         <label asp-for="Input.State" class="form-label">State</label>
                         <span asp-validation-for="Input.State" class="text-danger"></span>
                     </div>
 
                     <!-- ZipCode -->
                     <div class="col-4 form-floating mb-3">
-                        <input asp-for="Input.ZipCode" class="form-control" placeholder=" " />
+                        <input asp-for="Input.ZipCode" class="form-control shadow" placeholder=" " />
                         <label asp-for="Input.ZipCode" class="form-label">Zip</label>
                         <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                     </div>
 
                 </div>
 
-                <hr />
-
-                <!-- Plot Identifier -->
-                @* <div class="form-floating mb-3">
-                    <input asp-for="Input.Plot" class="form-control" placeholder=" " />
-                    <label asp-for="Input.Plot" class="form-label">Plot</label>
-                    <span asp-validation-for="Input.Plot" class="text-danger"></span>
-                </div> *@
-                
-                <hr />
-
                 <div>
 
                     <!-- Cancel Button -->
-                    <a href="~/" class="btn btn-sm btn-secondary me-2">
+                    <a href="~/" class="btn btn-sm btn-back me-2 shadow">
                         <i class="bi bi-box-arrow-left"></i> Cancel
                     </a>
 
                     <!-- Save Button -->
-                    <button id="update-profile-button" type="submit" class="btn btn-sm btn-primary me-2">
+                    <button id="update-profile-button" type="submit" class="btn btn-sm btn-success me-2 shadow">
                         <i class="bi bi-check-lg"></i> Save
                     </button>                  
 

@@ -8,19 +8,19 @@
 <!-- Email Edit -->
 <div class="row gx-0 gy-0">
 
-    <div class="col-lg-8 ">
+    <div class="col-lg-8">
 
-        <h1 class="text-center text-gold-darker pb-2">Manage your account</h1>
+        <h1 class="text-gold-darker pb-2 text-center">Manage your account</h1>
 
-        <div class="card p-2 mx-0 mb-2 shadow rounded bg-Card-Menu">
-            <h2 class="text-center mb-4 text-gold-darker">
+        <div class="card bg-Card-Menu mx-0 mb-2 rounded p-2 shadow">
+            <h2 class="text-gold-darker mb-4 text-center">
                 <i class="bi bi-envelope-fill"></i> @ViewData["Title"]
             </h2>
             <form id="email-form" method="post">
                 @if (Model.IsEmailConfirmed)
                 {
-                            <div class="form-floating mb-3 input-group">
-                                <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
+                            <div class="form-floating input-group mb-3">
+                                <input asp-for="Email" class="form-control shadow" placeholder="Please enter your email." disabled />
                                 <div class="input-group-append">
                                     <span class="no-left-radius h-100 input-group-text text-success font-weight-bold">✓</span>
                                 </div>
@@ -30,24 +30,24 @@
                 else
                 {
                             <div class="form-floating mb-3">
-                                <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
+                        <input asp-for="Email" class="form-control shadow" placeholder="Please enter your email." disabled />
                                 <label asp-for="Email" class="form-label"></label>
                         <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-sm btn-link">Send verification email</button>
                             </div>
                 }
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
+                    <input asp-for="Input.NewEmail" class="form-control shadow" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
                     <label asp-for="Input.NewEmail" class="form-label"></label>
                     <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
                 </div>
 
                 <!-- Cancel -->
-                <a href="~/" class="btn btn-sm btn-secondary me-2">
+                <a href="~/" class="btn btn-sm btn-back me-2 shadow">
                     <i class="bi bi-box-arrow-left"></i> Cancel
                 </a>
 
                 <!-- Change Email -->
-                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary me-2">
+                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary me-2 shadow">
                     <i class="bi bi-envelope-arrow-right"></i> Change email
                 </button>
                 
