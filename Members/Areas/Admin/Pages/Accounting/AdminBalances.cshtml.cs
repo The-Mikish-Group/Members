@@ -687,7 +687,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
             var usersToEmail = memberBalancesTemp.Where(mb => mb.CurrentBalance > 0 || mb.CreditBalance > 0).ToList();
 
-            if (!usersToEmail.Any())
+            if (usersToEmail.Count == 0)
             {
                 _logger.LogWarning("OnPostEmailBalanceNotificationsAsync: No members found with a balance to notify after re-fetching data.");
                 TempData["WarningMessage"] = "No members found with a balance to notify.";
@@ -706,7 +706,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 if (string.IsNullOrEmpty(member.Email) || member.Email == "N/A")
                 {
-                    _logger.LogWarning($"Skipping email for {member.FullName} (User ID: {member.UserId}) due to missing or invalid email address.");
+                    _logger.LogWarning("Skipping email for {member.FullName} (User ID: {member.UserId}) due to missing or invalid email address.", member.FullName, member.UserId);
                     emailErrors.Add($"Skipped {member.FullName}: Missing email.");
                     continue;
                 }
@@ -761,7 +761,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 else // Should not happen based on usersToEmail filter, but as a fallback.
                 {
-                    _logger.LogInformation($"Skipping email for {member.FullName} (User ID: {member.UserId}) as they have a zero balance and no credit.");
+                    _logger.LogInformation("Skipping email for {member.FullName} (User ID: {member.UserId}) as they have a zero balance and no credit.", member.FullName, member.UserId);
                     continue;
                 }
 
@@ -772,7 +772,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Failed to send balance notification email to {member.Email} for user {member.FullName} (ID: {member.UserId}).");
+                    _logger.LogError(ex, "Failed to send balance notification email to {member.Email} for user {member.FullName} (ID: {member.UserId}).", member.Email, member.FullName, member.UserId);
                     emailErrors.Add($"Failed for {member.FullName} ({member.Email}): {ex.Message}");
                 }
             }
@@ -780,7 +780,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             var statusMessage = new StringBuilder();
             statusMessage.AppendLine($"Balance notification process completed.");
             statusMessage.AppendLine($"- Emails successfully sent: {emailsSentCount}");
-            if (emailErrors.Any())
+            if (emailErrors.Count != 0)
             {
                 statusMessage.AppendLine($"- Errors encountered: {emailErrors.Count}");
                 emailErrors.Take(5).ToList().ForEach(err => statusMessage.AppendLine($"  - {err}"));
