@@ -28,7 +28,7 @@ namespace Members.Areas.Admin.Pages.Accounting
         {
             [Required]
             [StringLength(150, MinimumLength = 5)]
-            [Display(Name = "Batch Description (e.g., Monthly Assessment)")]
+            [Display(Name = "Batch Description:")]
             public string Description { get; set; } = string.Empty;
             // AmountDue removed from InputModel
             [Required]

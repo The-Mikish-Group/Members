@@ -36,7 +36,7 @@
     @if (!Model.MemberBalances.Any())
     {
         <div class="alert alert-info" role="alert">
-            No member balances to display with the current filter.
+            No member balances to display.
         </div>
     }
     else
@@ -50,7 +50,7 @@
                     <form method="get" class="my-2">
                         <div class="form-check">
                             <input asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-input shadow" onchange="this.form.submit()" />
-                            <label asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-label">Show Only Members with Outstanding Balances</label>
+                            <label asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-label">Show Only Members with Balances</label>
                         </div>
                         <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
                     </form>
@@ -77,6 +77,14 @@
                             </button>
                         </div>
                     }
+
+                    <!-- Email Balance Notifications -->
+                    <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block; margin-left: 5px;" class="my-2">
+                        <button type="submit" class="btn btn-sm btn-info"
+                                onclick="return confirm('Are you sure you want to send balance notification emails to all members with a balance?');">
+                            <i class="bi bi-envelope"></i> Email Balance Notifications
+                        </button>
+                    </form>
 
                 </div>
 

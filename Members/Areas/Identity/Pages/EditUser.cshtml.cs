@@ -91,6 +91,8 @@ namespace Members.Areas.Identity.Pages
             // public string? Plot { get; set; } // Removed
             [Display(Name = "Is Billing Contact")] // DisplayName might need update if "for Plot" is no longer relevant
             public bool IsBillingContact { get; set; }
+            [Display(Name = "Is Two Factor On")]
+            public bool TwoFactorEnabled { get; set; }
         }
         private async Task LoadUserAsync(IdentityUser user)
         {
@@ -103,6 +105,7 @@ namespace Members.Areas.Identity.Pages
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumber = user.PhoneNumber,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+                TwoFactorEnabled = user.TwoFactorEnabled,
                 HomePhoneNumber = userProfile?.HomePhoneNumber,
                 FirstName = userProfile?.FirstName,
                 MiddleName = userProfile?.MiddleName,
@@ -198,6 +201,7 @@ namespace Members.Areas.Identity.Pages
             user.EmailConfirmed = Input.EmailConfirmed;
             user.PhoneNumber = Input.PhoneNumber;
             user.PhoneNumberConfirmed = Input.PhoneNumberConfirmed;
+            user.TwoFactorEnabled = Input.TwoFactorEnabled;
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
@@ -226,13 +230,13 @@ namespace Members.Areas.Identity.Pages
             userProfile.ZipCode = Input.ZipCode;
             // userProfile.Plot = Input.Plot; // Removed
             userProfile.HomePhoneNumber = Input.HomePhoneNumber;
-            
+
             // Simplified IsBillingContact assignment
             userProfile.IsBillingContact = Input.IsBillingContact;
 
             await _dbContext.SaveChangesAsync(); // Consolidated SaveChanges
             StatusMessage = "User updated successfully.";
-            
+
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             {
                 return Redirect(ReturnUrl);

@@ -13,11 +13,13 @@ namespace Members.Areas.Admin.Pages.Accounting
     public class AdminBalancesModel(
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
-        ILogger<AdminBalancesModel> logger) : PageModel
+        ILogger<AdminBalancesModel> logger,
+        Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender) : PageModel
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<AdminBalancesModel> _logger = logger;
+        private readonly Microsoft.AspNetCore.Identity.UI.Services.IEmailSender _emailSender = emailSender;
         private const int RecentFeeDaysThreshold = 7;
         // Inner class for results
         public class LateFeeApplicationResult
@@ -242,7 +244,9 @@ namespace Members.Areas.Admin.Pages.Accounting
         public class MemberBalanceViewModel
         {
             public string UserId { get; set; } = string.Empty;
-            public string FullName { get; set; } = string.Empty;
+            public string FullName { get; set; } = string.Empty; // Used for display in table (LastName, FirstName)
+            public string FirstName { get; set; } = string.Empty; // For email salutation
+            public string LastName { get; set; } = string.Empty; // For email salutation
             public string Email { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
             public decimal CurrentBalance { get; set; }
@@ -328,6 +332,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                         UserId = user.Id,
                         FullName = fullName,
                         Email = user.Email ?? "N/A",
+                        FirstName = userProfile.FirstName ?? string.Empty,
+                        LastName = userProfile.LastName ?? string.Empty,
                         CurrentBalance = currentBalance,
                         CreditBalance = unappliedCredits
                     };
@@ -408,6 +414,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 UserId = user.Id,
                                 FullName = fullName,
                                 Email = user.Email ?? "N/A",
+                                FirstName = userProfile.FirstName ?? string.Empty,
+                                LastName = userProfile.LastName ?? string.Empty,
                                 CurrentBalance = currentBalance,
                                 CreditBalance = userCreditBalance
                             };
@@ -473,7 +481,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                 if (csvBytes.Length <= sb.ToString().Split(Environment.NewLine)[0].Length + 2 && dataToExport.Count == 0) // Check if only header or empty
                 {
-                     _logger.LogWarning("[AdminBalances Export CSV] CSV is empty or contains only header. This might not trigger a download in some browsers.");
+                    _logger.LogWarning("[AdminBalances Export CSV] CSV is empty or contains only header. This might not trigger a download in some browsers.");
                 }
 
                 return File(csvBytes, "text/csv", fileName);
@@ -485,7 +493,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 // For now, rethrow or return a specific error page/message.
                 // Returning a ContentResult might be better for AJAX, but for direct nav, this will be a server error.
                 TempData["ErrorMessage"] = "A critical error occurred while generating the CSV export for Admin Balances. Please check the logs.";
-                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding }); // Redirect back to the page with an error message
+                return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding }); // Redirect back to the page with an error message
                 // Or, for more direct feedback without redirect:
                 // return Content($"Error generating CSV: {ex.Message}. Check server logs.", "text/plain");
             }
@@ -615,6 +623,179 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 TempData["WarningMessage"] = "Bulk late fee process ran, but no fees were applied or applicable to the targeted billing contacts.";
             }
+            return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
+        }
+
+        public async Task<IActionResult> OnPostEmailBalanceNotificationsAsync()
+        {
+            _logger.LogInformation("OnPostEmailBalanceNotificationsAsync START - Attempting to send balance notifications.");
+
+            // Re-fetch member balances to ensure data is current for the POST request.
+            var memberBalancesTemp = new List<MemberBalanceViewModel>();
+            var memberRoleName = "Member";
+            var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
+
+            if (usersInMemberRole != null && usersInMemberRole.Any())
+            {
+                foreach (var user in usersInMemberRole)
+                {
+                    var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
+                    if (userProfile != null && userProfile.IsBillingContact)
+                    {
+                        string fullName;
+                        if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
+                        {
+                            fullName = userProfile.LastName;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = userProfile.FirstName;
+                        }
+                        else
+                        {
+                            fullName = user.UserName ?? "N/A";
+                        }
+
+                        decimal totalChargesFromInvoices = await _context.Invoices
+                            .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
+                            .SumAsync(i => i.AmountDue);
+                        decimal totalAmountPaidOnInvoices = await _context.Invoices
+                            .Where(i => i.UserID == user.Id && i.Status != InvoiceStatus.Cancelled)
+                            .SumAsync(i => i.AmountPaid);
+                        decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
+                        decimal unappliedCredits = await _context.UserCredits
+                            .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
+                            .SumAsync(uc => uc.Amount);
+
+                        memberBalancesTemp.Add(new MemberBalanceViewModel
+                        {
+                            UserId = user.Id,
+                            FullName = fullName,
+                            Email = user.Email ?? "N/A",
+                            FirstName = userProfile.FirstName ?? string.Empty,
+                            LastName = userProfile.LastName ?? string.Empty,
+                            CurrentBalance = currentBalance,
+                            CreditBalance = unappliedCredits
+                        });
+                    }
+                }
+            }
+
+            var usersToEmail = memberBalancesTemp.Where(mb => mb.CurrentBalance > 0 || mb.CreditBalance > 0).ToList();
+
+            if (!usersToEmail.Any())
+            {
+                _logger.LogWarning("OnPostEmailBalanceNotificationsAsync: No members found with a balance to notify after re-fetching data.");
+                TempData["WarningMessage"] = "No members found with a balance to notify.";
+                return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
+            }
+
+            int emailsSentCount = 0;
+            var emailErrors = new List<string>();
+            var siteName = Environment.GetEnvironmentVariable("SITE_NAME") ?? "Our Community"; // Fallback site name
+
+            // Calculate Due Date (first day of the upcoming month)
+            var today = DateTime.Today;
+            var dueDate = new DateTime(today.Year, today.Month, 1).AddMonths(1);
+
+            foreach (var member in usersToEmail)
+            {
+                if (string.IsNullOrEmpty(member.Email) || member.Email == "N/A")
+                {
+                    _logger.LogWarning($"Skipping email for {member.FullName} (User ID: {member.UserId}) due to missing or invalid email address.");
+                    emailErrors.Add($"Skipped {member.FullName}: Missing email.");
+                    continue;
+                }
+
+                string subject;
+                string body;
+
+                if (member.CurrentBalance > 0) // Balance Due
+                {
+                    subject = $"Important: Your {siteName} Account Balance Due";
+                    body = $@"
+                        <!DOCTYPE html>
+                        <html lang=""en"">
+                        <head>
+                            <meta charset=""UTF-8"">
+                            <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                            <title>{subject}</title>
+                        </head>
+                        <body style=""font-family: sans-serif; line-height: 1.6; margin: 20px;"">
+                            <p style=""margin-bottom: 1em;"">Dear {member.FirstName} {member.LastName},</p>
+                            <p style=""margin-bottom: 1em;"">This is a notification regarding your account balance with {siteName}.</p>
+                            <p style=""margin-bottom: 1em;"">Your current outstanding balance is: <strong>{member.CurrentBalance:C}</strong>.</p>
+                            <p style=""margin-bottom: 1em;"">This amount is due by <strong>{dueDate:MMMM dd, yyyy}</strong>.</p>
+                            <p style=""margin-bottom: 1em;"">You can view your detailed billing history and make payments by logging into your account at <a href=""https://{Request.Host}/Member/MyBilling"" style=""color: #007bff; text-decoration: none;"">https://{Request.Host}/Member/MyBilling</a>.</p>
+                            {(member.CreditBalance > 0 ? $"<p style=\"margin-bottom: 1em;\">You also have an available credit balance of <strong>{member.CreditBalance:C}</strong>. This credit will be automatically applied to new charges.</p>" : "")}
+                            <p style=""margin-bottom: 0;"">Sincerely,</p>
+                            <p style=""margin-top: 0;"">The {siteName} Team</p>
+                        </body>
+                        </html>";
+                }
+                else if (member.CreditBalance > 0) // Credit Balance Only
+                {
+                    subject = $"Your {siteName} Account Credit Balance";
+                    body = $@"
+                        <!DOCTYPE html>
+                        <html lang=""en"">
+                        <head>
+                            <meta charset=""UTF-8"">
+                            <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                            <title>{subject}</title>
+                        </head>
+                        <body style=""font-family: sans-serif; line-height: 1.6; margin: 20px;"">
+                            <p style=""margin-bottom: 1em;"">Dear {member.FirstName} {member.LastName},</p>
+                            <p style=""margin-bottom: 1em;"">This is a notification regarding your account balance with {siteName}.</p>
+                            <p style=""margin-bottom: 1em;"">You currently have a credit balance of: <strong>{member.CreditBalance:C}</strong>.</p>
+                            <p style=""margin-bottom: 1em;"">This credit will be automatically applied to any future charges on your account.</p>
+                            <p style=""margin-bottom: 1em;"">You can view your detailed billing history by logging into your account at <a href=""https://{Request.Host}/Member/MyBilling"" style=""color: #007bff; text-decoration: none;"">https://{Request.Host}/Member/MyBilling</a>.</p>
+                            <p style=""margin-bottom: 0;"">Sincerely,</p>
+                            <p style=""margin-top: 0;"">The {siteName} Team</p>
+                        </body>
+                        </html>";
+                }
+                else // Should not happen based on usersToEmail filter, but as a fallback.
+                {
+                    _logger.LogInformation($"Skipping email for {member.FullName} (User ID: {member.UserId}) as they have a zero balance and no credit.");
+                    continue;
+                }
+
+                try
+                {
+                    await _emailSender.SendEmailAsync(member.Email, subject, body);
+                    emailsSentCount++;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Failed to send balance notification email to {member.Email} for user {member.FullName} (ID: {member.UserId}).");
+                    emailErrors.Add($"Failed for {member.FullName} ({member.Email}): {ex.Message}");
+                }
+            }
+
+            var statusMessage = new StringBuilder();
+            statusMessage.AppendLine($"Balance notification process completed.");
+            statusMessage.AppendLine($"- Emails successfully sent: {emailsSentCount}");
+            if (emailErrors.Any())
+            {
+                statusMessage.AppendLine($"- Errors encountered: {emailErrors.Count}");
+                emailErrors.Take(5).ToList().ForEach(err => statusMessage.AppendLine($"  - {err}"));
+                if (emailErrors.Count > 5)
+                {
+                    statusMessage.AppendLine($"  - ...and {emailErrors.Count - 5} more errors (check logs).");
+                }
+                TempData["ErrorMessage"] = statusMessage.ToString();
+            }
+            else
+            {
+                TempData["StatusMessage"] = statusMessage.ToString();
+            }
+
+            _logger.LogInformation("OnPostEmailBalanceNotificationsAsync COMPLETE. Emails Sent: {EmailsSent}, Errors: {ErrorCount}", emailsSentCount, emailErrors.Count);
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
     }

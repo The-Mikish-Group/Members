@@ -11,14 +11,14 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<h1 class="my-4 text-center text-gold-darker">
+<h1 class="text-gold-darker my-4 text-center">
     <i class="bi bi-person-fill"></i> @ViewData["Title"]
 </h1>
 
-<div class="container px-2 mb-4">
+<div class="container mb-4 px-2">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card p-2 shadow bg-Card-Menu">                
+            <div class="card bg-Card-Menu p-2 shadow">
 
                 <!-- Display Status Message -->
                 <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
@@ -29,7 +29,7 @@
                     <div class="d-flex justify-content-center my-3">
 
                         <!-- Cancel Button -->
-                        <button type="submit" asp-page-handler="Cancel" class="shadow btn btn-sm btn-secondary me-2">
+                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2 shadow">
                             <i class="bi bi-box-arrow-left"></i> Cancel
                         </button>
                         @{
@@ -55,29 +55,29 @@
                         <!-- Link to Member History (MyBilling) Only Billable Members -->
                         @if (Model.Input.IsBillingContact)
                         {
-                        <a asp-area="Member" asp-page="/MyBilling"
-                           asp-route-userId="@Model.Input.Id"
-                           asp-route-returnUrl="@editUserReturnUrl"
-                           class="btn btn-sm btn-info me-2">
-                            <i class="bi bi-card-list"></i> Billing
-                        </a>
-                        } 
+                            <a asp-area="Member" asp-page="/MyBilling"
+                               asp-route-userId="@Model.Input.Id"
+                               asp-route-returnUrl="@editUserReturnUrl"
+                               class="btn btn-sm btn-info me-2">
+                                <i class="bi bi-card-list"></i> Billing
+                            </a>
+                        }
 
                         <!-- Admin Protection on Delete Button -->
                         @if (User.IsInRole("Admin"))
                         {
                             <!-- Delete -->
-                            <button type="submit" asp-page-handler="Delete" class="shadow btn btn-sm btn-danger me-2" id="confirmDeleteButton">
+                            <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2 shadow" id="confirmDeleteButton">
                                 <i class="bi bi-x-circle"></i> Delete
                             </button>
                         }
 
                         <!-- Save -->
-                        <button type="submit" class="shadow btn btn-sm btn-success me-2">
+                        <button type="submit" class="btn btn-sm btn-success me-2 shadow">
                             <i class="bi bi-save"></i> Save
                         </button>
 
-                        @{                            
+                        @{
                             editUserReturnUrl = Url.Page("/EditUser",
                             new
                             {
@@ -86,7 +86,7 @@
                                 returnUrl = Model.ReturnUrl
                             });
                         }
-                        
+
                     </div>
 
                     <!-- Hidden Fields -->
@@ -101,7 +101,7 @@
 
                     <!-- Email -->
                     <div class="form-floating mb-3">
-                        <span class="shadow form-control email-display readonly-email">@Model.Input.Email</span>
+                        <span class="text-gold-darker form-control email-display readonly-email shadow">@Model.Input.Email</span>
                         <div class="email-icon-container" id="emailCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
                         </div>
@@ -111,30 +111,30 @@
 
                     <!-- Email Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="shadow form-check-input email-confirmed-checkbox" id="emailConfirmedCheckbox" />
+                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox shadow" id="emailConfirmedCheckbox" />
                         <label class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
 
                     <!-- Phone Number -->
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.PhoneNumber" class="shadow form-control readonly-PhoneNumber" id="phoneNumber" placeholder="Phone Number" />
+                        <input asp-for="Input.PhoneNumber" class="text-gold-darker form-control readonly-PhoneNumber shadow" id="phoneNumber" placeholder="Phone Number" />
                         <div class="phoneNumber-icon-container" id="phoneNumberCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
                         </div>
-                        <label asp-for="Input.PhoneNumber" class="form-label">Cell Phone</label>
+                        <label asp-for="Input.PhoneNumber" class="text-gold-darker form-label">Cell Phone</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
                     <!-- Phone Number Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="shadow form-check-input phoneNumber-confirmed-checkbox" id="PhoneNumberConfirmedCheckbox" />
+                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox shadow" id="PhoneNumberConfirmedCheckbox" />
                         <label class="form-check-label text-gold-darker" for="PhoneNumberConfirmedCheckbox">Cell Phone Confirmed</label>
                     </div>
 
                     <!-- Home Phone -->
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.HomePhoneNumber" class="shadow form-control" id="homephoneNumber" placeholder="Home Phone (Opt.)" />
-                        <label asp-for="Input.HomePhoneNumber" class="form-label">Home Phone  (Opt.)</label>
+                        <input asp-for="Input.HomePhoneNumber" class="text-gold-darker form-control shadow" id="homephoneNumber" placeholder="Home Phone (Opt.)" />
+                        <label asp-for="Input.HomePhoneNumber" class="text-gold-darker form-label">Home Phone  (Opt.)</label>
                         <span asp-validation-for="Input.HomePhoneNumber" class="text-danger"></span>
                     </div>
 
@@ -144,19 +144,19 @@
                     <div class="row gx-1">
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.FirstName" class="shadow form-control" placeholder="First Name" />
-                            <label asp-for="Input.FirstName" class="form-label">First Name</label>
+                            <input asp-for="Input.FirstName" class="text-gold-darker form-control shadow" placeholder="First Name" />
+                            <label asp-for="Input.FirstName" class="text-gold-darker form-label">First Name</label>
                             <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                         </div>
 
                         <div class="col-2 form-floating mb-3">
-                            <input asp-for="Input.MiddleName" class="shadow form-control" placeholder="Middle" />
+                            <input asp-for="Input.MiddleName" class="text-gold-darker form-control shadow" placeholder="Middle" />
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.LastName" class="shadow form-control" placeholder="Last Name" />
-                            <label asp-for="Input.LastName" class="form-label">Last Name</label>
+                            <input asp-for="Input.LastName" class="text-gold-darker form-control shadow" placeholder="Last Name" />
+                            <label asp-for="Input.LastName" class="text-gold-darker form-label">Last Name</label>
                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
                         </div>
 
@@ -166,14 +166,14 @@
                     <div class="row gx-1">
 
                         <div class="col-6 form-floating mb-2">
-                            <input asp-for="Input.Birthday" class="shadow form-control" type="date" placeholder=" " />
-                            <label asp-for="Input.Birthday" class="form-label">Birthday (Opt.)</label>
+                            <input asp-for="Input.Birthday" class="text-gold-darker form-control shadow" type="date" placeholder=" " />
+                            <label asp-for="Input.Birthday" class="text-gold-darker form-label">Birthday (Opt.)</label>
                             <span asp-validation-for="Input.Birthday" class="text-danger"></span>
                         </div>
 
                         <div class="col-6 form-floating mb-2">
-                            <input asp-for="Input.Anniversary" class="shadow form-control" type="date" placeholder=" " />
-                            <label asp-for="Input.Anniversary" class="form-label">Anniversary (Opt.)</label>
+                            <input asp-for="Input.Anniversary" class="text-gold-darker form-control shadow" type="date" placeholder=" " />
+                            <label asp-for="Input.Anniversary" class="text-gold-darker form-label">Anniversary (Opt.)</label>
                             <span asp-validation-for="Input.Anniversary" class="text-danger"></span>
                         </div>
 
@@ -183,15 +183,15 @@
 
                     <!-- Address Line 1 -->
                     <div class="col-12 form-floating mb-3">
-                        <input asp-for="Input.AddressLine1" class="shadow form-control" placeholder="Address Line 1" />
-                        <label asp-for="Input.AddressLine1" class="form-label">Address Line 1</label>
+                        <input asp-for="Input.AddressLine1" class="text-gold-darker form-control shadow" placeholder="Address Line 1" />
+                        <label asp-for="Input.AddressLine1" class="text-gold-darker form-label">Address Line 1</label>
                         <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
                     </div>
 
                     <!-- Address Line 2 -->
                     <div class="col-12 form-floating mb-3">
-                        <input asp-for="Input.AddressLine2" class="shadow form-control" placeholder="Address Line 2 (Opt.)" />
-                        <label asp-for="Input.AddressLine2" class="form-label">Address Line 2 (Opt.)</label>
+                        <input asp-for="Input.AddressLine2" class="text-gold-darker form-control shadow" placeholder="Address Line 2 (Opt.)" />
+                        <label asp-for="Input.AddressLine2" class="text-gold-darker form-label">Address Line 2 (Opt.)</label>
                         <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                     </div>
 
@@ -199,100 +199,46 @@
                     <div class="row gx-1">
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.City" class="shadow form-control" placeholder="City" />
-                            <label asp-for="Input.City" class="form-label">City</label>
+                            <input asp-for="Input.City" class="text-gold-darker form-control shadow" placeholder="City" />
+                            <label asp-for="Input.City" class="text-gold-darker form-label">City</label>
                             <span asp-validation-for="Input.City" class="text-danger"></span>
                         </div>
 
                         <div class="col-3 form-floating mb-3">
-                            <input asp-for="Input.State" class="shadow form-control" placeholder="State" />
-                            <label asp-for="Input.State" class="form-label">State</label>
+                            <input asp-for="Input.State" class="text-gold-darker form-control shadow" placeholder="State" />
+                            <label asp-for="Input.State" class="text-gold-darker form-label">State</label>
                             <span asp-validation-for="Input.State" class="text-danger"></span>
                         </div>
 
                         <div class="col-4 form-floating mb-3">
-                            <input asp-for="Input.ZipCode" class="shadow form-control" placeholder="Zip Code" />
-                            <label asp-for="Input.ZipCode" class="form-label">Zip</label>
+                            <input asp-for="Input.ZipCode" class="text-gold-darker form-control shadow" placeholder="Zip Code" />
+                            <label asp-for="Input.ZipCode" class="text-gold-darker form-label">Zip</label>
                             <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                         </div>
 
                     </div>
 
-                    <hr />
-
                     <div class="row gx-1">
 
                         <!-- Is Billing Contact -->
-                        <div class="col-12 mb-4"> <!-- Changed from col-6 form-floating -->
+                        <div class="col-6 mb-4">
                             <div class="form-check ms-2">
-                                <input asp-for="Input.IsBillingContact" type="checkbox" class="shadow form-check-input isBillingContact-checkbox" id="IsBillingContactCheckbox" />
+                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox shadow" id="IsBillingContactCheckbox" />
                                 <label asp-for="Input.IsBillingContact" class="form-check-label"></label>
                             </div>
                             <span asp-validation-for="Input.IsBillingContact" class="text-danger"></span>
                         </div>
 
+                        <!-- Two Factor Enabled -->
+                        <div class="col-6 mb-4">
+                            <div class="form-check mb-3">
+                                <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox shadow" id="twoFactorEnabledCheckbox" />
+                                <label class="form-check-label text-gold-darker" asp-for="Input.TwoFactorEnabled"></label>
+                                <span asp-validation-for="Input.TwoFactorEnabled" class="text-danger"></span>
+                            </div>
+                        </div>
+
                     </div>
-
-                    <hr />
-
-                    @* <div class="d-flex justify-content-center mt-3">
-
-                        <!-- Cancel Button -->
-                        <button type="submit" asp-page-handler="Cancel" class="shadow btn btn-sm btn-secondary me-2">
-                            <i class="bi bi-box-arrow-left"></i> Cancel
-                        </button>
-                        @{
-                            // Construct the return URL that points back to this EditUser page,
-                            // including its own ReturnUrl parameter (which typically points to the Users list page).
-                            var editUserReturnUrl = Url.Page("/EditUser",
-                            new
-                            {
-                                area = "Identity",
-                                id = Model.Input.Id,
-                                returnUrl = Model.ReturnUrl // This is EditUser's original ReturnUrl from the Users list
-                            });
-                        }
-                        <!-- Link to the Manage Roles page - Pass the current user's ID and the ReturnUrl -->
-                        <a asp-page="./ManageRoles"
-                           asp-route-userId="@Model.Input.Id"
-                           asp-route-returnUrl="@editUserReturnUrl"
-                           class="btn btn-sm btn-info me-2">
-                            <i class="bi bi-tags"></i> Roles
-                        </a>
-
-                        <!-- Admin Protection on Delete Button -->
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <!-- Delete -->
-                            <button type="submit" asp-page-handler="Delete" class="shadow btn btn-sm btn-danger me-2" id="confirmDeleteButton">
-                                <i class="bi bi-x-circle"></i> Delete
-                            </button>
-                        }
-
-                        <!-- Save -->
-                        <button type="submit" class="shadow btn btn-sm btn-success me-2">
-                            <i class="bi bi-save"></i> Save
-                        </button>
-
-                        @{                            
-                            editUserReturnUrl = Url.Page("/EditUser",
-                            new
-                            {
-                                area = "Identity",
-                                id = Model.Input.Id,
-                                returnUrl = Model.ReturnUrl
-                            });
-                        }
-                        <a asp-area="Member" asp-page="/MyBilling"
-                           asp-route-userId="@Model.Input.Id"
-                           asp-route-returnUrl="@editUserReturnUrl"
-                           class="btn btn-sm btn-info" target="_blank">
-                            <i class="bi bi-card-list"></i> Billing
-                        </a>
-
-                    </div>  *@
-                    <hr />
-
                 </form>
             </div>
         </div>
@@ -317,6 +263,7 @@
             transform: translateY(-50%);
         }
 
+        .form-check-input[type=checkbox].twoFactorEnabled-checkbox,
         .form-check-input[type=checkbox].isBillingContact-checkbox,
         .form-check-input[type=checkbox].email-confirmed-checkbox,
         .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox,
@@ -333,6 +280,7 @@
             position: relative;
         }
 
+            .form-check-input[type=checkbox].twoFactorEnabled-checkbox:checked,
             .form-check-input[type=checkbox].isBillingContact-checkbox:checked,
             .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
             .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked,
@@ -341,6 +289,7 @@
                 border-color: #28a745; /* Green border when checked */
             }
 
+                .form-check-input[type=checkbox].twoFactorEnabled-checkbox:checked::before,
                 .form-check-input[type=checkbox].isBillingContact-checkbox:checked::before,
                 .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
                 .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,
@@ -371,6 +320,7 @@
             const phoneNumberCheckIcon = document.getElementById('phoneNumberCheckIcon');
             const isManager = document.getElementById('isManager').value === 'True';
             const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+            const twoFactorEnabledCheckbox = document.getElementById('twoFactorEnabledCheckbox');
 
             // Get references to the input fields for capitalization
             const firstNameInput = document.getElementById('Input_FirstName');
@@ -541,7 +491,7 @@
                  }
             });
 
-            // Admin role lockout logic remains the same
+            // Admin role lockout logic
             if (roleCheckboxes && isManager) {
                 roleCheckboxes.forEach(checkbox => {
                     if (checkbox.dataset.roleName === "Admin") {
@@ -552,25 +502,31 @@
                 });
             }
 
-            // const isBillingContactCheckbox = document.getElementById('IsBillingContactCheckbox'); // Plot related JS removed
-            // const accountingActionsSection = document.getElementById('accountingActionsSection'); // Plot related JS removed
-            // const plotInput = document.getElementById('Input_Plot'); // Plot related JS removed
+            // Logic for Two Factor Enabled checkbox
+            if (twoFactorEnabledCheckbox) {
+                const initialTwoFactorState = twoFactorEnabledCheckbox.checked;
+                if (!initialTwoFactorState) {
+                    // If 2FA is initially off (false), disable the checkbox.
+                    // This prevents an admin from enabling 2FA from this page.
+                    twoFactorEnabledCheckbox.disabled = true;
+                } else {
+                    // If 2FA is initially on (true), the checkbox is enabled by default.
+                    // We add a listener to prevent it from being *checked* if the admin unchecks it and then tries to re-check it
+                    // without a page reload. They can only uncheck it.
+                    let hasBeenUncheckedByAdmin = false;
+                    twoFactorEnabledCheckbox.addEventListener('click', function (e) {
+                        // This event fires *after* the checkbox state has changed due to the click.
+                        if (!twoFactorEnabledCheckbox.checked) {
+                            // If the admin just UNCHECKED it (it was true, now it's false)
+                            hasBeenUncheckedByAdmin = true;
+                        } else if (hasBeenUncheckedByAdmin && twoFactorEnabledCheckbox.checked) {
+                            // If it was unchecked by the admin in this session, and they are now trying to CHECK it again
+                            e.preventDefault(); // Prevent the re-checking action
+                        }
+                    });
+                }
+            }
 
-            // function toggleBillingContactCheckboxability() { // Plot related JS removed
-            // }
-
-            // // Initial check on page load // Plot related JS removed
-            // toggleBillingContactCheckboxability();
-
-            // // Event listener for Plot input field // Plot related JS removed
-            // if (plotInput) {
-            // }
-
-            // // Modify existing IsBillingContact checkbox event listener // Plot related JS removed
-            // if (isBillingContactCheckbox && accountingActionsSection) {
-            // } else {
-            // }
-        
         });
     </script>
 }
