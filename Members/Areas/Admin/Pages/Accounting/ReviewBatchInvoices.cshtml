@@ -40,11 +40,12 @@
 
     @if (Model.DraftInvoices == null || !Model.DraftInvoices.Any())
     {
-        @* <div class="alert alert-info mt-4" role="alert">
+        @*<div class="alert alert-info mt-4" role="alert">
             No draft invoices found for this batch ID, or the batch has already been processed.
         </div> *@
+
         <div class="mt-3">
-            <a asp-page="./CreateBatchInvoices" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i> Create New Batch</a>
+            <a asp-page="./CreateBatchInvoices" class="btn btn-sm btn-success"><i class="bi bi-plus"></i> Create a New Batch</a>
         </div>
         return;
     }
@@ -79,11 +80,11 @@
                 }
                 else if (string.IsNullOrEmpty(Model.BatchId))
                 {
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info mt-4" role="alert">
                         There are currently no draft batches available for review.
                     </div>
-                    <div class="mt-3">
-                        <a asp-page="./CreateBatchInvoices" class="btn btn-primary">Create New Batch</a>
+                    <div class="mt-4">
+                        <a asp-page="./CreateBatchInvoices" class="btn btn-success">Create a New Batch</a>
                     </div>
                     return;
                 }
