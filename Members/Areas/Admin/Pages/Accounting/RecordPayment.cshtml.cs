@@ -494,50 +494,146 @@ namespace Members.Areas.Admin.Pages.Accounting
             UserCredit? userCreditForOverpayment = null; // Declare variable to hold the UserCredit if created
 
             // Handle UserCredit if there was an overpayment
+            // START: Modified Overpayment Handling
+            decimal remainingOverpaymentToCreditUser = overpaymentAmount;
+
             if (overpaymentAmount > 0)
+            {
+                _logger.LogInformation("Overpayment of {OverpaymentAmount} occurred for User {UserId} on Invoice {InvoiceId}. Attempting to apply to other due invoices.",
+                                       overpaymentAmount, Input.SelectedUserID, invoiceToPay.InvoiceID);
+
+                var otherDueInvoices = await _context.Invoices
+                    .Where(i => i.UserID == Input.SelectedUserID &&
+                                 i.InvoiceID != invoiceToPay.InvoiceID &&
+                                 (i.Status == InvoiceStatus.Due || i.Status == InvoiceStatus.Overdue) &&
+                                 i.AmountPaid < i.AmountDue)
+                    .OrderBy(i => i.DueDate)
+                    .ToListAsync();
+
+                if (otherDueInvoices.Count != 0)
+                {
+                    _logger.LogInformation("Found {OtherInvoiceCount} other due/overdue invoices for User {UserId} to apply overpayment.",
+                                           otherDueInvoices.Count, Input.SelectedUserID);
+
+                    foreach (var otherInvoice in otherDueInvoices)
+                    {
+                        if (remainingOverpaymentToCreditUser <= 0) break; // All overpayment has been applied
+
+                        decimal amountNeededForOtherInvoice = otherInvoice.AmountDue - otherInvoice.AmountPaid;
+                        decimal amountToApplyToOtherInvoice = Math.Min(remainingOverpaymentToCreditUser, amountNeededForOtherInvoice);
+
+                        otherInvoice.AmountPaid += amountToApplyToOtherInvoice;
+                        otherInvoice.LastUpdated = DateTime.UtcNow;
+                        if (otherInvoice.AmountPaid >= otherInvoice.AmountDue)
+                        {
+                            otherInvoice.Status = InvoiceStatus.Paid;
+                            otherInvoice.AmountPaid = otherInvoice.AmountDue; // Cap
+                        }
+                        else if (otherInvoice.DueDate < DateTime.Today.AddDays(-1) && otherInvoice.Status == InvoiceStatus.Due)
+                        {
+                            otherInvoice.Status = InvoiceStatus.Overdue;
+                        }
+                        _context.Invoices.Update(otherInvoice);
+                        remainingOverpaymentToCreditUser -= amountToApplyToOtherInvoice;
+
+                        _logger.LogInformation("Applied {AppliedAmount} of overpayment to Invoice {OtherInvoiceId}. Remaining overpayment: {RemainingOverpayment}",
+                                               amountToApplyToOtherInvoice, otherInvoice.InvoiceID, remainingOverpaymentToCreditUser);
+
+                        // It's good practice to also update notes on the original payment or invoice to show this distribution.
+                        // For now, the logging captures this. A more complex system might create sub-payment records or detailed transaction logs.
+                        // We will add a note to the payment.
+                        payment.Notes = (payment.Notes ?? "") + $" Auto-applied ${amountToApplyToOtherInvoice:F2} to INV-{otherInvoice.InvoiceID:D5}.";
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("No other due/overdue invoices found for User {UserId} to apply overpayment to.", Input.SelectedUserID);
+                }
+            }
+
+            if (remainingOverpaymentToCreditUser > 0)
             {
                 userCreditForOverpayment = new UserCredit
                 {
                     UserID = Input.SelectedUserID,
-                    CreditDate = Input.PaymentDate!.Value, // Or DateTime.Today
-                    Amount = overpaymentAmount,
+                    CreditDate = Input.PaymentDate!.Value,
+                    Amount = remainingOverpaymentToCreditUser, // Only the final remaining amount
                     SourcePaymentID = null, // Will be set after payment is saved
-                    Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5}.", // Initial reason
+                    Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5} (after auto-applying to other dues).",
                     IsApplied = false,
                     DateCreated = DateTime.UtcNow,
-                    LastUpdated = DateTime.UtcNow // Ensure LastUpdated is set on creation
+                    LastUpdated = DateTime.UtcNow
                 };
                 _context.UserCredits.Add(userCreditForOverpayment);
-                const string userCreditLogTemplate = "UserCredit record created for {CreditAmount} for user {UserID} due to overpayment.";
-                _logger.LogInformation(userCreditLogTemplate, overpaymentAmount, Input.SelectedUserID);
+                _logger.LogInformation("UserCredit record created for {RemainingCreditAmount} for user {UserID} after auto-applying overpayment.",
+                                       remainingOverpaymentToCreditUser, Input.SelectedUserID);
             }
+            else if (overpaymentAmount > 0 && remainingOverpaymentToCreditUser <= 0)
+            {
+                _logger.LogInformation("Full overpayment of {OverpaymentAmount} was applied to other invoices. No UserCredit record needed for remaining balance.", overpaymentAmount);
+                payment.Notes = (payment.Notes ?? "") + $" Full overpayment auto-applied to other invoices.";
+            }
+            // END: Modified Overpayment Handling
 
             _context.Invoices.Update(invoiceToPay); // Ensure invoice is marked for update
-            // Removed the second UserCredit instantiation block and the redundant UserCredit? newCreditForOverpayment = null;
+            // _context.Payments.Update(payment); // REMOVED: This line caused the error for new entities. Changes to payment.Notes will be saved as 'payment' is already tracked by .Add()
+
+            // START: Final Truncation Safeguard for Payment.Notes
+            const int dbColumnMaxLength = 200; // Actual defined max length in the database model for Payment.Notes
+            if (payment.Notes != null && payment.Notes.Length > dbColumnMaxLength)
+            {
+                _logger.LogWarning("Payment.Notes for UserID {UserId} (InvoiceID {InvoiceId}) was further truncated from {OriginalLength} to {MaxLength} characters to fit database column. Original Note: {OriginalNote}",
+                                   payment.UserID, payment.InvoiceID, payment.Notes.Length, dbColumnMaxLength, payment.Notes);
+                payment.Notes = payment.Notes.Substring(0, dbColumnMaxLength);
+            }
+            // END: Final Truncation Safeguard
 
             try
             {
-                await _context.SaveChangesAsync(); // First main save (Payment, Invoice, potential UserCredit without SourcePaymentID)
-                _logger.LogInformation("Initial save successful for payment {PaymentAmount} to invoice {InvoiceId}. PaymentID: {PaymentId}", payment.Amount, invoiceToPay.InvoiceID, payment.PaymentID);
+                // All modifications to 'payment' (including notes) are done.
+                // 'payment' was added via _context.Payments.Add(payment).
+                // 'invoiceToPay' was updated.
+                // 'otherDueInvoices' were updated within the loop.
+                // 'userCreditForOverpayment' might have been added.
+                // All these tracked changes will be saved here:
+                await _context.SaveChangesAsync(); // First main save (Payment, Invoice, potential UserCredit without SourcePaymentID, other updated invoices)
+                _logger.LogInformation("Initial save successful for payment {PaymentAmount} to invoice {InvoiceId}. PaymentID: {PaymentId}. Other invoices might have been updated.", payment.Amount, invoiceToPay.InvoiceID, payment.PaymentID);
 
-                // Check if userCreditForOverpayment was created and payment.PaymentID is available
-                if (userCreditForOverpayment != null && payment.PaymentID > 0)
+                if (userCreditForOverpayment != null && userCreditForOverpayment.Amount > 0 && payment.PaymentID > 0)
                 {
                     userCreditForOverpayment.SourcePaymentID = payment.PaymentID;
-                    userCreditForOverpayment.Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5} from Payment ID: {payment.PaymentID}.";
-                    userCreditForOverpayment.LastUpdated = DateTime.UtcNow; // Update LastUpdated timestamp
-                    // _context.UserCredits.Update(userCreditForOverpayment); // EF Core tracks changes, explicit Update often not needed here.
+                    userCreditForOverpayment.Reason = $"Overpayment on Invoice INV-{invoiceToPay.InvoiceID:D5} from Payment ID: {payment.PaymentID} (after auto-applying to other dues).";
+                    userCreditForOverpayment.LastUpdated = DateTime.UtcNow;
+                    // _context.UserCredits.Update(userCreditForOverpayment); // EF Core tracks changes
                     await _context.SaveChangesAsync(); // Second save, specifically for UserCredit.SourcePaymentID, Reason, and LastUpdated
-                    _logger.LogInformation("Successfully linked UserCredit {UserCreditId} to PaymentID {PaymentId}", userCreditForOverpayment.UserCreditID, payment.PaymentID);
+                    _logger.LogInformation("Successfully linked UserCredit {UserCreditId} (Amount: {CreditAmount}) to PaymentID {PaymentId}",
+                                           userCreditForOverpayment.UserCreditID, userCreditForOverpayment.Amount, payment.PaymentID);
                 }
 
                 // All database operations successful, now set TempData
-                TempData["StatusMessage"] = $"Payment of {Input.Amount!.Value:C} applied. Invoice INV-{invoiceToPay.InvoiceID:D5} status: {invoiceToPay.Status}.";
-                if (userCreditForOverpayment != null) // Check if a credit was actually created
+                var statusMessageBuilder = new System.Text.StringBuilder();
+                statusMessageBuilder.Append($"Payment of {Input.Amount!.Value:C} processed for Invoice INV-{invoiceToPay.InvoiceID:D5} (Status: {invoiceToPay.Status}).");
+
+                if (overpaymentAmount > 0)
                 {
-                    TempData["StatusMessage"] += $"\nOverpayment of {overpaymentAmount:C} credited to account (Credit ID: {userCreditForOverpayment.UserCreditID}).";
+                    decimal amountActuallyAppliedToOthers = overpaymentAmount - remainingOverpaymentToCreditUser;
+                    if (amountActuallyAppliedToOthers > 0)
+                    {
+                        statusMessageBuilder.Append($" ${amountActuallyAppliedToOthers:C} of the overpayment was automatically applied to other due invoices.");
+                    }
                 }
-                _logger.LogInformation("Successfully processed payment ID {PaymentID}, updated invoice ID {InvoiceID}.", payment.PaymentID, invoiceToPay.InvoiceID);
+                if (userCreditForOverpayment != null && userCreditForOverpayment.Amount > 0)
+                {
+                    statusMessageBuilder.Append($" Remaining overpayment of ${userCreditForOverpayment.Amount:C} credited to account (Credit ID: {userCreditForOverpayment.UserCreditID}).");
+                }
+                else if (overpaymentAmount > 0 && remainingOverpaymentToCreditUser <= 0)
+                {
+                    statusMessageBuilder.Append($" The entire overpayment amount was applied to other due invoices.");
+                }
+
+                TempData["StatusMessage"] = statusMessageBuilder.ToString();
+                _logger.LogInformation("Successfully processed payment ID {PaymentID}, updated invoice ID {InvoiceID}. Final status message: {StatusMessage}",
+                                       payment.PaymentID, invoiceToPay.InvoiceID, TempData["StatusMessage"]);
             }
             catch (DbUpdateException ex)
             {

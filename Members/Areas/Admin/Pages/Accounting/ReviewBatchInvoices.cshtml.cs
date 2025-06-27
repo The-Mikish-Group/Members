@@ -290,7 +290,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                 if (csvBytes.Length <= sb.ToString().Split(Environment.NewLine)[0].Length + 2 && invoicesToExportDetails.Count == 0) // Check if only header or empty
                 {
-                     _logger.LogWarning("[ReviewBatchInvoices Export CSV] CSV is empty or contains only header for BatchID '{BatchId}'. This might not trigger a download.", batchId);
+                    _logger.LogWarning("[ReviewBatchInvoices Export CSV] CSV is empty or contains only header for BatchID '{BatchId}'. This might not trigger a download.", batchId);
                 }
 
                 return File(csvBytes, "text/csv", fileName);
@@ -404,12 +404,93 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
                 _context.Invoices.Update(invoice);
                 finalizedCount++;
+
+                // START: Apply remaining credit to other due invoices for the user
+                var remainingUserCredits = await _context.UserCredits
+                    .Where(uc => uc.UserID == invoice.UserID && !uc.IsApplied && uc.Amount > 0)
+                    .OrderBy(uc => uc.CreditDate)
+                    .ToListAsync();
+
+                if (remainingUserCredits.Count != 0)
+                {
+                    var otherDueInvoices = await _context.Invoices
+                        .Where(i => i.UserID == invoice.UserID &&
+                                     i.InvoiceID != invoice.InvoiceID && // Exclude the current invoice
+                                     (i.Status == InvoiceStatus.Due || i.Status == InvoiceStatus.Overdue) &&
+                                     i.AmountPaid < i.AmountDue)
+                        .OrderBy(i => i.DueDate) // Oldest due invoices first
+                        .ToListAsync();
+
+                    if (otherDueInvoices.Count != 0)
+                    {
+                        _logger.LogInformation("User {UserId} has {CreditCount} remaining credit(s). Attempting to apply to {InvoiceCount} other due/overdue invoices.", invoice.UserID, remainingUserCredits.Count, otherDueInvoices.Count);
+
+                        foreach (var otherInvoice in otherDueInvoices)
+                        {
+                            if (!remainingUserCredits.Any(c => c.Amount > 0)) break; // No more credit left to apply
+
+                            decimal remainingAmountDueOnOtherInvoice = otherInvoice.AmountDue - otherInvoice.AmountPaid;
+
+                            foreach (var credit in remainingUserCredits.Where(c => c.Amount > 0).ToList()) // Iterate over a copy in case of modification
+                            {
+                                if (remainingAmountDueOnOtherInvoice <= 0) break; // This 'otherInvoice' is now fully paid
+
+                                decimal originalCreditAmountForNotes = credit.Amount; // For logging/notes
+                                decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnOtherInvoice);
+
+                                // Update otherInvoice
+                                otherInvoice.AmountPaid += amountToApplyFromThisCredit;
+                                remainingAmountDueOnOtherInvoice -= amountToApplyFromThisCredit;
+                                otherInvoice.LastUpdated = DateTime.UtcNow;
+
+                                // Update credit
+                                credit.Amount -= amountToApplyFromThisCredit;
+                                // Note: AppliedToInvoiceID is tricky here if a single credit applies to multiple.
+                                // For simplicity, we'll update it to the *last* invoice it was applied to, or append.
+                                // A more robust solution might involve a linking table CreditApplication(CreditID, InvoiceID, AmountApplied)
+                                credit.AppliedToInvoiceID = otherInvoice.InvoiceID; // Mark this credit as (at least partially) applied to this other invoice
+                                credit.LastUpdated = DateTime.UtcNow;
+                                credit.AppliedDate = DateTime.UtcNow; // Update applied date
+
+                                string noteSuffix = $"Applied {amountToApplyFromThisCredit:C} to INV-{otherInvoice.InvoiceID:D5} (secondary application during batch finalization). Original credit amount was {originalCreditAmountForNotes:C}.";
+
+                                if (credit.Amount <= 0)
+                                {
+                                    credit.IsApplied = true;
+                                    credit.Amount = 0; // Ensure it doesn't go negative
+                                    credit.ApplicationNotes = $"{noteSuffix} No balance remaining on this credit.";
+                                    _logger.LogInformation("Credit ID {CreditId} fully applied to INV-{InvoiceId}. Amount: {AmountApplied}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit);
+                                }
+                                else
+                                {
+                                    credit.IsApplied = false; // Still has balance
+                                    credit.ApplicationNotes = $"{noteSuffix} Remaining balance on this credit: {credit.Amount:C}.";
+                                    _logger.LogInformation("Credit ID {CreditId} partially applied to INV-{InvoiceId}. Amount: {AmountApplied}. Remaining on credit: {CreditRemaining}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit, credit.Amount);
+                                }
+                                _context.UserCredits.Update(credit);
+                            }
+
+                            // Update status of otherInvoice
+                            if (otherInvoice.AmountPaid >= otherInvoice.AmountDue)
+                            {
+                                otherInvoice.Status = InvoiceStatus.Paid;
+                                otherInvoice.AmountPaid = otherInvoice.AmountDue; // Cap at AmountDue
+                            }
+                            else if (otherInvoice.Status == InvoiceStatus.Due && otherInvoice.DueDate < DateTime.UtcNow.Date)
+                            {
+                                otherInvoice.Status = InvoiceStatus.Overdue;
+                            }
+                            _context.Invoices.Update(otherInvoice);
+                        }
+                    }
+                }
+                // END: Apply remaining credit to other due invoices for the user
             }
             try
             {
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Successfully finalized {finalizedCount} invoices for BatchID: {BatchId}.", finalizedCount, BatchId);
-                TempData["StatusMessage"] = $"{finalizedCount} invoices in batch '{BatchId}' have been finalized and are now Due (or Paid if credits applied).";
+                _logger.LogInformation("Successfully finalized {finalizedCount} invoices for BatchID: {BatchId}. Additional credit applications may have occurred.", finalizedCount, BatchId);
+                TempData["StatusMessage"] = $"{finalizedCount} invoices in batch '{BatchId}' have been finalized. Credits were applied where applicable, including to other outstanding invoices for users with balances.";
             }
             catch (DbUpdateException ex)
             {
