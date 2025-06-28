@@ -584,7 +584,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             {
                 _logger.LogWarning("Payment.Notes for UserID {UserId} (InvoiceID {InvoiceId}) was further truncated from {OriginalLength} to {MaxLength} characters to fit database column. Original Note: {OriginalNote}",
                                    payment.UserID, payment.InvoiceID, payment.Notes.Length, dbColumnMaxLength, payment.Notes);
-                payment.Notes = payment.Notes.Substring(0, dbColumnMaxLength);
+                payment.Notes = payment.Notes[..dbColumnMaxLength];
             }
             // END: Final Truncation Safeguard
 
