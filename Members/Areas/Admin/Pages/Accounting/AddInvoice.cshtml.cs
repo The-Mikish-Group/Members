@@ -196,14 +196,15 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, during new invoice creation.", credit.UserCreditID, invoice.InvoiceID, amountActuallyApplied);
 
                                 decimal creditAmountBeforeThisApplication = credit.Amount;
-                                credit.Amount -= amountActuallyApplied; 
+
+                                credit.Amount -= amountActuallyApplied;
                                 credit.LastUpdated = DateTime.UtcNow;
                                 // string applicationNoteForCredit = $"Utilized {amountActuallyApplied:C} for new INV-{invoice.InvoiceID:D5} (CA_ID {creditApplication.CreditApplicationID}) on {DateTime.UtcNow:yyyy-MM-dd}.";
 
-                                if (credit.Amount <= 0) 
+                                if (credit.Amount <= 0)
                                 {
-                                    credit.IsApplied = true; 
-                                    credit.Amount = 0;      
+                                    credit.IsApplied = true;
+                                    credit.Amount = 0;
                                     credit.AppliedDate = DateTime.UtcNow;
                                     // credit.AppliedToInvoiceID = invoice.InvoiceID; // Less critical with CreditApplications table
                                     // applicationNoteForCredit += " Credit fully utilized."; // Not needed for UserCredit.ApplicationNotes
@@ -219,10 +220,10 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 // credit.ApplicationNotes = (string.IsNullOrEmpty(credit.ApplicationNotes) ? "" : credit.ApplicationNotes + "; ") + applicationNoteForCredit;
                                 _context.UserCredits.Update(credit);
 
-                                invoice.AmountPaid += amountActuallyApplied; 
+                                invoice.AmountPaid += amountActuallyApplied;
                                 remainingAmountDueOnNewInvoice -= amountActuallyApplied;
                                 // invoice.LastUpdated will be set before SaveChangesAsync below
-                                
+
                                 creditsWereUpdated = true;
                                 if (string.IsNullOrEmpty(appliedCreditsSummary)) appliedCreditsSummary = "\nCredits applied: ";
                                 appliedCreditsSummary += $"{amountActuallyApplied:C} (from Credit UCID#{credit.UserCreditID} via CA_ID#{creditApplication.CreditApplicationID}); ";

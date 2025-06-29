@@ -390,7 +390,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                             credit.Amount -= amountToApplyFromThisCredit;
                             // credit.AppliedToInvoiceID = invoice.InvoiceID; // This becomes less important
                             credit.LastUpdated = DateTime.UtcNow;
-                            
+
                             if (credit.Amount <= 0)
                             {
                                 credit.IsApplied = true;
@@ -478,12 +478,12 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 };
                                 _context.CreditApplications.Add(secondaryCreditApplication);
                                 _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, for secondary invoice.", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit);
-                                
+
                                 // Update credit
                                 credit.Amount -= amountToApplyFromThisCredit;
                                 // credit.AppliedToInvoiceID = otherInvoice.InvoiceID; // Less important now
                                 credit.LastUpdated = DateTime.UtcNow;
-                                
+
                                 // string noteSuffix = $"Applied {amountToApplyFromThisCredit:C} to INV-{otherInvoice.InvoiceID:D5} (secondary app during batch {BatchId}). Prev Bal: {creditAmountBeforeThisSpecificApplication:C}.";
 
                                 if (credit.Amount <= 0)

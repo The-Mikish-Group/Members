@@ -297,6 +297,10 @@ namespace Members.Areas.Admin.Pages.Accounting
             _context.CreditApplications.Add(creditApplication);
 
             decimal originalCreditAmountForLog = creditToApply.Amount;
+            creditToApply.Amount -= actualAmountToApply;
+            creditToApply.LastUpdated = DateTime.UtcNow;
+
+            decimal originalCreditAmountForLog = creditToApply.Amount;
             creditToApply.Amount -= actualAmountToApply; 
             creditToApply.LastUpdated = DateTime.UtcNow;
             
@@ -306,16 +310,18 @@ namespace Members.Areas.Admin.Pages.Accounting
                 creditToApply.Amount = 0;       // Ensure amount doesn't go negative
                 creditToApply.AppliedDate = DateTime.UtcNow; // Optional: can signify date of full application
                 // creditToApply.AppliedToInvoiceID = invoiceToApplyTo.InvoiceID; // This field becomes less critical
-                _logger.LogInformation("CreditID {CreditID} fully applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}", 
+                _logger.LogInformation("CreditID {CreditID} fully applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}",
+
                     creditToApply.UserCreditID, originalCreditAmountForLog, actualAmountToApply, creditToApply.Amount);
             }
             else
             {
                 creditToApply.IsApplied = false; // Ensure IsApplied is false if there's a remaining balance
-                _logger.LogInformation("CreditID {CreditID} partially applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}", 
+                _logger.LogInformation("CreditID {CreditID} partially applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}",
                     creditToApply.UserCreditID, originalCreditAmountForLog, actualAmountToApply, creditToApply.Amount);
             }
-            
+
+
             // UserCredit.ApplicationNotes will primarily store the original reason or voiding notes.
             // Details of this specific application are in CreditApplication.Notes.
             // We don't need to append detailed application notes to UserCredit.ApplicationNotes anymore.
@@ -324,10 +330,10 @@ namespace Members.Areas.Admin.Pages.Accounting
             // unless the credit is fully utilized or voided later.
 
             _context.UserCredits.Update(creditToApply);
-            
+
             try
             {
-                await _context.SaveChangesAsync(); 
+                await _context.SaveChangesAsync();
 
                 TempData["StatusMessage"] = $"{actualAmountToApply:C} from Credit ID {creditToApply.UserCreditID} (New App. ID: {creditApplication.CreditApplicationID}) applied to Invoice INV-{invoiceToApplyTo.InvoiceID:D5}. Invoice status: {invoiceToApplyTo.Status}.";
                 if (creditToApply.IsVoided) // Should not happen as we fetch non-voided credits
@@ -620,7 +626,8 @@ namespace Members.Areas.Admin.Pages.Accounting
                     }
                     else
                     {
-                        _logger.LogInformation("No other due/overdue invoices found for User {UserId} to apply overpayment from UserCredit {UserCreditId}.", 
+                        _logger.LogInformation("No other due/overdue invoices found for User {UserId} to apply overpayment from UserCredit {UserCreditId}.",
+
                                                Input.SelectedUserID, overpaymentEventCredit.UserCreditID);
                     }
 
@@ -648,7 +655,6 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                 await _context.SaveChangesAsync(); // Save CreditApplications, updated UserCredit, and other Invoices
                 _logger.LogInformation("Successfully saved credit applications and updated overpayment UserCredit {UserCreditId}.", overpaymentEventCredit?.UserCreditID);
-
 
                 // Build Status Message
                 var statusMessageBuilder = new System.Text.StringBuilder();

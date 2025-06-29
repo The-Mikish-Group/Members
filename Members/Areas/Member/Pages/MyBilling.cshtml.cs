@@ -264,6 +264,7 @@ namespace Members.Areas.Member.Pages
                         linkedCredit.Amount += appToReverse.AmountApplied; // Restore amount to the credit
                         linkedCredit.IsApplied = false; // It's no longer (fully) applied
                         // Optionally clear AppliedDate if you use it to signify date of full application
+
                         // linkedCredit.AppliedDate = null; 
                         linkedCredit.LastUpdated = DateTime.UtcNow;
                         linkedCredit.ApplicationNotes = (string.IsNullOrEmpty(linkedCredit.ApplicationNotes) ? "" : linkedCredit.ApplicationNotes + "; ") +
@@ -289,7 +290,7 @@ namespace Members.Areas.Member.Pages
             // The actual direct payments are handled next by creating a new credit.
             invoiceToVoid.AmountPaid -= totalAmountUnpaidFromCreditApplications;
             if (invoiceToVoid.AmountPaid < 0) invoiceToVoid.AmountPaid = 0;
-            
+
             _context.Invoices.Update(invoiceToVoid);
 
             // --- Step 3: Create a new UserCredit for any amount that was paid by direct payments (not by other credits) ---
@@ -538,7 +539,6 @@ namespace Members.Areas.Member.Pages
                 // If payment was $500 for $100 invoice, AmountPaid became $100. reduction is Min(100, 500) = $100. Correct for this invoice.
                 // If payment was $50 for $100 invoice, AmountPaid became $50. reduction is Min(50, 50) = $50. Correct.
                 decimal reductionAmountForDirectApplication = Math.Min(directlyLinkedInvoice.AmountPaid, paymentToVoid.Amount);
-                
                 // This reductionAmountForDirectApplication should not exceed the portion of the payment that was NOT an overpayment.
                 // Example: Payment $500, Invoice $100. Overpayment $400. Portion applied to this invoice = $100.
                 // So, reductionAmountForDirectApplication should be $100.
@@ -582,11 +582,13 @@ namespace Members.Areas.Member.Pages
                         paymentToVoid.PaymentID, sourcedCredit.UserCreditID, sourcedCredit.Amount);
 
                     sourcedCredit.IsVoided = true;
-                    sourcedCredit.Reason += $"; VOIDED: Source Payment P{paymentToVoid.PaymentID} was voided on {DateTime.UtcNow:yyyy-MM-dd}.";
-                    sourcedCredit.ApplicationNotes = (string.IsNullOrEmpty(sourcedCredit.ApplicationNotes) ? "" : sourcedCredit.ApplicationNotes + "; ") +
-                                                     $"VOIDED due to source Payment P{paymentToVoid.PaymentID} void.";
+
+                    // Append to Reason, as this is a significant event for the credit's lifecycle.
+                    sourcedCredit.Reason = $"{sourcedCredit.Reason ?? "Credit"}; VOIDED: Source Payment P{paymentToVoid.PaymentID} was voided on {DateTime.UtcNow:yyyy-MM-dd}.";
+                    // Set ApplicationNotes to a concise final status, rather than appending.
+                    sourcedCredit.ApplicationNotes = $"VOIDED due to source Payment P{paymentToVoid.PaymentID} void on {DateTime.UtcNow:yyyy-MM-dd}. Original reason: {sourcedCredit.Reason}";
                     sourcedCredit.LastUpdated = DateTime.UtcNow;
-                    
+
                     // Find all active applications of this specific sourcedCredit
                     var applicationsToReverse = await _context.CreditApplications
                         .Include(ca => ca.Invoice) // Include the Invoice to update it
