@@ -6,7 +6,7 @@ namespace Members.Models
 {
     public enum InvoiceStatus
     {
-        Draft,      // <<< ADD THIS NEW STATUS
+        Draft,     
         Due,
         Paid,
         Overdue,

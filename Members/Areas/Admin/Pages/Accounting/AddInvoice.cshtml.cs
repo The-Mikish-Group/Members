@@ -51,7 +51,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             [Display(Name = "Description")]
             public string Description { get; set; } = string.Empty;
             [Required]
-            [Range(0.01, 1000000.00, ErrorMessage = "Amount must be greater than 0.")]
+            [Range(0.00, 1000000.00, ErrorMessage = "Amount must be 0 or greater.")] // Changed 0.01 to 0.00
             [DataType(DataType.Currency)]
             [Display(Name = "Amount Due")]
             public decimal AmountDue { get; set; }
@@ -180,31 +180,61 @@ namespace Members.Areas.Admin.Pages.Accounting
                             if (remainingAmountDueOnNewInvoice <= 0) break; // Invoice is fully paid by credits
                             //decimal amountToApplyFromThisCredit;
                             decimal amountActuallyApplied = Math.Min(remainingAmountDueOnNewInvoice, credit.Amount);
-                            credit.Amount -= amountActuallyApplied; // DECREASE the credit's amount
-                            credit.LastUpdated = DateTime.UtcNow;
-                            credit.ApplicationNotes = (credit.ApplicationNotes ?? "") +
-                                $"Utilized {amountActuallyApplied:C} for INV-{invoice.InvoiceID:D5} on {DateTime.UtcNow:yyyy-MM-dd}. ";
-                            if (credit.Amount <= 0) // Check if credit is now exhausted
+
+                            if (amountActuallyApplied > 0) // Only proceed if there's an amount to apply
                             {
-                                credit.IsApplied = true; // Mark as fully applied
-                                credit.Amount = 0;      // Ensure it's not negative
-                                credit.AppliedDate = DateTime.UtcNow;
-                                credit.AppliedToInvoiceID = invoice.InvoiceID; // Link to the invoice that exhausted it
-                                credit.ApplicationNotes += "Credit fully utilized. ";
+                                // Create CreditApplication record
+                                var creditApplication = new CreditApplication
+                                {
+                                    UserCreditID = credit.UserCreditID,
+                                    InvoiceID = invoice.InvoiceID,
+                                    AmountApplied = amountActuallyApplied,
+                                    ApplicationDate = DateTime.UtcNow,
+                                    Notes = $"Auto-applied during new invoice creation (INV-{invoice.InvoiceID:D5}). Original UserCredit Reason: {credit.Reason}"
+                                };
+                                _context.CreditApplications.Add(creditApplication);
+                                _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, during new invoice creation.", credit.UserCreditID, invoice.InvoiceID, amountActuallyApplied);
+
+                                decimal creditAmountBeforeThisApplication = credit.Amount;
+                                credit.Amount -= amountActuallyApplied; 
+                                credit.LastUpdated = DateTime.UtcNow;
+                                // string applicationNoteForCredit = $"Utilized {amountActuallyApplied:C} for new INV-{invoice.InvoiceID:D5} (CA_ID {creditApplication.CreditApplicationID}) on {DateTime.UtcNow:yyyy-MM-dd}.";
+
+                                if (credit.Amount <= 0) 
+                                {
+                                    credit.IsApplied = true; 
+                                    credit.Amount = 0;      
+                                    credit.AppliedDate = DateTime.UtcNow;
+                                    // credit.AppliedToInvoiceID = invoice.InvoiceID; // Less critical with CreditApplications table
+                                    // applicationNoteForCredit += " Credit fully utilized."; // Not needed for UserCredit.ApplicationNotes
+                                    _logger.LogInformation("UserCredit UCID#{UserCreditID} fully utilized by new invoice INV-{InvoiceID}. Prev Bal: {PrevBal}, Applied: {AppliedAmount}", credit.UserCreditID, invoice.InvoiceID, creditAmountBeforeThisApplication, amountActuallyApplied);
+                                }
+                                else
+                                {
+                                    credit.IsApplied = false;
+                                     _logger.LogInformation("UserCredit UCID#{UserCreditID} partially utilized by new invoice INV-{InvoiceID}. Prev Bal: {PrevBal}, Applied: {AppliedAmount}, Rem Bal: {RemBal}", credit.UserCreditID, invoice.InvoiceID, creditAmountBeforeThisApplication, amountActuallyApplied, credit.Amount);
+                                }
+                                // UserCredit.ApplicationNotes should retain its original creation reason.
+                                // No longer appending detailed application notes here.
+                                // credit.ApplicationNotes = (string.IsNullOrEmpty(credit.ApplicationNotes) ? "" : credit.ApplicationNotes + "; ") + applicationNoteForCredit;
+                                _context.UserCredits.Update(credit);
+
+                                invoice.AmountPaid += amountActuallyApplied; 
+                                remainingAmountDueOnNewInvoice -= amountActuallyApplied;
+                                // invoice.LastUpdated will be set before SaveChangesAsync below
+                                
+                                creditsWereUpdated = true;
+                                if (string.IsNullOrEmpty(appliedCreditsSummary)) appliedCreditsSummary = "\nCredits applied: ";
+                                appliedCreditsSummary += $"{amountActuallyApplied:C} (from Credit UCID#{credit.UserCreditID} via CA_ID#{creditApplication.CreditApplicationID}); ";
                             }
-                            // If credit.Amount > 0, IsApplied remains false, and it's still available with its new reduced amount.
-                            _context.UserCredits.Update(credit);
-                            invoice.AmountPaid += amountActuallyApplied; // This part should be correct
-                            remainingAmountDueOnNewInvoice -= amountActuallyApplied;
-                            credit.AppliedDate = DateTime.UtcNow;
-                            credit.AppliedToInvoiceID = invoice.InvoiceID; // NOW invoice.InvoiceID is valid
-                            _context.UserCredits.Update(credit);
-                            creditsWereUpdated = true;
-                            if (string.IsNullOrEmpty(appliedCreditsSummary)) appliedCreditsSummary = "\nCredits applied: ";
-                            appliedCreditsSummary += $"{amountActuallyApplied:C} (from Credit #{credit.UserCreditID}); ";
                         }
                     }
                     // Update invoice status after applying credits
+                    if (creditsWereUpdated || invoice.AmountPaid > 0) // ensure LastUpdated is set if AmountPaid changed
+                    {
+                        invoice.LastUpdated = DateTime.UtcNow;
+                    }
+
                     if (invoice.AmountPaid >= invoice.AmountDue)
                     {
                         invoice.Status = InvoiceStatus.Paid;

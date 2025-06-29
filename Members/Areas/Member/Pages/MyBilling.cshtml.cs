@@ -54,7 +54,7 @@ namespace Members.Areas.Member.Pages
         {
             public DateTime Date { get; set; }
             public int? InvoiceID { get; set; }
-            public int? PaymentID { get; set; } // Added for voiding payments
+            public int? PaymentID { get; set; } 
             public string Description { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
             public decimal? ChargeAmount { get; set; }
@@ -62,7 +62,7 @@ namespace Members.Areas.Member.Pages
             public decimal? PaymentAmount { get; set; }
             public string Type { get; set; } = string.Empty;
             public string StatusOrMethod { get; set; } = string.Empty;
-            public bool IsVoided { get; set; } = false; // Added for voiding payments
+            public bool IsVoided { get; set; } = false;
         }
         public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
         {
@@ -236,40 +236,96 @@ namespace Members.Areas.Member.Pages
                 // ... (handle already cancelled) ...
                 return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
             }
-            decimal amountPreviouslyPaidOnInvoice = invoiceToVoid.AmountPaid;
+            decimal originalAmountPaidOnInvoice = invoiceToVoid.AmountPaid; // Capture before any changes
+            string successMessage = $"Invoice INV-{invoiceToVoid.InvoiceID:D5} ('{invoiceToVoid.Description}') has been cancelled.";
+            List<string> creditReversalSummaries = [];
+
+            // --- Step 1: Reverse any CreditApplications that paid this invoice ---
+            var applicationsToReverse = await _context.CreditApplications
+                .Include(ca => ca.UserCredit) // Include the UserCredit to update it
+                .Where(ca => ca.InvoiceID == invoiceToVoid.InvoiceID && !ca.IsReversed)
+                .ToListAsync();
+
+            decimal totalAmountUnpaidFromCreditApplications = 0;
+
+            if (applicationsToReverse.Count != 0)
+            {
+                _logger.LogInformation("Found {Count} active credit applications for cancelled InvoiceID {InvoiceId}. Reversing them.", applicationsToReverse.Count, invoiceToVoid.InvoiceID);
+                foreach (var appToReverse in applicationsToReverse)
+                {
+                    appToReverse.IsReversed = true;
+                    appToReverse.ReversedDate = DateTime.UtcNow;
+                    appToReverse.Notes = (appToReverse.Notes ?? "") + $"; Reversed due to Invoice INV-{invoiceToVoid.InvoiceID:D5} cancellation on {DateTime.UtcNow:yyyy-MM-dd}.";
+                    _context.CreditApplications.Update(appToReverse);
+
+                    if (appToReverse.UserCredit != null)
+                    {
+                        var linkedCredit = appToReverse.UserCredit;
+                        linkedCredit.Amount += appToReverse.AmountApplied; // Restore amount to the credit
+                        linkedCredit.IsApplied = false; // It's no longer (fully) applied
+                        // Optionally clear AppliedDate if you use it to signify date of full application
+                        // linkedCredit.AppliedDate = null; 
+                        linkedCredit.LastUpdated = DateTime.UtcNow;
+                        linkedCredit.ApplicationNotes = (string.IsNullOrEmpty(linkedCredit.ApplicationNotes) ? "" : linkedCredit.ApplicationNotes + "; ") +
+                                                        $"Reversed application of {appToReverse.AmountApplied:C} from INV-{invoiceToVoid.InvoiceID:D5} (CA_ID {appToReverse.CreditApplicationID}) due to invoice cancellation.";
+                        _context.UserCredits.Update(linkedCredit);
+                        totalAmountUnpaidFromCreditApplications += appToReverse.AmountApplied;
+                        creditReversalSummaries.Add($"Restored {appToReverse.AmountApplied:C} to UserCredit UCID#{linkedCredit.UserCreditID} (from CA_ID#{appToReverse.CreditApplicationID}).");
+                        _logger.LogInformation("Reversed CreditApplicationID {CreditAppId}: Restored {AmountApplied} to UserCreditID {UserCreditId}.", appToReverse.CreditApplicationID, appToReverse.AmountApplied, linkedCredit.UserCreditID);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("CreditApplicationID {CreditAppId} linked to InvoiceID {InvoiceId} has a null UserCredit navigation property. Cannot automatically restore amount to UserCredit.", appToReverse.CreditApplicationID, invoiceToVoid.InvoiceID);
+                    }
+                }
+                successMessage += "\nApplied credits reversed: " + string.Join(" ", creditReversalSummaries);
+            }
+
+            // --- Step 2: Update the invoice itself ---
             invoiceToVoid.Status = InvoiceStatus.Cancelled;
             invoiceToVoid.ReasonForCancellation = voidReason;
             invoiceToVoid.LastUpdated = DateTime.UtcNow;
-            // Optional: Consider if invoiceToVoid.AmountPaid should be reset to 0 for cancelled invoices.
-            // For now, we'll leave it, as amountPreviouslyPaidOnInvoice captures what needs to be credited.
+            // AmountPaid on the invoice should reflect that credit applications are reversed.
+            // The actual direct payments are handled next by creating a new credit.
+            invoiceToVoid.AmountPaid -= totalAmountUnpaidFromCreditApplications;
+            if (invoiceToVoid.AmountPaid < 0) invoiceToVoid.AmountPaid = 0;
+            
             _context.Invoices.Update(invoiceToVoid);
-            string successMessage = $"Invoice INV-{invoiceToVoid.InvoiceID:D5} ('{invoiceToVoid.Description}') has been cancelled.";
-            // --- NEW LOGIC: Generate UserCredit if invoice was previously paid ---
-            if (amountPreviouslyPaidOnInvoice > 0)
+
+            // --- Step 3: Create a new UserCredit for any amount that was paid by direct payments (not by other credits) ---
+            // This is the originalAmountPaidOnInvoice MINUS what we just reversed from credit applications.
+            decimal netAmountPaidByDirectMeans = originalAmountPaidOnInvoice - totalAmountUnpaidFromCreditApplications;
+
+            if (netAmountPaidByDirectMeans > 0)
             {
-                var userCredit = new UserCredit
+                var newCreditForDirectPayments = new UserCredit
                 {
                     UserID = invoiceToVoid.UserID,
                     CreditDate = DateTime.UtcNow,
-                    Amount = amountPreviouslyPaidOnInvoice,
-                    Reason = $"Credit from cancelled Invoice INV-{invoiceToVoid.InvoiceID:D5}. Original reason: {voidReason}",
+                    Amount = netAmountPaidByDirectMeans,
+                    Reason = $"Credit from cancelled (and previously directly paid portion of) Invoice INV-{invoiceToVoid.InvoiceID:D5}. Original cancel reason: {voidReason}",
                     IsApplied = false,
                     IsVoided = false,
                     DateCreated = DateTime.UtcNow,
-                    LastUpdated = DateTime.UtcNow
-                    // SourcePaymentID could be tricky to determine if multiple payments paid this invoice.
-                    // For simplicity, we can leave it null or add a more general note.
+                    LastUpdated = DateTime.UtcNow,
+                    SourcePaymentID = null // Cannot easily determine this if multiple payments were involved
                 };
-                _context.UserCredits.Add(userCredit);
-                _logger.LogInformation("UserCredit for {Amount} created due to cancellation of InvoiceID {InvoiceId}.", amountPreviouslyPaidOnInvoice, invoiceToVoid.InvoiceID);
-                successMessage += $"\nA credit of {amountPreviouslyPaidOnInvoice:C} has been generated for you.";
+                _context.UserCredits.Add(newCreditForDirectPayments);
+                _logger.LogInformation("New UserCredit UCID#{UserCreditId} for {Amount} created due to directly paid portion of cancelled InvoiceID {InvoiceId}.", newCreditForDirectPayments.UserCreditID, newCreditForDirectPayments.Amount, invoiceToVoid.InvoiceID);
+                successMessage += $"\nA new credit of {newCreditForDirectPayments.Amount:C} has been generated for the directly paid portion.";
             }
-            // --- END NEW LOGIC ---
+            else if (originalAmountPaidOnInvoice > 0 && netAmountPaidByDirectMeans <= 0)
+            {
+                _logger.LogInformation("Invoice INV-{InvoiceId} was fully paid by credits that have now been reversed. No new credit generated for direct payments.", invoiceToVoid.InvoiceID);
+                successMessage += "\nInvoice was previously paid by credits; those credits have been restored.";
+            }
+
+
             try
             {
                 await _context.SaveChangesAsync();
                 TempData["StatusMessage"] = successMessage;
-                _logger.LogInformation("Invoice {InvoiceId} cancelled. Credit generated if applicable.", invoiceToVoid.InvoiceID);
+                _logger.LogInformation("Invoice INV-{InvoiceId} cancelled. Credit applications reversed and new credit generated if applicable.", invoiceToVoid.InvoiceID);
             }
             catch (DbUpdateException ex)
             {
@@ -466,72 +522,123 @@ namespace Members.Areas.Member.Pages
             paymentToVoid.LastUpdated = DateTime.UtcNow;
             _context.Payments.Update(paymentToVoid);
             _logger.LogInformation("PaymentID {PaymentId} marked as voided.", paymentToVoid.PaymentID);
+            // --- Step 1: Adjust the directly linked invoice (if any) ---
+            // This part handles the portion of the payment that directly paid an invoice, *not* the overpayment part.
             if (paymentToVoid.InvoiceID.HasValue && paymentToVoid.Invoice != null)
             {
                 var directlyLinkedInvoice = paymentToVoid.Invoice;
-                _logger.LogInformation("Adjusting directly linked Invoice {InvoiceID} for voided Payment {PaymentId}. Current AmountPaid: {AmountPaid}",
-                    directlyLinkedInvoice.InvoiceID, paymentToVoid.PaymentID, directlyLinkedInvoice.AmountPaid);
-                // Logic to determine how much of this payment was applied to this specific invoice
-                // This is a simplified approach; complex scenarios with multiple payments to one invoice might need more detail.
-                // Assuming the payment covered some or all of the amount that made the invoice 'Paid' or reduced its balance.
-                decimal amountPaidByThisPaymentPortion = paymentToVoid.Amount; // Start with the full payment amount
-                                                                               // If this payment resulted in an overpayment (credit generated), then the amount applied to *this* invoice was less than the full payment amount.
-                                                                               // For your scenario: P1 ($200) paid InvoiceA ($100). InvoiceA.AmountPaid became $100. Credit C1 ($100) was made.
-                                                                               // So, amountPaidByThisPaymentPortion for InvoiceA from P1 is $100.
-                                                                               // This is difficult to get retroactively without storing payment allocations.
-                                                                               // However, since InvoiceA.AmountPaid is $100 before this void, and it was paid by this $200 payment,
-                                                                               // we can deduce that $100 of P1 was applied to InvoiceA.
-                                                                               // A pragmatic approach: Reduce AmountPaid by what was paid up to AmountDue if this payment was involved.
-                                                                               // If directlyLinkedInvoice.AmountPaid currently reflects this payment's contribution correctly:
-                decimal reductionAmount = Math.Min(directlyLinkedInvoice.AmountPaid, paymentToVoid.Amount);
-                directlyLinkedInvoice.AmountPaid -= reductionAmount;
+                _logger.LogInformation("Voiding Payment P{PaymentId}: Adjusting directly linked Invoice INV-{InvoiceID}. Current AmountPaid: {AmountPaid}",
+                    paymentToVoid.PaymentID, directlyLinkedInvoice.InvoiceID, directlyLinkedInvoice.AmountPaid);
+
+                // Determine how much of *this specific payment* was applied to *this invoice*.
+                // This is complex if multiple payments hit one invoice or one payment hit multiple.
+                // For simplicity, assume the payment amount up to the invoice's original (AmountDue - AmountPaid_before_this_payment) was from this payment.
+                // A more accurate way would be to look at Payment.Amount vs Invoice.AmountDue if this was the only payment.
+                // The current logic: Math.Min(directlyLinkedInvoice.AmountPaid, paymentToVoid.Amount)
+                // If payment was $500 for $100 invoice, AmountPaid became $100. reduction is Min(100, 500) = $100. Correct for this invoice.
+                // If payment was $50 for $100 invoice, AmountPaid became $50. reduction is Min(50, 50) = $50. Correct.
+                decimal reductionAmountForDirectApplication = Math.Min(directlyLinkedInvoice.AmountPaid, paymentToVoid.Amount);
+                
+                // This reductionAmountForDirectApplication should not exceed the portion of the payment that was NOT an overpayment.
+                // Example: Payment $500, Invoice $100. Overpayment $400. Portion applied to this invoice = $100.
+                // So, reductionAmountForDirectApplication should be $100.
+                decimal nonOverpaymentPortion = paymentToVoid.Amount; // Assume full payment initially applied to this invoice if no overpayment
+                if (paymentToVoid.Amount > directlyLinkedInvoice.AmountDue - (directlyLinkedInvoice.AmountPaid - reductionAmountForDirectApplication)) { // A bit circular, need original state
+                     // More simply: if payment amount > what was needed for THIS invoice, then only what was needed is reversed from direct application.
+                     var amountNeededForThisInvoiceInitially = directlyLinkedInvoice.AmountDue - (directlyLinkedInvoice.AmountPaid - reductionAmountForDirectApplication); // Amount paid before this payment's effect is hard to get here.
+                     // Let's assume `reductionAmount` as calculated by Min is the best guess for what this payment contributed to this invoice's AmountPaid directly.
+                }
+
+
+                directlyLinkedInvoice.AmountPaid -= reductionAmountForDirectApplication;
                 if (directlyLinkedInvoice.AmountPaid < 0) directlyLinkedInvoice.AmountPaid = 0;
-                if (directlyLinkedInvoice.Status == InvoiceStatus.Paid || directlyLinkedInvoice.AmountPaid < directlyLinkedInvoice.AmountDue)
+
+                if (directlyLinkedInvoice.Status != InvoiceStatus.Cancelled) // Respect if already cancelled
                 {
-                    directlyLinkedInvoice.Status = (directlyLinkedInvoice.DueDate < DateTime.Today.AddDays(-1)) ? InvoiceStatus.Overdue : InvoiceStatus.Due;
+                    if (directlyLinkedInvoice.AmountPaid < directlyLinkedInvoice.AmountDue)
+                    {
+                        directlyLinkedInvoice.Status = (directlyLinkedInvoice.DueDate < DateTime.Today.AddDays(-1)) ? InvoiceStatus.Overdue : InvoiceStatus.Due;
+                    }
                 }
                 directlyLinkedInvoice.LastUpdated = DateTime.UtcNow;
                 _context.Invoices.Update(directlyLinkedInvoice);
-                _logger.LogInformation("Directly linked Invoice {InvoiceID} updated. New AmountPaid: {NewAmountPaid}, New Status: {NewStatus}",
-                    directlyLinkedInvoice.InvoiceID, directlyLinkedInvoice.AmountPaid, directlyLinkedInvoice.Status);
+                _logger.LogInformation("Voiding Payment P{PaymentId}: Directly linked Invoice INV-{InvoiceID} updated. New AmountPaid: {NewAmountPaid}, New Status: {NewStatus}",
+                    paymentToVoid.PaymentID, directlyLinkedInvoice.InvoiceID, directlyLinkedInvoice.AmountPaid, directlyLinkedInvoice.Status);
             }
-            var creditsSourcedByThisPayment = await _context.UserCredits
-                .Include(uc => uc.AppliedToInvoice)
-                .Where(uc => uc.SourcePaymentID == paymentToVoid.PaymentID)
+
+            // --- Step 2: Handle UserCredits that were created BY this payment (i.e., overpayment credits) ---
+            var creditsSourcedFromThisPayment = await _context.UserCredits
+                .Where(uc => uc.SourcePaymentID == paymentToVoid.PaymentID && !uc.IsVoided)
                 .ToListAsync();
-            if (creditsSourcedByThisPayment.Count != 0)
+
+            if (creditsSourcedFromThisPayment.Count != 0)
             {
-                _logger.LogInformation("Found {Count} UserCredits sourced from voided PaymentID {PaymentId}. Processing...",
-                    creditsSourcedByThisPayment.Count, paymentToVoid.PaymentID);
-                foreach (var credit in creditsSourcedByThisPayment)
+                _logger.LogInformation("Voiding Payment P{PaymentId}: Found {Count} UserCredits sourced from this payment. Voiding them and reversing their applications.",
+                    paymentToVoid.PaymentID, creditsSourcedFromThisPayment.Count);
+
+                foreach (var sourcedCredit in creditsSourcedFromThisPayment)
                 {
-                    bool wasCreditPreviouslyApplied = credit.IsApplied;
-                    decimal creditAmountThatWasApplied = credit.Amount; // Assuming this is the amount that would have been used from the credit
-                    credit.IsVoided = true;
-                    credit.ApplicationNotes = (credit.ApplicationNotes ?? "") +
-                                              $"; CREDIT VOIDED: Source Payment {paymentToVoid.PaymentID} was voided on {DateTime.UtcNow:yyyy-MM-dd}.";
-                    credit.LastUpdated = DateTime.UtcNow;
-                    // Optional: credit.Amount = 0; 
-                    // Optional: credit.IsApplied = false; credit.AppliedToInvoiceID = null; credit.AppliedDate = null;
-                    _context.UserCredits.Update(credit);
-                    _logger.LogInformation("UserCreditID {CreditID} marked as voided.", credit.UserCreditID);
-                    if (wasCreditPreviouslyApplied && credit.AppliedToInvoiceID.HasValue && credit.AppliedToInvoice != null)
+                    _logger.LogInformation("Voiding Payment P{PaymentId}: Processing sourced UserCredit UCID#{SourcedCreditId} (Amount: {Amount}).",
+                        paymentToVoid.PaymentID, sourcedCredit.UserCreditID, sourcedCredit.Amount);
+
+                    sourcedCredit.IsVoided = true;
+                    sourcedCredit.Reason += $"; VOIDED: Source Payment P{paymentToVoid.PaymentID} was voided on {DateTime.UtcNow:yyyy-MM-dd}.";
+                    sourcedCredit.ApplicationNotes = (string.IsNullOrEmpty(sourcedCredit.ApplicationNotes) ? "" : sourcedCredit.ApplicationNotes + "; ") +
+                                                     $"VOIDED due to source Payment P{paymentToVoid.PaymentID} void.";
+                    sourcedCredit.LastUpdated = DateTime.UtcNow;
+                    
+                    // Find all active applications of this specific sourcedCredit
+                    var applicationsToReverse = await _context.CreditApplications
+                        .Include(ca => ca.Invoice) // Include the Invoice to update it
+                        .Where(ca => ca.UserCreditID == sourcedCredit.UserCreditID && !ca.IsReversed)
+                        .ToListAsync();
+
+                    if (applicationsToReverse.Count != 0)
                     {
-                        var invoicePaidByThisCredit = credit.AppliedToInvoice;
-                        _logger.LogInformation("Credit {CreditID} was applied to Invoice {AppliedInvoiceID}. Reversing application. Current AmountPaid: {CurrentAmountPaid}",
-                            credit.UserCreditID, invoicePaidByThisCredit.InvoiceID, invoicePaidByThisCredit.AmountPaid);
-                        invoicePaidByThisCredit.AmountPaid -= creditAmountThatWasApplied;
-                        if (invoicePaidByThisCredit.AmountPaid < 0) invoicePaidByThisCredit.AmountPaid = 0;
-                        if (invoicePaidByThisCredit.Status == InvoiceStatus.Paid || invoicePaidByThisCredit.AmountPaid < invoicePaidByThisCredit.AmountDue)
+                        _logger.LogInformation("Voiding Payment P{PaymentId}: UserCredit UCID#{SourcedCreditId} has {AppCount} active applications. Reversing them.",
+                            paymentToVoid.PaymentID, sourcedCredit.UserCreditID, applicationsToReverse.Count);
+                        foreach (var appToReverse in applicationsToReverse)
                         {
-                            invoicePaidByThisCredit.Status = (invoicePaidByThisCredit.DueDate < DateTime.Today.AddDays(-1)) ? InvoiceStatus.Overdue : InvoiceStatus.Due;
+                            appToReverse.IsReversed = true;
+                            appToReverse.ReversedDate = DateTime.UtcNow;
+                            appToReverse.Notes = (appToReverse.Notes ?? "") + $"; Reversed due to source UserCredit UCID#{sourcedCredit.UserCreditID} (from Payment P{paymentToVoid.PaymentID}) voiding on {DateTime.UtcNow:yyyy-MM-dd}.";
+                            _context.CreditApplications.Update(appToReverse);
+
+                            if (appToReverse.Invoice != null)
+                            {
+                                var invoicePaidByApplication = appToReverse.Invoice;
+                                invoicePaidByApplication.AmountPaid -= appToReverse.AmountApplied;
+                                if (invoicePaidByApplication.AmountPaid < 0) invoicePaidByApplication.AmountPaid = 0;
+
+                                if (invoicePaidByApplication.Status != InvoiceStatus.Cancelled) // Respect if already cancelled
+                                {
+                                    if (invoicePaidByApplication.AmountPaid < invoicePaidByApplication.AmountDue)
+                                    {
+                                        invoicePaidByApplication.Status = (invoicePaidByApplication.DueDate < DateTime.Today.AddDays(-1)) ? InvoiceStatus.Overdue : InvoiceStatus.Due;
+                                    }
+                                }
+                                invoicePaidByApplication.LastUpdated = DateTime.UtcNow;
+                                _context.Invoices.Update(invoicePaidByApplication);
+                                _logger.LogInformation("Voiding Payment P{PaymentId}: Reversed CA_ID#{AppId} ({AmountApplied:C} from INV-{InvoiceId}). Invoice new AmountPaid: {NewAmountPaid}, Status: {NewStatus}",
+                                    paymentToVoid.PaymentID, appToReverse.CreditApplicationID, appToReverse.AmountApplied, invoicePaidByApplication.InvoiceID, invoicePaidByApplication.AmountPaid, invoicePaidByApplication.Status);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Voiding Payment P{PaymentId}: CreditApplication CA_ID#{AppId} for UserCredit UCID#{SourcedCreditId} has a null Invoice navigation property. Cannot update invoice.",
+                                    paymentToVoid.PaymentID, appToReverse.CreditApplicationID, sourcedCredit.UserCreditID);
+                            }
                         }
-                        invoicePaidByThisCredit.LastUpdated = DateTime.UtcNow;
-                        _context.Invoices.Update(invoicePaidByThisCredit);
-                        _logger.LogInformation("Invoice {AppliedInvoiceID} (paid by credit) updated. New AmountPaid: {NewAmountPaid}, New Status: {NewStatus}",
-                            invoicePaidByThisCredit.InvoiceID, invoicePaidByThisCredit.AmountPaid, invoicePaidByThisCredit.Status);
                     }
+                    // After reversing applications, set the sourced credit's amount to 0 and mark as applied (as it's now voided)
+                    sourcedCredit.Amount = 0;
+                    sourcedCredit.IsApplied = true; // A voided credit is effectively "applied" in the sense it's no longer available
+                    sourcedCredit.AppliedDate = DateTime.UtcNow; // Date it was effectively zeroed out/voided
+                    _context.UserCredits.Update(sourcedCredit);
                 }
+            }
+            else
+            {
+                 _logger.LogInformation("Voiding Payment P{PaymentId}: No UserCredits were directly sourced from this payment.", paymentToVoid.PaymentID);
             }
             try
             {
