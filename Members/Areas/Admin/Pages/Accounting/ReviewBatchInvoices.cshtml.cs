@@ -372,21 +372,45 @@ namespace Members.Areas.Admin.Pages.Accounting
                             // Update invoice
                             invoice.AmountPaid += amountToApplyFromThisCredit;
                             remainingAmountDueOnInvoice -= amountToApplyFromThisCredit;
+
+                            // Create CreditApplication record
+                            var primaryCreditApplication = new CreditApplication
+                            {
+                                UserCreditID = credit.UserCreditID,
+                                InvoiceID = invoice.InvoiceID,
+                                AmountApplied = amountToApplyFromThisCredit,
+                                ApplicationDate = DateTime.UtcNow,
+                                Notes = $"Applied during batch finalization (BatchID: {BatchId}). UserCredit original reason: {credit.Reason}"
+                            };
+                            _context.CreditApplications.Add(primaryCreditApplication);
+                            _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, for primary batch invoice.", credit.UserCreditID, invoice.InvoiceID, amountToApplyFromThisCredit);
+
                             // Update credit
+                            decimal creditAmountBeforeThisSpecificApplication = credit.Amount; // For accurate logging of this application instance
                             credit.Amount -= amountToApplyFromThisCredit;
-                            credit.AppliedToInvoiceID = invoice.InvoiceID;
+                            // credit.AppliedToInvoiceID = invoice.InvoiceID; // This becomes less important
                             credit.LastUpdated = DateTime.UtcNow;
-                            credit.AppliedDate = DateTime.UtcNow;
+
                             if (credit.Amount <= 0)
                             {
                                 credit.IsApplied = true;
                                 credit.Amount = 0; // Ensure it doesn't go negative
-                                credit.ApplicationNotes = $"Fully applied to INV-{invoice.InvoiceID:D5} (Batch: {BatchId}). Original credit amount was {originalCreditAmountBeforeThisApplication:C}. No balance remaining.";
+                                credit.AppliedDate = DateTime.UtcNow; // Date of full application
+                                // Keep UserCredit.ApplicationNotes as its original reason, or a general status note.
+                                // Detailed application notes are now in CreditApplication.Notes.
+                                // If ApplicationNotes is null or empty, it means it was likely just the reason.
+                                // If it already has content, we might append a general status like "; Fully utilized."
+                                if (!string.IsNullOrEmpty(credit.ApplicationNotes) && !credit.ApplicationNotes.EndsWith("Fully utilized."))
+                                {
+                                   // credit.ApplicationNotes += "; Fully utilized during batch finalization."; // Optional: too verbose?
+                                }
+                                _logger.LogInformation("UserCredit UCID#{UserCreditID} fully utilized during batch finalization. Prev Bal: {PrevBal}, Applied: {AppliedAmount}", credit.UserCreditID, creditAmountBeforeThisSpecificApplication, amountToApplyFromThisCredit);
                             }
                             else
                             {
-                                credit.IsApplied = false; // Explicitly keep it false as it's partially applied
-                                credit.ApplicationNotes = $"Partially applied {amountToApplyFromThisCredit:C} to INV-{invoice.InvoiceID:D5} (Batch: {BatchId}). Original credit amount was {originalCreditAmountBeforeThisApplication:C}. Remaining balance: {credit.Amount:C}.";
+                                credit.IsApplied = false;
+                                // Similarly, avoid detailed appends.
+                                _logger.LogInformation("UserCredit UCID#{UserCreditID} partially utilized during batch finalization. Prev Bal: {PrevBal}, Applied: {AppliedAmount}, Rem Bal: {RemBal}", credit.UserCreditID, creditAmountBeforeThisSpecificApplication, amountToApplyFromThisCredit, credit.Amount);
                             }
                             _context.UserCredits.Update(credit);
                         }
@@ -423,7 +447,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                     if (otherDueInvoices.Count != 0)
                     {
-                        _logger.LogInformation("User {UserId} has {CreditCount} remaining credit(s). Attempting to apply to {InvoiceCount} other due/overdue invoices.", invoice.UserID, remainingUserCredits.Count, otherDueInvoices.Count);
+                        _logger.LogInformation("User {UserId} has {CreditCount} remaining credit(s) after primary batch invoice. Attempting to apply to {InvoiceCount} other due/overdue invoices.", invoice.UserID, remainingUserCredits.Count, otherDueInvoices.Count);
 
                         foreach (var otherInvoice in otherDueInvoices)
                         {
@@ -435,7 +459,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                             {
                                 if (remainingAmountDueOnOtherInvoice <= 0) break; // This 'otherInvoice' is now fully paid
 
-                                decimal originalCreditAmountForNotes = credit.Amount; // For logging/notes
+                                decimal creditAmountBeforeThisSpecificApplication = credit.Amount; // For logging
                                 decimal amountToApplyFromThisCredit = Math.Min(credit.Amount, remainingAmountDueOnOtherInvoice);
 
                                 // Update otherInvoice
@@ -443,29 +467,40 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 remainingAmountDueOnOtherInvoice -= amountToApplyFromThisCredit;
                                 otherInvoice.LastUpdated = DateTime.UtcNow;
 
+                                // Create CreditApplication record
+                                var secondaryCreditApplication = new CreditApplication
+                                {
+                                    UserCreditID = credit.UserCreditID,
+                                    InvoiceID = otherInvoice.InvoiceID,
+                                    AmountApplied = amountToApplyFromThisCredit,
+                                    ApplicationDate = DateTime.UtcNow,
+                                    Notes = $"Applied during batch finalization (BatchID: {BatchId}) to other due invoice. UserCredit original reason: {credit.Reason}"
+                                };
+                                _context.CreditApplications.Add(secondaryCreditApplication);
+                                _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, for secondary invoice.", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit);
+
                                 // Update credit
                                 credit.Amount -= amountToApplyFromThisCredit;
-                                // Note: AppliedToInvoiceID is tricky here if a single credit applies to multiple.
-                                // For simplicity, we'll update it to the *last* invoice it was applied to, or append.
-                                // A more robust solution might involve a linking table CreditApplication(CreditID, InvoiceID, AmountApplied)
-                                credit.AppliedToInvoiceID = otherInvoice.InvoiceID; // Mark this credit as (at least partially) applied to this other invoice
+                                // credit.AppliedToInvoiceID = otherInvoice.InvoiceID; // Less important now
                                 credit.LastUpdated = DateTime.UtcNow;
-                                credit.AppliedDate = DateTime.UtcNow; // Update applied date
 
-                                string noteSuffix = $"Applied {amountToApplyFromThisCredit:C} to INV-{otherInvoice.InvoiceID:D5} (secondary application during batch finalization). Original credit amount was {originalCreditAmountForNotes:C}.";
+                                // string noteSuffix = $"Applied {amountToApplyFromThisCredit:C} to INV-{otherInvoice.InvoiceID:D5} (secondary app during batch {BatchId}). Prev Bal: {creditAmountBeforeThisSpecificApplication:C}.";
 
                                 if (credit.Amount <= 0)
                                 {
                                     credit.IsApplied = true;
                                     credit.Amount = 0; // Ensure it doesn't go negative
-                                    credit.ApplicationNotes = $"{noteSuffix} No balance remaining on this credit.";
-                                    _logger.LogInformation("Credit ID {CreditId} fully applied to INV-{InvoiceId}. Amount: {AmountApplied}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit);
+                                    credit.AppliedDate = DateTime.UtcNow;
+                                    // credit.ApplicationNotes = (string.IsNullOrEmpty(credit.ApplicationNotes) ? "" : credit.ApplicationNotes + "; ") +
+                                    //                           $"{noteSuffix} No balance remaining.";
+                                    _logger.LogInformation("Credit ID {CreditId} fully applied to secondary INV-{InvoiceId} during batch finalization. Amount: {AmountApplied}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit);
                                 }
                                 else
                                 {
                                     credit.IsApplied = false; // Still has balance
-                                    credit.ApplicationNotes = $"{noteSuffix} Remaining balance on this credit: {credit.Amount:C}.";
-                                    _logger.LogInformation("Credit ID {CreditId} partially applied to INV-{InvoiceId}. Amount: {AmountApplied}. Remaining on credit: {CreditRemaining}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit, credit.Amount);
+                                    // credit.ApplicationNotes = (string.IsNullOrEmpty(credit.ApplicationNotes) ? "" : credit.ApplicationNotes + "; ") +
+                                    //                           $"{noteSuffix} Rem Bal: {credit.Amount:C}.";
+                                    _logger.LogInformation("Credit ID {CreditId} partially applied to secondary INV-{InvoiceId} during batch finalization. Amount: {AmountApplied}. Rem on credit: {CreditRemaining}", credit.UserCreditID, otherInvoice.InvoiceID, amountToApplyFromThisCredit, credit.Amount);
                                 }
                                 _context.UserCredits.Update(credit);
                             }
