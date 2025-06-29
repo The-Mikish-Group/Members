@@ -300,6 +300,10 @@ namespace Members.Areas.Admin.Pages.Accounting
             creditToApply.Amount -= actualAmountToApply;
             creditToApply.LastUpdated = DateTime.UtcNow;
 
+            decimal originalCreditAmountForLog = creditToApply.Amount;
+            creditToApply.Amount -= actualAmountToApply; 
+            creditToApply.LastUpdated = DateTime.UtcNow;
+            
             if (creditToApply.Amount <= 0)
             {
                 creditToApply.IsApplied = true; // Mark as fully applied if balance is zero or less
@@ -307,6 +311,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 creditToApply.AppliedDate = DateTime.UtcNow; // Optional: can signify date of full application
                 // creditToApply.AppliedToInvoiceID = invoiceToApplyTo.InvoiceID; // This field becomes less critical
                 _logger.LogInformation("CreditID {CreditID} fully applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}",
+
                     creditToApply.UserCreditID, originalCreditAmountForLog, actualAmountToApply, creditToApply.Amount);
             }
             else
@@ -315,6 +320,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogInformation("CreditID {CreditID} partially applied. Original amount: {OriginalAmount}, Applied now: {AppliedNow}, Remaining amount: {RemainingAmount}",
                     creditToApply.UserCreditID, originalCreditAmountForLog, actualAmountToApply, creditToApply.Amount);
             }
+
 
             // UserCredit.ApplicationNotes will primarily store the original reason or voiding notes.
             // Details of this specific application are in CreditApplication.Notes.
@@ -621,6 +627,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     else
                     {
                         _logger.LogInformation("No other due/overdue invoices found for User {UserId} to apply overpayment from UserCredit {UserCreditId}.",
+
                                                Input.SelectedUserID, overpaymentEventCredit.UserCreditID);
                     }
 
@@ -648,7 +655,6 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                 await _context.SaveChangesAsync(); // Save CreditApplications, updated UserCredit, and other Invoices
                 _logger.LogInformation("Successfully saved credit applications and updated overpayment UserCredit {UserCreditId}.", overpaymentEventCredit?.UserCreditID);
-
 
                 // Build Status Message
                 var statusMessageBuilder = new System.Text.StringBuilder();

@@ -408,7 +408,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                             }
                             else
                             {
-                                credit.IsApplied = false;
+                                credit.IsApplied = false; 
                                 // Similarly, avoid detailed appends.
                                 _logger.LogInformation("UserCredit UCID#{UserCreditID} partially utilized during batch finalization. Prev Bal: {PrevBal}, Applied: {AppliedAmount}, Rem Bal: {RemBal}", credit.UserCreditID, creditAmountBeforeThisSpecificApplication, amountToApplyFromThisCredit, credit.Amount);
                             }

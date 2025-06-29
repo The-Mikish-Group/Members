@@ -196,6 +196,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                                 _logger.LogInformation("CreditApplication created: UCID {UserCreditID} to INV {InvoiceID}, Amount {AmountApplied}, during new invoice creation.", credit.UserCreditID, invoice.InvoiceID, amountActuallyApplied);
 
                                 decimal creditAmountBeforeThisApplication = credit.Amount;
+
                                 credit.Amount -= amountActuallyApplied;
                                 credit.LastUpdated = DateTime.UtcNow;
                                 // string applicationNoteForCredit = $"Utilized {amountActuallyApplied:C} for new INV-{invoice.InvoiceID:D5} (CA_ID {creditApplication.CreditApplicationID}) on {DateTime.UtcNow:yyyy-MM-dd}.";

@@ -54,7 +54,7 @@ namespace Members.Areas.Member.Pages
         {
             public DateTime Date { get; set; }
             public int? InvoiceID { get; set; }
-            public int? PaymentID { get; set; } // Added for voiding payments
+            public int? PaymentID { get; set; } 
             public string Description { get; set; } = string.Empty;
             [DataType(DataType.Currency)]
             public decimal? ChargeAmount { get; set; }
@@ -62,7 +62,7 @@ namespace Members.Areas.Member.Pages
             public decimal? PaymentAmount { get; set; }
             public string Type { get; set; } = string.Empty;
             public string StatusOrMethod { get; set; } = string.Empty;
-            public bool IsVoided { get; set; } = false; // Added for voiding payments
+            public bool IsVoided { get; set; } = false;
         }
         public async Task<IActionResult> OnGetAsync(string? userId, string? returnUrl, string? sortOrder)
         {
@@ -264,14 +264,11 @@ namespace Members.Areas.Member.Pages
                         linkedCredit.Amount += appToReverse.AmountApplied; // Restore amount to the credit
                         linkedCredit.IsApplied = false; // It's no longer (fully) applied
                         // Optionally clear AppliedDate if you use it to signify date of full application
-                        // linkedCredit.AppliedDate = null;
+
+                        // linkedCredit.AppliedDate = null; 
                         linkedCredit.LastUpdated = DateTime.UtcNow;
-                        // UserCredit.ApplicationNotes should retain its original creation reason.
-                        // Add a general note if it's being significantly altered by a reversal.
-                        // For now, the main point is that its Amount and IsApplied status are corrected.
-                        // A detailed log of the reversal is in CreditApplication.Notes.
-                        // We can add a simple, non-cumulative note if desired:
-                        // linkedCredit.ApplicationNotes = $"Balance adjusted by reversing CA_ID {appToReverse.CreditApplicationID} from INV-{invoiceToVoid.InvoiceID:D5}. Original reason: {linkedCredit.Reason}";
+                        linkedCredit.ApplicationNotes = (string.IsNullOrEmpty(linkedCredit.ApplicationNotes) ? "" : linkedCredit.ApplicationNotes + "; ") +
+                                                        $"Reversed application of {appToReverse.AmountApplied:C} from INV-{invoiceToVoid.InvoiceID:D5} (CA_ID {appToReverse.CreditApplicationID}) due to invoice cancellation.";
                         _context.UserCredits.Update(linkedCredit);
                         totalAmountUnpaidFromCreditApplications += appToReverse.AmountApplied;
                         creditReversalSummaries.Add($"Restored {appToReverse.AmountApplied:C} to UserCredit UCID#{linkedCredit.UserCreditID} (from CA_ID#{appToReverse.CreditApplicationID}).");
@@ -542,7 +539,6 @@ namespace Members.Areas.Member.Pages
                 // If payment was $500 for $100 invoice, AmountPaid became $100. reduction is Min(100, 500) = $100. Correct for this invoice.
                 // If payment was $50 for $100 invoice, AmountPaid became $50. reduction is Min(50, 50) = $50. Correct.
                 decimal reductionAmountForDirectApplication = Math.Min(directlyLinkedInvoice.AmountPaid, paymentToVoid.Amount);
-
                 // This reductionAmountForDirectApplication should not exceed the portion of the payment that was NOT an overpayment.
                 // Example: Payment $500, Invoice $100. Overpayment $400. Portion applied to this invoice = $100.
                 // So, reductionAmountForDirectApplication should be $100.
@@ -586,6 +582,7 @@ namespace Members.Areas.Member.Pages
                         paymentToVoid.PaymentID, sourcedCredit.UserCreditID, sourcedCredit.Amount);
 
                     sourcedCredit.IsVoided = true;
+
                     // Append to Reason, as this is a significant event for the credit's lifecycle.
                     sourcedCredit.Reason = $"{sourcedCredit.Reason ?? "Credit"}; VOIDED: Source Payment P{paymentToVoid.PaymentID} was voided on {DateTime.UtcNow:yyyy-MM-dd}.";
                     // Set ApplicationNotes to a concise final status, rather than appending.
