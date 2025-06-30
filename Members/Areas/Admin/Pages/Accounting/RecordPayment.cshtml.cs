@@ -299,11 +299,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             decimal originalCreditAmountForLog = creditToApply.Amount;
             creditToApply.Amount -= actualAmountToApply;
             creditToApply.LastUpdated = DateTime.UtcNow;
-
-            decimal originalCreditAmountForLog = creditToApply.Amount;
-            creditToApply.Amount -= actualAmountToApply; 
-            creditToApply.LastUpdated = DateTime.UtcNow;
-            
+             
             if (creditToApply.Amount <= 0)
             {
                 creditToApply.IsApplied = true; // Mark as fully applied if balance is zero or less
