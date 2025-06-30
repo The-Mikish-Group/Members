@@ -126,13 +126,16 @@ namespace Members.Areas.Member.Pages
             _logger.LogInformation("MyBilling.OnGetAsync: Fetching billing data for user: {determinedTargetUser.UserName} (ID: {determinedTargetUser.Id}).", determinedTargetUser.UserName, determinedTargetUser.Id);
             Invoices = await _context.Invoices.Where(i => i.UserID == determinedTargetUser.Id).ToListAsync();
             Payments = await _context.Payments.Where(p => p.UserID == determinedTargetUser.Id).ToListAsync();
-            AvailableCredits = await _context.UserCredits.Where(uc => uc.UserID == determinedTargetUser.Id && !uc.IsApplied).ToListAsync();
+            AvailableCredits = await _context.UserCredits.Where(uc => uc.UserID == determinedTargetUser.Id && !uc.IsApplied && !uc.IsVoided).ToListAsync();
             _logger.LogInformation("MyBilling.OnGetAsync: Found {Invoices.Count} invoices, {Payments.Count} payments, {AvailableCredits.Count} available credits for {determinedTargetUser.UserName}", Invoices.Count, Payments.Count, AvailableCredits.Count, determinedTargetUser.UserName);
-            decimal totalCharges = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled).Sum(i => i.AmountDue);
-            decimal currentTotalAmountPaidOnInvoices = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled).Sum(i => i.AmountPaid);
+            decimal totalCharges = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled && i.Status != InvoiceStatus.Draft).Sum(i => i.AmountDue);
+            decimal currentTotalAmountPaidOnInvoices = Invoices.Where(i => i.Status != InvoiceStatus.Cancelled && i.Status != InvoiceStatus.Draft).Sum(i => i.AmountPaid);
             CurrentBalance = totalCharges - currentTotalAmountPaidOnInvoices;
             TotalAvailableCredit = AvailableCredits.Sum(uc => uc.Amount);
             _logger.LogInformation("MyBilling.OnGetAsync: Balance for {determinedTargetUser.UserName}: {CurrentBalance}, TotalAvailableCredit: {TotalAvailableCredit}", determinedTargetUser.UserName, CurrentBalance, TotalAvailableCredit);
+            _logger.LogInformation("MyBilling.OnGetAsync: Balance for {determinedTargetUser.UserName} (excluding Draft): {CurrentBalance}, TotalAvailableCredit: {TotalAvailableCredit}", determinedTargetUser.UserName, CurrentBalance, TotalAvailableCredit);
+
+
             // Populate Transactions
             Transactions.Clear();
             foreach (var invoice in Invoices.OrderByDescending(i => i.InvoiceDate).ThenByDescending(i => i.DateCreated))
