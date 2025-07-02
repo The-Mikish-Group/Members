@@ -99,10 +99,23 @@ namespace Members.Areas.Admin.Pages.Reporting
 
         public async Task OnGetAsync()
         {
-            // Only generate data if the form has been submitted (i.e., query parameters are present)
-            // or consider always generating if defaults are desired on initial load.
-            // For now, let's assume we always generate based on StartDate/EndDate which have defaults.
+            // Always generate data based on StartDate/EndDate which have defaults.
+            // GenerateReportDataAsync initializes SummaryData.
             await GenerateReportDataAsync();
+
+            // Ensure SummaryData is not null for the view, even if no underlying data was found
+            // (GenerateReportDataAsync already creates the SummaryData object, so this is redundant if it always runs)
+            // However, if there was a condition to skip GenerateReportDataAsync, this would be essential:
+            if (SummaryData == null)
+            {
+                _logger.LogWarning("SummaryData was null after OnGetAsync, initializing to default. StartDate: {StartDate}, EndDate: {EndDate}", StartDate, EndDate);
+                SummaryData = new RevenueSummaryViewModel
+                {
+                    ReportStartDate = StartDate.Date,
+                    ReportEndDate = EndDate.Date
+                    // Other properties will default to 0 for decimals
+                };
+            }
         }
 
         public async Task<IActionResult> OnGetExportToCsvAsync()
