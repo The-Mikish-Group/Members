@@ -469,3 +469,73 @@ img {
 }
 
 /* #endregion*/
+
+/* Print Styles */
+@media print {
+    body {
+        font-size: 10pt !important; /* Smaller font for print */
+        color: #000 !important; /* Ensure text is black for print */
+        background-color: #fff !important; /* Ensure background is white */
+        -webkit-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+        print-color-adjust: exact !important; /* Standard */
+    }
+
+    header, .navbar, footer, .btn, .modal, #exportArAgingTriggerButton, .no-print /* Hide non-essential elements */ {
+        display: none !important;
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid #dee2e6 !important;
+        color: #000 !important;
+        background-color: #fff !important; /* Ensure table backgrounds are white */
+    }
+
+    .table th {
+        font-weight: bold;
+        background-color: #f8f9fa !important; /* Light gray for table headers in print if needed */
+    }
+
+    .table-responsive {
+        overflow-x: visible !important; /* Allow table to use full page width */
+    }
+
+    /* Specific to A/R Aging Report table if it has an ID, e.g., id="arAgingTable"
+       If not, these general table cell adjustments might be okay, or use a class.
+    */
+    #arAgingTable th, #arAgingTable td { /* Assuming you might add id="arAgingTable" to your table */
+        padding: 0.25rem 0.4rem !important; /* Reduce padding */
+        font-size: 9pt !important;
+    }
+    /* More generic approach if no ID is on the table in ArAgingReport.cshtml */
+    .table td, .table th {
+        padding: 0.25rem 0.4rem !important;
+        font-size: 9pt !important;
+    }
+
+
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    /* Avoid printing full URLs for links unless specifically desired */
+    /* a[href^="/"]:after { content: " (" attr(href) ")"; } */
+
+    .container, .container-fluid {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
+    /* Ensure report title is visible and black */
+    h2 { /* Assuming report titles are h2 */
+        color: #000 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Remove shadows for print */
+    .shadow, .shadow-sm, .shadow-lg {
+        box-shadow: none !important;
+    }
+}

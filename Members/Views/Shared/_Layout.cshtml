@@ -198,6 +198,14 @@
                     event.stopPropagation();
                 });
             }
+
+            // Add stopPropagation for the nested Reporting dropdown
+            const adminReportingToggle = document.querySelector('#adminReportingDropdown');
+            if (adminReportingToggle) {
+                adminReportingToggle.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            }
         });
 
     </script>
