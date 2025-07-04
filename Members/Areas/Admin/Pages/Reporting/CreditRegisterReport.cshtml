@@ -5,7 +5,7 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <div class="row">
         <div class="col">
             <h2 class="text-gold-darker">@ViewData["Title"]</h2>
@@ -17,11 +17,11 @@
         <div class="row align-items-end gy-2">
             <div class="col-md-3">
                 <label for="StartDate" class="form-label text-gold-darker">Start Date</label>
-                <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" />
+                <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-md-3">
                 <label for="EndDate" class="form-label text-gold-darker">End Date</label>
-                <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" />
+                <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-md-auto">
                 <button type="submit" class="btn btn-primary shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
@@ -90,8 +90,8 @@
                             <td>UC-@item.CreditId.ToString("D5")</td>
                             <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
                             <td>@item.CreditDate.ToString("yyyy-MM-dd")</td>
-                            <td>@Html.DisplayFor(modelItem => item.Reason)</td>
-                            <td>@Html.DisplayFor(modelItem => item.SourceInfo)</td>
+                            <td style="max-width: 250px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.Reason)</td>
+                            <td style="max-width: 250px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.SourceInfo)</td>
                             <td class="text-end">@item.OriginalAmount.ToString("C")</td>
                             <td class="text-end">@item.RemainingAmount.ToString("C")</td>
                             <td>@Html.DisplayFor(modelItem => item.Status)</td>
@@ -104,7 +104,7 @@
                             {
                                 // For the first application, display it in the main row's allocated cells
                                 var firstApp = item.AppliedApplications.First();
-                                <td class="ps-3">@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceDescription)</small></td>
+                                <td class="ps-3" style="max-width: 250px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceDescription)</small></td>
                                 <td class="text-end">@firstApp.AmountApplied.ToString("C")</td>
                                 <td>@firstApp.ApplicationDate.ToString("yyyy-MM-dd")</td>
                             }
@@ -116,7 +116,7 @@
                             {
                                 <tr class="align-middle bg-light"> @* Indent or style sub-rows *@
                                     <td colspan="9"></td> @* Empty cells for main credit info *@
-                                    <td class="ps-3">@Html.DisplayFor(modelItem => app.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => app.AppliedToInvoiceDescription)</small></td>
+                                    <td class="ps-3" style="max-width: 250px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => app.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => app.AppliedToInvoiceDescription)</small></td>
                                     <td class="text-end">@app.AmountApplied.ToString("C")</td>
                                     <td>@app.ApplicationDate.ToString("yyyy-MM-dd")</td>
                                 </tr>
