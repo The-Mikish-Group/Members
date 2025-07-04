@@ -216,7 +216,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             var builder = new System.Text.StringBuilder();
             if (StatementData == null) return new EmptyResult();
 
-            builder.AppendLine($"\"Account Statement for Member: {EscapeCsvField(StatementData.SelectedUserName)}\""); // Updated text
+            builder.AppendLine($"\"Member Account Statement for: {EscapeCsvField(StatementData.SelectedUserName)}\""); // Updated text
             builder.AppendLine($"\"Report Period: {StatementData.ReportStartDate:yyyy-MM-dd} to {StatementData.ReportEndDate:yyyy-MM-dd}\"");
             builder.AppendLine();
             builder.AppendLine($"\"Opening Balance\",,,,,\"{StatementData.OpeningBalance:F2}\"");
@@ -236,7 +236,8 @@ namespace Members.Areas.Admin.Pages.Reporting
             builder.AppendLine();
             builder.AppendLine($"\"Closing Balance\",,,,,\"{StatementData.ClosingBalance:F2}\"");
 
-            string fileName = $"AccountStatement_{StatementData.SelectedUserName?.Replace(", ", "_").Replace("(", "").Replace(")", "").Replace(" ", "")}_{StatementData.ReportStartDate:yyyyMMdd}_{StatementData.ReportEndDate:yyyyMMdd}.csv";
+            string safeUserName = StatementData.SelectedUserName?.Replace(", ", "_").Replace("(", "").Replace(")", "").Replace(" ", "") ?? "Member";
+            string fileName = $"MemberAccountStatement_{safeUserName}_{StatementData.ReportStartDate:yyyyMMdd}_{StatementData.ReportEndDate:yyyyMMdd}.csv";
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(builder.ToString());
             return File(buffer, "text/csv", fileName);
         }
@@ -250,36 +251,44 @@ namespace Members.Areas.Admin.Pages.Reporting
 
         private async Task PopulateUserSelectListAsync()
         {
-            _logger.LogInformation("PopulateUserSelectListAsync started.");
-            var users = await _userManager.Users
-                .OrderBy(u => u.UserName) // Consider ordering by last name from UserProfile if available
+            _logger.LogInformation("PopulateUserSelectListAsync started - Filtering for IsBillingContact=true.");
+
+            var billingContactProfiles = await _context.UserProfile
+                .Where(up => up.IsBillingContact)
+                .OrderBy(up => up.LastName)
+                .ThenBy(up => up.FirstName)
+                .Select(up => new { up.UserId, up.FirstName, up.LastName }) // Select only needed fields
                 .ToListAsync();
-            _logger.LogInformation("Fetched {UserCount} users from UserManager.", users.Count);
+
+            _logger.LogInformation("Fetched {ProfileCount} billing contact UserProfiles.", billingContactProfiles.Count);
 
             var userList = new List<SelectListItem>();
-            foreach (var user in users)
+            if (billingContactProfiles.Any())
             {
-                _logger.LogInformation("Processing user: ID={UserId}, Email={UserEmail}", user.Id, user.Email);
-                var profile = await _context.UserProfile.FirstOrDefaultAsync(p => p.UserId == user.Id);
-                if (profile == null)
-                {
-                    _logger.LogWarning("No UserProfile found for UserId: {UserId}", user.Id);
-                }
+                var userIds = billingContactProfiles.Select(p => p.UserId).ToList();
+                var identityUsers = await _userManager.Users
+                                          .Where(u => userIds.Contains(u.Id))
+                                          .ToDictionaryAsync(u => u.Id);
+                _logger.LogInformation("Fetched {IdentityUserCount} IdentityUser records for the billing contact profiles.", identityUsers.Count);
 
-                string displayText = user.Email ?? user.UserName ?? "Unnamed User"; // Fallback
-                if (profile != null && !string.IsNullOrWhiteSpace(profile.LastName))
+                foreach (var profile in billingContactProfiles)
                 {
-                    displayText = $"{profile.LastName}, {profile.FirstName} ({user.Email})";
+                    _logger.LogInformation("Processing profile for UserId: {UserId}", profile.UserId);
+                    if (identityUsers.TryGetValue(profile.UserId, out var user))
+                    {
+                        string displayText = $"{profile.LastName}, {profile.FirstName} ({user.Email})";
+                        _logger.LogInformation("Generated displayText: '{DisplayText}' for UserId: {UserId}", displayText, profile.UserId);
+                        userList.Add(new SelectListItem { Value = user.Id, Text = displayText });
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No IdentityUser found for UserProfile UserId: {UserId} (FirstName: {FirstName}, LastName: {LastName}), though profile IsBillingContact=true. Skipping.", profile.UserId, profile.FirstName, profile.LastName);
+                    }
                 }
-                else if (profile != null && !string.IsNullOrWhiteSpace(profile.FirstName))
-                {
-                     displayText = $"{profile.FirstName} ({user.Email})";
-                }
-                _logger.LogInformation("Generated displayText: '{DisplayText}' for UserId: {UserId}", displayText, user.Id);
-                userList.Add(new SelectListItem { Value = user.Id, Text = displayText });
             }
+
             _logger.LogInformation("userList contains {UserListCount} items before creating SelectList.", userList.Count);
-            UserSelectList = new SelectList(userList.OrderBy(u => u.Text), "Value", "Text", SelectedUserId);
+            UserSelectList = new SelectList(userList.OrderBy(u => u.Text), "Value", "Text", SelectedUserId); // OrderBy(u=>u.Text) is redundant due to earlier OrderBy on profiles, but harmless.
             _logger.LogInformation("UserSelectList created. Item count: {SelectListCount}", UserSelectList?.Count());
         }
 
