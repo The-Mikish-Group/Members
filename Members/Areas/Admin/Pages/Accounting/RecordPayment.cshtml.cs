@@ -609,15 +609,35 @@ namespace Members.Areas.Admin.Pages.Accounting
                                     ApplicationDate = DateTime.UtcNow,
                                     Notes = $"Auto-applied from overpayment (Payment P{payment.PaymentID}, UserCredit UC{overpaymentEventCredit.UserCreditID})"
                                 };
-                                newCreditApplications.Add(creditApplication); // Add to list, will batch add later
+                                newCreditApplications.Add(creditApplication);
                                 _context.CreditApplications.Add(creditApplication);
 
-
                                 overpaymentEventCredit.Amount -= amountToApplyToOtherInvoice;
-                                payment.Notes = (payment.Notes ?? "") + $" Auto-applied ${amountToApplyToOtherInvoice:F2} from UC{overpaymentEventCredit.UserCreditID} to INV-{otherInvoice.InvoiceID:D5}.";
+                                // NOTE: Individual note append removed from here. Summary will be built after loop.
                                 _logger.LogInformation("Recorded CreditApplication: {AmountApplied} from UserCredit {UserCreditId} to Invoice {OtherInvoiceId}. UserCredit remaining: {UserCreditRemaining}",
                                                        amountToApplyToOtherInvoice, overpaymentEventCredit.UserCreditID, otherInvoice.InvoiceID, overpaymentEventCredit.Amount);
                             }
+                        }
+
+                        // After processing all otherDueInvoices, construct the summarized note for payment.Notes
+                        if (newCreditApplications.Any())
+                        {
+                            var appliedSummaries = newCreditApplications.Select(ca => $"INV-{ca.InvoiceID:D5} (${ca.AmountApplied:F2})").ToList();
+                            string summaryText = string.Join(", ", appliedSummaries);
+                            // Ensure overpaymentEventCredit is not null before accessing UserCreditID
+                            string userCreditIdString = overpaymentEventCredit?.UserCreditID.ToString("D5") ?? "N/A";
+                            string overpaymentApplicationNote = $" Overpayment (ref UC-{userCreditIdString}) auto-applied to: {summaryText}.";
+
+                            if (string.IsNullOrWhiteSpace(payment.Notes))
+                            {
+                                payment.Notes = overpaymentApplicationNote.Trim();
+                            }
+                            else
+                            {
+                                // Append the new summary, ensuring a period and space separator if original notes existed.
+                                payment.Notes = payment.Notes.TrimEnd(['.', ' ']) + ". " + overpaymentApplicationNote.Trim();
+                            }
+                            _logger.LogInformation("Constructed/Appended payment note for overpayment: {PaymentNotes}", payment.Notes);
                         }
                     }
                     else
@@ -640,7 +660,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 }
 
                 // Final truncation safeguard for payment notes (might have been updated)
-                const int dbColumnMaxLength = 200;
+                const int dbColumnMaxLength = 500; // Updated to match new DB schema
                 if (payment.Notes != null && payment.Notes.Length > dbColumnMaxLength)
                 {
                     _logger.LogWarning("Payment.Notes for UserID {UserId} (PaymentID {PaymentId}) was truncated from {OriginalLength} to {MaxLength} characters.",

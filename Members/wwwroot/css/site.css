@@ -476,6 +476,25 @@ img {
 
 /* #endregion*/
 
+/* For User Account Statement Description Cell */
+.statement-description-cell {
+    max-width: 300px; /* Adjust as needed for screen */
+    white-space: normal !important; /* Allow text to wrap */
+    word-break: break-word;   /* Break long words */
+    overflow-wrap: break-word; /* Ensure wrapping */
+    vertical-align: top; /* Align top if rows become multi-line */
+}
+
+@media print {
+    .statement-description-cell {
+        max-width: 200px; /* Adjust as needed for print */
+        font-size: 8pt;   /* Smaller font for potentially long descriptions */
+        white-space: normal !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+}
+
 /* Print Styles */
 @media print {
     body {

@@ -1,7 +1,7 @@
 @page
 @model Members.Areas.Admin.Pages.Reporting.UserAccountStatementReportModel
 @{
-    ViewData["Title"] = "User Account Statement";
+    ViewData["Title"] = "Member Account Statement";
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
@@ -16,7 +16,7 @@
     <form method="get" class="mb-3">
         <div class="row align-items-end gy-2">
             <div class="col-md-4">
-                <label asp-for="SelectedUserId" class="form-label text-gold-darker"></label> <!-- Text will come from [Display] attribute -->
+                <label for="SelectedUserId" class="form-label text-gold-darker">Select Member</label>
                 <select asp-for="SelectedUserId" name="SelectedUserId" id="SelectedUserId" class="form-select shadow">
                     <option value="">-- Select a Member --</option>
                     @if (Model.UserSelectList != null && Model.UserSelectList.Any())
@@ -42,12 +42,12 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label asp-for="StartDate" class="form-label text-gold-darker"></label>
-                <input asp-for="StartDate" type="date" class="form-control shadow" />
+                <label for="StartDate" class="form-label text-gold-darker">Start Date</label>
+                <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")"/>
             </div>
             <div class="col-md-3">
-                <label asp-for="EndDate" class="form-label text-gold-darker"></label>
-                <input asp-for="EndDate" type="date" class="form-control shadow" />
+                <label for="EndDate" class="form-label text-gold-darker">End Date</label>
+                <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")"/>
             </div>
             <div class="col-md-auto">
                 <button type="submit" class="btn btn-primary shadow"><i class="bi bi-funnel-fill"></i> Run Statement</button>
@@ -124,7 +124,7 @@
                                     <td>@item.TransactionDate.ToString("yyyy-MM-dd")</td>
                                     <td>@Html.DisplayFor(modelItem => item.TransactionType)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Reference)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                    <td class="statement-description-cell">@Html.DisplayFor(modelItem => item.Description)</td>
                                     <td class="text-end">@(item.DebitAmount?.ToString("C"))</td>
                                     <td class="text-end">@(item.CreditAmount?.ToString("C"))</td>
                                     <td class="text-end">@item.RunningBalance.ToString("C")</td>

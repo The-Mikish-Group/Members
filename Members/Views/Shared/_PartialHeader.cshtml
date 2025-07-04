@@ -83,13 +83,13 @@
                         <a class="nav-link dropdown-toggle text-dark" href="#" id="accountingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <!-- data-bs-auto-close="outside" REMOVED -->
                             <i class="bi bi-journal-album"></i> Accounting
                         </a>
-                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 220px;" aria-labelledby="accountingDropdown"> <!-- Updated min-width -->
+                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 225px;" aria-labelledby="accountingDropdown"> <!-- Updated min-width to 225px -->
                             <!-- Manage Accounting Dropdown / Accounts Receivable -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" id="adminAccountsReceivableDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     <i class="bi bi-currency-dollar"></i> Accounts Receivable
                                 </a>
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 220px;" aria-labelledby="adminAccountsReceivableDropdown" data-bs-auto-close="outside"> <!-- Updated min-width -->
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 225px;" aria-labelledby="adminAccountsReceivableDropdown" data-bs-auto-close="outside"> <!-- Updated min-width to 225px -->
                                     <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ManageBillableAssets" title="Manage Billable Assets"><i class="bi bi-house"></i> Billable Assets</a></li>
                                     <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
                                     <!-- Invoice Draft Batches Sub-Dropdown -->
@@ -97,7 +97,7 @@
                                         <a class="nav-link dropdown-toggle text-dark" href="#" id="invoiceDraftBatchesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                                             <i class="bi bi-files"></i> Invoice Draft Batches
                                         </a>
-                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="invoiceDraftBatchesDropdown" style="min-width: 220px;"> <!-- Updated min-width -->
+                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="invoiceDraftBatchesDropdown" style="min-width: 225px;"> <!-- Updated min-width to 225px -->
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/CreateBatchInvoices" title="Create Draft Batches"><i class="bi bi-plus"></i> Create Draft Batches</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
                                         </ul>
@@ -107,14 +107,14 @@
                                         <a class="nav-link dropdown-toggle text-dark" href="#" id="adminReportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"> <!-- Ensured data-bs-auto-close="outside" -->
                                             <i class="bi bi-bar-chart-line-fill"></i> Reporting
                                         </a>
-                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 220px;" aria-labelledby="adminReportingDropdown" data-bs-auto-close="outside"> <!-- Updated min-width -->
+                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 245px;" aria-labelledby="adminReportingDropdown" data-bs-auto-close="outside"> <!-- Explicitly set to 245px -->
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/ArAgingReport" title="A/R Aging Report"><i class="bi bi-calendar-range"></i> A/R Aging Report</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/InvoiceRegisterReport" title="Invoice Register Report"><i class="bi bi-list-ul"></i> Invoice Register</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/PaymentRegisterReport" title="Payment Register Report"><i class="bi bi-cash-coin"></i> Payment Register</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/CreditRegisterReport" title="Credit Register Report"><i class="bi bi-gift-fill"></i> Credit Register</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/LateFeeRegisterReport" title="Late Fee Register Report"><i class="bi bi-alarm-fill"></i> Late Fee Register</a></li>
                                             <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/RevenueSummaryReport" title="Revenue Summary Report"><i class="bi bi-file-earmark-bar-graph-fill"></i> Revenue Summary</a></li>
-                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/UserAccountStatementReport" title="User Account Statement"><i class="bi bi-person-lines-fill"></i> User Account Statement</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/UserAccountStatementReport" title="Member Account Statement"><i class="bi bi-person-lines-fill"></i> Member Account Statement</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -135,7 +135,7 @@
                         </a>
                     
                         <!-- Members Dropdown Menu -->  
-                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" aria-labelledby="membersDropdown" style="min-width: 220px;"> <!-- Updated min-width -->
+                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" aria-labelledby="membersDropdown" style="min-width: 225px;"> <!-- Updated min-width to 225px -->
                         
                             <!-- Blog -->  
                             <li>  

@@ -40,7 +40,7 @@ namespace Members.Models
         [StringLength(100)]
         [Display(Name = "Reference Number")]
         public string? ReferenceNumber { get; set; } // E.g., Check number, transaction ID
-        [StringLength(200)]
+        [StringLength(500)]
         public string? Notes { get; set; } // Optional notes from admin
         // Optional: For tracking when the payment was recorded
         [DataType(DataType.DateTime)]

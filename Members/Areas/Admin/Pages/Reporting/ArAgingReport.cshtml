@@ -17,7 +17,7 @@
         <div class="row align-items-end">
             <div class="col-md-3">
                 <label for="AsOfDate" class="form-label text-gold-darker">As of Date</label>
-                <input asp-for="AsOfDate" type="date" class="form-control shadow" id="AsOfDate" name="AsOfDate" />
+                <input asp-for="AsOfDate" type="date" class="form-control shadow" id="AsOfDate" name="AsOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-md-auto">
                 <button type="submit" class="btn btn-primary shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
