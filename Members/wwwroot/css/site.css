@@ -232,7 +232,7 @@ li.show > a#pdfDocumentsDropdown,
 li.show > a#adminAccountsReceivableDropdown,
 li.show > a#invoiceDraftBatchesDropdown,
 li.show > a#adminReportingDropdown,
-li.show > a#adminPdfFoldersDropdown, /* This is PDF Menus */
+li.show > a#adminPdfFoldersDropdown,
 li.show > a#membersManageDropdown,
 li.show > a#pdfDocumentsFooterDropdown,
 li.show > a#confidentialPdfMenusDropdown,

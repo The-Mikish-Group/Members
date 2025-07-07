@@ -5,16 +5,16 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center text-gold-darker mt-4 mb-2">
-    <h3><i class="bi bi-list-ul ms-2 "></i> @ViewData["Title"]</h3>
+<div class="text-gold-darker mb-2 mt-4 text-center">
+    <h3><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h3>
 </div>
 
-<div class="row mx-0 p-0 mb-3">
-    <div class="col-md-8 mx-auto p-2 my-0">
+<div class="row mx-0 mb-3 p-0">
+    <div class="col-md-8 mx-auto my-0 p-2">
 
-        <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
+        <div class="card m-sm-0 bg-Card-Menu rounded p-2 shadow">
             <div class="card-body m-1 p-2">
-                <div class="text-center mb-2">
+                <div class="mb-2 ms-2 text-start">
                     <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
                 </div>
                 <form id="addCategoryForm" method="post" asp-action="CreateCategory">
@@ -39,10 +39,10 @@
 </div>
 
 <div class="row mx-0 p-0">
-    <div class="col-md-8 mx-auto p-2 my-0">
-        <div class="card m-sm-0 p-0 shadow rounded bg-Card-Menu">
+    <div class="col-md-8 mx-auto my-0 p-2">
+        <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">
             <div class="card-body m-1 p-2">
-                <div class="text-center mb-3">
+                <div class="mb-3 ms-2 text-start">
                     <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
                 </div>
 
@@ -55,7 +55,7 @@
                                 <th id="EditHeader"><span class="header-text text-gold-darker ps-2">Rename</span></th>
                                 <th id="CategoryHeader"><span class="header-text text-gold-darker">Category</span></th>
                                 <th id="SortHeader"><span class="header-text text-gold-darker">Sort</span></th>
-                                <th id="DeleteHeader" class="text-end text-gold-darker"><span class="header-text pe-2">Delete</span></th>
+                                <th id="DeleteHeader" class="text-gold-darker text-end"><span class="header-text pe-2">Delete</span></th>
                             </tr>
                         </thead>
 
@@ -68,7 +68,7 @@
                                     data-sort-order="@item.SortOrder"> 
                                     <td class="edit-cell py-0">
                                        
-                                        <button type="button" class=" mt-1 btn btn-sm btn-link btn-rename"
+                                        <button type="button" class="btn btn-sm btn-link btn-rename mt-1"
                                                 data-bs-toggle="modal" data-bs-target="#renameModal"
                                                 onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
                                             <i class="bi bi-pencil-square"></i>
@@ -77,9 +77,9 @@
                                     
                                     <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
                                     <td class="text-gold-darker">@item.SortOrder</td>
-                                    <td class="delete-cell text-end py-0">
+                                    <td class="delete-cell py-0 text-end">
                                         <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
-                                            <button type="submit" class="btn btn-sm btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                            <button type="submit" class="btn btn-sm btn-delete delete-button px-2 py-2" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
@@ -91,7 +91,7 @@
                 }
                 else
                 {                    
-                     <div class="text-center text-gold-darker mt-2">
+                     <div class="text-gold-darker mt-2 text-center">
                          No categories found.
                      </div>
                 }
@@ -101,7 +101,7 @@
     </div>
 
     <div class="row justify-content-center mx-auto p-0">
-        <div class="col-md-8 bg-transparent pt-2 pe-2">
+        <div class="col-md-8 bg-transparent pe-2 pt-2">
             <div class="d-flex justify-content-end mb-3">
                 <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
                     Edit PDF Category Files <i class="bi bi-arrow-right"></i>
@@ -120,7 +120,7 @@
                 
                 <input type="hidden" id="renameCategoryId" name="renameCategoryId" />
                 
-                <div class="row mb-2 align-items-center">
+                <div class="row align-items-center mb-2">
                     <div class="col-3"> 
                         <label for="newCategoryName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
                     </div>
@@ -129,7 +129,7 @@
                     </div>
                 </div>
 
-                <div class="row mb-1 align-items-center">
+                <div class="row align-items-center mb-1">
                      <div class="col-3">
                         <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
                      </div>

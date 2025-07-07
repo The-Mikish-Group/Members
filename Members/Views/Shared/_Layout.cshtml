@@ -160,7 +160,8 @@
 
             // --- Top Level Dropdowns that need stopPropagation because they have data-bs-auto-close="outside" 
             //     and contain further nested dropdown toggles.
-            addStopPropagation('#membersDropdown');         // Has data-bs-auto-close="outside", contains #pdfDocumentsDropdown and #membersManageDropdown
+            addStopPropagation('#membersDropdown');
+            addStopPropagation('#managementDropdown');// Has data-bs-auto-close="outside", contains #pdfDocumentsDropdown and #membersManageDropdown
             
             // --- Nested Dropdown Toggles that need stopPropagation ---
             // These are children of top-level items that have data-bs-auto-close="true" (or default),

@@ -180,7 +180,7 @@ namespace Members.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UploadFileToManagerCategory(int categoryId, IFormFile file, int sortOrder)
+        public async Task<IActionResult> UploadFileToMembersCategory(int categoryId, IFormFile file, int sortOrder)
         {
             var category = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
             if (category == null)
@@ -215,9 +215,9 @@ namespace Members.Controllers
             return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId });
         }
 
-        [HttpPost("ManagerPdfCategory/DeleteFileFromMembersCategory/{id}/{categoryId}")]
+        [HttpPost("PdfCategory/DeleteFileFromMembersCategory/{id}/{categoryId}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteFileFromMembersCategory(int id, int categoryId)
+        public async Task<IActionResult> DeleteFileFromCategory(int id, int categoryId)
         {
             var parentCategory = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
             if (parentCategory == null) { TempData["ErrorMessage"] = "Parent category is not a valid confidential category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }
@@ -236,7 +236,7 @@ namespace Members.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RenameFileInManagerCategory(int renameFileId, int categoryId, string oldFileName, string newFileName, int newSortOrder)
+        public async Task<IActionResult> RenameFileInCategory(int renameFileId, int categoryId, string oldFileName, string newFileName, int newSortOrder)
         {
             var parentCategory = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
             if (parentCategory == null) { TempData["ErrorMessage"] = "Invalid confidential category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }

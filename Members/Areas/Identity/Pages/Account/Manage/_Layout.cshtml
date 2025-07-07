@@ -51,7 +51,7 @@
                 <li class="nav-item my-1"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi bi-shield-fill-check"></i> Two-factor authentication</a></li>
 
                 @* Take the following line out with the leading bracket (and ending bracket below) for Members to see *@
-                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Member"))
                 {
                     @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member")))
                     {
