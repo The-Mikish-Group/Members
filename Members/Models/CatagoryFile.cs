@@ -11,7 +11,7 @@ namespace Members.Models
         public int CategoryID { get; set; }
         [Required]
         public required string FileName { get; set; }
-        public int SortOrder { get; set; }
+        public int SortOrder { get; set; }        
 
         public required virtual PDFCategory PDFCategory { get; set; }
     }

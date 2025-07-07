@@ -207,28 +207,38 @@ html > body header {
 }
 
 /*Dropdowns*/
-a#adminDropdown[aria-expanded="true"],
 a#welcomeDropdown[aria-expanded="true"],
-a#pdfDocumentsDropdown[aria-expanded="true"],
-a#adminPdfFoldersDropdown[aria-expanded="true"],
-a#adminEditMembersDropdown[aria-expanded="true"],
-a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#managementDropdown[aria-expanded="true"],
 a#membersDropdown[aria-expanded="true"],
-a#membersfooterDropdown[aria-expanded="true"],
-a#adminCreateFilesDropdown[aria-expanded="true"] {
+a#pdfDocumentsDropdown[aria-expanded="true"],
+a#adminAccountsReceivableDropdown[aria-expanded="true"],
+a#invoiceDraftBatchesDropdown[aria-expanded="true"],
+a#adminReportingDropdown[aria-expanded="true"],
+a#adminPdfFoldersDropdown[aria-expanded="true"], /* This is PDF Menus */
+a#membersManageDropdown[aria-expanded="true"],
+a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#confidentialPdfMenusDropdown[aria-extended="true"],
+a#ManageMembersDropdown[aria-extended="true"],
+a#membersfooterDropdown[aria-expanded="true"], /* Kept, assuming still used */
+a#adminCreateFilesDropdown[aria-expanded="true"] /* Kept, assuming still used */ {
     color: white !important;
     /*background-color: rgba(0, 0, 0, 0.3) !important;*/
 }
 
-li.show > a#adminDropdown,
 li.show > a#welcomeDropdown,
-li.show > a#pdfDocumentsDropdown,
-li.show > a#adminPdfFoldersDropdown,
-li.show > a#adminEditMembersDropdown,
-li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#managementDropdown,
 li.show > a#membersDropdown,
-li.show > a#membersfooterDropdown
-li.show > a#adminCreateFilesDropdown {
+li.show > a#pdfDocumentsDropdown,
+li.show > a#adminAccountsReceivableDropdown,
+li.show > a#invoiceDraftBatchesDropdown,
+li.show > a#adminReportingDropdown,
+li.show > a#adminPdfFoldersDropdown, /* This is PDF Menus */
+li.show > a#membersManageDropdown,
+li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#confidentialPdfMenusDropdown,
+li.show > a#ManageMembersDropdown,
+li.show > a#membersfooterDropdown, /* Kept, assuming still used */
+li.show > a#adminCreateFilesDropdown /* Kept, assuming still used */ {
     color: white !important;
     /*background-color: rgba(0, 0, 0, 0.3) !important;*/
 }
@@ -469,3 +479,73 @@ img {
 }
 
 /* #endregion*/
+
+/* Print Styles */
+@media print {
+    body {
+        font-size: 10pt !important; /* Smaller font for print */
+        color: #000 !important; /* Ensure text is black for print */
+        background-color: #fff !important; /* Ensure background is white */
+        -webkit-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+        print-color-adjust: exact !important; /* Standard */
+    }
+
+    header, .navbar, footer, .btn, .modal, #exportArAgingTriggerButton, .no-print /* Hide non-essential elements */ {
+        display: none !important;
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid #dee2e6 !important; 
+        color: #000 !important;
+        background-color: #fff !important; /* Ensure table backgrounds are white */
+    }
+
+    .table th {
+        font-weight: bold;
+        background-color: #f8f9fa !important; /* Light gray for table headers in print if needed */
+    }
+    
+    .table-responsive {
+        overflow-x: visible !important; /* Allow table to use full page width */
+    }
+
+    /* Specific to A/R Aging Report table if it has an ID, e.g., id="arAgingTable" 
+       If not, these general table cell adjustments might be okay, or use a class.
+    */
+    #arAgingTable th, #arAgingTable td { /* Assuming you might add id="arAgingTable" to your table */
+        padding: 0.25rem 0.4rem !important; /* Reduce padding */
+        font-size: 9pt !important;
+    }
+    /* More generic approach if no ID is on the table in ArAgingReport.cshtml */
+    .table td, .table th {
+        padding: 0.25rem 0.4rem !important;
+        font-size: 9pt !important;
+    }
+
+
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    /* Avoid printing full URLs for links unless specifically desired */
+    /* a[href^="/"]:after { content: " (" attr(href) ")"; } */
+
+    .container, .container-fluid {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
+    /* Ensure report title is visible and black */
+    h2 { /* Assuming report titles are h2 */
+        color: #000 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Remove shadows for print */
+    .shadow, .shadow-sm, .shadow-lg {
+        box-shadow: none !important;
+    }
+}

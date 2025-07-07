@@ -107,8 +107,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/sizes.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/colors.css" asp-append-version=" true" />
-    <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version=" true" />
-    
+    <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version=" true" />    
 
     @RenderSection("Styles", required: false)
 
@@ -147,57 +146,38 @@
         // Add event listeners with stopPropagation for nested dropdown toggles
         // This prevents clicks on sub-toggles from closing their parent dropdowns
         document.addEventListener('DOMContentLoaded', function() {
-            const adminEditMembersToggle = document.querySelector('#adminEditMembersDropdown');
-            if (adminEditMembersToggle) {
-                adminEditMembersToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
-            const adminGalleryToggle = document.querySelector('#adminGalleryDropdown');
-            if (adminGalleryToggle) {
-                adminGalleryToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
-
-            const adminPdfFoldersToggle = document.querySelector('#adminPdfFoldersDropdown');
-            if (adminPdfFoldersToggle) {
-                adminPdfFoldersToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
+            // Helper function to add stopPropagation
+            function addStopPropagation(selector) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                    });
+                } else {
+                    // console.warn('stopPropagation: Element not found for selector:', selector); // Optional: for debugging if selectors are wrong
+                }
             }
 
-            // Add stopPropagation for the nested PDF Documents dropdown toggle in the header
-            const pdfDocumentsToggle = document.querySelector('#pdfDocumentsDropdown');
-            if (pdfDocumentsToggle) {
-                pdfDocumentsToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
+            // --- Top Level Dropdowns that need stopPropagation because they have data-bs-auto-close="outside" 
+            //     and contain further nested dropdown toggles.
+            addStopPropagation('#membersDropdown');         // Has data-bs-auto-close="outside", contains #pdfDocumentsDropdown and #membersManageDropdown
+            
+            // --- Nested Dropdown Toggles that need stopPropagation ---
+            // These are children of top-level items that have data-bs-auto-close="true" (or default),
+            // OR they are children of items that have data-bs-auto-close="outside".
+            // Their stopPropagation prevents their immediate parent from closing if the parent is not auto-close="false".
+            
+            addStopPropagation('#adminAccountsReceivableDropdown'); 
+            addStopPropagation('#pdfDocumentsDropdown');            
+            addStopPropagation('#invoiceDraftBatchesDropdown'); 
+            addStopPropagation('#adminReportingDropdown');
+            addStopPropagation('#confidentialPdfMenusDropdown');
+            addStopPropagation('#adminPdfFoldersDropdown');
+            addStopPropagation('#ManageMembersDropdown');            
 
-            // Add stopPropagation for the nested PDF Documents dropdown toggle in the footer
-            const pdfDocumentsFooterToggle = document.querySelector('#pdfDocumentsFooterDropdown');
-            if (pdfDocumentsFooterToggle) {
-                pdfDocumentsFooterToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
-
-            // Add stopPropagation for the nested Accounting dropdown
-            const adminAccountingToggle = document.querySelector('#adminAccountingDropdown');
-            if (adminAccountingToggle) {
-                adminAccountingToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
-
-            // Add stopPropagation for the nested Accounts Receivable dropdown
-            const adminAccountsReceivableToggle = document.querySelector('#adminAccountsReceivableDropdown');
-            if (adminAccountsReceivableToggle) {
-                adminAccountsReceivableToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                });
-            }
+            // Footer dropdowns (if it's a nested structure and needs similar behavior)
+            addStopPropagation('#pdfDocumentsFooterDropdown');
+          
         });
 
     </script>

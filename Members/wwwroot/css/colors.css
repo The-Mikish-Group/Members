@@ -330,7 +330,14 @@ text-red-lighter {
     color: #6c757d !important;
 }
 
-/* Existing styles from ManageBillableAssets.cshtml */
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+    background-color: antiquewhite !important; /* Your desired color for odd rows */
+}
+
+.table-striped > tbody > tr:nth-of-type(even) > td {
+    background-color: #ffffff !important; /* Your desired color for even rows */
+}
+
 .row-even {
     background-color: antiquewhite;
 }

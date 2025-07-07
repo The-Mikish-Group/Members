@@ -1,74 +1,61 @@
-﻿using Members.Data;
+using Members.Data;
+using Members.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging; 
+using System.Linq; 
+using System.Threading.Tasks; 
 
 namespace Members.Controllers
 {
-    // Authorize for Members, Managers, and Admins
-    [Authorize(Roles = "Member,Manager,Admin")]
-    public class MembersController(ILogger<MembersController> logger, ApplicationDbContext context) : Controller // No need for IWebHostEnvironment here unless file paths are used
+    [Authorize(Roles = "Admin,Manager,Member")] 
+    public class MembersController(ILogger<MembersController> logger, ApplicationDbContext context) : Controller 
     {
-        private readonly ILogger<MembersController> _logger = logger;
+        private readonly ILogger<MembersController> _logger = logger; 
         private readonly ApplicationDbContext _context = context;
 
-        // Action for the first view: List Categories available to members
-        // This will list all categories that have at least one file
-        [HttpGet] // Use HttpGet for displaying a view
-        public IActionResult ListCategories()
+        [HttpGet]
+        public async Task<IActionResult> ListCategories() 
         {
-            _logger.LogInformation("Loading list of categories for members.");
+            _logger.LogInformation("Loading list of Members categories.");
 
-            // Fetch PDFCategories that have at least one CategoryFile
-            var nonEmptyCategories = _context.PDFCategories
-                                        .Where(c => c.CategoryFiles.Any()) // Filter to include only categories with files
-                                        .OrderBy(c => c.SortOrder) // Order categories
+            var membersCategories = await _context.PDFCategories
+                                        .Where(c => c.CategoryFiles.Any() && c.IsAdminOnly == false) 
+                                        .OrderBy(c => c.SortOrder)
                                         .ThenBy(c => c.CategoryName)
-                                        .ToList();
+                                        .ToListAsync(); 
 
-            ViewData["Title"] = "Available PDF Categories"; // Set a title for the view
-
-            // Pass the list of categories to the ListCategories view (in Views/Members folder)
-            return View("ListCategories", nonEmptyCategories);
+            ViewData["Title"] = "Members PDF Categories"; 
+            return View("~/Views/Members/ListCategories.cshtml", membersCategories); 
         }
 
-        // Action for the second view: List Files for a specific Category
-        // It takes the categoryId from the first view
-        [HttpGet] // Use HttpGet for displaying a view
-        public IActionResult ListFiles(int categoryId) // Parameter name matches what will be passed
+        [HttpGet]
+        public async Task<IActionResult> ListFiles(int categoryId) 
         {
-            _logger.LogInformation("Loading list of files for category ID: {CategoryId}", categoryId);
+            _logger.LogInformation("Loading list of files for members category ID: {CategoryId}.", categoryId);
 
-            // Find the category to display its name in the view
-            var category = _context.PDFCategories.Find(categoryId);
+            var category = await _context.PDFCategories
+                                 .FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false); 
 
-            // If the category doesn't exist, return NotFound or redirect
             if (category == null)
             {
                 _logger.LogWarning("Attempted to access non-existent category ID: {CategoryId}", categoryId);
-                // Optionally redirect back to the ListCategories page with an error message
-                // TempData["ErrorMessage"] = "Category not found.";
-                // return RedirectToAction(nameof(ListCategories));
-                return NotFound($"Category with ID {categoryId} not found.");
+                TempData["ErrorMessage"] = "The selected category is not a members category or does not exist.";
+                return RedirectToAction(nameof(ListCategories));
             }
 
-            // Fetch the files for the selected category
-            // Include PDFCategory if you need category details in the view (e.g., category name in heading)
-            var files = _context.CategoryFiles
+            var files = await _context.CategoryFiles
                                 .Where(f => f.CategoryID == categoryId)
-                                .Include(f => f.PDFCategory) // Include the related category data (useful for accessing category name in view)
-                                .OrderBy(f => f.SortOrder) // Order files within the category
+                                .OrderBy(f => f.SortOrder)
                                 .ThenBy(f => f.FileName)
-                                .ToList();
+                                .ToListAsync(); 
 
-            ViewData["Title"] = $"Files in {category.CategoryName}"; // Set a title for the view
-            ViewBag.CategoryName = category.CategoryName; // Pass the category name to the view
-            ViewBag.CategoryId = categoryId; // Pass the category ID back, useful for breadcrumbs or other links
+            ViewData["Title"] = $"Members Files in {category.CategoryName}"; 
+            ViewBag.CategoryName = category.CategoryName; 
+            ViewBag.CategoryId = categoryId; 
 
-            // Pass the list of files to the ListFiles view (in Views/Members folder)
-            return View("ListFiles", files);
+            return View("~/Views/Members/ListFiles.cshtml", files);
         }
-
-        // You might add other member-facing actions here later
     }
 }

@@ -6,19 +6,19 @@
 }
 
 <div class="d-flex justify-content-center my-4">
-    <h1><i class="bi bi-file-earmark-plus ms-2 text-gold-darker"></i> New Directory PDF</h1>
+    <h1><i class="bi bi-file-earmark-plus text-gold-darker ms-2"></i> New Directory PDF</h1>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show mx-auto col-md-8" role="alert">
+    <div class="alert alert-success alert-dismissible fade show col-md-8 mx-auto" role="alert">
         @TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show mx-auto col-md-8" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show col-md-8 mx-auto" role="alert">
         @TempData["ErrorMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -26,10 +26,10 @@
 
 @if (Model.DirectoryCategoryId > 0)
 {
-    <div class="row justify-content-center my-2 mx-auto p-2">
-        <div class="shadow border rounded col-md-8 bg-PDF-Menu p-2">
+    <div class="row justify-content-center mx-auto my-2 p-2">
+        <div class="col-md-8 bg-PDF-Menu rounded border p-2 shadow">
             <div class="mt-2">
-                <form method="post" id="pdfForm" class="mx-auto bg-PDF-Menu" asp-action="CreatePdf" asp-controller="PdfGeneration" enctype="application/x-www-form-urlencoded">
+                <form method="post" id="pdfForm" class="bg-PDF-Menu mx-auto" asp-action="CreatePdf" asp-controller="PdfGeneration" enctype="application/x-www-form-urlencoded">
                     @Html.AntiForgeryToken()
 
                     <input type="hidden" name="CategoryId" value="@Model.DirectoryCategoryId" />
@@ -61,10 +61,10 @@
         </div>
     </div>
 
-    <div class="row justify-content-center my-0 mx-auto p-0 mt-3">
+    <div class="row justify-content-center mx-auto my-0 mt-3 p-0">
         <div class="col-md-8 bg-transparent px-2 pe-2">
             <div class="d-flex justify-content-start mb-3">
-                <button type="button" id="exportCsvButton" class="btn btn-sm btn-secondary">
+                <button type="button" id="exportCsvButton" class="btn btn-sm btn-back">
                     <i class="bi bi-download me-2"></i> Export Member Data (CSV)
                 </button>
             </div>
@@ -72,9 +72,9 @@
     </div>
 
     <div class="row justify-content-center mx-auto p-0">
-        <div class="col-md-8 bg-transparent pt-2 pe-2">
+        <div class="col-md-8 bg-transparent pe-2 pt-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategories">
+                <a class="btn btn-sm btn-option" href="/PdfCategory/CategoriesMenu">
                     <i class="bi bi-arrow-left text-gold-darker"></i> Back to Edit PDF Categories
                 </a>
             </div>
@@ -84,14 +84,14 @@
 }
 else
 {
-    <div class="alert alert-warning mx-auto col-md-8" role="alert">
+    <div class="alert alert-warning col-md-8 mx-auto" role="alert">
         The "Directory" category was not found in the database. Please ensure it exists to generate the directory PDF.
     </div>
     <div class="row justify-content-center mx-auto p-0">
-        <div class="col-md-8 bg-transparent pt-2 pe-2">
+        <div class="col-md-8 bg-transparent pe-2 pt-2">
             <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-option" href="/PdfCategory/ManageCategories">
-                    <i class="bi bi-box-arrow-right text-gold-darker"></i> Go to Edit PDF Categories
+                <a class="btn btn-sm btn-option" href="/PdfCategory/CategoriesMenu">
+                    <i class="bi bi-box-arrow-right text-gold-darker"></i> Go to Manage PDF Categories
                 </a>
             </div>
         </div>

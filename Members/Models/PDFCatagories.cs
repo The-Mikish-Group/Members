@@ -13,6 +13,8 @@ namespace Members.Models
         [Required]
         public int SortOrder { get; set; }
 
+        public bool IsAdminOnly { get; set; } = false; // New property for admin-only categories
+
         // Navigation property to the CategoryFiles
         public virtual ICollection<CategoryFile> CategoryFiles { get; set; } = [];
 

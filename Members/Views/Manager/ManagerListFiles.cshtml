@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Members.Models.CategoryFile>
+
+@{
+    ViewData["Title"] = $"Confidential Files in {@ViewBag.CategoryName}"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int categoryId = ViewBag.CategoryId;
+}
+
+<!-- View Headings -->
+<div class="text-gold-darker mb-2 mt-4 text-center">
+    <!-- Category Name -->
+    <h1 class="text-gold-darker mb-2">
+        <i class="bi bi-shield-lock-fill me-2"></i> @ViewBag.CategoryName <span class="fs-5 bg-danger small ms-1">Confidential</span>
+    </h1>
+
+    <!-- Back to Categories Button -->
+    <p>
+        <a asp-controller="Manager" asp-action="ManagerListCategories" class="btn btn-sm btn-back text-decoration-none" title="Back to Confidential PDF Categories">
+            <i class="bi bi-arrow-left"></i> Back to Confidential PDF Categories
+        </a>
+    </p>
+</div>
+
+<!-- Card Container -->
+<div class="row justify-content-center container mx-auto p-1">
+    <div class="col-lg-6 col-md-10 m-1 p-1">
+        <!-- Card -->
+        <div class="card bg-PDF-Menu rounded border shadow">
+            <div class="card-body p-0">
+                <!-- Create the List of File Names -->
+                @if (Model != null && Model.Any())
+                {
+                    <ul class="list-group list-group-flush"> 
+                        @foreach (var file in Model) 
+                        {
+                            <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
+                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="text-decoration-none text-gold-darker d-block">
+                                    <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
+                                    @* <small class="text-muted float-end">Sort: @file.SortOrder</small> *@
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-gold-darker m-3 text-center">No files found in this confidential category.</p>
+                }
+            </div>
+        </div>
+         <div class="mt-3 text-center">
+            <a asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" asp-route-categoryId="@categoryId" class="btn btn-info btn-sm shadow">
+                <i class="bi bi-pencil-fill"></i> Manage Files in This Category
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Styles from ListFiles.cshtml to remove borders and control hover */
+        .card-body .list-group-item { border-bottom: none !important; }
+        .card-body .list-group-item:first-child { border-top: none !important; }
+        .card-body .list-group-item:last-child { border-bottom: none !important; }
+        .card-body .list-group-item:hover a.text-gold-darker,
+        .card-body .list-group-item:focus a.text-gold-darker,
+        .card-body .list-group-item a.text-gold-darker:hover,
+        .card-body .list-group-item a.text-gold-darker:focus { color: #3b3726 !important; }
+        .card-body .list-group-item:hover,
+        .card-body .list-group-item:focus { background-color: rgba(0, 0, 0, 0.05) !important; }
+        .badge.small { font-size: 0.8em; vertical-align: middle; }
+    </style>
+}

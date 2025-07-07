@@ -70,7 +70,7 @@
                         <div class="row mb-3">
                             <div class="col-sm-6">
                                 <label asp-for="Input.AmountDue" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.AmountDue" class="shadow form-control text-gold-darker" />
+                                <input asp-for="Input.AmountDue" type="text" class="shadow form-control text-gold-darker" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                 <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
@@ -110,4 +110,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
 }

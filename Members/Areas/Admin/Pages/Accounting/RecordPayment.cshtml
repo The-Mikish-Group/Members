@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label asp-for="Input.AmountToApplyFromCredit" class="form-label text-gold-darker"></label>
-                                    <input asp-for="Input.AmountToApplyFromCredit" class="form-control shadow text-gold-darker" placeholder="Amount from credit" />
+                                    <input asp-for="Input.AmountToApplyFromCredit" type="text" class="form-control shadow text-gold-darker" placeholder="Amount from credit" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.AmountToApplyFromCredit" class="text-danger"></span>
                                 </div>
                             }
@@ -112,7 +112,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <label asp-for="Input.Amount" class="form-label text-gold-darker"></label>
-                                    <input asp-for="Input.Amount" class="shadow form-control text-gold-darker" />
+                                    <input asp-for="Input.Amount" type="text" class="shadow form-control text-gold-darker" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.Amount" class="text-danger"></span>
                                 </div>
                             </div>
@@ -175,4 +175,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
 }

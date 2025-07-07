@@ -65,91 +65,113 @@
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="About"><i class="bi bi-info-circle-fill"></i> About</a></li>  
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Facilities"><i class="bi bi-building-fill"></i> Facilities</a></li>  
                         <li><a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="GalleryList"><i class="bi bi-image me-2"></i> Galleries</a></li>  
+                        @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                        {
+                            <li>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="ManageGalleries">
+                                    <i class="bi bi-image"></i> Manage Galleries
+                                </a>
+                            </li>
+                        }
                     </ul>  
                 </li>
-
-                <!-- Contact -->  
-                <li class="nav-item">  
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Contact">  
-                        <i class="bi bi-envelope-fill"></i> Contact  
-                    </a>  
-                </li>
-
-                <!-- Manage Dropdown -->
+                
                 @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
                 {
                     <li class="nav-item dropdown pt-lg-0 pt-0">
-
-                        <!-- Manage Dropdown Toggle -->
-                        <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-shield-lock-fill"></i> Manage
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="managementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <!-- data-bs-auto-close="outside" REMOVED -->
+                            <i class="bi bi-journal-album"></i> Management
                         </a>
-
-                        <!-- Manage Dropdown Menu -->
-                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminDropdown">
-
-                            <!-- Manage Members Dropdown -->
+                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" style="min-width: 265px;" aria-labelledby="managementDropdown"> <!-- Updated min-width to 225px -->
+                            
+                            <!-- Manage Members -->
+                            @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="ManageMembersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <i class="bi bi-person-gear"></i> Manage Members
+                                    </a>
+                                    <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="ManageMembersDropdown" data-bs-auto-close="outside">
+                                        <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/ResendEmailConfirmation"><i class="bi bi-envelope-check"></i> Re-Confirm Email</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AddUser" title="Add Member"><i class="bi bi-plus-circle"></i> Add Member</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Users" title="Manage Members"><i class="bi bi-person-gear"></i> Manage Members</a></li>
+                                    </ul>
+                                </li>
+                            }                            
+                            
+                            <!-- Manage Accounting Dropdown / Accounts Receivable -->
                             <li class="nav-item dropdown">
-
-                                <!-- Manage Members Dropdown Toggle -->
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminEditMembersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-people-fill"></i> Members
-                                </a>
-
-                                <!-- Manage Members Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminEditMembersDropdown" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Users" title="Manage Members"><i class="bi bi-person-gear"></i> Manage Members</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/ResendEmailConfirmation"><i class="bi bi-envelope-check"></i> Re-Confirm Email</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AddUser" title="Add Member"><i class="bi bi-plus-circle"></i> Add Member</a></li>
-                                </ul>
-
-                            </li>
-
-                            <!-- Manage Accounting Dropdown -->
-                            <li class="nav-item dropdown">
-
-                                <!-- Manage Accounting Dropdown Toggle -->
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminAccountsReceivableDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminAccountsReceivableDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     <i class="bi bi-currency-dollar"></i> Accounts Receivable
                                 </a>
-
-                                <!-- Manage Accounting Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminAccountsReceivableDropdown" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 225px;" aria-labelledby="adminAccountsReceivableDropdown" data-bs-auto-close="outside"> <!-- Updated min-width to 225px -->
                                     <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ManageBillableAssets" title="Manage Billable Assets"><i class="bi bi-house"></i> Billable Assets</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/CreateBatchInvoices" title="Create Draft Batches"><i class="bi bi-plus"></i> Create Draft Batches</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>                                    
+                                    <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/AdminBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
+                                    <!-- Invoice Draft Batches Sub-Dropdown -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle text-dark" href="#" id="invoiceDraftBatchesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                            <i class="bi bi-files"></i> Invoice Draft Batches
+                                        </a>
+                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="invoiceDraftBatchesDropdown" style="min-width: 225px;" data-bs-auto-close="outside">
+                                            <!-- Updated min-width to 225px -->
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/CreateBatchInvoices" title="Create Draft Batches"><i class="bi bi-plus"></i> Create Draft Batches</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Accounting/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
+                                        </ul>
+                                    </li>
+                                    <!-- Reporting Dropdown (Moved Here) -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle text-dark" href="#" id="adminReportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"> <!-- Ensured data-bs-auto-close="outside" -->
+                                            <i class="bi bi-bar-chart-line-fill"></i> Reporting
+                                        </a>
+                                        <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 245px;" aria-labelledby="adminReportingDropdown" data-bs-auto-close="outside"> <!-- Explicitly set to 245px -->
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/ArAgingReport" title="A/R Aging Report"><i class="bi bi-calendar-range"></i> A/R Aging Report</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/InvoiceRegisterReport" title="Invoice Register Report"><i class="bi bi-list-ul"></i> Invoice Register</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/PaymentRegisterReport" title="Payment Register Report"><i class="bi bi-cash-coin"></i> Payment Register</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/CreditRegisterReport" title="Credit Register Report"><i class="bi bi-gift-fill"></i> Credit Register</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/LateFeeRegisterReport" title="Late Fee Register Report"><i class="bi bi-alarm-fill"></i> Late Fee Register</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/RevenueSummaryReport" title="Revenue Summary Report"><i class="bi bi-file-earmark-bar-graph-fill"></i> Revenue Summary</a></li>
+                                            <li><a class="nav-link text-dark" asp-area="Admin" asp-page="/Reporting/UserAccountStatementReport" title="Member Account Statement"><i class="bi bi-person-lines-fill"></i> Member Account Statement</a></li>
+                                        </ul>
+                                    </li>
+                                    
                                 </ul>
-
                             </li>
 
-                            <!-- Manage PDF Folders Dropdown -->
+                            <!-- PDF Menus (Moved Here) -->
+                            @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminPdfFoldersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">                                        
+                                        <i class="bi bi-folder-fill text-gold-dark"></i> Member PDF Menus
+                                    </a>
+                                    <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminPdfFoldersDropdown" data-bs-auto-close="outside">
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="MembersCategories" title="Manage Member PDF Categories"><i class="bi bi-file-earmark-pdf-fill text-gold-darker me-0"></i> Manage Categories</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" title="Manage Member PDF Documents"><i class="bi bi-list-ul text-gold-darker me-0"></i> Manage Documents</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfGeneration" asp-action="CreatePdf" title="New Directory PDF"><i class="bi bi-file-earmark-plus text-gold-darker me-0"></i> New Directory PDF</a></li>
+                                        <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AdminFiles" title="Delete Protected Files"><i class="bi bi-list-ul text-gold-darker me-0"></i> Delete Protected Files</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- NEW Confidential PDF Menus Dropdown HERE -->
                             <li class="nav-item dropdown">
-
-                                <!-- Manage PDF Folders Dropdown Toggle -->
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminPdfFoldersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-folder-fill text-gold-dark"></i> PDF Menus
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="confidentialPdfMenusDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                    <i class="bi bi-shield-shaded"></i> Confidential PDF Menus
                                 </a>
-
-                                <!-- Manage PDF Folders Dropdown Menu -->
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 210px;" aria-labelledby="adminPdfFoldersDropdown" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategories" title="Manage PDF Categories"><i class="bi bi-file-earmark-pdf-fill text-gold-darker me-0"></i> Manage Categories</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" title="Manage PDF Category Files"><i class="bi bi-list-ul text-gold-darker me-0"></i> Manage Documents</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="" asp-controller="PdfGeneration" asp-action="CreatePdf" title="New Directory PDF"><i class="bi bi-file-earmark-plus text-gold-darker me-0"></i> New Directory PDF</a></li>
-                                    <li><a class="nav-link text-dark" asp-area="Identity" asp-page="/AdminFiles" title="Delete Protected Files"><i class="bi bi-list-ul text-gold-darker me-0"></i> Delete Protected Files</a></li>
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" style="min-width: 290px;" aria-labelledby="confidentialPdfMenusDropdown">
+                                    <li><a class="nav-link text-dark" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" title="Manage Confidential PDF Categories"><i class="bi bi-folder-check"></i> Manage Confidential Categories</a></li>
+                                    <li><a class="nav-link text-dark" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" title="Manage Confidential PDF Documents"><i class="bi bi-file-earmark-richtext-fill"></i> Manage Confidential Documents</a></li>
+                                    <li>
+                                        <a class="nav text-dark" asp-area="" asp-controller="Manager" asp-action="ManagerListCategories" title="Confidential PDF Documents"></a>
+                                    </li>
                                 </ul>
-
                             </li>
+                            <li><a class="nav-link text-dark" asp-area="" asp-controller="Manager" asp-action="ManagerListCategories" title="Confidential PDF Documents"><i class="bi bi-file-earmark-plus text-gold-darker me-0"></i> Confidential PDF Documents</a></li>
+                            
 
-                            <!-- Manage Galleries -->
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Image" asp-action="ManageGalleries">
-                                    <i class="bi bi-image"></i> Galleries
-                                </a>
-                            </li>
+                            <!-- <li><span class="dropdown-item-text text-muted ps-2">Accounts Payable {To be determined}</span></li> -->
 
                         </ul>
-
                     </li>
                 }
                               
@@ -159,12 +181,12 @@
                     <li class="nav-item dropdown pt-0">
                         
                         <!-- Members Dropdown Toggle -->  
-                        <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"> <!-- data-bs-auto-close="outside" ADDED -->  
                             <i class="bi bi-people-fill"></i> Members  
                         </a>
                     
                         <!-- Members Dropdown Menu -->  
-                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" aria-labelledby="membersDropdown" style="min-width: 210px;">  
+                        <ul class="dropdown-menu ps-lg-2 bg-gold-light border-0 ps-4" aria-labelledby="membersDropdown" style="min-width: 225px;"> <!-- Updated min-width to 225px -->
                         
                             <!-- Blog -->  
                             <li>  
@@ -174,11 +196,11 @@
                             <!-- PDF Documents Dropdown -->  
                             <li class="nav-item dropdown">  
                                 <!-- PDF Documents Dropdown Toggle -->  
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="pdfDocumentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">  
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="pdfDocumentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">  
                                     <i class="bi bi-file-earmark-pdf-fill text-gold-darker me-2"></i> PDF Documents  
                                 </a>  
                                 <!-- PDF Documents Dropdown Menu -->  
-                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="pdfDocumentsDropdown">  
+                                <ul class="dropdown-menu ps-lg-2 bg-gold-light ms-4 border-0 ps-4" aria-labelledby="pdfDocumentsDropdown" data-bs-auto-close="outside"> @* This was already here, good. *@
                                     @{  
                                         // Fetch the non-empty categories directly in the layout  
                                         var dynamicCategories = DbContext.PDFCategories  
@@ -204,7 +226,7 @@
                                             // Optional: Display a placeholder if no categories are found  
                                             <li><span class="dropdown-item-text">No PDF categories available</span></li>  
                                         }  
-                                    }  
+                                    }                                      
                                 </ul>  
                             </li>
 
@@ -217,12 +239,17 @@
                                         <i class="bi bi-gear-fill"></i> Profile
                                     </a>
                                 </li>
-                            }                        
+                            }
 
-                        
                         </ul>  
                     </li>  
                 }
+                <!-- Contact Link (Moved here) -->
+                <li class="nav-item">  
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Info" asp-action="Contact">  
+                        <i class="bi bi-envelope-fill"></i> Contact  
+                    </a>  
+                </li>
 
                 <!-- Register or Logout -->
                 @if (SignInManager.IsSignedIn(User))

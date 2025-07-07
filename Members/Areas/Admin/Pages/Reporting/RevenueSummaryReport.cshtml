@@ -1,0 +1,157 @@
+@page
+@model Members.Areas.Admin.Pages.Reporting.RevenueSummaryReportModel
+@{
+    ViewData["Title"] = "Revenue Summary Report";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2 class="text-gold-darker">@ViewData["Title"]</h2>
+            <hr />
+        </div>
+    </div>
+
+    <form method="get" class="mb-3">
+        <div class="row align-items-end gy-2">
+            <div class="col-md-3">
+                <label for="StartDate" class="form-label text-gold-darker">Start Date</label>
+                <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label for="EndDate" class="form-label text-gold-darker">End Date</label>
+                <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
+            </div>
+            @if (Model.SummaryData != null) // Check if data has been generated
+            {
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-success shadow"
+                            data-bs-toggle="modal" data-bs-target="#exportRevenueSummaryConfirmModal">
+                        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
+                    </button>
+                </div>
+            }
+        </div>
+    </form>
+
+    <!-- Export Confirmation Modal -->
+    <div class="modal fade" id="exportRevenueSummaryConfirmModal" tabindex="-1" aria-labelledby="exportRevenueSummaryConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-Card-Modal">
+                <div class="modal-header">
+                    <h5 class="modal-title text-gold-darker" id="exportRevenueSummaryConfirmModalLabel">Confirm Export</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-gold-darker">
+                    Are you sure you want to export the Revenue Summary to CSV?
+                    The report will be generated for the period:
+                    <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> to <strong>@Model.EndDate.ToString("yyyy-MM-dd")</strong>.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary shadow" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmExportRevenueSummaryBtn" class="btn btn-primary shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.SummaryData != null)
+    {
+        var summary = Model.SummaryData!; // Introduce non-nullable local variable
+
+        <div class="card shadow mb-4 bg-Card-Menu">
+            <div class="card-header bg-gold-light text-gold-darker">
+                Summary for period: @summary.ReportStartDate.ToString("yyyy-MM-dd") to @summary.ReportEndDate.ToString("yyyy-MM-dd")
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4 text-gold-darker border-bottom pb-2">Invoiced Amounts</dt>
+                    <dd class="col-sm-8 border-bottom pb-2">&nbsp;</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_Dues)</dt>
+                    <dd class="col-sm-8">@summary.TotalAmountInvoiced_Dues.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_Fine)</dt>
+                    <dd class="col-sm-8">@summary.TotalAmountInvoiced_Fine.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_LateFee)</dt>
+                    <dd class="col-sm-8">@summary.TotalAmountInvoiced_LateFee.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_MiscCharge)</dt>
+                    <dd class="col-sm-8">@summary.TotalAmountInvoiced_MiscCharge.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4 fw-bold">@Html.DisplayNameFor(model => summary.GrandTotalAmountInvoiced)</dt>
+                    <dd class="col-sm-8 fw-bold">@summary.GrandTotalAmountInvoiced.ToString("C")</dd>
+
+                    <dt class="col-sm-4 text-gold-darker border-bottom py-2">Payments & Credits</dt>
+                    <dd class="col-sm-8 border-bottom py-2">&nbsp;</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalPaymentsReceived)</dt>
+                    <dd class="col-sm-8">@summary.TotalPaymentsReceived.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalCreditsIssued_RemainingValue)</dt>
+                    <dd class="col-sm-8">@summary.TotalCreditsIssued_RemainingValue.ToString("C")</dd>
+
+                    <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalCreditsApplied)</dt>
+                    <dd class="col-sm-8">@summary.TotalCreditsApplied.ToString("C")</dd>
+
+                    <dt class="col-sm-4 text-gold-darker border-bottom py-2">Net Change</dt>
+                    <dd class="col-sm-8 border-bottom py-2">&nbsp;</dd>
+
+                    <dt class="col-sm-4 ps-4 fw-bold">@Html.DisplayNameFor(model => summary.NetChange)</dt>
+                    <dd class="col-sm-8 fw-bold">@summary.NetChange.ToString("C")</dd>
+                </dl>
+            </div>
+        </div>
+    }
+    else if (Request.Query.ContainsKey("StartDate") || Request.Query.ContainsKey("EndDate"))
+    {
+        <div class="alert alert-info shadow" role="alert">
+            No summary data found for the selected period: @Model.StartDate.ToString("yyyy-MM-dd") to @Model.EndDate.ToString("yyyy-MM-dd"). Click "Run Report" to generate.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info shadow" role="alert">
+            Please select a date range and run the report to view the summary.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var exportButton = document.getElementById('confirmExportRevenueSummaryBtn');
+            if (exportButton) {
+                exportButton.addEventListener('click', function() {
+                    var currentPagePath = window.location.pathname;
+                    var handlerQuery = 'handler=ExportToCsv';
+                    var baseUrl = currentPagePath + '?' + handlerQuery;
+
+                    var startDateValue = '@Model.StartDate.ToString("yyyy-MM-dd")';
+                    var endDateValue = '@Model.EndDate.ToString("yyyy-MM-dd")';
+                    var targetUrl = baseUrl + '&StartDate=' + encodeURIComponent(startDateValue) + '&EndDate=' + encodeURIComponent(endDateValue);
+
+                    console.log('JS Export (RevenueSummary): Navigating to URL: ' + targetUrl);
+                    window.location.href = targetUrl;
+
+                    setTimeout(function() {
+                        var modalElement = document.getElementById('exportRevenueSummaryConfirmModal');
+                        if (modalElement) {
+                            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        }
+                    }, 500); // 500ms delay
+                });
+            }
+        });
+    </script>
+}

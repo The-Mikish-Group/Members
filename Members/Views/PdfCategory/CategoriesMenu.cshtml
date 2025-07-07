@@ -4,124 +4,175 @@
     ViewData["Title"] = "Manage Categories";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container mb-2 mt-4">
 
-<!-- Title -->
-<div class="text-center mt-4 mb-2">
-    <h3><i class="bi bi-list-ul ms-2 text-gold-darker"></i> @ViewData["Title"]</h3>
-</div>
+    <!-- Title -->
+    <div class="text-gold-darker mb-2 mt-4 text-center">
+        <h3 class="text-gold-darker"><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h3>
+    </div>    
 
-<!-- Row and Column -->
-<div class="row mx-0 p-0 mb-3">
-    <div class="col-md-8 mx-auto p-2 my-0">
+    <!-- Row and Column -->
+    <div class="row mx-0 mb-3 p-0">
+        <div class="col-md-8 mx-auto my-0 p-2">
 
-        <!-- Card with Shadow -->
-        <div class="card m-sm-0 p-2 shadow rounded bg-Card-Menu">
-            <div class="card-body m-1 p-2">
+            <!-- Status Messsage -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert-success alert-dismissible fade show my-2" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show my-2" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+            }
 
-                <!-- Heading: Add a New Category -->
-                <div class="text-center mb-2">
-                    <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
-                </div>
+            <!-- Card with Shadow -->
+            <div class="card m-sm-0 bg-Card-Menu rounded p-2 shadow">
+                <div class="card-body m-1 p-2">
 
-                <!-- Create Category form -->
-                <form id="addCategoryForm" method="post" asp-action="CreateCategory">
-                    <div class="row">
-                        <div class="col-8 px-0">
-                            <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
-                            <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
-                        </div>
-                        <div class="col-2 px-0">
-                            <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
-                            <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
-                        </div>
-                        <div class="col-2 px-0">
-                            <button type="submit" class="btn btn-primary no-left-radius w-100">Add</button>
-                        </div>
+                    <!-- Heading: Add a New Category -->
+                    <div class="mb-2 text-center">
+                        <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
                     </div>
-                </form>
 
-            </div>
-        </div>
-    </div>
-</div>
+                    <!-- Create Category form -->
+                    <form id="addCategoryForm" method="post" asp-controller="PdfCategory"  asp-action="CreateCategory">
+                        @Html.AntiForgeryToken()
+                        <div class="row align-items-center">
+                        
+                            <!-- New Category Name -->
+                            <div class="col-8 px-0">
+                                <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
+                                <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
+                            </div>
 
-<div class="row mx-0 p-0">
-    <div class="col-md-8 mx-auto p-2 my-0">
-        <div class="card m-sm-0 p-0 shadow border border-dark rounded bg-Card-Menu">
-            <div class="card-body m-1 p-2">
-                <div class="text-center mb-3">
-                    <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
+                            <!-- Sort Order -->
+                            <div class="col-2 px-0">
+                                <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
+                                <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
+                            </div>
+
+                            <!-- Add Button -->
+                            <div class="col-2 px-0">
+                                <button type="submit" class="btn btn-success no-left-radius w-100">Add</button>
+                            </div>
+                        </div>
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="text-danger small mt-2 py-1">
+                                @Html.ValidationSummary(false, "", new { @class = "list-unstyled" })
+                            </div>
+                        }
+
+                    </form>
                 </div>
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="bg-gold-dark text-white">
-                            <th id="EditHeader"><span class="header-text ps-2">Edit</span></th>
-                            <th id="CategoryHeader"><span class="header-text">Category</span></th>
-                            <th id="SortHeader"><span class="header-text">Sort</span></th>
-                            <th id="DeleteHeader" class="text-end"><span class="header-text pe-2">Delete</span></th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody id="manageCategoriesTableBody">
-                        @if (Model != null && Model.Any())
-                        {
-                            @foreach (var item in Model)
-                            {
-                                <tr data-category-id="@item.CategoryID" id="display-row-@item.CategoryID">
-                                    <td class="edit-cell py-0">
-                                        <button type="button" class=" mt-1 btn btn-sm btn-link btn-rename"
-                                                onclick="showEditRow('@item.CategoryID')">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                    </td>
-                                    <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
-                                    <td class="text-gold-darker">@item.SortOrder</td>
-                                    <td class="delete-cell text-end py-0">
-                                        <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
-                                            <button type="submit" class="btn btn-delete py-2 px-2 delete-button" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <tr id="edit-row-@item.CategoryID" class="d-none">
-                                    <td colspan="4">
-                                        <div class="container row align-items-center">
-                                            <div class="col-7 px-0">
-                                                <label for="editCategoryName_@item.CategoryID" class="form-label visually-hidden">New Category Name</label>
-                                                <input type="text" class="form-control form-control-sm rounded-start rounded-0" id="editCategoryName_@item.CategoryID" name="newCategoryName" value="@item.CategoryName" placeholder="New Category Name">
-                                            </div>
-                                            <div class="col-2 px-0">
-                                                <label for="editSortOrder_@item.CategoryID" class="form-label visually-hidden">New Sort Order</label>
-                                                <input type="number" class="ps-4 form-control form-control-sm rounded-end rounded-0" id="editSortOrder_@item.CategoryID" name="newSortOrder" value="@item.SortOrder" min="1">
-                                            </div>
-                                            <div class="col-3 pe-0 text-end">
-                                                <button type="button" class="btn btn-sm btn-primary update-button" onclick="saveCategoryEdit('@item.CategoryID')"><i class="bi bi-save-fill me-1"></i></button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2 cancel-button" onclick="cancelEditRow('@item.CategoryID')"><i class="bi bi-x-octagon-fill me-1"></i></button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="4" class="text-center text-gold-darker">No categories found.</td></tr>
-                        }
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
-    <div class="row justify-content-center mx-auto p-0">
-        <div class="col-md-8 bg-transparent pt-2 pe-2">
-            <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
-                    Edit PDF Category Files <i class="bi bi-arrow-right"></i>
-                </a>
+    <!-- Category Table -->
+    <div class="row mx-0 p-0">
+        <div class="col-md-8 mx-auto my-0 p-2">
+
+            <!-- Shadowed Card -->
+            <div class="card m-sm-0 border-dark bg-Card-Menu rounded border p-0 shadow">
+                <div class="card-body m-1 p-2">
+
+                    <!-- Edit Existing Categories Heading -->
+                    <div class="mb-3 text-center">
+                        <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
+                    </div>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <!-- Table -->
+                        <table class="table-striped table">
+
+                            <!-- Table Header -->
+                            <thead>
+                                <tr class="bg-gold-dark text-white">
+                                    <th id="EditHeader"><span class="header-text ps-2">Edit</span></th>
+                                    <th id="CategoryHeader"><span class="header-text">Category</span></th>
+                                    <th id="SortHeader"><span class="header-text">Sort</span></th>
+                                    <th id="DeleteHeader" class="text-end"><span class="header-text pe-2">Delete</span></th>
+                                </tr>
+                            </thead>
+                            
+                            <!-- Table Body -->
+                            <tbody id="manageCategoriesTableBody">
+                                
+                                @foreach (var item in Model)
+                                {
+                                    <!-- Table Row -->
+                                    <tr data-category-id="@item.CategoryID" id="display-row-@item.CategoryID">
+
+                                        <!-- Edit Button -->
+                                        <td class="edit-cell py-0 align-middle">
+                                            <button type="button" class="btn btn-sm btn-link btn-rename mt-1"
+                                                    onclick="showEditRow('@item.CategoryID')">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                        </td>
+
+                                        <!-- Category Name -->
+                                        <td class="category-name-cell" style="cursor: pointer;">
+                                            @item.CategoryName
+                                        </td>
+
+                                        <!-- Sort Order -->
+                                        <td class="text-gold-darker text-center align-middle">@item.SortOrder</td>
+
+                                        <!-- Delete Button -->
+                                        <td class="delete-cell py-0 text-end">
+                                            <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
+                                                <button type="submit" class="btn btn-delete delete-button px-2 py-2" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                    </tr>
+                                    <tr id="edit-row-@item.CategoryID" class="d-none">
+                                        <td colspan="4">
+                                            <div class="row align-items-center container">
+                                                <div class="col-7 px-0">
+                                                    <label for="editCategoryName_@item.CategoryID" class="form-label visually-hidden">New Category Name</label>
+                                                    <input type="text" class="form-control form-control-sm rounded-start rounded-0" id="editCategoryName_@item.CategoryID" name="newCategoryName" value="@item.CategoryName" placeholder="New Category Name">
+                                                </div>
+                                                <div class="col-2 px-0">
+                                                    <label for="editSortOrder_@item.CategoryID" class="form-label visually-hidden">New Sort Order</label>
+                                                    <input type="number" class="form-control form-control-sm rounded-end rounded-0 ps-4" id="editSortOrder_@item.CategoryID" name="newSortOrder" value="@item.SortOrder" min="1">
+                                                </div>
+                                                <div class="col-3 pe-0 text-end">
+                                                    <button type="button" class="btn btn-sm btn-primary update-button" onclick="saveCategoryEdit('@item.CategoryID')"><i class="bi bi-save-fill me-1"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary cancel-button ms-2" onclick="cancelEditRow('@item.CategoryID')"><i class="bi bi-x-octagon-fill me-1"></i></button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody> 
+                        </table>
+                    }
+                    }
+                    else
+                    { 
+                        <div class="text-gold-darker mt-2 text-center">No categories found. Use the form above to add one.</div> 
+                    }
+                </div>
             </div>
         </div>
+
+        <div class="row justify-content-center mx-auto p-0">
+            <div class="col-md-8 bg-transparent pe-2 pt-2">
+                <div class="d-flex justify-content-end mb-3">
+                    <a class="btn btn-sm btn-back" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
+                        Manage PDF Category Files <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>

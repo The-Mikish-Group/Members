@@ -25,15 +25,19 @@
     <NoWarn>1701;1702;CA1862</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Data\Migrations\**" />
     <Compile Remove="Pdf\**" />
     <Compile Remove="Views\Admin\**" />
     <Compile Remove="wwwroot\js\ej2\**" />
+    <Content Remove="Data\Migrations\**" />
     <Content Remove="Pdf\**" />
     <Content Remove="Views\Admin\**" />
     <Content Remove="wwwroot\js\ej2\**" />
+    <EmbeddedResource Remove="Data\Migrations\**" />
     <EmbeddedResource Remove="Pdf\**" />
     <EmbeddedResource Remove="Views\Admin\**" />
     <EmbeddedResource Remove="wwwroot\js\ej2\**" />
+    <None Remove="Data\Migrations\**" />
     <None Remove="Pdf\**" />
     <None Remove="Views\Admin\**" />
     <None Remove="wwwroot\js\ej2\**" />
@@ -49,11 +53,8 @@
     <Compile Remove="Controllers\PdfGenerationControllerBackup.cs" />       
     <Compile Remove="Controllers\PdfGenerationControllerx.cs" />       
     <Compile Remove="Controllers\SharedController.cs" />       
-    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />       
-    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />       
-    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].cs" />       
-    <Compile Remove="Data\Migrations\20250424122526_[00000000000000_CreateIdentitySchema].Designer.cs" />       
-    <Compile Remove="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />       
+    <Compile Remove="Controllers\xMembersController.cs" />       
+    <Compile Remove="Controllers\xPdfCategoryController.cs" />       
     <Compile Remove="Models\CreateGalleryViewModel.cs" />       
     <Compile Remove="Models\GalleryViewModel.cs" />       
     <Compile Remove="Models\GalleryViewModels.cs" />       
@@ -77,6 +78,7 @@
     <Content Remove="Views\Home\Financials.cshtml" />
     <Content Remove="Views\Home\Minutes.cshtml" />
     <Content Remove="Views\Home\Privacy.cshtml" />
+    <Content Remove="Views\PdfCategory\CategoriesMenu.cshtml" />
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
     <Content Remove="Views\Shared\Galleries.cshtml" />
     <Content Remove="Views\Shared\Gallery.cshtml" />
@@ -140,7 +142,7 @@
     <PackageReference Include="System.Security.Permissions" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\Migrations\" />
+    <Folder Include="Areas\Admin\Pages\Reporting\" />
     <Folder Include="ProtectedFiles\" />
     <Folder Include="wwwroot\Galleries\" />
   </ItemGroup>
