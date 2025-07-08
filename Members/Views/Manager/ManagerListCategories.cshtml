@@ -22,23 +22,21 @@
                     @foreach (var category in Model) // Model is already filtered by ManagerController
                     {
                         <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
-                            @* Link to ManagerController to view files in this category *@
+                            
                             <a asp-controller="Manager" asp-action="ManagerListFiles" asp-route-categoryId="@category.CategoryID" class="text-decoration-none text-gold-darker d-block">
-                                    <i class="bi bi-folder2-open me-2"></i> @category.CategoryName  @* Updated Icon Suggestion *@
-                                    @* <span class="badge bg-danger float-end mt-1">Admin Only</span> -- Redundant as all are admin only here *@
-                                     @* <br /> *@
-                                    @* <small class="text-muted ms-4 ps-1">@category.CategoryFiles.Count @(category.CategoryFiles.Count == 1 ? "document" : "documents"), Sort: @category.SortOrder</small> *@
+                                    <i class="bi bi-folder2-open me-2"></i> @category.CategoryName 
                             </a>
+
                         </li>
                     }
                     </ul>
                 }
                 else
                 {
-                    <p class="text-gold-darker m-3 mt-0 pt-0 text-center">
-                        No confidential PDF categories (marked 'Admin Only' and containing files) are currently available.
-                        <br/>
-                        Use the <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories">Manage Confidential Categories</a> page to create them.
+                    <p class="text-gold-darker m-3 mt-0 pt-0 text-start">
+                        No confidential PDF categories are currently available.
+                        <br/><br />
+                        Use the <a class="my-nav-link" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories">Manage Confidential Categories</a> page to create them.
                     </p>
                 }
             </div>

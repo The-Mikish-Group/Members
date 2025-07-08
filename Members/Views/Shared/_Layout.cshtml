@@ -160,25 +160,21 @@
 
             // --- Top Level Dropdowns that need stopPropagation because they have data-bs-auto-close="outside" 
             //     and contain further nested dropdown toggles.
-            addStopPropagation('#membersDropdown');
-            addStopPropagation('#managementDropdown');// Has data-bs-auto-close="outside", contains #pdfDocumentsDropdown and #membersManageDropdown
-            
-            // --- Nested Dropdown Toggles that need stopPropagation ---
-            // These are children of top-level items that have data-bs-auto-close="true" (or default),
-            // OR they are children of items that have data-bs-auto-close="outside".
-            // Their stopPropagation prevents their immediate parent from closing if the parent is not auto-close="false".
-            
-            addStopPropagation('#adminAccountsReceivableDropdown'); 
-            addStopPropagation('#pdfDocumentsDropdown');            
-            addStopPropagation('#invoiceDraftBatchesDropdown'); 
-            addStopPropagation('#adminReportingDropdown');
-            addStopPropagation('#confidentialPdfMenusDropdown');
-            addStopPropagation('#adminPdfFoldersDropdown');
-            addStopPropagation('#ManageMembersDropdown');            
+            // addStopPropagation('#welcomesDropdown');
+            // addStopPropagation('#accountsReceivableDropdown');
+            // addStopPropagation('#invoiceDraftBatchesDropdown'); 
+            // addStopPropagation('#reportingDropdown');
+            // addStopPropagation('#managementDropdown');
+            // addStopPropagation('#manageMembersDropdown');
+            // addStopPropagation('#managePdfMenusDropdown');
+            // addStopPropagation('#PdfDocumentsDropdown');
+            // addStopPropagation('#confidentialPdfMenusDropdown');
+            // addStopPropagation('#membersDropdown'); 
+            // addStopPropagation('#pdfDocumentsDropdown');        
 
             // Footer dropdowns (if it's a nested structure and needs similar behavior)
             addStopPropagation('#pdfDocumentsFooterDropdown');
-          
+            addStopPropagation('#membersFooterDropdown');
         });
 
     </script>

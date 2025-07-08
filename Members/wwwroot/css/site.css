@@ -207,38 +207,36 @@ html > body header {
 }
 
 /*Dropdowns*/
+a#membersDropdown[aria-extended="true"],
 a#welcomeDropdown[aria-expanded="true"],
-a#managementDropdown[aria-expanded="true"],
-a#membersDropdown[aria-expanded="true"],
-a#pdfDocumentsDropdown[aria-expanded="true"],
-a#adminAccountsReceivableDropdown[aria-expanded="true"],
+a#accountsReceivableDropdown[aria-expanded="true"],
 a#invoiceDraftBatchesDropdown[aria-expanded="true"],
-a#adminReportingDropdown[aria-expanded="true"],
-a#adminPdfFoldersDropdown[aria-expanded="true"], /* This is PDF Menus */
-a#membersManageDropdown[aria-expanded="true"],
-a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#reportingDropdown[aria-expanded="true"],
+a#managementDropdown[aria-expanded="true"],
+a#manageMembersDropdown[aria-expanded="true"],
+a#managePdfMenusDropdown[aria-expanded="true"],
+a#PdfDocumentsDropdown[aria-expanded="true"],
 a#confidentialPdfMenusDropdown[aria-extended="true"],
-a#ManageMembersDropdown[aria-extended="true"],
-a#membersfooterDropdown[aria-expanded="true"], /* Kept, assuming still used */
-a#adminCreateFilesDropdown[aria-expanded="true"] /* Kept, assuming still used */ {
+a#pdfDocumentsDropdown[aria-expanded="true"],
+a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#membersfooterDropdown[aria-expanded="true"]
+a {
     color: white !important;
     /*background-color: rgba(0, 0, 0, 0.3) !important;*/
 }
-
-li.show > a#welcomeDropdown,
-li.show > a#managementDropdown,
 li.show > a#membersDropdown,
-li.show > a#pdfDocumentsDropdown,
-li.show > a#adminAccountsReceivableDropdown,
+li.show > a#welcomeDropdown,
+li.show > a#accountsReceivableDropdown,
 li.show > a#invoiceDraftBatchesDropdown,
-li.show > a#adminReportingDropdown,
-li.show > a#adminPdfFoldersDropdown,
-li.show > a#membersManageDropdown,
-li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#reportingDropdown,
+li.show > a#managementDropdown,
+li.show > a#manageMembersDropdown,
+li.show > a#managePdfMenusDropdown,
+li.show > a#PdfDocumentsDropdown,
 li.show > a#confidentialPdfMenusDropdown,
-li.show > a#ManageMembersDropdown,
-li.show > a#membersfooterDropdown, /* Kept, assuming still used */
-li.show > a#adminCreateFilesDropdown /* Kept, assuming still used */ {
+li.show > a#pdfDocumentsDropdown,
+li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#membersFooterDropdown {
     color: white !important;
     /*background-color: rgba(0, 0, 0, 0.3) !important;*/
 }

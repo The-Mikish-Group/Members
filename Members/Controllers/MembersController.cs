@@ -21,7 +21,7 @@ namespace Members.Controllers
             _logger.LogInformation("Loading list of Members categories.");
 
             var membersCategories = await _context.PDFCategories
-                                        .Where(c => c.CategoryFiles.Any() && c.IsAdminOnly == false) 
+                                        .Where(c => c.IsAdminOnly != true) 
                                         .OrderBy(c => c.SortOrder)
                                         .ThenBy(c => c.CategoryName)
                                         .ToListAsync(); 

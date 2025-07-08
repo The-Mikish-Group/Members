@@ -19,8 +19,8 @@
 
             <div class="col-4">
                 <ul class="navbar-nav ms-auto flex-nowrap ps-2">
-                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/">Welcome</a></li>
-                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap " href="~/Info/About">About Us</a></li>
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Info/">Welcome</a></li>
+                    <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Info/About">About Us</a></li>
                     <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Info/Facilities">Facilities</a></li>
                     <li class="nav-item text-light"><a class="nav-link footer-fs text-nowrap" href="~/Image/GalleryList">Galleries</a></li>
                 </ul>
@@ -43,15 +43,15 @@
                     @if (SignInManager.IsSignedIn(User))
                     { 
                         <!-- Members Dropdown in the footer -->
-                        <li class="nav-item dropdown pt-0 pt-lg-0">
+                        <li class="nav-item dropdown pt-lg-0 pt-0">
 
                         <!-- Members Dropdown Toggle in the footer -->
-                        <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="membersfooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-people-fill"></i> Members
                         </a>
 
                         <!-- Members Dropdown Menu in the footer -->
-                        <ul class="dropdown-menu ps-4 ps-lg-2 bg-transparent border-0" aria-labelledby="membersfooterDropdown" style="min-width: 210px;">
+                        <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="membersFooterDropdown" style="min-width: 210px;">
 
                             <!-- News and Notices -->
                             <li class="nav-item text-light">
@@ -65,17 +65,18 @@
 
                                 <!-- PDF Documents Dropdown Toggle in the footer -->
                                 <a class="nav-link dropdown-toggle text-gold-dark footer-fs" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-file-earmark-pdf-fill me-0 text-gold-dark"></i> PDF Documents
+                                    <i class="bi bi-file-earmark-pdf-fill text-gold-dark me-0"></i> PDF Documents
                                 </a>
+
                                 <!-- PDF Documents Menu in the footer -->
-                                <ul class="dropdown-menu ps-4 ps-lg-2 bg-transparent border-0" aria-labelledby="pdfDocumentsFooterDropdown">
+                                <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="pdfDocumentsFooterDropdown">
                                     @{
                                         // Fetch the non-empty categories directly in the layout
                                         var dynamicCategories = DbContext.PDFCategories
-                                        .Where(c => c.CategoryFiles.Any()) // Only include categories with files
-                                        .OrderBy(c => c.SortOrder)        // Order categories
+                                        .Where(c => c.IsAdminOnly != true) 
+                                        .OrderBy(c => c.SortOrder)
                                         .ThenBy(c => c.CategoryName)
-                                        .ToList(); // Execute the query
+                                        .ToList(); 
 
                                         // Check if any categories were found
                                         if (dynamicCategories != null && dynamicCategories.Any())
@@ -86,7 +87,7 @@
                                                 // Maintain footer styles for nested list items
                                                 <li class="nav-item text-light">
                                                     <a class="nav-link footer-fs text-nowrap" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
-                                                        <i class="bi bi-list-ul ms-2 text-gold-darker"></i> @category.CategoryName
+                                                        <i class="bi bi-list-ul text-gold-darker ms-2"></i> @category.CategoryName
                                                     </a>
                                                 </li>
                                             }
@@ -126,8 +127,8 @@
     </div>
 
     <!-- Footer logo and text -->
-    <div class="w-100 bg-gray text-white pt-4">
-        <p class="text-center py-2 text-white" style="font-size: 10px;"><img class="footer-logo" src="~/Images/Svg/Logos/SmallLogo.svg" /> @Environment.GetEnvironmentVariable("SITE_NAME") Copyright © @DateTime.Now.Year</p>
+    <div class="w-100 bg-gray pt-4 text-white">
+        <p class="py-2 text-center text-white" style="font-size: 10px;"><img class="footer-logo" src="~/Images/Svg/Logos/SmallLogo.svg" /> @Environment.GetEnvironmentVariable("SITE_NAME") Copyright © @DateTime.Now.Year</p>
     </div>
 
 </div>

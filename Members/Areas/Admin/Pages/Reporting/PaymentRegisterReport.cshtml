@@ -66,31 +66,31 @@
     @if (Model.ReportData.Any())
     {
         <div class="table-responsive rounded shadow">
-            <table class="table-striped table-hover table-bordered bg-Card-Stripe mb-0 table">
-                <thead class="bg-gold-light text-gold-darker">
+            <table class="table-striped table-hover table-bordered bg-Card-Stripe mb-2">
+                <thead class="text-gold-darker bg-white">
                     <tr>
-                        <th>Payment ID</th>
-                        <th>Customer</th>
-                        <th>Payment Date</th>
-                        <th class="text-end">Amount</th>
-                        <th>Method</th>
-                        <th>Reference #</th>
-                        <th>Applied to Invoice</th>
-                        <th>Notes</th>
+                        <th class="text-nowrap">Payment ID</th>
+                        <th class="text-nowrap">Customer</th>
+                        <th class="text-nowrap">Payment Date</th>
+                        <th class="text-nowrap text-end">Amount</th>
+                        <th class="text-gold-darker text-nowrap">Method</th>
+                        <th class="text-gold-darker text-nowrap">Reference #</th>
+                        <th class="text-gold-darker text-nowrap">Applied to Invoice</th>
+                        <th class="text-gold-darker text-nowrap">Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.ReportData)
                     {
                         <tr>
-                            <td>@item.PaymentId.ToString("D5")</td>
-                            <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
-                            <td>@item.PaymentDate.ToString("yyyy-MM-dd")</td>
-                            <td class="text-end">@item.PaymentAmount.ToString("C")</td>
-                            <td>@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
-                            <td>@Html.DisplayFor(modelItem => item.ReferenceNumber)</td>
-                            <td>@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
-                            <td style="max-width: 400px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
+                            <td class="text-gold-darker text-nowrap">@item.PaymentId.ToString("D5")</td>
+                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.CustomerName)</td>
+                            <td class="text-gold-darker text-nowrap">@item.PaymentDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-gold-darker text-nowrap text-end">@item.PaymentAmount.ToString("C")</td>
+                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
+                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.ReferenceNumber)</td>
+                            <td class="text-gold-darker text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
+                            <td class="text-gold-darker text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
                         </tr>
                     }
                 </tbody>

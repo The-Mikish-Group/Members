@@ -19,12 +19,11 @@ namespace Members.Controllers
         public async Task<IActionResult> ManagerListCategories() 
         {
             _logger.LogInformation("Loading list of confidential categories for Admin/Manager.");
-
             var confidentialCategories = await _context.PDFCategories
-                                        .Where(c => c.CategoryFiles.Any() && c.IsAdminOnly == true) 
-                                        .OrderBy(c => c.SortOrder)
-                                        .ThenBy(c => c.CategoryName)
-                                        .ToListAsync(); 
+                .Where(c => c.IsAdminOnly == true)
+                .OrderBy(c => c.SortOrder)
+                .ThenBy(c => c.CategoryName)
+                .ToListAsync();             
 
             ViewData["Title"] = "Confidential PDF Categories"; 
             return View("~/Views/Manager/ManagerListCategories.cshtml", confidentialCategories); 
