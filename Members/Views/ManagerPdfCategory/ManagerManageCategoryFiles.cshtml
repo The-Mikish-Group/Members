@@ -49,7 +49,6 @@
     
     </div>
     
-
     @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div> }
     @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div> }
 
@@ -144,20 +143,21 @@
 <div class="modal fade" id="mmcfRenameModal" tabindex="-1" aria-labelledby="mmcfRenameModalLabel" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
         <div class="modal-header bg-gold-light"><h5 class="modal-title text-gold-darker" id="mmcfRenameModalLabel">Edit File Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body pb-0">
-            <input type="hidden" id="mmcfRenameFileId" /><input type="hidden" id="mmcfOldFileName" /><input type="hidden" id="mmcfFileCategoryId" />
-            <div class="row align-items-center mb-2">
-                <div class="col-sm-3"><label for="mmcfNewFileName" class="col-form-label fw-bold text-gold-darker">File Name:</label></div>
-                <div class="col-sm-9"><input type="text" class="form-control" id="mmcfNewFileName"></div>
+            <div class="modal-body pb-0">
+                <input type="hidden" id="mmcfRenameFileId" /><input type="hidden" id="mmcfOldFileName" /><input type="hidden" id="mmcfFileCategoryId" />
+                <div class="row align-items-center mb-2">
+                    <div class="col-sm-3"><label for="mmcfNewFileName" class="col-form-label fw-bold text-gold-darker">File Name:</label></div>
+                    <div class="col-sm-9"><input type="text" class="form-control" id="mmcfNewFileName"></div>
+                </div>
+                <div class="row align-items-center mb-3">
+                     <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label></div>
+                     <div class="col-sm-9"><input type="number" class="form-control" id="mmcfNewSortOrder" min="1"></div>
+                </div>
+                <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
             </div>
-            <div class="row align-items-center mb-3">
-                 <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label></div>
-                 <div class="col-sm-9"><input type="number" class="form-control" id="mmcfNewSortOrder" min="1"></div>
-            </div>
-            <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
+            <div class="modal-footer border-top-0"><button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-sm btn-primary" onclick="submitMmcfRenameForm()">Save</button></div>
         </div>
-        <div class="modal-footer border-top-0"><button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-sm btn-primary" onclick="submitMmcfRenameForm()">Save</button></div>
-    </div></div> 
+    </div> 
 </div>
 
 @section Styles { <style> .table th, .table td { vertical-align: middle; } </style> }

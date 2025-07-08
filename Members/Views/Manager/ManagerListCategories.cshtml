@@ -22,7 +22,7 @@
                     @foreach (var category in Model) // Model is already filtered by ManagerController
                     {
                         <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
-                            @* Link to ManagerController to view files in this confidential category *@
+                            @* Link to ManagerController to view files in this category *@
                             <a asp-controller="Manager" asp-action="ManagerListFiles" asp-route-categoryId="@category.CategoryID" class="text-decoration-none text-gold-darker d-block">
                                     <i class="bi bi-folder2-open me-2"></i> @category.CategoryName  @* Updated Icon Suggestion *@
                                     @* <span class="badge bg-danger float-end mt-1">Admin Only</span> -- Redundant as all are admin only here *@

@@ -67,7 +67,7 @@ namespace Members.Controllers
                 {
                     _context.CategoryFiles.RemoveRange(orphanedDbEntries);
                     await _context.SaveChangesAsync();
-                    _logger.LogWarning("Removed {orphanedDbEntries.Count} orphaned DB file entries for confidential category ID {categoryId.Value}.", orphanedDbEntries.Count, categoryId.Value);
+                    _logger.LogWarning("Removed {orphanedDbEntries.Count} orphaned DB file entries for category ID {categoryId.Value}.", orphanedDbEntries.Count, categoryId.Value);
                 }
                 files = validFiles;
             }
@@ -136,7 +136,7 @@ namespace Members.Controllers
             var categoryToUpdate = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryID && c.IsAdminOnly == false);
             if (categoryToUpdate == null)
             {
-                return NotFound("Confidential category not found.");
+                return NotFound("Category not found.");
             }
             if (string.IsNullOrWhiteSpace(categoryName)) return BadRequest("Category name cannot be empty.");
             if (sortOrder < 1) return BadRequest("Sort order must be at least 1.");
@@ -163,7 +163,7 @@ namespace Members.Controllers
             var category = await _context.PDFCategories.Include(c => c.CategoryFiles).FirstOrDefaultAsync(c => c.CategoryID == id && c.IsAdminOnly == false);
             if (category == null)
             {
-                TempData["ErrorMessage"] = "Confidential category not found.";
+                TempData["ErrorMessage"] = "Category not found.";
                 return RedirectToAction(nameof(MembersCategories));
             }
 
@@ -180,7 +180,7 @@ namespace Members.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UploadFileToMembersCategory(int categoryId, IFormFile file, int sortOrder)
+        public async Task<IActionResult> UploadFileToCategory(int categoryId, IFormFile file, int sortOrder)
         {
             var category = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
             if (category == null)
@@ -220,7 +220,7 @@ namespace Members.Controllers
         public async Task<IActionResult> DeleteFileFromCategory(int id, int categoryId)
         {
             var parentCategory = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
-            if (parentCategory == null) { TempData["ErrorMessage"] = "Parent category is not a valid confidential category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }
+            if (parentCategory == null) { TempData["ErrorMessage"] = "Parent category is not a valid category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }
 
             var categoryFileToDelete = await _context.CategoryFiles.FirstOrDefaultAsync(cf => cf.FileID == id && cf.CategoryID == categoryId);
             if (categoryFileToDelete != null)
@@ -239,7 +239,7 @@ namespace Members.Controllers
         public async Task<IActionResult> RenameFileInCategory(int renameFileId, int categoryId, string oldFileName, string newFileName, int newSortOrder)
         {
             var parentCategory = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryId && c.IsAdminOnly == false);
-            if (parentCategory == null) { TempData["ErrorMessage"] = "Invalid confidential category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }
+            if (parentCategory == null) { TempData["ErrorMessage"] = "Invalid category."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId }); }
 
             if (string.IsNullOrWhiteSpace(newFileName) || !newFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) { TempData["ErrorMessage"] = "New file name must be valid and end with .pdf."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId });}
             if (newSortOrder < 1) { TempData["ErrorMessage"] = "Sort order must be at least 1."; return RedirectToAction(nameof(ManageCategoryFiles), new { categoryId });}

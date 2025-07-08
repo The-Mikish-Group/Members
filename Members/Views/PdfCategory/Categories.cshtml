@@ -237,7 +237,7 @@
             var newCategoryName = document.getElementById('newCategoryNameInput').value;
             var newSortOrder = document.getElementById('newSortOrderInput').value;
 
-            var url = '@Url.Action("EditCategory", "PdfCategory")'; // Your existing EditCategory action URL
+            var url = '@Url.Action("EditMemberCategory", "PdfCategory")'; // Corrected Action URL
 
             // Use FormData to easily collect and send data for the POST request
             var formData = new FormData();
