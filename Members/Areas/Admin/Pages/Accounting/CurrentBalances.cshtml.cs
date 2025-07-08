@@ -11,15 +11,15 @@ using System.Text; // Added for StringBuilder and Encoding
 namespace Members.Areas.Admin.Pages.Accounting
 {
     [Authorize(Roles = "Admin,Manager")] // Or your specific admin/manager roles
-    public class AdminBalancesModel(
+    public class CurrentBalancesModel(
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
-        ILogger<AdminBalancesModel> logger,
+        ILogger<CurrentBalancesModel> logger,
         Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender) : PageModel
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
-        private readonly ILogger<AdminBalancesModel> _logger = logger;
+        private readonly ILogger<CurrentBalancesModel> _logger = logger;
         private readonly Microsoft.AspNetCore.Identity.UI.Services.IEmailSender _emailSender = emailSender;
         private const int RecentFeeDaysThreshold = 7;
 
@@ -285,12 +285,12 @@ namespace Members.Areas.Admin.Pages.Accounting
 
         public async Task OnGetAsync(string? sortOrder, bool? showOnlyOutstanding) // Made parameters nullable to match typical OnGetAsync patterns if they can be optional
         {
-            _logger.LogInformation("OnGetAsync called for AdminBalancesModel. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowFilter}, ReturnedFromUserId: {ReturnedUserId}",
+            _logger.LogInformation("OnGetAsync called for CurrentBalancesModel. SortOrder: {SortOrder}, ShowOnlyOutstanding: {ShowFilter}, ReturnedFromUserId: {ReturnedUserId}",
                 sortOrder, showOnlyOutstanding, ReturnedFromUserId);
 
             if (!string.IsNullOrEmpty(ReturnedFromUserId))
             {
-                _logger.LogInformation("Returned to AdminBalances from MyBilling, last viewed user ID: {ReturnedUserId}", ReturnedFromUserId);
+                _logger.LogInformation("Returned to CurrentBalances from MyBilling, last viewed user ID: {ReturnedUserId}", ReturnedFromUserId);
                 // Placeholder for potential future use:
                 // TempData["HighlightUserId"] = ReturnedFromUserId; 
             }
@@ -410,13 +410,13 @@ namespace Members.Areas.Admin.Pages.Accounting
 
         public async Task<IActionResult> OnGetExportCsvAsync(string? sortOrder, bool? showOnlyOutstanding)
         {
-            _logger.LogInformation("[AdminBalances Export CSV] Handler started. Received sortOrder: '{SortOrder}', showOnlyOutstanding: '{ShowOnlyOutstanding}'", sortOrder, showOnlyOutstanding);
+            _logger.LogInformation("[CurrentBalances Export CSV] Handler started. Received sortOrder: '{SortOrder}', showOnlyOutstanding: '{ShowOnlyOutstanding}'", sortOrder, showOnlyOutstanding);
 
             try
             {
                 var memberRoleName = "Member";
                 var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
-                _logger.LogInformation("[AdminBalances Export CSV] Found {UserCount} users in role '{MemberRoleName}'.", usersInMemberRole?.Count ?? 0, memberRoleName);
+                _logger.LogInformation("[CurrentBalances Export CSV] Found {UserCount} users in role '{MemberRoleName}'.", usersInMemberRole?.Count ?? 0, memberRoleName);
 
                 var dataToExport = new List<MemberBalanceViewModel>();
                 if (usersInMemberRole != null)
@@ -471,31 +471,31 @@ namespace Members.Areas.Admin.Pages.Accounting
                             };
 
                             bool effectiveShowOnlyOutstanding = showOnlyOutstanding ?? ShowOnlyOutstanding; // Use page's ShowOnlyOutstanding if parameter is null
-                            _logger.LogTrace("[AdminBalances Export CSV] Processing user {UserName}. Balance: {CurrentBalance}, Credit: {UserCreditBalance}. EffectiveShowOutstanding: {EffectiveShowOutstanding}", user.UserName, currentBalance, userCreditBalance, effectiveShowOnlyOutstanding);
+                            _logger.LogTrace("[CurrentBalances Export CSV] Processing user {UserName}. Balance: {CurrentBalance}, Credit: {UserCreditBalance}. EffectiveShowOutstanding: {EffectiveShowOutstanding}", user.UserName, currentBalance, userCreditBalance, effectiveShowOnlyOutstanding);
 
                             if (effectiveShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0)
                             {
-                                _logger.LogTrace("[AdminBalances Export CSV] Skipping user {UserName} due to ShowOnlyOutstanding filter.", user.UserName);
+                                _logger.LogTrace("[CurrentBalances Export CSV] Skipping user {UserName} due to ShowOnlyOutstanding filter.", user.UserName);
                                 continue;
                             }
                             dataToExport.Add(memberVm);
                         }
                         else
                         {
-                            _logger.LogTrace("[AdminBalances Export CSV] Skipping user {UserName} as they are not a billing contact or profile is missing.", user.UserName);
+                            _logger.LogTrace("[CurrentBalances Export CSV] Skipping user {UserName} as they are not a billing contact or profile is missing.", user.UserName);
                         }
                     }
                 }
-                _logger.LogInformation("[AdminBalances Export CSV] Total users processed for potential export: {ProcessedCount}. Users matching criteria for export: {DataToExportCount}", usersInMemberRole?.Count ?? 0, dataToExport.Count);
+                _logger.LogInformation("[CurrentBalances Export CSV] Total users processed for potential export: {ProcessedCount}. Users matching criteria for export: {DataToExportCount}", usersInMemberRole?.Count ?? 0, dataToExport.Count);
 
 
                 if (dataToExport.Count == 0)
                 {
-                    _logger.LogWarning("[AdminBalances Export CSV] No data to export after filtering. Returning empty file or message.");
+                    _logger.LogWarning("[CurrentBalances Export CSV] No data to export after filtering. Returning empty file or message.");
                 }
 
                 string currentSortOrder = sortOrder ?? CurrentSort ?? "name_asc";
-                _logger.LogInformation("[AdminBalances Export CSV] Applying sort order: '{CurrentSortOrder}'.", currentSortOrder);
+                _logger.LogInformation("[CurrentBalances Export CSV] Applying sort order: '{CurrentSortOrder}'.", currentSortOrder);
 
                 dataToExport = currentSortOrder switch
                 {
@@ -509,7 +509,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     "credit_asc" => [.. dataToExport.OrderBy(s => s.CreditBalance)],
                     _ => [.. dataToExport.OrderBy(s => s.FullName)],
                 };
-                _logger.LogInformation("[AdminBalances Export CSV] Data sorted. Final count for CSV: {Count}", dataToExport.Count);
+                _logger.LogInformation("[CurrentBalances Export CSV] Data sorted. Final count for CSV: {Count}", dataToExport.Count);
 
                 var sb = new StringBuilder();
                 sb.AppendLine("\"Full Name\",\"Email\",\"Current Balance\",\"Credit Balance\"");
@@ -520,13 +520,13 @@ namespace Members.Areas.Admin.Pages.Accounting
 
                 byte[] csvBytes = Encoding.UTF8.GetBytes(sb.ToString());
                 string fileName = $"member_balances_export_{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
-                _logger.LogInformation("[AdminBalances Export CSV] CSV string generated. Byte length: {Length}. Filename: {FileName}", csvBytes.Length, fileName);
+                _logger.LogInformation("[CurrentBalances Export CSV] CSV string generated. Byte length: {Length}. Filename: {FileName}", csvBytes.Length, fileName);
 
                 return File(csvBytes, "text/csv", fileName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[AdminBalances Export CSV] CRITICAL ERROR during CSV export generation. SortOrder: {SortOrder}, ShowOutstanding: {ShowOutstanding}", sortOrder, showOnlyOutstanding);
+                _logger.LogError(ex, "[CurrentBalances Export CSV] CRITICAL ERROR during CSV export generation. SortOrder: {SortOrder}, ShowOutstanding: {ShowOutstanding}", sortOrder, showOnlyOutstanding);
                 TempData["ErrorMessage"] = "A critical error occurred while generating the CSV export for Admin Balances. Please check the logs.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }

@@ -532,7 +532,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogError(ex, "Error finalizing batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error finalizing batch '{BatchId}'. See logs.";
             }
-            return RedirectToPage("./AdminBalances");
+            return RedirectToPage("./CurrentBalances");
         }
 
         private static string EscapeCsvField(string? field)

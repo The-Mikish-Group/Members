@@ -1,9 +1,12 @@
-@page
+﻿@page
 @model Members.Areas.Admin.Pages.Reporting.UserAccountStatementReportModel
 @{
     ViewData["Title"] = "Member Account Statement";
     Layout = "/Views/Shared/_Layout.cshtml";
 }
+
+<!-- Top Button placed here -->
+<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
 <div class="container mt-4">
     <div class="row">
@@ -88,14 +91,14 @@
 
     @if (!string.IsNullOrEmpty(Model.SelectedUserId) && Model.StatementData != null)
     {
-        <div class="card shadow mb-4 bg-Card-Menu">
+        <div class="card bg-Card-Menu mb-4 shadow">
             <div class="card-header bg-gold-light text-gold-darker">
                 Statement for: <strong>@Model.StatementData.SelectedUserName</strong> <br />
                 Period: @Model.StatementData.ReportStartDate.ToString("yyyy-MM-dd") to @Model.StatementData.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover table-sm">
+                    <table class="table-striped table-hover table-sm table">
                         <thead>
                             <tr>
                                 <th colspan="4">Opening Balance:</th>
@@ -115,7 +118,7 @@
                             @if (!Model.StatementData.Transactions.Any())
                             {
                                 <tr>
-                                    <td colspan="7" class="text-center fst-italic py-3">No transactions found for this period.</td>
+                                    <td colspan="7" class="fst-italic py-3 text-center">No transactions found for this period.</td>
                                 </tr>
                             }
                             @foreach (var item in Model.StatementData.Transactions)
@@ -133,8 +136,8 @@
                         </tbody>
                         <tfoot class="bg-gold-light text-gold-darker fw-bold">
                             <tr>
-                                <th colspan="4" class="text-end border-top-2">Closing Balance:</th>
-                                <th class="text-end border-top-2" colspan="3">@Model.StatementData.ClosingBalance.ToString("C")</th>
+                                <th colspan="4" class="border-top-2 text-end">Closing Balance:</th>
+                                <th class="border-top-2 text-end" colspan="3">@Model.StatementData.ClosingBalance.ToString("C")</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -209,5 +212,28 @@
                 });
             }
         });
+    </script>
+    <script>
+
+        //Get the button
+        var mybutton = document.getElementById("top-button");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
     </script>
 }
