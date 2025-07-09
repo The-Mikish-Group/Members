@@ -43,6 +43,7 @@
     <None Remove="wwwroot\js\ej2\**" />
   </ItemGroup>
   <ItemGroup>       
+    <Compile Remove="Areas\Admin\Pages\Accounting\AccountsReceivable.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MembersGrid.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml.cs" />       
@@ -66,6 +67,7 @@
     <Compile Remove="Services\UserService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="Areas\Admin\Pages\Accounting\AccountsReceivable.cshtml" />
     <Content Remove="Areas\Identity\Pages\body.cshtml" />
     <Content Remove="Areas\Identity\Pages\MembersGrid.cshtml" />
     <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
