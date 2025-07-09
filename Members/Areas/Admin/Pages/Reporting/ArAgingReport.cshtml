@@ -31,16 +31,23 @@
 
             <!-- Run Report Button -->
             <div class="col-md-auto mt-2">
-                <button type="submit" class="btn btn-success rounded p-1 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
+                <button type="submit" class="btn btn-success rounded px-2 py-1 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
             </div>
 
             @if (Model.ReportData.Any())
             {
                 <!-- Export to CSV Button (Only show if there is report data) -->
                 <div class="col-md-auto mt-2">
-                    <button type="button" class="btn btn-success rounded p-1 shadow" id="exportArAgingTriggerButton"
+                    <button type="button" class="btn btn-success rounded px-2 py-1 shadow" id="exportArAgingTriggerButton"
                             data-bs-toggle="modal" data-bs-target="#exportArAgingConfirmModal">
                         <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
+                    </button>
+                </div>
+
+                <!-- Print Button (Only show if there is report data) -->
+                <div class="col-md-auto mt-2">
+                    <button type="button" class="btn btn-success shaadow rounded px-2 py-1" id="printReportButton">
+                        <i class="bi bi-printer-fill"></i> Print
                     </button>
                 </div>
             }
@@ -189,6 +196,18 @@
         });
     </script>
 
+    <!-- Print Button Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var printButton = document.getElementById('printReportButton');
+            if (printButton) {
+                printButton.addEventListener('click', function () {
+                    window.print();
+                });
+            }
+        });
+    </script>
+
     <!-- Top Button Script -->
     <script>
 
@@ -199,7 +218,7 @@
         window.onscroll = function () { scrollFunction() };
 
         function scrollFunction() {
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
                 mybutton.style.display = "block";
             } else {
                 mybutton.style.display = "none";

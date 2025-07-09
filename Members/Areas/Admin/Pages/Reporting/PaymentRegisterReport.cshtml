@@ -8,7 +8,7 @@
 <!-- Top Button placed here -->
 <button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
-<div class="container mt-4">
+<div class="container my-4">
     <div class="row">
         <div class="col">
             <h2 class="text-gold-darker">@ViewData["Title"]</h2>
@@ -26,15 +26,26 @@
                 <label for="EndDate" class="form-label text-gold-darker">End Date</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
+
+            <!-- Run Report Button -->
             <div class="col-md-auto">
-                <button type="submit" class="btn btn-primary shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
+                <button type="submit" class="btn btn-success mx-z shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
             </div>
+
             @if (Model.ReportData.Any())
             {
+                <!-- Export to CSV Button (Only show if there is report data) -->
                 <div class="col-md-auto">
-                    <button type="button" class="btn btn-success shadow"
+                    <button type="button" class="btn btn-success mx-2 shadow"
                             data-bs-toggle="modal" data-bs-target="#exportPaymentRegisterConfirmModal">
                         <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
+                    </button>
+                </div>
+
+                <!-- Print Button (Only show if there is report data) -->
+                <div class="col-md-auto">
+                    <button type="button" class="btn btn-success mx-2 shadow" id="printReportButton">
+                        <i class="bi bi-printer-fill"></i> Print
                     </button>
                 </div>
             }
@@ -56,8 +67,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary shadow" data-bs-dismiss="modal">Cancel</button>
-                    @* The button below will be changed to a simple button with JS handler in a later step *@
-                    <button type="button" id="confirmExportPaymentRegisterBtn" class="btn btn-primary shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
+                    <button type="button" id="confirmExportPaymentRegisterBtn" class="btn btn-success shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
                 </div>
             </div>
         </div>
@@ -65,36 +75,36 @@
 
     @if (Model.ReportData.Any())
     {
-        <div class="table-responsive rounded shadow">
+        <div class="table-responsive shadow">
             <table class="table-striped table-hover table-bordered bg-Card-Stripe mb-2">
-                <thead class="text-gold-darker bg-white">
+                <thead class="bg-white text-black">
                     <tr>
-                        <th class="text-nowrap">Payment ID</th>
-                        <th class="text-nowrap">Customer</th>
-                        <th class="text-nowrap">Payment Date</th>
-                        <th class="text-nowrap text-end">Amount</th>
-                        <th class="text-gold-darker text-nowrap">Method</th>
-                        <th class="text-gold-darker text-nowrap">Reference #</th>
-                        <th class="text-gold-darker text-nowrap">Applied to Invoice</th>
-                        <th class="text-gold-darker text-nowrap">Notes</th>
+                        <th class="text-nowrap text-black">Payment ID</th>
+                        <th class="text-nowrap text-black">Customer</th>
+                        <th class="text-nowrap text-black">Payment Date</th>
+                        <th class="text-nowrap text-end text-black">Amount</th>
+                        <th class="text-nowrap text-black">Method</th>
+                        <th class="text-nowrap text-black">Reference #</th>
+                        <th class="text-nowrap text-black">Applied to Invoice</th>
+                        <th class="text-nowrap text-black">Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.ReportData)
                     {
                         <tr>
-                            <td class="text-gold-darker text-nowrap">@item.PaymentId.ToString("D5")</td>
-                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.CustomerName)</td>
-                            <td class="text-gold-darker text-nowrap">@item.PaymentDate.ToString("yyyy-MM-dd")</td>
-                            <td class="text-gold-darker text-nowrap text-end">@item.PaymentAmount.ToString("C")</td>
-                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
-                            <td class="text-gold-darker text-nowrap">@Html.DisplayFor(modelItem => item.ReferenceNumber)</td>
-                            <td class="text-gold-darker text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
-                            <td class="text-gold-darker text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
+                            <td class="text-nowrap">@item.PaymentId.ToString("D5")</td>
+                            <td class="text-nowrap">@Html.DisplayFor(modelItem => item.CustomerName)</td>
+                            <td class="text-nowrap">@item.PaymentDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-nowrap text-end">@item.PaymentAmount.ToString("C")</td>
+                            <td class="text-nowrap">@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
+                            <td class="text-nowrap">@Html.DisplayFor(modelItem => item.ReferenceNumber)</td>
+                            <td class="text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
+                            <td class="text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
                         </tr>
                     }
                 </tbody>
-                <tfoot class="bg-gold-light text-gold-darker fw-bold">
+                <tfoot class="fw-bold bg-white">
                     <tr>
                         <td colspan="3" class="text-end">Total Payments:</td>
                         <td class="text-end">@Model.Totals.TotalPaymentsAmount.ToString("C")</td>
@@ -121,6 +131,8 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Export Button Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var exportButton = document.getElementById('confirmExportPaymentRegisterBtn');
@@ -150,6 +162,20 @@
             }
         });
     </script>
+
+    <!-- Print Button Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var printButton = document.getElementById('printReportButton');
+            if (printButton) {
+                printButton.addEventListener('click', function () {
+                    window.print();
+                });
+            }
+        });
+    </script>
+
+    <!-- Top Button Script -->
     <script>
 
         //Get the button
@@ -159,7 +185,7 @@
         window.onscroll = function () { scrollFunction() };
 
         function scrollFunction() {
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
                 mybutton.style.display = "block";
             } else {
                 mybutton.style.display = "none";
