@@ -24,13 +24,13 @@
             @if (selectedCategory != null) {
                 <span>@ViewData["Title"] <span class="badge bg-danger ms-1">Confidential</span></span>
             } else {
-                <span>Manage Confidential PDF Documents</span>
+                <span>Manage Confidential Documents</span>
             }
         </h3>
 
         <!-- Back Button -->
         <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" class="btn btn-sm btn-back mb-3 shadow">
-            <i class="bi bi-arrow-left-square"></i> Back to Manage Confidential Categories
+            <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
         </a>
 
     </div>
@@ -40,8 +40,8 @@
         <!-- Category Selection Dropdown -->
         <form method="get" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" class="mb-4">
             
-            <label for="mmcf_categoryIdSelection" class="form-label fw-bold text-gold-darker">Select Confidential Category to Manage Files:</label>
-            <select name="categoryId" id="mmcf_categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allConfidentialCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
+            <label for="categoryIdSelection" class="form-label fw-bold text-gold-darker">Select Confidential Category to Manage:</label>
+            <select name="categoryId" id="categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allConfidentialCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
                 <option value="">-- Select a Category --</option>
             </select>
             
@@ -59,29 +59,36 @@
             <div class="card-header bg-gold-light text-gold-darker fw-bold">
                 <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
-            <div class="card-body">
+
+            <!-- Upload PDF Document -->
+            <div class="card-body px-1">
                 <form method="post" enctype="multipart/form-data" asp-controller="ManagerPdfCategory" asp-action="UploadFileToManagerCategory">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
-                    <div class="row gx-0 align-items-center">
-                        <div class="col-md-6">
-                            <label for="mmcf_fileUpload" class="form-label">PDF File:</label>
-                            <input type="file" name="file" id="mmcf_fileUpload" class="form-control no-right-radius" required accept=".pdf">
+                    <div class="row gx-0 gy-2 align-items-center">
+
+                        <div class="col-8">
+                            <label for="fileUpload" class="form-label fw-bold ms-2">PDF Document:</label>
+                            <input type="file" name="file" id="fileUpload" class="form-control no-right-radius" required accept=".pdf">
                         </div>
-                        <div class="col-md-3">
-                            <label for="mmcf_sortOrder" class="form-label">Sort Order:</label>
-                            <input type="number" name="sortOrder" id="mmcf_sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
+
+                        <div class="col-2">
+                            <label for="sortOrder" class="form-label">Sort:</label>
+                            <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
                         </div>
-                        <div class="col-md-3 align-self-end">
+
+                        <div class="col-2 align-self-end">
                             <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i> Upload</button>
                         </div>
+
                     </div>
                 </form>
             </div>
+
         </div>
 
         <!-- Existing Files Table -->
-        <h5 class="text-gold-darker mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
+        <h5 class="text-gold-darker mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
         @if (Model == null || !Model.Any())
         {
             <div class="alert alert-secondary mt-2">No files in this category.</div>
@@ -205,10 +212,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        var categorySelect = document.getElementById('mmcf_categoryIdSelection');
+        var categorySelect = document.getElementById('categoryIdSelection');
         var currentSelectedCategoryId = "@selectedCategoryId"; 
         if (categorySelect && currentSelectedCategoryId) {
-             fetchNextSortOrderForMmcf(currentSelectedCategoryId, 'mmcf_sortOrder');
+             fetchNextSortOrderForMmcf(currentSelectedCategoryId, 'sortOrder');
         }
     });
 

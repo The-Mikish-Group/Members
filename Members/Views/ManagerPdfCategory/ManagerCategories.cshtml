@@ -8,7 +8,7 @@
 
     <!-- Title -->
     <div class="text-gold-darker mb-2 mt-4 text-center">
-        <h3 class="text-gold-darker"><i class="bi bi-shield-lock-fill ms-2"></i> @ViewData["Title"]</h3>
+        <h3 class="text-gold-darker"><i class="bi bi-shield-lock-fill ms-1"></i> @ViewData["Title"]</h3>
         @* <p class="text-muted">Use this page to create, edit names/sort order, and delete categories designated as 'Admin Only'. Files for these categories are managed separately.</p> *@
     </div>
 
@@ -32,8 +32,7 @@
 
                     <!-- Heading: Add a New Category -->
                     <div class="mb-2">
-                        <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add A New Confidential Category</h5>
-                        @* <small class="text-muted d-block">Categories created here will automatically be 'Admin Only'.</small> *@
+                        <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-1"></i> Add A New Category</h5>                        
                     </div>
 
                     <!-- Create Category form -->
@@ -44,7 +43,7 @@
                             <!-- New Category Name -->
                             <div class="col-8 px-0">
                                 <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
-                                <input type="text" class="no-right-radius form-control" id="newCategoryName" name="CategoryName" placeholder="Confidential Category Name" required value="@ViewData["CurrentCategoryName"]">
+                                <input type="text" class="no-right-radius form-control" id="newCategoryName" name="CategoryName" placeholder="Category Name" required value="@ViewData["CurrentCategoryName"]">
                             </div>
 
                             <!-- Sort Order -->
@@ -55,7 +54,7 @@
 
                             <!-- Add Button -->
                             <div class="col-2 px-0">
-                                <button type="submit" class="btn btn-success no-left-radius w-100"><i class="bi bi-plus-square-fill"></i> Add</button>
+                                <button type="submit" class="btn btn-success no-left-radius w-100"><i class="bi bi-plus-square-fill"></i></button>
                             </div>
 
                         </div>
@@ -82,7 +81,7 @@
 
                     <!-- Edit Existing Categories Heading -->
                     <div class="mb-3 ms-2">
-                        <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Confidential Categories</h5>
+                        <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
                     </div>
 
                     @if (Model != null && Model.Any())
@@ -94,9 +93,9 @@
                             <thead>
                                 <tr class="bg-gold-dark text-white">
                                     <th class="bg-gold-dark header-text ps-2 text-white">Edit</th>
-                                    <th class="bg-gold-dark header-text text-white">Category Name</th>
+                                    <th class="bg-gold-dark header-text text-white">Category</th>
                                     <th class="bg-gold-dark header-text text-center text-white">Sort</th>
-                                    <th class="bg-gold-dark header-text text-center text-white">Visibility</th>
+                                    @* <th class="bg-gold-dark header-text text-center text-white">Visibility</th> *@
                                     <th class="bg-gold-dark header-text pe-2 text-end text-white">Delete</th>
                                 </tr>
                             </thead>
@@ -125,7 +124,7 @@
                                         <td class="text-gold-darker text-center align-middle">@item.SortOrder</td>
                                         
                                         <!-- Admin Only -->
-                                        <td class="text-gold-darker text-center align-middle"><span class="badge bg-danger">Admin Only</span></td>
+                                        @* <td class="text-gold-darker text-center align-middle"><span class="badge bg-danger">Admin Only</span></td> *@
                                         
                                         <!-- Delete Button -->
                                         <td class="delete-cell py-0 text-end align-middle">
@@ -171,12 +170,17 @@
 
         <div class="row justify-content-center mx-auto p-0">
             <div class="col-md-8 d-flex justify-content-between mx-auto my-2 bg-transparent p-2">
+                
+                <!-- Browse Confidential Categories -->
                 <a class="btn btn-sm btn-outline-success shadow" asp-controller="Manager" asp-action="ManagerListCategories">
-                    <i class="bi bi-eye-fill"></i> Browse Confidential Categories
+                    <span><i class="bi bi-eye-fill"></i> Browse</span><br />Confidential Categories
                 </a>
+
+                <!-- Manage Confidential Categories -->
                 <a class="btn btn-sm btn-outline-info shadow" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles">
-                    <i class="bi bi-folder-symlink"></i> Manage Confidential Category Files
+                    <span><i class="bi bi-folder-symlink"></i> Manage</span><br />Confidential <span class="text-nowrap">Category Files</span>
                 </a>
+
             </div>
         </div>
     </div>
@@ -200,7 +204,7 @@
                      <div class="col-sm-3"><label for="editConfCatSortOrderInput" class="col-form-label fw-bold text-gold-darker">Sort Order:</label></div>
                      <div class="col-sm-9"><input type="number" class="form-control" id="editConfCatSortOrderInput" min="1"></div>
                 </div>
-                <div class="alert alert-info small p-2">This category will remain 'Admin Only'. To change its overall visibility to public (making it a non-confidential category), please use the main 'Manage Public Categories' interface and edit it there.</div>
+                @* <div class="alert alert-info small p-2">This category will remain 'Admin Only'. To change its overall visibility to public (making it a non-confidential category), please use the main 'Manage Public Categories' interface and edit it there.</div> *@
             </div>
             <div class="modal-footer border-top-0">
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancel</button>

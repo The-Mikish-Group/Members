@@ -834,5 +834,164 @@ namespace Members.Areas.Admin.Pages.Accounting
             _logger.LogInformation("OnPostEmailBalanceNotificationsAsync COMPLETE. Emails Sent: {EmailsSentCount}, Errors: {EmailErrorsCount}", emailsSentCount, emailErrors.Count);
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
+
+        public async Task<IActionResult> OnPostEmailLateFeeWarningsAsync()
+        {
+            _logger.LogInformation("OnPostEmailLateFeeWarningsAsync START - Attempting to send late fee warning emails.");
+
+            var today = DateTime.Today;
+            if (today.Day > 5)
+            {
+                _logger.LogWarning("OnPostEmailLateFeeWarningsAsync: Attempted to send warnings after the 5th of the month (Day: {TodayDay}). Action aborted.", today.Day);
+                TempData["WarningMessage"] = "Late fee warnings should typically be sent between the 1st and 5th of the month. No emails were sent.";
+                return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
+            }
+            // No specific check for "on or after the 1st" as the button would typically be used 1st-5th.
+            // If clicked before the 1st, it might not be harmful, just early. The main guard is for *after* the 5th.
+
+            var memberBalancesTemp = new List<MemberBalanceViewModel>();
+            var memberRoleName = "Member";
+            var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
+
+            if (usersInMemberRole != null && usersInMemberRole.Any())
+            {
+                foreach (var user in usersInMemberRole)
+                {
+                    var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
+                    if (userProfile != null && userProfile.IsBillingContact)
+                    {
+                        string fullName;
+                        if (!string.IsNullOrWhiteSpace(userProfile.LastName) && !string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = $"{userProfile.LastName}, {userProfile.FirstName}";
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.LastName))
+                        {
+                            fullName = userProfile.LastName;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(userProfile.FirstName))
+                        {
+                            fullName = userProfile.FirstName;
+                        }
+                        else
+                        {
+                            fullName = user.UserName ?? "N/A";
+                        }
+
+                        decimal totalChargesFromInvoices = await _context.Invoices
+                            .Where(i => i.UserID == user.Id &&
+                                        i.Status != InvoiceStatus.Cancelled &&
+                                        i.Status != InvoiceStatus.Draft)
+                            .SumAsync(i => i.AmountDue);
+                        decimal totalAmountPaidOnInvoices = await _context.Invoices
+                            .Where(i => i.UserID == user.Id &&
+                                        i.Status != InvoiceStatus.Cancelled &&
+                                        i.Status != InvoiceStatus.Draft)
+                            .SumAsync(i => i.AmountPaid);
+                        decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
+
+                        // Credit balance is not strictly needed for this warning email logic, but keeping it for consistency with MemberBalanceViewModel
+                        decimal unappliedCredits = await _context.UserCredits
+                            .Where(uc => uc.UserID == user.Id && !uc.IsApplied && !uc.IsVoided)
+                            .SumAsync(uc => uc.Amount);
+
+                        memberBalancesTemp.Add(new MemberBalanceViewModel
+                        {
+                            UserId = user.Id,
+                            FullName = fullName,
+                            Email = user.Email ?? "N/A",
+                            FirstName = userProfile.FirstName ?? string.Empty,
+                            LastName = userProfile.LastName ?? string.Empty,
+                            CurrentBalance = currentBalance,
+                            CreditBalance = unappliedCredits
+                        });
+                    }
+                }
+            }
+
+            var usersToEmail = memberBalancesTemp.Where(mb => mb.CurrentBalance > 0).ToList();
+
+            if (usersToEmail.Count == 0)
+            {
+                _logger.LogInformation("OnPostEmailLateFeeWarningsAsync: No members found with an outstanding balance to notify.");
+                TempData["StatusMessage"] = "No members found with an outstanding balance to send late fee warnings to.";
+                return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
+            }
+
+            int emailsSentCount = 0;
+            var emailErrors = new List<string>();
+            var siteName = Environment.GetEnvironmentVariable("SITE_NAME") ?? "Our Community";
+            var fifthOfMonth = new DateTime(today.Year, today.Month, 5);
+
+            foreach (var member in usersToEmail)
+            {
+                if (string.IsNullOrEmpty(member.Email) || member.Email == "N/A")
+                {
+                    _logger.LogWarning("Skipping late fee warning email for {memberFullName} (User ID: {memberUserId}) due to missing or invalid email address.", member.FullName, member.UserId);
+                    emailErrors.Add($"Skipped {member.FullName}: Missing email.");
+                    continue;
+                }
+
+                string subject = $"Action Required: Upcoming Late Fee for Your {siteName} Account Balance";
+                string body = $@"
+                    <!DOCTYPE html>
+                    <html lang=""en"">
+                    <head>
+                        <meta charset=""UTF-8"">
+                        <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                        <title>{subject}</title>
+                    </head>
+                    <body style=""font-family: sans-serif; line-height: 1.6; margin: 20px;"">
+                        <p style=""margin-bottom: 1em;"">Dear {member.FirstName} {member.LastName},</p>
+                        <p style=""margin-bottom: 1em;"">This is an important reminder regarding your account balance with {siteName}.</p>
+                        <p style=""margin-bottom: 1em;"">Your current outstanding balance is: <strong>{member.CurrentBalance:C}</strong>.</p>
+                        <p style=""margin-bottom: 1em; color: #dc3545; font-weight: bold;"">
+                            Please be advised that if this balance is not paid in full by the end of day on <strong>{fifthOfMonth:MMMM dd, yyyy}</strong>, 
+                            a late fee of $25.00 will be applied to your account.
+                        </p>
+                        <p style=""margin-bottom: 1em;"">
+                            To avoid this fee, please make a payment as soon as possible. You can view your detailed billing history and make payments by logging into your account at:
+                            <a href=""https://{Request.Host}/Member/MyBilling"" style=""color: #007bff; text-decoration: none;"">https://{Request.Host}/Member/MyBilling</a>.
+                        </p>
+                        {(member.CreditBalance > 0 ? $"<p style=\"margin-bottom: 1em;\">You also have an available credit balance of <strong>{member.CreditBalance:C}</strong>. This credit will be automatically applied to new charges, which may reduce or cover your outstanding balance.</p>" : "")}
+                        <p style=""margin-bottom: 0;"">Sincerely,</p>
+                        <p style=""margin-top: 0;"">The {siteName} Team</p>
+                    </body>
+                    </html>";
+
+                try
+                {
+                    await _emailSender.SendEmailAsync(member.Email, subject, body);
+                    emailsSentCount++;
+                    _logger.LogInformation("Late fee warning email sent to {MemberEmail} for user {MemberFullName} (ID: {MemberUserId}). Balance: {CurrentBalance:C}", member.Email, member.FullName, member.UserId, member.CurrentBalance);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send late fee warning email to {memberEmail} for user {memberFullName} (ID: {memberUserId}).", member.Email, member.FullName, member.UserId);
+                    emailErrors.Add($"Failed for {member.FullName} ({member.Email}): {ex.Message}");
+                }
+            }
+
+            var statusMessage = new StringBuilder();
+            statusMessage.AppendLine($"Late fee warning email process completed.");
+            statusMessage.AppendLine($"- Emails successfully sent to members with outstanding balances: {emailsSentCount}");
+            if (emailErrors.Count != 0)
+            {
+                statusMessage.AppendLine($"- Errors encountered: {emailErrors.Count}");
+                emailErrors.Take(5).ToList().ForEach(err => statusMessage.AppendLine($"  - {err}"));
+                if (emailErrors.Count > 5)
+                {
+                    statusMessage.AppendLine($"  - ...and {emailErrors.Count - 5} more errors (check logs).");
+                }
+                TempData["ErrorMessage"] = statusMessage.ToString();
+            }
+            else
+            {
+                TempData["StatusMessage"] = statusMessage.ToString();
+            }
+
+            _logger.LogInformation("OnPostEmailLateFeeWarningsAsync COMPLETE. Emails Sent: {EmailsSentCount}, Errors: {EmailErrorsCount}", emailsSentCount, emailErrors.Count);
+            return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
+        }
     }
 }

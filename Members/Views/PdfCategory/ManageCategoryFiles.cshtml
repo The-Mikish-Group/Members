@@ -59,21 +59,24 @@
             <div class="card-header bg-gold-light text-gold-darker fw-bold">
                 <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
-            <div class="card-body">
+            <div class="card-body px-1">
                 <form method="post" enctype="multipart/form-data" asp-controller="PdfCategory" asp-action="UploadFileToCategory">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
-                    <div class="row gx-0 align-items-center">
-                        <div class="col-md-6">
-                            <label for="fileUpload" class="form-label">PDF File:</label>
+                    <div class="row gx-0 gy-2 align-items-center">
+
+                        <div class="col-8">
+                            <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
                             <input type="file" name="file" id="fileUpload" class="form-control no-right-radius" required accept=".pdf">
                         </div>
-                        <div class="col-md-3">
-                            <label for="sortOrder" class="form-label">Sort Order:</label>
+
+                        <div class="col-2">
+                            <label for="sortOrder" class="form-label">Sort:</label>
                             <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
                         </div>
-                        <div class="col-md-3 align-self-end">
-                            <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i> Upload</button>
+
+                        <div class="col-2 align-self-end">
+                            <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i></button>
                         </div>
                     </div>
                 </form>
@@ -81,7 +84,7 @@
         </div>
 
         <!-- Existing Files Table -->
-        <h5 class="text-gold-darker mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
+        <h5 class="text-gold-darker mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
         @if (Model == null || !Model.Any())
         {
             <div class="alert alert-secondary mt-2">No files in this category.</div>

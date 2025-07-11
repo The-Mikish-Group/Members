@@ -31,7 +31,7 @@
             @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    }    
+    }
 
     @if (!Model.MemberBalances.Any())
     {
@@ -83,6 +83,14 @@
                         <button type="submit" class="btn btn-sm btn-info"
                                 onclick="return confirm('Are you sure you want to send balance notification emails to all members with a balance?');">
                             <i class="bi bi-envelope"></i> Email Balance Notifications
+                        </button>
+                    </form>
+
+                    <!-- Email Late Fee Warnings -->
+                    <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block; margin-left: 5px;" class="my-2">
+                        <button type="submit" class="btn btn-sm btn-warning"
+                                onclick="return confirm('Are you sure you want to send late fee warning emails to all members with an outstanding balance? This should typically be done between the 1st and 5th of the month.');">
+                            <i class="bi bi-exclamation-triangle"></i> Email Late Fee Warnings
                         </button>
                     </form>
 
@@ -213,7 +221,7 @@
                     <tfoot class="border-top">
                         <tr class="bg-light">
                             <td colspan="2" class="fw-bold py-1 pe-2 text-end">Totals:</td>
-                            
+
                             <!-- Current Balance Total -->
                             <td class="text-gold-darker fw-bold text-nowrap py-1 text-end @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
                                 @Model.TotalCurrentBalance.ToString("C")
@@ -224,15 +232,15 @@
                                 @Model.TotalCreditBalance.ToString("C")
                             </td>
                             <td class="py-1"></td>
-                            <td class="py-1"></td> 
+                            <td class="py-1"></td>
                         </tr>
                     </tfoot>
 
                 </table>
             </div>
         </div>
-        
-        
+
+
     }
 
     <!-- Export Confirmation Modal -->
