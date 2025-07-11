@@ -115,7 +115,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
             var latestOverdueDuesInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
-                            i.Type == InvoiceType.Dues &&
+                            //i.Type == InvoiceType.Dues &&
                             i.Status != InvoiceStatus.Paid &&
                             i.Status != InvoiceStatus.Cancelled &&
                             i.DueDate < DateTime.Today)
@@ -546,7 +546,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             int successCount = 0;
             int skippedNoOutstandingBalance = 0;
             int skippedRecentFeeExists = 0;
-            int skippedNoOverdueDues = 0; // Counter for the new skip condition
+            int skippedNoOverdueDues = 0; 
             int errorCount = 0;
             var detailedErrorMessages = new List<string>();
             var successMessages = new List<string>();
@@ -612,7 +612,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                     }
                     else if (result.Message.Contains("no outstanding balance")) { skippedNoOutstandingBalance++; }
                     else if (result.Message.Contains("recent late fee")) { skippedRecentFeeExists++; }
-                    else if (result.Message.Contains("no overdue DUES invoices")) { skippedNoOverdueDues++; } // Count new skip reason
+                    else if (result.Message.Contains("no overdue invoices")) { skippedNoOverdueDues++; } // Count new skip reason
                     else
                     {
                         errorCount++;
@@ -630,7 +630,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             summaryMessage.AppendLine($"- Late fees successfully applied: {successCount}");
             summaryMessage.AppendLine($"- Skipped (No outstanding balance): {skippedNoOutstandingBalance}");
             summaryMessage.AppendLine($"- Skipped (Recent fee already exists): {skippedRecentFeeExists}");
-            summaryMessage.AppendLine($"- Skipped (No overdue DUES invoice): {skippedNoOverdueDues}"); // Add to summary
+            summaryMessage.AppendLine($"- Skipped (No overdue invoice): {skippedNoOverdueDues}"); // Add to summary
             summaryMessage.AppendLine($"- Errors encountered: {errorCount}");
 
             if (successMessages.Count > 0)
