@@ -8,9 +8,9 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7"> @* Slightly wider for more invoice details *@
-            <div class="card shadow mb-2 bg-Card-Menu">
+            <div class="card bg-Card-Menu mb-2 shadow">
                 <div class="card-header bg-gold-light text-white">
-                    <h4 class="mb-0 text-gold-darker">
+                    <h4 class="text-gold-darker mb-0">
                         @ViewData["Title"]                       
                     </h4>
                 </div>
@@ -31,7 +31,7 @@
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-gold-darker">Member</label>
-                                <p class="form-control shadow text-gold-darker">@Model.TargetUserName</p>
+                                <p class="form-control text-gold-darker shadow">@Model.TargetUserName</p>
                             </div>
 
                             @* Display Open Invoices for Selection *@
@@ -39,7 +39,7 @@
                                 <label asp-for="Input.SelectedInvoiceID" class="form-label text-gold-darker"></label>
                                 @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
                                 {
-                                    <div class="ps-3 py-2 shadow card list-group" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                    <div class="card list-group py-2 ps-3 shadow" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
                                         @foreach (var invoice in Model.OpenInvoicesForUser)
                                         {
                                             <label class="list-group-item list-group-item-action text-gold-darker">
@@ -54,16 +54,16 @@
                                 }
                                 else
                                 {
-                                    <p class="ps-3 py-2 shadow card form-text text-gold-darker">No open invoices found to apply payment towards.</p>
+                                    <p class="card form-text text-gold-darker py-2 ps-3 shadow">No open invoices found to apply payment towards.</p>
                                 }
                             </div>
 
-                            <p class="mt-0 text-gold-darker">Apply Existing Credit to Selected Invoice</p>
+                            <p class="text-gold-darker mt-0">Apply Existing Credit to Selected Invoice</p>
                             @if (Model.IsUserPreselected && Model.AvailableUserCredits.Any())
                             {   
                                 <div class="mb-3">
                                     <label asp-for="Input.SelectedUserCreditID" class="form-label text-gold-darker"></label>
-                                    <select asp-for="Input.SelectedUserCreditID" class="form-select shadow text-gold-darker">
+                                    <select asp-for="Input.SelectedUserCreditID" class="form-select text-gold-darker shadow">
                                         <option value="">-- Select a credit --</option>
                                         @foreach (var credit in Model.AvailableUserCredits)
                                         {
@@ -76,20 +76,20 @@
                                 </div>
                                 <div class="mb-3">
                                     <label asp-for="Input.AmountToApplyFromCredit" class="form-label text-gold-darker"></label>
-                                    <input asp-for="Input.AmountToApplyFromCredit" type="text" class="form-control shadow text-gold-darker" placeholder="Amount from credit" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
+                                    <input asp-for="Input.AmountToApplyFromCredit" type="text" class="form-control text-gold-darker shadow" placeholder="Amount from credit" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.AmountToApplyFromCredit" class="text-danger"></span>
                                 </div>
                             }
                             else if (Model.IsUserPreselected)
                             {                               
-                                <p class="mb-3 ps-3 py-2 shadow card form-text text-gold-darker">No available credits for this Member.</p>
+                                <p class="card form-text text-gold-darker mb-3 py-2 ps-3 shadow">No available credits for this Member.</p>
                             }
                         }
                         else // User not preselected, show dropdown (fallback)
                         {
                             <div class="mb-3">
                                 <label asp-for="Input.SelectedUserID" class="form-label text-gold-darker"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="shadow form-select text-gold-darker">
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select text-gold-darker shadow">
                                     <option value="">-- Select User --</option>
                                 </select>
                                 <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
@@ -107,12 +107,12 @@
                             <div class="row mb-3">
                                 <div class="col-sm-6">
                                     <label asp-for="Input.PaymentDate" class="form-label text-gold-darker"></label>
-                                    <input asp-for="Input.PaymentDate" class="shadow form-control text-gold-darker" />
+                                    <input asp-for="Input.PaymentDate" class="form-control text-gold-darker shadow" />
                                     <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
                                 </div>
                                 <div class="col-sm-6">
                                     <label asp-for="Input.Amount" class="form-label text-gold-darker"></label>
-                                    <input asp-for="Input.Amount" type="text" class="shadow form-control text-gold-darker" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
+                                    <input asp-for="Input.Amount" type="text" class="form-control text-gold-darker shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.Amount" class="text-danger"></span>
                                 </div>
                             </div>
@@ -126,37 +126,37 @@
 
                             <div class="mb-3">
                                 <label asp-for="Input.ReferenceNumber" class="form-label text-gold-darker"></label>
-                                <input asp-for="Input.ReferenceNumber" class="shadow form-control text-gold-darker" />
+                                <input asp-for="Input.ReferenceNumber" class="form-control text-gold-darker shadow" />
                                 <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="Input.Notes" class="form-label text-gold-darker"></label>
-                                <textarea asp-for="Input.Notes" class="shadow form-control text-gold-darker" rows="3"></textarea>
+                                <textarea asp-for="Input.Notes" class="form-control text-gold-darker shadow" rows="3"></textarea>
                                 <span asp-validation-for="Input.Notes" class="text-danger"></span>
                             </div>                            
 
-                            <div class="d-grid gap-2 mt-4">
+                            <div class="d-grid mt-4 gap-2">
                                 <div class="row gy-2 justify-content-center">
                                     <div class="col-md-auto mb-2 text-center">
                                         @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                                         {
-                                            <a href="@Model.ReturnUrl" class="shadow btn btn-sm btn-back mt-0"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                            <a href="@Model.ReturnUrl" class="btn btn-sm btn-back mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
                                         }
                                         else
                                         {
-                                            <a href="~/Info/" class="shadow btn btn-sm btn-back mt-0"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                            <a href="~/Info/" class="btn btn-sm btn-back mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
                                         }
                                     </div>
                                     <div class="col-md-auto mb-2 text-center">
-                                        <button type="submit" asp-page-handler="RecordNewPayment" class="shadow btn btn-sm btn-primary">
+                                        <button type="submit" asp-page-handler="RecordNewPayment" class="btn btn-sm btn-success rounded-4 shadow">
                                             <i class="bi bi-cash-coin"></i> Record New Payment
                                         </button>
                                     </div>
                                     @if (Model.AvailableUserCredits.Any())
                                     {
                                         <div class="col-md-auto mb-2 text-center">
-                                            <button type="submit" asp-page-handler="ApplyCredit" class="shadow btn btn-sm btn-success">
+                                            <button type="submit" asp-page-handler="ApplyCredit" class="btn btn-sm btn-success rounded-4 shadow">
                                                 <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
                                             </button>
                                         </div>

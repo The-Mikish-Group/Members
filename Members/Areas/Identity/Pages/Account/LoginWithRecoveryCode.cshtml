@@ -11,18 +11,18 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow rounded m-4 p-4 bg-Card-Menu">
+            <div class="card bg-Card-Menu m-4 rounded p-4 shadow">
                 <div class="card-body">
-                    <h1 class="text-center mb-4 text-gold-darker">
+                    <h1 class="text-gold-darker mb-4 text-center">
                         <i class="bi bi-key"></i> <i class="bi bi-arrow-clockwise"></i> @ViewData["Title"]
                     </h1>
-                    <p class="text-center text-gold-darker">
+                    <p class="text-gold-darker text-center">
                         You have requested to log in with a recovery code. This login will not be remembered until you provide
                         an authenticator app code at log in or disable 2FA and log in again.
                     </p>
 
                     <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center" role="alert"></div>
                         <div class="form-floating mb-3">
                             <input asp-for="Input.RecoveryCode" class="form-control" autocomplete="off" placeholder="RecoveryCode" />
                             <label asp-for="Input.RecoveryCode" class="form-label">Recovery Code</label>
@@ -33,12 +33,12 @@
                         <div class="d-flex justify-content-between">
 
                             <!-- Cancel -->
-                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                            <a href="~/" class="btn btn-sm btn-secondary rounded-4 me-2">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
                             <!-- Log In -->
-                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                            <button type="submit" class="btn btn-sm btn-success rounded-4 me-2">
                                 <i class="bi bi-save"></i> Log in
                             </button>                            
 

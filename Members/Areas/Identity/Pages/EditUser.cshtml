@@ -29,7 +29,7 @@
                     <div class="d-flex justify-content-center my-3">
 
                         <!-- Cancel Button -->
-                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2 shadow">
+                        <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary rounded-4 me-2 shadow">
                             <i class="bi bi-box-arrow-left"></i> Cancel
                         </button>
                         @{
@@ -48,7 +48,7 @@
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
                            asp-route-returnUrl="@editUserReturnUrl"
-                           class="btn btn-sm btn-info me-2">
+                           class="btn btn-sm btn-info rounded-4 me-2">
                             <i class="bi bi-tags"></i> Roles
                         </a>
 
@@ -58,7 +58,7 @@
                             <a asp-area="Member" asp-page="/MyBilling"
                                asp-route-userId="@Model.Input.Id"
                                asp-route-returnUrl="@editUserReturnUrl"
-                               class="btn btn-sm btn-info me-2">
+                               class="btn btn-sm btn-info rounded-4 me-2">
                                 <i class="bi bi-card-list"></i> Billing
                             </a>
                         }
@@ -67,13 +67,13 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <!-- Delete -->
-                            <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger me-2 shadow" id="confirmDeleteButton">
+                            <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger rounded-4 me-2 shadow" id="confirmDeleteButton">
                                 <i class="bi bi-x-circle"></i> Delete
                             </button>
                         }
 
                         <!-- Save -->
-                        <button type="submit" class="btn btn-sm btn-success me-2 shadow">
+                        <button type="submit" class="btn btn-sm btn-success rounded-4 me-2 shadow">
                             <i class="bi bi-save"></i> Save
                         </button>
 

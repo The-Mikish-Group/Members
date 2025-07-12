@@ -15,9 +15,9 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-10">
-            <div class="card p-2 shadow bg-Card-Menu">
+            <div class="card bg-Card-Menu p-2 shadow">
 
-                <h1 class="mb-4 text-center text-gold-darker">
+                <h1 class="text-gold-darker mb-4 text-center">
                     <i class="bi bi-person-fill"></i> @ViewData["Title"]
                 </h1>
                 
@@ -110,15 +110,15 @@
                         <div class="row gx-0 justify-content-center">
 
                             <!-- Cancel Button -->
-                            <div class="col-6 text-end pe-2">                                
-                                <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary me-2">
+                            <div class="col-6 pe-2 text-end">                                
+                                <button type="submit" asp-page-handler="Cancel" class="btn btn-sm btn-secondary rounded-4 me-2">
                                     <i class="bi bi-box-arrow-left"></i> Cancel
                                 </button>
                             </div>
 
                             <!-- Save -->
-                            <div class="col-6 text-start ps-2">                                
-                                <button type="submit" class="btn btn-sm btn-primary me-2">
+                            <div class="col-6 ps-2 text-start">                                
+                                <button type="submit" class="btn btn-sm btn-primary rounded-4 me-2">
                                     <i class="bi bi-save"></i> Save
                                 </button>
                             </div>
@@ -142,8 +142,8 @@
 }
 else
 {
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 50vh;">
-        <div class="card shadow rounded bg-Card-Menu p-4" style="max-width: 400px;">
+    <div class="d-flex justify-content-center align-items-center container" style="min-height: 50vh;">
+        <div class="card bg-Card-Menu rounded p-4 shadow" style="max-width: 400px;">
             <div class="card-body text-center">
                 <p class="card-text pb-2">This is the secure site of @siteName.</p>
                 <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>

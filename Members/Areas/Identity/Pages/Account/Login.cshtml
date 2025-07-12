@@ -14,10 +14,10 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card p-2 shadow rounded bg-Card-Menu">
+            <div class="card bg-Card-Menu rounded p-2 shadow">
 
                 <!-- Title -->
-                <h2 class="text-center mb-4 text-gold-darker">
+                <h2 class="text-gold-darker mb-4 text-center">
                     <i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]
                 </h2>
 
@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- Remember Me -->
-                        <div class="form-check mb-3 text-gold-darker">
+                        <div class="form-check text-gold-darker mb-3">
                             <input class="form-check-input" asp-for="Input.RememberMe" id="rememberMe" />
                             <label class="form-check-label" asp-for="Input.RememberMe" for="rememberMe">
                                 @Html.DisplayNameFor(m => m.Input.RememberMe)
@@ -55,19 +55,19 @@
 
                         <!-- Forgot your Password -->
                         <div class="form-floating mb-4">
-                            <a class="btn btn-sm btn-loglink border-0" asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot your password?</a>
+                            <a class="btn btn-sm btn-loglink rounded-4 border-0" asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot your password?</a>
                         </div>
                        
                         <!-- Buttons -->
                         <div class="d-flex justify-content-between">
 
                             <!-- Cancel -->
-                            <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-secondary border-0 me-2" title="Cancel">
+                            <a asp-controller="Info" asp-action="Index" class="btn btn-sm btn-secondary rounded-4 me-2 border-0" title="Cancel">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
                             <!-- Log In -->                            
-                            <button id="login-submit" type="submit" class="btn btn-sm btn-success border-0 me-2">
+                            <button id="login-submit" type="submit" class="btn btn-sm btn-success rounded-4 me-2 border-0">
                                 <i class="bi bi-unlock"></i> Log in
                             </button>                            
 

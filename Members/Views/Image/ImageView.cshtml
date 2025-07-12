@@ -4,14 +4,14 @@
     ViewData["Title"] = Model.FileName;
 }
 
-<h1 class="text-center text-gold-darker mt-4 mb-2">@System.IO.Path.GetFileNameWithoutExtension(Model.FileName)</h1>
+<h1 class="text-gold-darker mb-2 mt-4 text-center">@System.IO.Path.GetFileNameWithoutExtension(Model.FileName)</h1>
 
 <div class="mb-3 text-center">
-    <a href="javascript:history.back()" class="btn btn-sm btn-back me-2" title="Back to Previous Page">
+    <a href="javascript:history.back()" class="btn btn-sm btn-back rounded-4 me-2 shadow" title="Back to Previous Page">
         <i class="bi bi-box-arrow-left me-2"></i> Back
     </a>
 </div>
 
-<div class="container d-flex justify-content-center mb-2">
+<div class="d-flex justify-content-center container mb-2">
     <img src="@Model.FullImageUrl" class="img-fluid rounded" alt="@Model.FileName" style="width: 100%; height: auto;">
 </div>

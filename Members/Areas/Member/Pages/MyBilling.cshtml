@@ -3,7 +3,7 @@
 @using Members.Models
 @{
     ViewData["Title"] = "Billing History";
-    Layout = "_Layout"; // Or your specific Member Area layout
+    Layout = "_Layout";
 }
 
 <div class="container mb-2 mt-4">
@@ -20,6 +20,7 @@
                 </div>
             }
 
+
             @if (TempData["WarningMessage"] != null)
             {
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -27,6 +28,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
+
 
             @if (TempData["StatusMessage"] != null)
             {
@@ -36,14 +38,16 @@
                 </div>
             }
 
+
             @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.BackToEditUserUrl))
             {
                 <div class="my-2 text-center">
-                    <a href="@Model.BackToEditUserUrl" class="btn btn-sm btn-back shadow">
+                    <a href="@Model.BackToEditUserUrl" class="btn btn-sm btn-back rounded-4 shadow">
                         <i class="bi bi-arrow-left"></i> Back
                     </a>
                 </div>
             }
+
 
             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
@@ -56,14 +60,14 @@
                     returnUrl = Model.BackToEditUserUrl
                 });
 
-                <div id="accountingActionsSectionOnMyBilling" style="display: @accountingActionsDisplayStyle;" class="mb-0">
-                    <div class="row gx-2 gy-2 justify-content-center mb-3">
+                <div id="accountingActionsSectionOnMyBilling" style="@(string.IsNullOrEmpty(accountingActionsDisplayStyle) ? "display:none;" : $"display:{accountingActionsDisplayStyle};")" class="mb-0 mt-2">
+                    <div class="row gx-2 gy-2 justify-content-center mb-3 mt-3">
 
                         <div class="col-auto">
                             <a asp-area="Admin" asp-page="/Accounting/AddInvoice"
                                asp-route-userId="@Model.ViewedUserId"
                                asp-route-returnUrl="@myBillingReturnUrl"
-                               class="btn btn-sm btn-primary shadow">
+                               class="btn btn-sm btn-success rounded-4 shadow">
                                 <i class="bi bi-file-earmark-plus"></i> Invoice
                             </a>
                         </div>
@@ -72,18 +76,17 @@
                             <a asp-area="Admin" asp-page="/Accounting/RecordPayment"
                                asp-route-userId="@Model.ViewedUserId"
                                asp-route-returnUrl="@myBillingReturnUrl"
-                               class="btn btn-sm btn-success shadow">
+                               class="btn btn-sm btn-success rounded-4 shadow">
                                 <i class="bi bi-cash-coin"></i> Payment
                             </a>
                         </div>
 
                         <div class="col-auto">
                             <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@Model.ViewedUserId" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-warning shadow"
+                                <button type="submit" class="btn btn-sm btn-danger rounded-4 shadow"
                                         title="Apply Late Fee if Dues/Assessments are overdue"
                                         onclick="return confirm('Are you sure you want to attempt to apply a late fee for @Model.DisplayName.Replace("'s", "")? This will check for overdue Dues/Assessments and apply a fee if appropriate.');"
                                         @(Model.TargetUserIsBillingContact ? "" : "disabled")>
-                                    @* Button is disabled if user is not a billing contact *@
                                     <i class="bi bi-alarm"></i> Apply Late Fee
                                 </button>
                             </form>
@@ -93,6 +96,7 @@
 
                 </div>
             }
+
 
             <div class="card bg-Card-Menu mb-4 shadow">
 
@@ -162,6 +166,7 @@
                     </div>
                 </div>
             }
+
 
             <div class="card bg-Card-Menu mb-2 shadow">
                 <div class="card-header">
@@ -258,10 +263,10 @@
 
                                         <!-- Status/Method -->
                                         <th class="text-decoration-none text-nowrap py-1 text-center text-white">Type</th>
-                                        
+
                                         <!-- Edit Invoice -->
                                         <th class="text-nowrap py-1 text-center text-white">Edit</th>
-                                        
+
                                         <!-- Void Invoice -->
                                         <th class="text-nowrap py-1 text-center text-white">Void</th>
                                     </tr>
@@ -288,7 +293,7 @@
                                             <td class="text-gold-darker text-wrap py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
                                             <td class="text-gold-darker text-nowrap py-1 text-end">@trans.ChargeAmount?.ToString("C")</td>
                                             <td class="text-gold-darker text-nowrap py-1 pe-1 text-end">@trans.PaymentAmount?.ToString("C")</td>
-                                            
+
 
                                             <!-- Voided or Status/Method -->
                                             <td class="text-gold-darker text-nowrap py-1 text-center">
@@ -303,7 +308,7 @@
                                             </td>
 
                                             <!-- Status/Method -->
-                                           <td class="text-gold-darker text-nowrap py-1 text-center">
+                                            <td class="text-gold-darker text-nowrap py-1 text-center">
                                                 @Html.DisplayFor(modelItem => trans.Type)
                                             </td>
 
@@ -318,7 +323,7 @@
                                                         <a asp-area="Admin" asp-page="/Accounting/EditInvoice"
                                                            asp-route-invoiceId="@trans.InvoiceID.Value"
                                                            asp-route-returnUrl="@Url.Page("/MyBilling", new { area = "Member", userId = Model.ViewedUserId, sortOrder = Model.CurrentSort, returnUrl = Model.BackToEditUserUrl })"
-                                                           class="btn btn-sm btn-outline-primary" title="Edit Invoice">
+                                                           class="btn btn-sm btn-rename" title="Edit Invoice">
                                                             <i class="bi bi-pencil-square"></i>
                                                         </a>
                                                     }
@@ -335,14 +340,14 @@
                                                     {
                                                         <form method="post" asp-page-handler="VoidInvoice" style="display:inline;"
                                                               onsubmit="return handleVoidInvoice('@trans.InvoiceID.Value.ToString()');">
-                                                           
+
                                                             <input type="hidden" name="invoiceId" value="@trans.InvoiceID.Value" />
                                                             <input type="hidden" name="voidReason" id="voidReason_@trans.InvoiceID.Value.ToString()" />
                                                             <input type="hidden" name="ViewedUserId" value="@Model.ViewedUserId" />
                                                             <input type="hidden" name="BackToEditUserUrl" value="@Model.BackToEditUserUrl" />
 
-                                                            <button type="submit" class="btn btn-sm btn-danger ms-1" title="Void Invoice INV-@trans.InvoiceID.Value.ToString().PadLeft(5, '0')">
-                                                                <i class="bi bi-x-circle"></i> Void
+                                                            <button type="submit" class="btn btn-sm btn-delete ms-1" title="Void Invoice INV-@trans.InvoiceID.Value.ToString().PadLeft(5, '0')">
+                                                                <i class="bi bi-x-circle"></i>
                                                             </button>
 
                                                         </form>
@@ -359,14 +364,14 @@
                                                             <input type="hidden" name="ViewedUserId" value="@Model.ViewedUserId" />
                                                             <input type="hidden" name="BackToEditUserUrl" value="@Model.BackToEditUserUrl" />
 
-                                                            <button type="submit" class="btn btn-sm btn-warning ms-1" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
-                                                                <i class="bi bi-eraser"></i> Void Pmt
+                                                            <button type="submit" class="btn btn-sm btn-danger ms-1" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
+                                                                <i class="bi bi-eraser"></i>
                                                             </button>
 
                                                         </form>
                                                     }
                                                 }
-                                            </td>                                            
+                                            </td>
                                         </tr>
                                         i++;
                                     }
@@ -376,12 +381,13 @@
                     }
                 </div>
             </div>
-        </div>
-        </<div>
-        </div>
-    </div>
 
+        </div>
+        
+    </div>
 </div>
+
+
 
 @section Scripts {
     <script>

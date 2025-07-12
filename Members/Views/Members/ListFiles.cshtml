@@ -7,16 +7,16 @@
 }
 
 <!-- View Headings -->
-<div class="text-center mt-4 mb-2 text-gold-darker">
+<div class="text-gold-darker mb-2 mt-4 text-center">
 
     <!-- Category Name -->
-    <h1 class="mb-2 text-gold-darker">
-        <i class="bi bi-file-earmark-pdf-fill me-0 text-gold-darker"></i> @ViewBag.CategoryName
+    <h1 class="text-gold-darker mb-2">
+        <i class="bi bi-file-earmark-pdf-fill text-gold-darker me-0"></i> @ViewBag.CategoryName
     </h1>
 
     <!-- Back to Categories Button -->
     <p>
-        <a asp-controller="Members" asp-action="ListCategories" class="btn btn-sm btn-back text-decoration-none text-gold-darker" title="Back to PDF Categories">
+        <a asp-controller="Members" asp-action="ListCategories" class="btn btn-sm btn-back text-decoration-none text-gold-darker rounded-4 shadow" title="Back to PDF Categories">
             <i class="bi bi-arrow-left"></i> Back to PDF Categories
         </a>
     </p>
@@ -24,11 +24,11 @@
 </div>
 
 <!-- Card Container -->
-<div class="container row justify-content-center mx-auto p-1">
+<div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Card -->
-        <div class="card shadow rounded border bg-PDF-Menu">
+        <div class="card bg-PDF-Menu rounded border shadow">
             <div class="card-body p-0">
 
                 <!-- Create the List of File Names -->
@@ -47,7 +47,7 @@
                 }
                 else
                 {
-                    <p class="text-center text-gold-darker">No files found in this category.</p>
+                    <p class="text-gold-darker text-center">No files found in this category.</p>
                 }
             </div>
         </div>

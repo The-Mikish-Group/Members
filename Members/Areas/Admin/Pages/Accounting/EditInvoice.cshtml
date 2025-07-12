@@ -1,62 +1,62 @@
-@page "{invoiceId:int}"
+﻿@page "{invoiceId:int}"
 @model EditInvoiceModel
 @{
     ViewData["Title"] = "Edit Invoice";
     Layout = "_Layout"; // Or your specific Member Area layout
 }
 
-<h2 class="mt-4 text-center text-gold-darker"><i class="bi bi-pencil-square"></i> @ViewData["Title"]</h2>
+<h2 class="text-gold-darker mt-4 text-center"><i class="bi bi-pencil-square"></i> @ViewData["Title"]</h2>
 
 <div class="container my-4">
     <div class="row justify-content-center">
 
         <div class="col-md-8 col-lg-6">
 
-            <div class="shadow card m-1 p-2 bg-Card-Menu">
+            <div class="card bg-Card-Menu m-1 p-2 shadow">
                 <form method="post">
 
                     <h4 class="text-gold-darker ms-2">Invoice details:</h4>
 
                     
 
-                    <div class="mt-0 form-group text-gold-darker">
-                        <label for="InvoiceIdDisplay" class="ms-2 text-gold-darker">Invoice ID:</label>
-                        <input type="text" id="InvoiceIdDisplay" class="shadow form-control text-gold-darker" readonly value="@Model.InvoiceId" />
+                    <div class="form-group text-gold-darker mt-0">
+                        <label for="InvoiceIdDisplay" class="text-gold-darker ms-2">Invoice ID:</label>
+                        <input type="text" id="InvoiceIdDisplay" class="form-control text-gold-darker shadow" readonly value="@Model.InvoiceId" />
                     </div>
-                    <div class="mt-3 form-group text-gold-darker">
-                        <label for="BatchIdDisplay" class="ms-2 text-gold-darker">Batch ID:</label>
-                        <input type="text" id="BatchIdDisplay" class="shadow form-control text-gold-darker" readonly value="@Model.BatchId" />
+                    <div class="form-group text-gold-darker mt-3">
+                        <label for="BatchIdDisplay" class="text-gold-darker ms-2">Batch ID:</label>
+                        <input type="text" id="BatchIdDisplay" class="form-control text-gold-darker shadow" readonly value="@Model.BatchId" />
                     </div>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <input type="hidden" asp-for="ReturnUrl" />
-                    <div class="mt-0 form-group text-gold-darker">
-                        <label asp-for="Input.DueDate" class="ms-2 text-gold-darker"></label>
-                        <input asp-for="Input.DueDate" class="shadow form-control text-gold-darker" />
+                    <div class="form-group text-gold-darker mt-0">
+                        <label asp-for="Input.DueDate" class="text-gold-darker ms-2"></label>
+                        <input asp-for="Input.DueDate" class="form-control text-gold-darker shadow" />
                         <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                     </div>
-                    <div class="mt-3 form-group text-gold-darker">
-                        <label asp-for="Input.Description" class="ms-2 text-gold-darker"></label>
-                        <input asp-for="Input.Description" class="shadow form-control text-gold-darker" />
+                    <div class="form-group text-gold-darker mt-3">
+                        <label asp-for="Input.Description" class="text-gold-darker ms-2"></label>
+                        <input asp-for="Input.Description" class="form-control text-gold-darker shadow" />
                         <span asp-validation-for="Input.Description" class="text-danger"></span>
                     </div>
-                    <div class="mt-3 form-group">
-                        <label asp-for="Input.AmountDue" class="ms-2 text-gold-darker"></label>
-                        <input asp-for="Input.AmountDue" class="shadow form-control text-gold-darker" />
+                    <div class="form-group mt-3">
+                        <label asp-for="Input.AmountDue" class="text-gold-darker ms-2"></label>
+                        <input asp-for="Input.AmountDue" class="form-control text-gold-darker shadow" />
                         <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Input.Status" hidden class="ms-2 text-gold-darker"></label>
-                        <input asp-for="Input.Status" hidden class="shadow form-control text-gold-darker" />
+                        <label asp-for="Input.Status" hidden class="text-gold-darker ms-2"></label>
+                        <input asp-for="Input.Status" hidden class="form-control text-gold-darker shadow" />
                         <span asp-validation-for="Input.Status" class="text-danger"></span>
                     </div>
 
                     <div class="row justify-content-center">
                         <div class="col-6 text-start">
-                            <a href="@Model.ReturnUrl" class="mt-3 mb-2 shadow btn btn-sm btn-secondary"><i class="bi bi-arrow-left"></i> Cancel</a>
+                            <a href="@Model.ReturnUrl" class="btn btn-sm btn-secondary rounded-4 mb-2 mt-3 shadow"><i class="bi bi-arrow-left"></i> Cancel</a>
                         </div>
                         <div class="col-6 text-end">
-                            <button type="submit" class="mt-3 mb-2 shadow btn btn-sm btn-success"><i class="bi bi-pencil-square"></i> Save Changes</button>
+                            <button type="submit" class="btn btn-sm btn-success rounded-4 mb-2 mt-3 shadow"><i class="bi bi-pencil-square"></i> Save Changes</button>
                         </div>
                     </div>
                   

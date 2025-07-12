@@ -20,14 +20,14 @@
 }
 
 <!-- Title: Image Galleries -->
-<h1 class="text-center text-gold-darker mt-4 mb-2"><i class="bi bi-image"></i> Image Galleries</h1>
+<h1 class="text-gold-darker mb-2 mt-4 text-center"><i class="bi bi-image"></i> Image Galleries</h1>
 
 <!-- Row and Column setup for Card -->
-<div class="container row justify-content-center mx-auto p-1">
+<div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Shadowed Card -->
-        <div class="card shadow rounded border bg-Card-Menu">
+        <div class="card bg-Card-Menu rounded border shadow">
             <div class="card-body p-0">
                 
                 <!-- Check to see if there are any Galleries -->
@@ -40,7 +40,7 @@
                         @foreach (var gallery in Model)
                         {
                             <!-- List item with link to the gallery view -->
-                            <li class="list-group-item bg-transparent text-gold-darker" style="cursor: pointer;">
+                            <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
                                 <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="text-decoration-none text-gold-dark d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
                             </li>                         
                         }
@@ -48,7 +48,7 @@
                 }
                 else
                 {
-                    <div class="text-center py-4">
+                    <div class="py-4 text-center">
                         <p class="text-gold-dark">No galleries available yet.</p>
                     </div>
                 }
@@ -61,7 +61,7 @@
 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
 {
     <div class="mt-4 text-center">
-        <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back text-gold-dark"><i class="bi bi-shield-lock"></i> Manage Galleries</a>
+        <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back text-gold rounded-4 shadow"><i class="bi bi-shield-lock"></i> Manage Galleries</a>
     </div>
 }
 

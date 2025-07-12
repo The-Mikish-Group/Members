@@ -560,26 +560,26 @@ a {
 .btn-danger {
     color: white !important;
     background-color: darkred !important; 
-    border-color: #414042 !important;
+    border-color: gray !important;
 }
 
     .btn-danger:focus,
     .btn-danger:hover {
         color: white !important;
         background-color: red !important;
-        border-color: #7d7e81 !important;
+        border-color: gray !important;
     }
 
 /* btn-subtle-danger */
 .btn-subtle-danger {
     background-color: lightpink; 
-    border: 1px solid black;
-    border-radius: 4em;
+    border-color: gray;
     color: black; 
 }
 
     .btn-subtle-danger:hover {
-        background-color: crimson; /* Slightly darker hover background */
+        background-color: crimson;
+        border-color: gray;
         color: white;
     }
 

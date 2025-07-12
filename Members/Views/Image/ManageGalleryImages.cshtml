@@ -10,11 +10,11 @@
     <div class="col-md-8 col-lg-10 mx-auto">
 
         <!-- Heading: Manage Images fir 'Gallery' -->
-        <h1 class="text-center mt-4 mb-2 text-gold-darker">Manage Images for:<br />@ViewBag.GalleryName</h1>
+        <h1 class="text-gold-darker mb-2 mt-4 text-center">Manage Images for:<br />@ViewBag.GalleryName</h1>
 
         <!-- Back to Manage Galleries Button -->
-        <div class="text-center mb-3">
-            <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
+        <div class="mb-3 text-center">
+            <a asp-controller="Image" asp-action="ManageGalleries" class="btn btn-sm btn-back rounded-4 shadow"><i class="bi bi-box-arrow-left"></i> Back to Manage Galleries</a>
         </div>
 
         <!-- Status Success Message (Auto-Clear) -->
@@ -34,10 +34,10 @@
         }
        
         <!-- Shadow Card (Upload a New Image) -->
-        <div class="card shadow rounded p-2 bg-Card-Menu">
+        <div class="card bg-Card-Menu rounded p-2 shadow">
             
             <!-- Heading: Upload a New Image -->
-            <h2 class="mt-4 mb-2 ps-2 text-gold-darker"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
+            <h2 class="text-gold-darker mb-2 mt-4 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
 
             <!-- Upload a New Image Form -->
             <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data">
@@ -49,7 +49,7 @@
                     <input type="file" name="ImageFiles" class="form-control" accept="image/*" required multiple>
 
                         <!-- Upload Button -->
-                        <button type="submit" class="btn btn-primary no-left-radius">
+                    <button type="submit" class="btn btn-success rounded-4 no-left-radius">
                             <i class="bi bi-cloud-arrow-up"></i>
                         </button>
 
@@ -59,13 +59,13 @@
         </div>
 
         <!-- Shadow Card (Existing Images) -->
-        <div class="card shadow rounded p-2 bg-Card-Menu mt-4">
+        <div class="card bg-Card-Menu mt-4 rounded p-2 shadow">
 
             @if (Model != null && Model.Any())
                 {
 
                 <!-- Heading: Existing Images -->
-                <h2 class="mt-4 mb-2 ps-2 text-gold-darker">
+                <h2 class="text-gold-darker mb-2 mt-4 ps-2">
                     <i class="bi bi-images"></i> Existing Images
                 </h2>
 
@@ -76,7 +76,7 @@
                         <div class="col-md-6 col-lg-3 col-xl-2 mb-2">
 
                             <!-- Shadow Card for each Image -->
-                            <div class="card shadow rounded p-2 bg-Card-Menu h-100">
+                            <div class="card bg-Card-Menu h-100 rounded p-2 shadow">
 
                                 <!-- Image Thumbnail with Link to View Image -->
                                 <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
@@ -84,7 +84,7 @@
                                 </a>
 
                                 <!-- Image Name and Action Buttons -->
-                                <div class="card-body text-center p-0">
+                                <div class="card-body p-0 text-center">
 
                                     <!-- Image Name -->
                                     <p class="card-text text-gold-darker mt-1">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
@@ -99,7 +99,7 @@
 
                                         <!-- Rename -->
                                         <button type="button" 
-                                            class="btn btn-sm btn-rename rounded py-2 px-2 me-5" 
+                                            class="btn btn-sm btn-rename me-5 rounded px-2 py-2" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#renameImageModal_@sanitizedImageFileNameForId">
                                             <i class="bi bi-pencil-square px-0"></i>
@@ -111,7 +111,7 @@
                                             <input type="hidden" name="fileName" value="@image.FileName" />
                                                 
                                             <!-- Delete Button -->
-                                            <button type="submit" class="btn btn-delete py-2 px-2 delete-button rounded ms-5"><i class="bi bi-trash-fill"></i></button>                      
+                                            <button type="submit" class="btn btn-delete delete-button ms-5 rounded px-2 py-2"><i class="bi bi-trash-fill"></i></button>                      
 
                                         </form>
 
@@ -145,12 +145,12 @@
                                             <div class="modal-footer p-0">
 
                                                 <!-- Cancel button -->
-                                                <button type="button" class="btn btn-sm btn-secondary me-2" data-bs-dismiss="modal" aria-label="Cancel">
+                                                <button type="button" class="btn btn-sm btn-secondary rounded-4 me-2 shadow" data-bs-dismiss="modal" aria-label="Cancel">
                                                     <i class="bi bi-box-arrow-left"></i> Cancel
                                                 </button>
 
                                                 <!-- Save Changes Button -->
-                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                <button type="submit" class="btn btn-sm btn-success rounded-4 shadow">
                                                     <i class="bi bi-pencil-square px-0"></i> Save Changes
                                                 </button>
 
@@ -169,7 +169,7 @@
                 else
                 {   
                     <!-- No Images Message -->
-                    <div class="text-center text-gold-dark py-4">This gallery is empty. Upload images above!</div>
+                    <div class="text-gold-dark py-4 text-center">This gallery is empty. Upload images above!</div>
                 }    
             
         </div>

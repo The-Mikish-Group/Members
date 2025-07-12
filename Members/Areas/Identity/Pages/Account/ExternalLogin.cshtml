@@ -11,10 +11,10 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow rounded bg-Card-Menu m-4 p-4">
+            <div class="card bg-Card-Menu m-4 rounded p-4 shadow">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
-                    <h2 id="external-login-title" class="text-center mb-4">Associate your @Model.ProviderDisplayName account.</h2>
+                    <h1 class="mb-4 text-center">@ViewData["Title"]</h1>
+                    <h2 id="external-login-title" class="mb-4 text-center">Associate your @Model.ProviderDisplayName account.</h2>
                     
                     <p id="external-login-description" class="text-info text-center">
                         You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
@@ -23,7 +23,7 @@
                     </p>
 
                     <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center" role="alert"></div>
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email." />
                             <label asp-for="Input.Email" class="form-label">Email</label>
@@ -34,11 +34,11 @@
 
                             <!-- Cancel Button -->
                             <a href="~/" class="btn btn-sm btn-secondary me-2">
-                                <i class="bi bi-box-arrow-left"></i> Cancel
+                                <i class="bi bi-box-arrow-left rounded-4 shadow"></i> Cancel
                             </a>
 
                             <!-- Register -->
-                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                            <button type="submit" class="btn btn-sm btn-primary rounded-4 me-2 shadow">
                                 <i class="bi bi-check-lg"></i> Register
                             </button>                            
 

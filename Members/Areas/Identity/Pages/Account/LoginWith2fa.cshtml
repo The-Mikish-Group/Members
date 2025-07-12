@@ -11,15 +11,15 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow rounded m-4 p-4 bg-Card-Menu">
+            <div class="card bg-Card-Menu m-4 rounded p-4 shadow">
                 <div class="card-body">
-                    <h1 class="text-center mb-4 text-gold-darker">
+                    <h1 class="text-gold-darker mb-4 text-center">
                         <i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]
                     </h1>
-                    <p class="text-center text-gold-darker">Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+                    <p class="text-gold-darker text-center">Your login is protected with an authenticator app. Enter your authenticator code below.</p>
                     <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
                         <input asp-for="RememberMe" type="hidden" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3" role="alert"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center" role="alert"></div>
                         <div class="form-floating mb-3">
                             <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
                             <label asp-for="Input.TwoFactorCode" class="form-label">Authenticator Code</label>
@@ -36,19 +36,19 @@
                         <div class="d-flex justify-content-between">
 
                             <!-- Cancel -->
-                            <a href="~/" class="btn btn-sm btn-secondary me-2">
+                            <a href="~/" class="btn btn-sm btn-secondary rounded-4 me-2 shadow">
                                 <i class="bi bi-box-arrow-left"></i> Cancel
                             </a>
 
                             <!-- Log In -->
-                            <button type="submit" class="btn btn-sm btn-primary me-2">
+                            <button type="submit" class="btn btn-sm btn-success rounded-4 me-2">
                                 <i class="bi bi-save"></i> Log in
                             </button>                            
 
                         </div>
 
                     </form>
-                    <p class="text-center mt-3">
+                    <p class="mt-3 text-center">
                         Don't have access to your authenticator device? You can
                         <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
                     </p>

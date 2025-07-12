@@ -60,7 +60,7 @@
                 <div class="col-md-9 text-md-end">
 
                     <!-- Email Late Fee Warnings -->
-                    <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block; margin-left: 5px;" class="my-2">
+                    <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block;" class="my-2 ms-1">
                         <button type="submit" class="btn btn-sm btn-subtle-danger rounded-4"
                                 onclick="return confirm('Are you sure you want to send late fee warning emails to all members with an outstanding balance? This should typically be done between the 1st and 5th of the month.');">
                             <i class="bi bi-exclamation-triangle"></i> Email Late Fee Warnings
@@ -68,7 +68,7 @@
                     </form>
 
                     <!-- Apply Late Fee -->
-                    <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block; margin-right: 5px;" class="ms-1">
+                    <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block;" class="my-2 ms-1">
                         <button type="submit" class="btn btn-sm btn-danger rounded-4"
                                 onclick="return confirm('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances? This may take a moment.');">
                             <i class="bi bi-alarm"></i> Apply Late Fees to All Eligible
@@ -76,7 +76,7 @@
                     </form>
 
                     <!-- Email Balance Notifications -->
-                    <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block; margin-left: 5px;" class="my-2">
+                    <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block;" class="my-2 ms-1">
                         <button type="submit" class="btn btn-sm btn-search-fill rounded-4"
                                 onclick="return confirm('Are you sure you want to send balance notification emails to all members with a balance?');">
                             <i class="bi bi-envelope"></i> Email Balance Notifications
