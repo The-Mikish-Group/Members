@@ -7,7 +7,7 @@
 }
 
 <div class="mb-2 mt-4 text-center">
-    <h3><i class="bi bi-shield-lock-fill text-gold-darker ms-2"></i> @ViewData["Title"]</h3>
+    <h3><i class="bi bi-shield-lock-fill text-blackish ms-2"></i> @ViewData["Title"]</h3>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -18,11 +18,11 @@
 <div class="row mx-0 p-0">
     <div class="col-md-8 mx-auto my-0 mb-2 p-2">
 
-        <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">
+        <div class="card m-sm-0 bg-card-light rounded p-0 shadow">
             <div class="card-body m-1 p-0">
 
                 @* <div class="mb-4 mt-2 text-center">
-                    <h5 class="text-gold-darker"><i class="bi bi-file-earmark-pdf-fill mb-2 me-2"></i> Upload a New PDF File</h5>
+                    <h5 class="text-blackish"><i class="bi bi-file-earmark-pdf-fill mb-2 me-2"></i> Upload a New PDF File</h5>
                 </div>
 
                 <div class="text-start">
@@ -39,7 +39,7 @@
                 <!-- Edit an Existing Row -->
                 <div class="mb-0 text-center">
                     <h5>
-                        <i class="bi bi-file-earmark-pdf-fill text-gold-darker mb-2 me-2"></i> Edit an Existing PDF File
+                        <i class="bi bi-file-earmark-pdf-fill text-blackish mb-2 me-2"></i> Edit an Existing PDF File
                     </h5>
                 </div> *@
 
@@ -47,12 +47,12 @@
 
                     <!-- File Name -->
                     <div class="col-6 text-start">
-                        <p class="text-gold-darker ps-2"><strong>File Name</strong></p>
+                        <p class="text-blackish ps-2"><strong>File Name</strong></p>
                     </div>
 
                     <!-- Delete -->
                     <div class="col-6 text-end">
-                        <p class="text-gold-darker pe-2">
+                        <p class="text-blackish pe-2">
                             <strong>Delete</strong>
                         </p>
                     </div>
@@ -74,7 +74,7 @@
                                         <div class="row align-items-center">
                                             
                                             <div class="col d-flex align-items-center">
-                                                <span class="flex-grow-1 d-block text-gold-darker" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
+                                                <span class="flex-grow-1 d-block text-blackish" style="word-break: break-word;">@System.IO.Path.GetFileNameWithoutExtension(file)</span>
                                             </div>
                                             <div class="d-flex align-items-center justify-content-end col-auto">
                                                 <button type="submit" asp-page-handler="DeleteSingle" asp-route-fileName="@file" class="btn btn-delete delete-button px-2 py-2" data-filename="@file">

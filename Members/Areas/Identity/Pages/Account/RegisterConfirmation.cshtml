@@ -11,31 +11,31 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card bg-Card-Menu m-2 rounded p-4 shadow">
-                <h1 class="text-gold-darker mb-4 text-center">
+            <div class="card bg-card-light m-2 rounded p-4 shadow">
+                <h1 class="text-blackish mb-4 text-center">
                     <i class="bi bi-person-check-fill"></i> @ViewData["Title"]
                 </h1>
                 @{
                     if (@Model.DisplayConfirmAccountLink)
                     {                        
-                        <h3 class="text-gold-darker pb-4 text-center">Thank you for registering!</h3>
+                        <h3 class="text-blackish pb-4 text-center">Thank you for registering!</h3>
                         <p class="text-danger pb-1">
                             Important!
                         </p>
                         
-                        <p class="text-gold-darker pb-2">
+                        <p class="text-blackish pb-2">
                             <strong>1. An Email Confirmation</strong> has been sent to your email address; please click the confirmation link in the email. If you do not see the email in your inbox, please check your Spam folder.
                         </p>
                        
-                        <p class="text-gold-darker pb-2">
+                        <p class="text-blackish pb-2">
                             <strong>2. Your account is pending approval by a Manager and one has been notified.</strong>
                             <strong>Please allow 24 hours</strong> for the <strong>manual the approval process</strong> to complete.
                         </p>
                         
-                        <p class="text-gold-darker pb-4">
+                        <p class="text-blackish pb-4">
                             (The email(s) will come from @Environment.GetEnvironmentVariable("SMTP_USERNAME") + ".")
                         </p>
-                        <p class="text-gold-darker pb-3">
+                        <p class="text-blackish pb-3">
                             <strong>3. Finally,</strong> you will recieve a <strong>Welcome Email</strong> telling you that you're ready to login. Again, this step may take 24 hours,
                             so please be patient. This is a manual process and we are a small team of volunteers.
                         </p> 
@@ -46,7 +46,7 @@
                     else
                     {
                         // Handle the case where the confirmation link is not displayed
-                        <p class="text-gold-darker text-center">
+                        <p class="text-blackish text-center">
                             Thank you for registering!
                         </p>
                     }

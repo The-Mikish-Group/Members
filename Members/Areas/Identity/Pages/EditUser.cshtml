@@ -11,14 +11,14 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<h1 class="text-gold-darker my-4 text-center">
+<h1 class="text-blackish my-4 text-center">
     <i class="bi bi-person-fill"></i> @ViewData["Title"]
 </h1>
 
 <div class="container mb-4 px-2">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card bg-Card-Menu p-2 shadow">
+            <div class="card bg-card-light p-2 shadow">
 
                 <!-- Display Status Message -->
                 <div asp-validation-summary="ModelOnly" class="text-danger text-center" role="alert"></div>
@@ -48,7 +48,7 @@
                         <a asp-page="./ManageRoles"
                            asp-route-userId="@Model.Input.Id"
                            asp-route-returnUrl="@editUserReturnUrl"
-                           class="btn btn-sm btn-info rounded-4 me-2">
+                           class="btn btn-sm btn-info rounded-4 me-2 shadow">
                             <i class="bi bi-tags"></i> Roles
                         </a>
 
@@ -58,7 +58,7 @@
                             <a asp-area="Member" asp-page="/MyBilling"
                                asp-route-userId="@Model.Input.Id"
                                asp-route-returnUrl="@editUserReturnUrl"
-                               class="btn btn-sm btn-info rounded-4 me-2">
+                               class="btn btn-sm btn-info rounded-4 me-2 shadow">
                                 <i class="bi bi-card-list"></i> Billing
                             </a>
                         }
@@ -101,7 +101,7 @@
 
                     <!-- Email -->
                     <div class="form-floating mb-3">
-                        <span class="text-gold-darker form-control email-display readonly-email shadow">@Model.Input.Email</span>
+                        <span class="text-blackish form-control email-display readonly-email shadow">@Model.Input.Email</span>
                         <div class="email-icon-container" id="emailCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
                         </div>
@@ -112,29 +112,29 @@
                     <!-- Email Confirmed -->
                     <div class="form-check mb-3">
                         <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox shadow" id="emailConfirmedCheckbox" />
-                        <label class="form-check-label text-gold-darker" for="emailConfirmedCheckbox">Email Confirmed</label>
+                        <label class="form-check-label text-blackish" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
 
                     <!-- Phone Number -->
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.PhoneNumber" class="text-gold-darker form-control readonly-PhoneNumber shadow" id="phoneNumber" placeholder="Phone Number" />
+                        <input asp-for="Input.PhoneNumber" class="text-blackish form-control readonly-PhoneNumber shadow" id="phoneNumber" placeholder="Phone Number" />
                         <div class="phoneNumber-icon-container" id="phoneNumberCheckIcon">
                             <i class="bi bi-check-circle-fill text-success"></i>
                         </div>
-                        <label asp-for="Input.PhoneNumber" class="text-gold-darker form-label">Cell Phone</label>
+                        <label asp-for="Input.PhoneNumber" class="text-blackish form-label">Cell Phone</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
 
                     <!-- Phone Number Confirmed -->
                     <div class="form-check mb-3">
                         <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox shadow" id="PhoneNumberConfirmedCheckbox" />
-                        <label class="form-check-label text-gold-darker" for="PhoneNumberConfirmedCheckbox">Cell Phone Confirmed</label>
+                        <label class="form-check-label text-blackish" for="PhoneNumberConfirmedCheckbox">Cell Phone Confirmed</label>
                     </div>
 
                     <!-- Home Phone -->
                     <div class="form-floating mb-3">
-                        <input asp-for="Input.HomePhoneNumber" class="text-gold-darker form-control shadow" id="homephoneNumber" placeholder="Home Phone (Opt.)" />
-                        <label asp-for="Input.HomePhoneNumber" class="text-gold-darker form-label">Home Phone  (Opt.)</label>
+                        <input asp-for="Input.HomePhoneNumber" class="text-blackish form-control shadow" id="homephoneNumber" placeholder="Home Phone (Opt.)" />
+                        <label asp-for="Input.HomePhoneNumber" class="text-blackish form-label">Home Phone  (Opt.)</label>
                         <span asp-validation-for="Input.HomePhoneNumber" class="text-danger"></span>
                     </div>
 
@@ -144,19 +144,19 @@
                     <div class="row gx-1">
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.FirstName" class="text-gold-darker form-control shadow" placeholder="First Name" />
-                            <label asp-for="Input.FirstName" class="text-gold-darker form-label">First Name</label>
+                            <input asp-for="Input.FirstName" class="text-blackish form-control shadow" placeholder="First Name" />
+                            <label asp-for="Input.FirstName" class="text-blackish form-label">First Name</label>
                             <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                         </div>
 
                         <div class="col-2 form-floating mb-3">
-                            <input asp-for="Input.MiddleName" class="text-gold-darker form-control shadow" placeholder="Middle" />
+                            <input asp-for="Input.MiddleName" class="text-blackish form-control shadow" placeholder="Middle" />
                             <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
                         </div>
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.LastName" class="text-gold-darker form-control shadow" placeholder="Last Name" />
-                            <label asp-for="Input.LastName" class="text-gold-darker form-label">Last Name</label>
+                            <input asp-for="Input.LastName" class="text-blackish form-control shadow" placeholder="Last Name" />
+                            <label asp-for="Input.LastName" class="text-blackish form-label">Last Name</label>
                             <span asp-validation-for="Input.LastName" class="text-danger"></span>
                         </div>
 
@@ -166,14 +166,14 @@
                     <div class="row gx-1">
 
                         <div class="col-6 form-floating mb-2">
-                            <input asp-for="Input.Birthday" class="text-gold-darker form-control shadow" type="date" placeholder=" " />
-                            <label asp-for="Input.Birthday" class="text-gold-darker form-label">Birthday (Opt.)</label>
+                            <input asp-for="Input.Birthday" class="text-blackish form-control shadow" type="date" placeholder=" " />
+                            <label asp-for="Input.Birthday" class="text-blackish form-label">Birthday (Opt.)</label>
                             <span asp-validation-for="Input.Birthday" class="text-danger"></span>
                         </div>
 
                         <div class="col-6 form-floating mb-2">
-                            <input asp-for="Input.Anniversary" class="text-gold-darker form-control shadow" type="date" placeholder=" " />
-                            <label asp-for="Input.Anniversary" class="text-gold-darker form-label">Anniversary (Opt.)</label>
+                            <input asp-for="Input.Anniversary" class="text-blackish form-control shadow" type="date" placeholder=" " />
+                            <label asp-for="Input.Anniversary" class="text-blackish form-label">Anniversary (Opt.)</label>
                             <span asp-validation-for="Input.Anniversary" class="text-danger"></span>
                         </div>
 
@@ -183,15 +183,15 @@
 
                     <!-- Address Line 1 -->
                     <div class="col-12 form-floating mb-3">
-                        <input asp-for="Input.AddressLine1" class="text-gold-darker form-control shadow" placeholder="Address Line 1" />
-                        <label asp-for="Input.AddressLine1" class="text-gold-darker form-label">Address Line 1</label>
+                        <input asp-for="Input.AddressLine1" class="text-blackish form-control shadow" placeholder="Address Line 1" />
+                        <label asp-for="Input.AddressLine1" class="text-blackish form-label">Address Line 1</label>
                         <span asp-validation-for="Input.AddressLine1" class="text-danger"></span>
                     </div>
 
                     <!-- Address Line 2 -->
                     <div class="col-12 form-floating mb-3">
-                        <input asp-for="Input.AddressLine2" class="text-gold-darker form-control shadow" placeholder="Address Line 2 (Opt.)" />
-                        <label asp-for="Input.AddressLine2" class="text-gold-darker form-label">Address Line 2 (Opt.)</label>
+                        <input asp-for="Input.AddressLine2" class="text-blackish form-control shadow" placeholder="Address Line 2 (Opt.)" />
+                        <label asp-for="Input.AddressLine2" class="text-blackish form-label">Address Line 2 (Opt.)</label>
                         <span asp-validation-for="Input.AddressLine2" class="text-danger"></span>
                     </div>
 
@@ -199,20 +199,20 @@
                     <div class="row gx-1">
 
                         <div class="col-5 form-floating mb-3">
-                            <input asp-for="Input.City" class="text-gold-darker form-control shadow" placeholder="City" />
-                            <label asp-for="Input.City" class="text-gold-darker form-label">City</label>
+                            <input asp-for="Input.City" class="text-blackish form-control shadow" placeholder="City" />
+                            <label asp-for="Input.City" class="text-blackish form-label">City</label>
                             <span asp-validation-for="Input.City" class="text-danger"></span>
                         </div>
 
                         <div class="col-3 form-floating mb-3">
-                            <input asp-for="Input.State" class="text-gold-darker form-control shadow" placeholder="State" />
-                            <label asp-for="Input.State" class="text-gold-darker form-label">State</label>
+                            <input asp-for="Input.State" class="text-blackish form-control shadow" placeholder="State" />
+                            <label asp-for="Input.State" class="text-blackish form-label">State</label>
                             <span asp-validation-for="Input.State" class="text-danger"></span>
                         </div>
 
                         <div class="col-4 form-floating mb-3">
-                            <input asp-for="Input.ZipCode" class="text-gold-darker form-control shadow" placeholder="Zip Code" />
-                            <label asp-for="Input.ZipCode" class="text-gold-darker form-label">Zip</label>
+                            <input asp-for="Input.ZipCode" class="text-blackish form-control shadow" placeholder="Zip Code" />
+                            <label asp-for="Input.ZipCode" class="text-blackish form-label">Zip</label>
                             <span asp-validation-for="Input.ZipCode" class="text-danger"></span>
                         </div>
 
@@ -233,7 +233,7 @@
                         <div class="col-6 mb-4">
                             <div class="form-check mb-3">
                                 <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox shadow" id="twoFactorEnabledCheckbox" />
-                                <label class="form-check-label text-gold-darker" asp-for="Input.TwoFactorEnabled"></label>
+                                <label class="form-check-label text-blackish" asp-for="Input.TwoFactorEnabled"></label>
                                 <span asp-validation-for="Input.TwoFactorEnabled" class="text-danger"></span>
                             </div>
                         </div>

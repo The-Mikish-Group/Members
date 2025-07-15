@@ -30,7 +30,7 @@
                     
                     <!-- Page Title -->
                     <div class="d-flex align-items-center col-auto mx-auto">
-                        <h1 class="text-gold-darker text-center"><i class="bi bi-people-fill"></i> Manage Members</h1>
+                        <h1 class="text-blackish text-center"><i class="bi bi-people-fill"></i> Manage Members</h1>
                     </div>
 
                 </div>
@@ -45,14 +45,14 @@
                 </div>
 
                 <!-- Shadow Card for Search Term and User Count -->
-                <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">                    
+                <div class="card m-sm-0 bg-card-light rounded p-0 shadow">                    
                     <div class="card-body m-0 p-1">
 
                         <!-- Searchterm input field and button -->
                         <div class="mb-3">
 
                             <!-- Comment out extra Search Term examples -->
-                            <h6 class="text-gold-darker mb-1 ps-2">(Also: billable, no role, and 'not confirmed')</h6>
+                            <h6 class="text-blackish mb-1 ps-2">(Also: billable, no role, and 'not confirmed')</h6>
 
                             <!-- Search Term input field and button -->
                             <form class="shadow" method="get" id="searchForm">
@@ -60,7 +60,7 @@
                                 <div class="input-group">
 
                                     <button class="btn btn-sm btn-add" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
-                                    <input type="text" class="form-control text-gold-darker shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
+                                    <input type="text" class="form-control text-blackish shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
 
                                     <!-- Hidden fields for storing Table status  -->
                                     <input type="hidden" asp-for="PageNumber" />
@@ -103,7 +103,7 @@
             <div class="col-12 mt-2 p-0">            
 
             <!-- Shadow Card for Manage Members Table -->
-            <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">                    
+            <div class="card m-sm-0 bg-card-light rounded p-0 shadow">                    
                 <div class="card-body m-0 p-0">
 
                     <!-- Table Container for displaying users -->
@@ -114,7 +114,7 @@
                     
                             <!-- Header: Manage Members -->
                             <div class="d-flex align-items-start col-auto">
-                                <h2 class="text-gold-darker text-start"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
+                                <h2 class="text-blackish text-start"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
                             </div>
 
                         </div>
@@ -406,7 +406,7 @@
                                 {
                                     <!-- User Row -->
                        
-                                    <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
+                                    <tr class="user-row text-blackish @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
 
                                         <!-- Full Name -->
                                         <td>@user.FullName</td>
@@ -602,8 +602,8 @@ else
 {
     <!-- Not an Admin or Manager -->
     <div class="mt-4 text-center">
-        <p class="text-gold-darker mb-1">This is an Admin area of @siteName.</p>
-        <p class="text-gold-darker mb-2">Please Login with Administration credentials.</p>
+        <p class="text-blackish mb-1">This is an Admin area of @siteName.</p>
+        <p class="text-blackish mb-2">Please Login with Administration credentials.</p>
         <a class="nav-link text-gold fs-3" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </div>
 } 
@@ -613,13 +613,13 @@ else
 
        /* Alternating table row colors */
 
-        .table-striped > tbody > tr:nth-of-type(odd) > td {
+       /*  .table-striped > tbody > tr:nth-of-type(odd) > td {
             background-color: antiquewhite !important; /* Your desired color for odd rows */
         }
 
         .table-striped > tbody > tr:nth-of-type(even) > td {
             background-color: #ffffff !important; /* Your desired color for even rows */
-        }
+        } */
 
         /* Green Border around hovered row */
         .table-striped tbody tr.user-row:nth-of-type(odd):hover,

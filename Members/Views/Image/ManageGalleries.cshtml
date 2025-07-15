@@ -8,7 +8,7 @@
 <div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-8 col-md-10 m-1 p-1">
 
-        <h1 class="text-gold-darker mb-2 mt-4 text-center"><i class="bi bi-images"></i> Manage Galleries</h1>
+        <h1 class="text-blackish mb-2 mt-4 text-center"><i class="bi bi-images"></i> Manage Galleries</h1>
 
         <div class="mb-3 text-center">
             <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back rounded-4 shadow"><i class="bi bi-box-arrow-left"></i> Back to Galleries</a>
@@ -27,16 +27,16 @@
             </div>
         }
 
-        <div class="card bg-Card-Menu mb-4 rounded border shadow">
+        <div class="card bg-card-light mb-4 rounded border shadow">
             <div class="card-body p-2">
 
-                <h2 class="text-gold-darker my-2 ps-2 text-start"><i class="bi bi-folder-plus"></i> Create a New Gallery</h2>
+                <h2 class="text-blackish my-2 ps-2 text-start"><i class="bi bi-folder-plus"></i> Create a New Gallery</h2>
 
                 <form asp-controller="Image" asp-action="CreateGallery" method="post" class="mb-4">
 
                     <div class="input-group">
 
-                        <input type="text" name="GalleryName" class="form-control text-gold-darker shadow" placeholder="New Gallery Name" required>
+                        <input type="text" name="GalleryName" class="form-control text-blackish shadow" placeholder="New Gallery Name" required>
             
                         <button type="submit" class="btn btn-success no-left-radius">
                                 <i class="bi bi-save"></i>
@@ -50,23 +50,23 @@
             </div>
         </div>
 
-        <div class="card bg-Card-Menu mb-4 rounded border shadow">
+        <div class="card bg-card-light mb-4 rounded border shadow">
             <div class="card-body p-2">
 
                 @if (Model != null && Model.Any())
                 {
-                    <h2 class="text-gold-darker my-2 ps-2 text-start"><i class="bi bi-images"></i> Existing Galleries</h2>
+                    <h2 class="text-blackish my-2 ps-2 text-start"><i class="bi bi-images"></i> Existing Galleries</h2>
                     
                     <table class="table-striped table rounded shadow">
                         <thead>
                             <tr>
-                                <th class="text-gold-dark">
+                                <th class="text-blackish">
                                     <div class="row align-items-center">
-                                        <div class="text-gold-dark col-6 d-flex justify-content-start">Manage Images</div>
+                                        <div class="text-blackish col-6 d-flex justify-content-start">Manage Images</div>
 
-                                        <div class="text-gold-dark col-4 d-flex justify-content-center">Rename</div>
+                                        <div class="text-blackish col-4 d-flex justify-content-center">Rename</div>
                                         
-                                        <div class="text-gold-dark col-2 d-flex justify-content-end">Delete</div>
+                                        <div class="text-blackish col-2 d-flex justify-content-end">Delete</div>
                                     </div>
                                 </th>
                             </tr>
@@ -77,12 +77,12 @@
                             {
                                 <tr>
 
-                                    <td class="text-gold-darker py-0">
+                                    <td class="text-blackish py-0">
                                         <div class="row align-items-center">
 
                                             <div class="col-6 d-flex justify-content-start">
                                                 <a asp-controller="Image" asp-action="ManageGalleryImages" asp-route-galleryName="@gallery.Name" 
-                                                    class="text-decoration-none text-gold-dark d-block"><i class="bi bi-images"></i> @gallery.Name (@gallery.ImageCount)</a>
+                                                    class="text-decoration-none text-blackish d-block"><i class="bi bi-images"></i> @gallery.Name (@gallery.ImageCount)</a>
                                             </div>
 
                                             <div class="col-4 d-flex justify-content-center">
@@ -164,7 +164,7 @@
                 else
                 {
                     <div class="row gx-1 gy-0 my-2">
-                        <div class="col-md-8 text-gold-dark mx-auto text-center">
+                        <div class="col-md-8 text-blackish mx-auto text-center">
                             <p>No galleries exist yet. Create one above!</p>
                         </div>
                     </div>

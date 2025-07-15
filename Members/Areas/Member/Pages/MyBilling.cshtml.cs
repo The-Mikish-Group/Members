@@ -364,7 +364,7 @@ namespace Members.Areas.Member.Pages
                 TempData["WarningMessage"] = $"Late fee cannot be applied: User {targetUser.UserName} is not designated as a Billing Contact.";
                 return RedirectToPage(new { userId, returnUrl = BackToEditUserUrl });
             }
-            var latestOverdueDuesInvoice = await _context.Invoices
+            var latestOverdueInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
                             i.Type == InvoiceType.Dues &&
                             i.Status != InvoiceStatus.Paid &&
@@ -372,24 +372,24 @@ namespace Members.Areas.Member.Pages
                             i.DueDate < DateTime.Today)
                 .OrderByDescending(i => i.DueDate)
                 .FirstOrDefaultAsync();
-            if (latestOverdueDuesInvoice == null)
+            if (latestOverdueInvoice == null)
             {
                 TempData["WarningMessage"] = $"No overdue Dues/Assessment invoice found for {targetUser.UserName} to apply a late fee to.";
                 return RedirectToPage(new { userId, returnUrl = BackToEditUserUrl });
             }
-            string expectedLateFeeDescriptionPart = $"INV-{latestOverdueDuesInvoice.InvoiceID:D5}";
+            string expectedLateFeeDescriptionPart = $"INV-{latestOverdueInvoice.InvoiceID:D5}";
             var existingLateFeeForThisInvoice = await _context.Invoices
                 .AnyAsync(i => i.UserID == userId &&
                                i.Type == InvoiceType.LateFee &&
                                i.Description.Contains(expectedLateFeeDescriptionPart));
             if (existingLateFeeForThisInvoice)
             {
-                TempData["WarningMessage"] = $"A late fee for the overdue assessment (INV-{latestOverdueDuesInvoice.InvoiceID:D5}) appears to have already been applied for {targetUser.UserName}.";
+                TempData["WarningMessage"] = $"A late fee for the overdue assessment (INV-{latestOverdueInvoice.InvoiceID:D5}) appears to have already been applied for {targetUser.UserName}.";
                 return RedirectToPage(new { userId, returnUrl = BackToEditUserUrl });
             }
-            decimal fivePercentOfDues = latestOverdueDuesInvoice.AmountDue * 0.05m;
+            decimal fivePercentOfDues = latestOverdueInvoice.AmountDue * 0.05m;
             decimal lateFeeAmount = Math.Max(25.00m, fivePercentOfDues);
-            string feeReason = $"Late Fee for overdue assessment (INV-{latestOverdueDuesInvoice.InvoiceID:D5} due {latestOverdueDuesInvoice.DueDate:yyyy-MM-dd}). Basis: Max($25, 5% of {latestOverdueDuesInvoice.AmountDue:C})";
+            string feeReason = $"Late Fee for overdue assessment (INV-{latestOverdueInvoice.InvoiceID:D5} due {latestOverdueInvoice.DueDate:yyyy-MM-dd}). Basis: Max($25, 5% of {latestOverdueInvoice.AmountDue:C})";
             var lateFeeInvoice = new Invoice
             {
                 UserID = userId,

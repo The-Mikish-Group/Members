@@ -47,7 +47,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) has no outstanding balance ({balance:C}). Skipped." };
             public static LateFeeApplicationResult SkippedRecentFeeExists(string userName, string userId) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) already has a recent late fee. Skipped." };
-            public static LateFeeApplicationResult SkippedNoOverdueDuesInvoice(string userName, string userId) =>
+            public static LateFeeApplicationResult SkippedNoOverdueInvoice(string userName, string userId) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) has an outstanding balance but no overdue DUES invoices. No late fee applied." };
             public static LateFeeApplicationResult Error(string userName, string userId, string errorMessage, Exception? ex = null) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"Error applying late fee to {userName} (ID: {userId}): {errorMessage}{(ex != null ? " Details: " + ex.Message : "")}" };
@@ -113,7 +113,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 return LateFeeApplicationResult.SkippedNoOutstandingBalance(userNameForDisplay, userId, currentBalance);
             }
 
-            var latestOverdueDuesInvoice = await _context.Invoices
+            var latestOverdueInvoice = await _context.Invoices
                 .Where(i => i.UserID == userId &&
                             //i.Type == InvoiceType.Dues &&
                             i.Status != InvoiceStatus.Paid &&
@@ -123,10 +123,10 @@ namespace Members.Areas.Admin.Pages.Accounting
                 .FirstOrDefaultAsync();
 
             bool skipForRecentFee = false;
-            if (latestOverdueDuesInvoice != null)
+            if (latestOverdueInvoice != null)
             {
-                // Check if a late fee specifically for this overdue Dues invoice was recently applied
-                string expectedDescPart = $"INV-{latestOverdueDuesInvoice.InvoiceID:D5}";
+                // Check if a late fee specifically for this overdue invoice was recently applied
+                string expectedDescPart = $"INV-{latestOverdueInvoice.InvoiceID:D5}";
                 if (await _context.Invoices.AnyAsync(i => i.UserID == userId &&
                                                           i.Type == InvoiceType.LateFee &&
                                                           i.Description.Contains(expectedDescPart) &&
@@ -137,8 +137,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             else
             {
-                // If there's no specific overdue Dues invoice, check if ANY type of late fee was applied recently.
-                // This is less critical with the new logic but kept for robustness against old data or manual fees.
+                // If there's no specific overdue invoice, check if ANY type of late fee was applied recently.
                 if (await _context.Invoices.AnyAsync(i => i.UserID == userId &&
                                                           i.Type == InvoiceType.LateFee &&
                                                           i.InvoiceDate >= DateTime.Today.AddDays(-RecentFeeDaysThreshold)))
@@ -152,25 +151,24 @@ namespace Members.Areas.Admin.Pages.Accounting
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) already has a recent late fee. Skipped.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.SkippedRecentFeeExists(userNameForDisplay, userId);
             }
-
-            // CORE LOGIC CHANGE: A late fee is only applied if there is an overdue Dues invoice.
-            if (latestOverdueDuesInvoice == null)
+            
+            if (latestOverdueInvoice == null)
             {
-                _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has an outstanding balance but no overdue DUES invoices. No late fee will be applied.", userNameForDisplay, userId);
-                return LateFeeApplicationResult.SkippedNoOverdueDuesInvoice(userNameForDisplay, userId);
+                _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has an outstanding balance but no overdue invoices. No late fee will be applied.", userNameForDisplay, userId);
+                return LateFeeApplicationResult.SkippedNoOverdueInvoice(userNameForDisplay, userId);
             }
 
-            // If we reach here, latestOverdueDuesInvoice is NOT null, and no recent fee for it exists.
+            // If we reach here, latestOverdueInvoice is NOT null, and no recent fee for it exists.
             // Proceed to calculate and apply the late fee.
-            decimal fivePercentOfDues = latestOverdueDuesInvoice.AmountDue * 0.05m;
+            decimal fivePercentOfDues = latestOverdueInvoice.AmountDue * 0.05m;
             decimal lateFeeAmount = Math.Max(25.00m, fivePercentOfDues);
-            string feeCalculationDescription = $"Late fee on overdue INV-{latestOverdueDuesInvoice.InvoiceID:D5} ({latestOverdueDuesInvoice.AmountDue:C} due {latestOverdueDuesInvoice.DueDate:yyyy-MM-dd}).";
+            string feeCalculationDescription = $"Late fee on overdue INV-{latestOverdueInvoice.InvoiceID:D5} ({latestOverdueInvoice.AmountDue:C} due {latestOverdueInvoice.DueDate:yyyy-MM-dd}).";
 
             var lateFeeInvoice = new Invoice
             {
                 UserID = userId,
                 InvoiceDate = DateTime.Today,
-                DueDate = DateTime.Today.AddDays(15), // Standard due date for late fees
+                DueDate = DateTime.Today.AddDays(15), // Standard due date for late fees (15 days)
                 Description = feeCalculationDescription,
                 AmountDue = lateFeeAmount,
                 AmountPaid = 0,
@@ -217,6 +215,7 @@ namespace Members.Areas.Admin.Pages.Accounting
 
             // Update credits with the actual InvoiceID now that it's generated
             bool neededCreditInvoiceIdUpdate = false;
+
             // Ensure we only update credits that were just applied in this session (marked with INV-0)
             foreach (var credit in availableCredits.Where(c => c.IsApplied && c.AppliedToInvoiceID == 0 && c.ApplicationNotes != null && c.ApplicationNotes.Contains("to Late Fee INV-0")))
             {
@@ -309,7 +308,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
 
-            if (usersInMemberRole == null || usersInMemberRole.Count == 0) // CA1860
+            if (usersInMemberRole == null || usersInMemberRole.Count == 0) 
             {
                 _logger.LogWarning("No users found in 'Member' role.");
                 MemberBalances = []; // Ensure MemberBalances is initialized even if empty
@@ -370,7 +369,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                         .SumAsync(uc => uc.Amount);
                     _logger.LogInformation("User {userUserName} - Fetched Unapplied Credit Balance: {unappliedCredits}", user.UserName, unappliedCredits);
 
-                    var memberVm = new MemberBalanceViewModel
+                    var memberBalance = new MemberBalanceViewModel
                     {
                         UserId = user.Id,
                         FullName = fullName,
@@ -381,11 +380,11 @@ namespace Members.Areas.Admin.Pages.Accounting
                         CreditBalance = unappliedCredits
                     };
 
-                    if (ShowOnlyOutstanding && memberVm.CurrentBalance <= 0 && memberVm.CreditBalance <= 0) // Also consider credit balance for this filter
+                    if (ShowOnlyOutstanding && memberBalance.CurrentBalance <= 0 && memberBalance.CreditBalance <= 0) // Also consider credit balance for this filter
                     {
                         continue;
                     }
-                    memberBalancesTemp.Add(memberVm);
+                    memberBalancesTemp.Add(memberBalance);
                 }
             }
 
@@ -551,9 +550,11 @@ namespace Members.Areas.Admin.Pages.Accounting
             var detailedErrorMessages = new List<string>();
             var successMessages = new List<string>();
 
+            // Fetch all users in the 'Member' role
             var memberRoleName = "Member";
             var allUsersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
 
+            // If no users found in the 'Member' role, log and return early
             if (allUsersInMemberRole == null || allUsersInMemberRole.Count == 0)
             {
                 _logger.LogWarning("OnPostBulkApplyLateFeesAsync: No users found in '{MemberRoleName}' role to begin processing.", memberRoleName);
@@ -561,6 +562,7 @@ namespace Members.Areas.Admin.Pages.Accounting
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
 
+            // Filter for billing contacts
             _logger.LogInformation("Fetched {AllUsersCount} users in member role. Filtering for billing contacts.", allUsersInMemberRole.Count);
             var billingContactsToProcess = new List<IdentityUser>();
             foreach (var user in allUsersInMemberRole)
@@ -573,19 +575,22 @@ namespace Members.Areas.Admin.Pages.Accounting
             }
             _logger.LogInformation("Found {BillingContactsCount} billing contacts. Starting late fee application process.", billingContactsToProcess.Count);
 
+            // If no billing contacts found, log and return early
             if (billingContactsToProcess.Count == 0)
             {
                 TempData["WarningMessage"] = "No billing contacts found among users in the member role to process for late fees.";
                 return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
             }
 
+            // Initialize counts
             processedCount = billingContactsToProcess.Count;
 
             foreach (var user in billingContactsToProcess)
             {
+                // Apply late fee to each billing contact
                 LateFeeApplicationResult result;
                 try
-                {
+                {                    
                     result = await ApplyLateFeeToUserAsync(user.Id, user.UserName);
                 }
                 catch (Exception ex)

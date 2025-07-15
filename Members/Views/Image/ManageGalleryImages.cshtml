@@ -10,7 +10,7 @@
     <div class="col-md-8 col-lg-10 mx-auto">
 
         <!-- Heading: Manage Images fir 'Gallery' -->
-        <h1 class="text-gold-darker mb-2 mt-4 text-center">Manage Images for:<br />@ViewBag.GalleryName</h1>
+        <h1 class="text-blackish mb-2 mt-4 text-center">Manage Images for:<br />@ViewBag.GalleryName</h1>
 
         <!-- Back to Manage Galleries Button -->
         <div class="mb-3 text-center">
@@ -34,10 +34,10 @@
         }
        
         <!-- Shadow Card (Upload a New Image) -->
-        <div class="card bg-Card-Menu rounded p-2 shadow">
+        <div class="card bg-card-light rounded p-2 shadow">
             
             <!-- Heading: Upload a New Image -->
-            <h2 class="text-gold-darker mb-2 mt-4 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
+            <h2 class="text-blackish mb-2 mt-4 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
 
             <!-- Upload a New Image Form -->
             <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data">
@@ -59,13 +59,13 @@
         </div>
 
         <!-- Shadow Card (Existing Images) -->
-        <div class="card bg-Card-Menu mt-4 rounded p-2 shadow">
+        <div class="card bg-card-light mt-4 rounded p-2 shadow">
 
             @if (Model != null && Model.Any())
                 {
 
                 <!-- Heading: Existing Images -->
-                <h2 class="text-gold-darker mb-2 mt-4 ps-2">
+                <h2 class="text-blackish mb-2 mt-4 ps-2">
                     <i class="bi bi-images"></i> Existing Images
                 </h2>
 
@@ -76,7 +76,7 @@
                         <div class="col-md-6 col-lg-3 col-xl-2 mb-2">
 
                             <!-- Shadow Card for each Image -->
-                            <div class="card bg-Card-Menu h-100 rounded p-2 shadow">
+                            <div class="card bg-card-light h-100 rounded p-2 shadow">
 
                                 <!-- Image Thumbnail with Link to View Image -->
                                 <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
@@ -87,7 +87,7 @@
                                 <div class="card-body p-0 text-center">
 
                                     <!-- Image Name -->
-                                    <p class="card-text text-gold-darker mt-1">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
+                                    <p class="card-text text-blackish mt-1">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
                                     
                                     <!-- Image Actions -->
                                     <div class="btn-group mt-0" role="group" aria-label="Image Actions">
@@ -137,7 +137,7 @@
 
                                             <!-- New File Name -->
                                             <div class="mb-2">
-                                                <label for="newFileName_@sanitizedImageFileNameForId" class="form-label fw-bold text-gold-darker">New File Name:</label>
+                                                <label for="newFileName_@sanitizedImageFileNameForId" class="form-label fw-bold text-blackish">New File Name:</label>
                                                 <input type="text" class="form-control" id="newFileName_@sanitizedImageFileNameForId" name="newFileName" value="@image.FileName" required>
                                             </div>
 
@@ -169,7 +169,7 @@
                 else
                 {   
                     <!-- No Images Message -->
-                    <div class="text-gold-dark py-4 text-center">This gallery is empty. Upload images above!</div>
+                    <div class="text-blackish py-4 text-center">This gallery is empty. Upload images above!</div>
                 }    
             
         </div>

@@ -12,7 +12,8 @@ body {
     /* font-size: 14px;*/
     font-weight: 400;
     text-rendering: optimizeLegibility;
-    background-color: cornsilk;
+    background-color: whitesmoke;
+    /*background-color: cornsilk;*/
     height: 100%;
     width: 100%;
 }
@@ -207,34 +208,37 @@ html > body header {
 }
 
 /*Dropdowns*/
-a#membersDropdown[aria-extended="true"],
 a#welcomeDropdown[aria-expanded="true"],
 a#accountsReceivableDropdown[aria-expanded="true"],
 a#invoiceDraftBatchesDropdown[aria-expanded="true"],
 a#reportingDropdown[aria-expanded="true"],
 a#managementDropdown[aria-expanded="true"],
+a#membersDropdown[aria-expanded="true"],
+a#membersPdfDocumentsDisplayDropdown[aris="true"],
+a#ManagementDropdown[aria-expanded="true"],
 a#manageMembersDropdown[aria-expanded="true"],
-a#managePdfMenusDropdown[aria-expanded="true"],
-a#PdfDocumentsDropdown[aria-expanded="true"],
-a#confidentialPdfMenusDropdown[aria-extended="true"],
-a#pdfDocumentsDropdown[aria-expanded="true"],
+a#managePdfDocumentsDropdown[aria-expanded="true"],
+a#membersPdfDocumentsDropdown[aria-expanded="true"],
+a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
 a#pdfDocumentsFooterDropdown[aria-expanded="true"],
 a#membersfooterDropdown[aria-expanded="true"]
 a {
     color: white !important;
     /*background-color: rgba(0, 0, 0, 0.3) !important;*/
 }
-li.show > a#membersDropdown,
+
 li.show > a#welcomeDropdown,
 li.show > a#accountsReceivableDropdown,
 li.show > a#invoiceDraftBatchesDropdown,
 li.show > a#reportingDropdown,
 li.show > a#managementDropdown,
+li.show > a#membersDropdown,
+li.show > a#membersPdfDocumentsDisplayDropdown,
+li.show > a#ManagementDropdown,
 li.show > a#manageMembersDropdown,
-li.show > a#managePdfMenusDropdown,
-li.show > a#PdfDocumentsDropdown,
-li.show > a#confidentialPdfMenusDropdown,
-li.show > a#pdfDocumentsDropdown,
+li.show > a#managePdfDocumentsDropdown,
+li.show > a#membersPdfDocumentsDropdown,
+li.show > a#confidentialPdfDocumentsDropdown,
 li.show > a#pdfDocumentsFooterDropdown,
 li.show > a#membersFooterDropdown {
     color: white !important;
@@ -242,7 +246,7 @@ li.show > a#membersFooterDropdown {
 }
 
 li .dropdown-menu .nav-link i {
-    color: var(--text-gold-dark) !important;
+    color: var(--text-blackish) !important;
 }
 
 .footer-spacing {
@@ -520,14 +524,13 @@ img {
         font-size: 9pt !important;
     }
 
-
     a {
         text-decoration: none !important;
         color: #000 !important;
     }
 
     /* Avoid printing full URLs for links unless specifically desired */
-    /* a[href^="/"]:after { content: " (" attr(href) ")"; } */
+    a[href^="/"]:after { content: " (" attr(href) ")"; }
 
     .container, .container-fluid {
         width: auto !important;

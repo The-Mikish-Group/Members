@@ -5,27 +5,27 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-gold-darker mb-2 mt-4 text-center">
+<div class="text-blackish mb-2 mt-4 text-center">
     <h3><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h3>
 </div>
 
 <div class="row mx-0 mb-3 p-0">
     <div class="col-md-8 mx-auto my-0 p-2">
 
-        <div class="card m-sm-0 bg-Card-Menu rounded p-2 shadow">
+        <div class="card m-sm-0 bg-card-light rounded p-2 shadow">
             <div class="card-body m-1 p-2">
                 <div class="mb-2 ms-2 text-start">
-                    <h5 class="text-gold-darker"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
+                    <h5 class="text-blackish"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
                 </div>
                 <form id="addCategoryForm" method="post" asp-action="CreateCategory">
                     @Html.AntiForgeryToken()
                     <div class="row">
                         <div class="col-8 px-0">
-                            <label for="newCategoryName" class="form-label visually-hidden text-gold-darker">Category Name</label>
+                            <label for="newCategoryName" class="form-label visually-hidden text-blackish">Category Name</label>
                             <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
                         </div>
                         <div class="col-2 px-0">
-                            <label for="newSortOrder" class="form-label visually-hidden text-gold-darker">Sort Order</label>
+                            <label for="newSortOrder" class="form-label visually-hidden text-blackish">Sort Order</label>
                             <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                         </div>
                         <div class="col-2 px-0">
@@ -40,30 +40,30 @@
 
 <div class="row mx-0 p-0">
     <div class="col-md-8 mx-auto my-0 p-2">
-        <div class="card m-sm-0 bg-Card-Menu rounded p-0 shadow">
+        <div class="card m-sm-0 bg-card-light rounded p-0 shadow">
             <div class="card-body m-1 p-2">
                 <div class="mb-3 ms-2 text-start">
-                    <h5 class="text-gold-darker"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
+                    <h5 class="text-blackish"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
                 </div>
 
                
                 @if (Model != null && Model.Any())
                 {
-                    <table class="w-100">
-                        <thead>
-                            <tr class="bg-gold-dark text-white">
-                                <th id="EditHeader"><span class="header-text text-gold-darker ps-2">Rename</span></th>
-                                <th id="CategoryHeader"><span class="header-text text-gold-darker">Category</span></th>
-                                <th id="SortHeader"><span class="header-text text-gold-darker">Sort</span></th>
-                                <th id="DeleteHeader" class="text-gold-darker text-end"><span class="header-text pe-2">Delete</span></th>
+               <div class="table-responsive rounded shadow">
+                    <table class="table-striped w-100 shadow">
+                        <thead class="bg-gray-light text-white">
+                            <tr class="bg-gray-dark text-white">
+                                <th id="EditHeader"><span class="header-text ps-2 text-white">Rename</span></th>
+                                <th id="CategoryHeader"><span class="header-text text-white">Category</span></th>
+                                <th id="SortHeader"><span class="header-text text-white">Sort</span></th>
+                                <th id="DeleteHeader" class="text-end text-white"><span class="header-text pe-2">Delete</span></th>
                             </tr>
                         </thead>
 
                         <tbody id="manageCategoriesTableBody">
                             @foreach (var item in Model)
-                            {
-                               
-                                <tr data-category-id="@item.CategoryID" id="display-row-@item.CategoryID"
+                                {
+                                    <tr  data-category-id="@item.CategoryID" id="display-row-@item.CategoryID"
                                     data-category-name="@item.CategoryName"
                                     data-sort-order="@item.SortOrder"> 
                                     <td class="edit-cell py-0">
@@ -76,7 +76,7 @@
                                     </td>
                                     
                                     <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
-                                    <td class="text-gold-darker">@item.SortOrder</td>
+                                    <td class="text-blackish">@item.SortOrder</td>
                                     <td class="delete-cell py-0 text-end">
                                         <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
                                             <button type="submit" class="btn btn-sm btn-delete delete-button px-2 py-2" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
@@ -86,12 +86,15 @@
                                     </td>
                                 </tr>                               
                             }
+
                         </tbody>
+
                     </table>
+                </div>
                 }
                 else
                 {                    
-                     <div class="text-gold-darker mt-2 text-center">
+                     <div class="text-blackish mt-2 text-center">
                          No categories found.
                      </div>
                 }
@@ -122,7 +125,7 @@
                 
                 <div class="row align-items-center mb-2">
                     <div class="col-3"> 
-                        <label for="newCategoryName" class="col-form-label fw-bold text-gold-darker">New Name:</label>
+                        <label for="newCategoryName" class="col-form-label fw-bold text-blackish">New Name:</label>
                     </div>
                     <div class="col-9"> 
                         <input type="text" class="form-control" id="newCategoryNameInput" name="newCategoryName">
@@ -131,7 +134,7 @@
 
                 <div class="row align-items-center mb-1">
                      <div class="col-3">
-                        <label for="newSortOrder" class="col-form-label fw-bold text-gold-darker">Sort Order:</label>
+                        <label for="newSortOrder" class="col-form-label fw-bold text-blackish">Sort Order:</label>
                      </div>
                      <div class="col-9">
                         <input type="number" class="form-control" id="newSortOrderInput" name="newSortOrder" min="0">
@@ -159,21 +162,7 @@
 
 @section Styles {
     <style>
-        /* Styles for alternating table rows */
-        .even-row {
-            background-color: antiquewhite !important; /* Added !important for specificity */
-        }
-
-        .odd-row {
-            background-color: #ffffff !important; /* Added !important for specificity */
-        }
-
-        /* Ensure table data cells inherit the row background color */
-         .even-row > td,
-         .odd-row > td {
-             background-color: inherit !important;
-         }        
-
+        
          /* Specific styles for the 'Add Category' sort order input if needed */
         #newSortOrder.rounded-0 {
             border-left: none; /* Remove border between category name and sort order inputs */
@@ -204,6 +193,7 @@
 
     </style>
 }
+
 
 @section Scripts {
     <script>

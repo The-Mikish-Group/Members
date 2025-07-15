@@ -20,14 +20,14 @@
 }
 
 <!-- Title: Image Galleries -->
-<h1 class="text-gold-darker mb-2 mt-4 text-center"><i class="bi bi-image"></i> Image Galleries</h1>
+<h1 class="text-blackish mb-2 mt-4 text-center"><i class="bi bi-image"></i> Image Galleries</h1>
 
 <!-- Row and Column setup for Card -->
 <div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Shadowed Card -->
-        <div class="card bg-Card-Menu rounded border shadow">
+        <div class="card bg-card-light rounded border shadow">
             <div class="card-body p-0">
                 
                 <!-- Check to see if there are any Galleries -->
@@ -40,8 +40,8 @@
                         @foreach (var gallery in Model)
                         {
                             <!-- List item with link to the gallery view -->
-                            <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
-                                <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="text-decoration-none text-gold-dark d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
+                            <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
+                                <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="text-decoration-none text-blackish d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
                             </li>                         
                         }
                     </ul>  
@@ -49,7 +49,7 @@
                 else
                 {
                     <div class="py-4 text-center">
-                        <p class="text-gold-dark">No galleries available yet.</p>
+                        <p class="text-blackish">No galleries available yet.</p>
                     </div>
                 }
 
@@ -82,10 +82,10 @@
 
             /* CSS to control the link color on hover/focus */
             /* Target the link directly within the list item on hover/focus */
-            .list-group-item:hover a.text-gold-darker,
-            .list-group-item:focus a.text-gold-darker,
-            .list-group-item a.text-gold-darker:hover,
-            .list-group-item a.text-gold-darker:focus {
+            .list-group-item:hover a.text-blackish,
+            .list-group-item:focus a.text-blackish,
+            .list-group-item a.text-blackish:hover,
+            .list-group-item a.text-blackish:focus {
                 color: #3b3726 !important; /* Use the dark gold color */
             }
 

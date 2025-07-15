@@ -5,22 +5,22 @@
     Layout = "~/Views/Shared/_Layout.cshtml"; // Use your main layout
 }
 
-<div class="text-center mt-4 mb-2 text-gold-darker">
-    <h1><i class="bi bi-file-earmark-pdf-fill me-0 text-gold-darker"></i> @ViewData["Title"]</h1>
+<div class="text-blackish mb-2 mt-4 text-center">
+    <h1><i class="bi bi-file-earmark-pdf-fill text-blackish me-0"></i> @ViewData["Title"]</h1>
 </div>
 
-<div class="container row justify-content-center mx-auto p-1">
+<div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
-        <div class="card shadow rounded border bg-PDF-Menu">
+        <div class="card bg-card-light rounded border shadow">
             <div class="card-body p-0">
                 @if (Model != null && Model.Any())
                 {
                     <ul class="list-group list-group-flush">
                     @foreach (var category in Model)
                     {
-                        <li class="list-group-item bg-transparent text-gold-darker" style="cursor: pointer;">
-                            <a asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID" class="text-decoration-none text-gold-darker d-block">
-                                    <i class="bi bi-list-ul me-0 text-gold-darker"></i> @category.CategoryName
+                        <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
+                            <a asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID" class="text-decoration-none text-blackish d-block">
+                                    <i class="bi bi-list-ul text-blackish me-0"></i> @category.CategoryName
                             </a>
                         </li>
                     }
@@ -28,7 +28,7 @@
                 }
                 else
                 {
-                    <p class=" mt-0 pt-0 text-center text-gold-darker">No categories with files found.</p>
+                    <p class="text-blackish mt-0 pt-0 text-center">No categories with files found.</p>
                 }
             </div>
         </div>
@@ -50,10 +50,10 @@
 
             /* CSS to control the link color on hover/focus */
             /* Target the link directly within the list item on hover/focus */
-            .card-body .list-group-item:hover a.text-gold-darker,
-            .card-body .list-group-item:focus a.text-gold-darker,
-            .card-body .list-group-item a.text-gold-darker:hover,
-            .card-body .list-group-item a.text-gold-darker:focus {
+            .card-body .list-group-item:hover a.text-blackish,
+            .card-body .list-group-item:focus a.text-blackish,
+            .card-body .list-group-item a.text-blackish:hover,
+            .card-body .list-group-item a.text-blackish:focus {
                 color: #3b3726 !important; /* Use the dark gold color */
             }
 

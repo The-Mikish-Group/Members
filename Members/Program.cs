@@ -166,5 +166,5 @@ using (var scope = app.Services.CreateScope())
         // Do Nothing!
     }
 }
-//Members.Helpers.ImageHelper.Initialize(app.Environment);
+
 app.Run();

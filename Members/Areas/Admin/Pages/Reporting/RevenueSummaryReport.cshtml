@@ -13,7 +13,7 @@
     <!-- Title -->
     <div class="row">
         <div class="col">
-            <h2 class="text-gold-darker">@ViewData["Title"]</h2>
+            <h2 class="text-blackish">@ViewData["Title"]</h2>
             <hr />
         </div>
     </div>
@@ -23,13 +23,13 @@
 
             <!-- Start Date -->
             <div class="col-md-3">
-                <label for="StartDate" class="form-label text-gold-darker">Start Date</label>
+                <label for="StartDate" class="form-label text-blackish">Start Date</label>
                 <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
             </div>
 
             <!-- End Date -->
             <div class="col-md-3">
-                <label for="EndDate" class="form-label text-gold-darker">End Date</label>
+                <label for="EndDate" class="form-label text-blackish">End Date</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
 
@@ -65,10 +65,10 @@
         <div class="modal-dialog">
             <div class="modal-content bg-Card-Modal">
                 <div class="modal-header">
-                    <h5 class="modal-title text-gold-darker" id="exportRevenueSummaryConfirmModalLabel">Confirm Export</h5>
+                    <h5 class="modal-title text-blackish" id="exportRevenueSummaryConfirmModalLabel">Confirm Export</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-gold-darker">
+                <div class="modal-body text-blackish">
                     Are you sure you want to export the Revenue Summary to CSV?
                     The report will be generated for the period:
                     <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> to <strong>@Model.EndDate.ToString("yyyy-MM-dd")</strong>.
@@ -85,13 +85,13 @@
     {
         var summary = Model.SummaryData!; // Introduce non-nullable local variable
 
-        <div class="card bg-Card-Menu mb-4 shadow">
+        <div class="card bg-card-light mb-4 shadow">
             <div class="card-header bg-white text-black">
                 Summary for period: @summary.ReportStartDate.ToString("yyyy-MM-dd") to @summary.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-4 text-gold-darker border-bottom pb-2">Invoiced Amounts</dt>
+                    <dt class="col-sm-4 text-blackish border-bottom pb-2">Invoiced Amounts</dt>
                     <dd class="col-sm-8 border-bottom pb-2">&nbsp;</dd>
 
                     <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_Dues)</dt>
@@ -109,7 +109,7 @@
                     <dt class="col-sm-4 fw-bold ps-4">@Html.DisplayNameFor(model => summary.GrandTotalAmountInvoiced)</dt>
                     <dd class="col-sm-8 fw-bold">@summary.GrandTotalAmountInvoiced.ToString("C")</dd>
 
-                    <dt class="col-sm-4 text-gold-darker border-bottom py-2">Payments & Credits</dt>
+                    <dt class="col-sm-4 text-blackish border-bottom py-2">Payments & Credits</dt>
                     <dd class="col-sm-8 border-bottom py-2">&nbsp;</dd>
 
                     <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalPaymentsReceived)</dt>
@@ -121,7 +121,7 @@
                     <dt class="col-sm-4 ps-4">@Html.DisplayNameFor(model => summary.TotalCreditsApplied)</dt>
                     <dd class="col-sm-8">@summary.TotalCreditsApplied.ToString("C")</dd>
 
-                    <dt class="col-sm-4 text-gold-darker border-bottom py-2">Net Change</dt>
+                    <dt class="col-sm-4 text-blackish border-bottom py-2">Net Change</dt>
                     <dd class="col-sm-8 border-bottom py-2">&nbsp;</dd>
 
                     <dt class="col-sm-4 fw-bold ps-4">@Html.DisplayNameFor(model => summary.NetChange)</dt>

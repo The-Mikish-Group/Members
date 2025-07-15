@@ -10,7 +10,7 @@
     <div class="row mx-1 p-0">
         <div class="col-12 mx-auto my-0 p-0">
 
-            <h2 class="text-gold-darker mb-2 text-center"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
+            <h2 class="text-blackish mb-2 text-center"><i class="bi bi-person-fill"></i> @ViewData["Title"]</h2>
 
             @if (TempData["ErrorMessage"] != null)
             {
@@ -98,11 +98,11 @@
             }
 
 
-            <div class="card bg-Card-Menu mb-4 shadow">
+            <div class="card bg-card-light mb-4 shadow">
 
                 <!-- Card header with title: Current Balance for -->
                 <div class="card-header">
-                    <h5 class="text-gold-darker mb-0">Current Balance Due for:<br />@Model.DisplayName</h5>
+                    <h5 class="text-blackish mb-0">Current Balance Due for:<br />@Model.DisplayName</h5>
                 </div>
 
                 <!-- Display the current balance with appropriate styling -->
@@ -130,11 +130,11 @@
             @if (Model.TotalAvailableCredit > 0)
             {
                 @* Available Account Credits for: Card *@
-                <div class="card bg-Card-Menu mb-4 shadow">
+                <div class="card bg-card-light mb-4 shadow">
 
                     @* Card header with title: Available Account Credits for *@
                     <div class="card-header">
-                        <h5 class="text-gold-darker mb-0">Available Account Credits for:<br /> @Model.DisplayName</h5>
+                        <h5 class="text-blackish mb-0">Available Account Credits for:<br /> @Model.DisplayName</h5>
                     </div>
 
                     @* Card body *@
@@ -168,10 +168,10 @@
             }
 
 
-            <div class="card bg-Card-Menu mb-2 shadow">
+            <div class="card bg-card-light mb-2 shadow">
                 <div class="card-header">
 
-                    <h5 class="text-gold-darker mb-0">Transaction History for:<br />@Model.DisplayName</h5>
+                    <h5 class="text-blackish mb-0">Transaction History for:<br />@Model.DisplayName</h5>
                 </div>
 
                 <div class="card-body p-0">
@@ -184,7 +184,7 @@
                         <div class="table-responsive m-1">
                             <table class="w-100 shadow">
                                 <thead class="table-light">
-                                    <tr class="bg-gold-dark py-1 text-white">
+                                    <tr class="bg-gray-dark py-1 text-white">
                                         <th class="text-nowrap py-1 ps-1 text-white">
                                             <a asp-page="./MyBilling"
                                                asp-route-sortOrder="@Model.DateSort"
@@ -277,9 +277,9 @@
                                     }
                                     @foreach (var trans in Model.Transactions)
                                     {
-                                        <tr class="text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
-                                            <td class="text-gold-darker text-nowrap py-1 ps-1">@trans.Date.ToString("yyyy-MM-dd")</td>
-                                            <td class="text-gold-darker text-nowrap py-1 ps-1">
+                                        <tr class="text-blackish @(i % 2 == 0 ? "row-even" : "row-odd")">
+                                            <td class="text-blackish text-nowrap py-1 ps-1">@trans.Date.ToString("yyyy-MM-dd")</td>
+                                            <td class="text-blackish text-nowrap py-1 ps-1">
                                                 @if (trans.Type == "Invoice" && trans.InvoiceID.HasValue)
                                                 {
                                                     @($"INV-{trans.InvoiceID:D5}")
@@ -290,13 +290,13 @@
                                                     @($"INV-{trans.InvoiceID:D5}-Pmt")
                                                 }
                                             </td>
-                                            <td class="text-gold-darker text-wrap py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
-                                            <td class="text-gold-darker text-nowrap py-1 text-end">@trans.ChargeAmount?.ToString("C")</td>
-                                            <td class="text-gold-darker text-nowrap py-1 pe-1 text-end">@trans.PaymentAmount?.ToString("C")</td>
+                                            <td class="text-blackish text-wrap py-1">@Html.DisplayFor(modelItem => trans.Description)</td>
+                                            <td class="text-blackish text-nowrap py-1 text-end">@trans.ChargeAmount?.ToString("C")</td>
+                                            <td class="text-blackish text-nowrap py-1 pe-1 text-end">@trans.PaymentAmount?.ToString("C")</td>
 
 
                                             <!-- Voided or Status/Method -->
-                                            <td class="text-gold-darker text-nowrap py-1 text-center">
+                                            <td class="text-blackish text-nowrap py-1 text-center">
                                                 @if (trans.Type == "Payment" && trans.IsVoided)
                                                 {
                                                     <span class="text-danger">Voided</span>
@@ -308,12 +308,12 @@
                                             </td>
 
                                             <!-- Status/Method -->
-                                            <td class="text-gold-darker text-nowrap py-1 text-center">
+                                            <td class="text-blackish text-nowrap py-1 text-center">
                                                 @Html.DisplayFor(modelItem => trans.Type)
                                             </td>
 
                                             <!-- Edit Invoice -->
-                                            <td class="text-gold-darker text-nowrap py-1 text-center">
+                                            <td class="text-blackish text-nowrap py-1 text-center">
 
                                                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                                 {
@@ -332,7 +332,7 @@
                                             </td>
 
                                             <!-- Void Invoice -->
-                                            <td class="text-gold-darker text-nowrap py-1 text-center">
+                                            <td class="text-blackish text-nowrap py-1 text-center">
 
                                                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                                 {

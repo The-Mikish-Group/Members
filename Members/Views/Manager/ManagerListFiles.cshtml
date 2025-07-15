@@ -7,10 +7,10 @@
 }
 
 <!-- View Headings -->
-<div class="text-gold-darker mb-2 mt-4 text-center">
+<div class="text-blackish mb-2 mt-4 text-center">
 
     <!-- Category Name -->
-    <h1 class="text-gold-darker mb-3">
+    <h1 class="text-blackish mb-3">
         <i class="bi bi-shield-lock-fill me-1"></i> @ViewBag.CategoryName <span class="fs-5 bg-danger rounded p-1 text-white">Confidential</span>
     </h1>
 
@@ -27,7 +27,7 @@
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Card -->
-        <div class="card bg-PDF-Menu rounded border shadow">
+        <div class="card bg-card-light rounded border shadow">
             <div class="card-body p-0">
 
                 <!-- Create the List of File Names -->
@@ -36,8 +36,8 @@
                     <ul class="list-group list-group-flush"> 
                         @foreach (var file in Model) 
                         {
-                            <li class="list-group-item text-gold-darker bg-transparent" style="cursor: pointer;">
-                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="text-decoration-none text-gold-darker d-block">
+                            <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
+                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="text-decoration-none text-blackish d-block">
                                     <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
                                     @* <small class="text-muted float-end">Sort: @file.SortOrder</small> *@
                                 </a>
@@ -47,7 +47,7 @@
                 }
                 else
                 {
-                    <p class="text-gold-darker m-3 text-center">No files found in this confidential category.</p>
+                    <p class="text-blackish m-3 text-center">No files found in this confidential category.</p>
                 }
             </div>
         </div>
@@ -65,10 +65,10 @@
         .card-body .list-group-item { border-bottom: none !important; }
         .card-body .list-group-item:first-child { border-top: none !important; }
         .card-body .list-group-item:last-child { border-bottom: none !important; }
-        .card-body .list-group-item:hover a.text-gold-darker,
-        .card-body .list-group-item:focus a.text-gold-darker,
-        .card-body .list-group-item a.text-gold-darker:hover,
-        .card-body .list-group-item a.text-gold-darker:focus { color: #3b3726 !important; }
+        .card-body .list-group-item:hover a.text-blackish,
+        .card-body .list-group-item:focus a.text-blackish,
+        .card-body .list-group-item a.text-blackish:hover,
+        .card-body .list-group-item a.text-blackish:focus { color: #3b3726 !important; }
         .card-body .list-group-item:hover,
         .card-body .list-group-item:focus { background-color: rgba(0, 0, 0, 0.05) !important; }
         .badge.small { font-size: 0.8em; vertical-align: middle; }

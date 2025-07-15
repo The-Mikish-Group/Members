@@ -5,9 +5,12 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Top Button placed here -->
+<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+
 <div class="container mt-4">
 
-    <h2 class="text-gold-darker mb-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
+    <h2 class="text-blackish mb-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
 
     @if (TempData["StatusMessage"] != null)
     {
@@ -49,8 +52,8 @@
                 <div class="col-md-3">
                     <form method="get" class="my-2">
                         <div class="form-check">
-                            <input asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-input shadow" onchange="this.form.submit()" />
-                            <label asp-for="ShowOnlyOutstanding" class="text-gold-darker form-check-label">Only Show Members with Balances</label>
+                            <input asp-for="ShowOnlyOutstanding" class="text-blackish form-check-input shadow" onchange="this.form.submit()" />
+                            <label asp-for="ShowOnlyOutstanding" class="text-blackish form-check-label">Only Show Members with Balances</label>
                         </div>
                         <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
                     </form>
@@ -103,7 +106,7 @@
 
                     <thead>
 
-                        <tr class="bg-gold-dark text-white">
+                        <tr class="bg-gray-dark text-white">
                             <th class="text-nowrap py-1 ps-1">
                                 <a asp-page="./CurrentBalances"
                                    asp-route-sortOrder="@Model.NameSort"
@@ -161,18 +164,18 @@
 
                         @foreach (var member in Model.MemberBalances)
                         {
-                            <tr class="user-row text-gold-darker @(i % 2 == 0 ? "row-even" : "row-odd")">
-                                <td class="text-gold-darker text-nowrap py-1 ps-1">@Html.DisplayFor(modelItem => member.FullName)</td>
-                                <td class="text-gold-darker text-nowrap py-1">@Html.DisplayFor(modelItem => member.Email)</td>
-                                <td class="text-gold-darker text-nowrap py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
+                            <tr class="user-row text-blackish @(i % 2 == 0 ? "row-even" : "row-odd")">
+                                <td class="text-blackish text-nowrap py-1 ps-1">@Html.DisplayFor(modelItem => member.FullName)</td>
+                                <td class="text-blackish text-nowrap py-1">@Html.DisplayFor(modelItem => member.Email)</td>
+                                <td class="text-nowrap py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
                                     @member.CurrentBalance.ToString("C")
                                 </td>
-                                <td class="text-gold-darker text-nowrap py-1 text-end @(member.CreditBalance > 0 ? "text-success fw-bold" : "")">
+                                <td class="text-nowrap py-1 text-end @(member.CreditBalance > 0 ? "text-success fw-bold" : "")">
                                     @Html.DisplayFor(modelItem => member.CreditBalance)
                                 </td>
 
                                 <!-- Apply Late Fee -->
-                                <td class="text-gold-darker text-nowrap py-1 pe-2 text-center">
+                                <td class="text-blackish text-nowrap py-1 pe-2 text-center">
                                     @if (member.CurrentBalance > 0 || member.CreditBalance > 0) // Also consider CreditBalance for enabling actions
                                     {
                                         <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
@@ -182,7 +185,7 @@
 
                                             <button type="submit" class="btn btn-sm btn-delete @(member.CurrentBalance <= 0 ? "disabled" : "")"
                                                     title="Apply Late Fee if Dues are Overdue"
-                                                    onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue Dues invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
+                                                    onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
                                                 <i class="bi bi-alarm"></i>
                                             </button>
                                         </form>
@@ -194,7 +197,7 @@
                                 </td>
 
                                 <!-- Billing History -->
-                                <td class="text-gold-darker text-nowrap py-1 pe-2 text-center">
+                                <td class="text-blackish text-nowrap py-1 pe-2 text-center">
                                     @if (!string.IsNullOrEmpty(member.UserId))
                                     {
                                         <a asp-area="Member"
@@ -223,12 +226,12 @@
                             <td colspan="2" class="fw-bold py-1 pe-2 text-end">Totals:</td>
 
                             <!-- Current Balance Total -->
-                            <td class="text-gold-darker fw-bold text-nowrap py-1 text-end @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
+                            <td class="text-blackish fw-bold text-nowrap py-1 text-end @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
                                 @Model.TotalCurrentBalance.ToString("C")
                             </td>
 
                             <!-- Credit Balance Total -->
-                            <td class="text-gold-darker fw-bold text-nowrap py-1 text-end @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
+                            <td class="text-blackish fw-bold text-nowrap py-1 text-end @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
                                 @Model.TotalCreditBalance.ToString("C")
                             </td>
                             <td class="py-1"></td>
@@ -310,5 +313,31 @@
                 });
             }
         });
+    </script>
+
+
+    <!-- Top Button Script -->
+    <script>
+
+        //Get the button
+        var mybutton = document.getElementById("top-button");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
     </script>
 }

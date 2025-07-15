@@ -6,25 +6,25 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h3 class="text-gold-darker text-start">@ViewData["Title"]</h3>
+<h3 class="text-blackish text-start">@ViewData["Title"]</h3>
 <div>
     <div class="my-2 text-start">To use an authenticator app go through the following steps:</div>
     <ol class="list">
-        <li class="text-gold-darker text-start">
+        <li class="text-blackish text-start">
             Download a two-factor authenticator app like:<br />
             <br />Microsoft Authenticator:<br />
                  for <a class="my-nav-link" href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and <a class="my-nav-link" href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a>
             <br /><br />or Google Authenticator:<br />
                  for <a class="my-nav-link" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and <a class="my-nav-link" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.<br /><br />
         </li>
-        <li class="text-gold-darker my-3 text-start">
+        <li class="text-blackish my-3 text-start">
             <span>Scan the QR Code or enter this key</span> <span>into your two factor authenticator app.</span><br /><br />
             <kbd id="sharedKey">@Model.SharedKey</kbd>
             <button id="copyKeyButton" class="btn btn-sm btn-success my-2 ms-2 shadow" type="button">Copy</button>
             <div class="my-4 text-center" id="qrCode"></div>
             <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
         </li>
-        <li class="text-gold-darker text-start">
+        <li class="text-blackish text-start">
             Once you have scanned the QR code or input the key above, 
             your two factor authentication app will provide you with 
             a unique code. Enter the code in the confirmation box below.            
