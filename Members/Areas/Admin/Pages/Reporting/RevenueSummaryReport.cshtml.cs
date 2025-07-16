@@ -148,12 +148,12 @@ namespace Members.Areas.Admin.Pages.Reporting
             return File(buffer, "text/csv", fileName);
         }
 
-        private static string EscapeCsvField(string? field) // Though not strictly needed for this CSV's labels
-        {
-            if (string.IsNullOrEmpty(field))
-                return string.Empty;
-            return field.Replace("\"", "\"\"");
-        }
+        //private static string EscapeCsvField(string? field) // Though not strictly needed for this CSV's labels
+        //{
+        //    if (string.IsNullOrEmpty(field))
+        //        return string.Empty;
+        //    return field.Replace("\"", "\"\"");
+        //}
 
 
         public class RevenueSummaryViewModel
@@ -182,7 +182,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             [DataType(DataType.Currency)]
             public decimal TotalPaymentsReceived { get; set; }
 
-            [Display(Name = "Total Credits Issued (Remaining Value)")]
+            [Display(Name = "Total Credits Value")]
             [DataType(DataType.Currency)]
             public decimal TotalCreditsIssued_RemainingValue { get; set; }
 
@@ -190,7 +190,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             [DataType(DataType.Currency)]
             public decimal TotalCreditsApplied { get; set; }
 
-            [Display(Name = "Net Change (Payments - Credits Applied)")]
+            [Display(Name = "Net Change")]
             [DataType(DataType.Currency)]
             public decimal NetChange { get; set; }
 

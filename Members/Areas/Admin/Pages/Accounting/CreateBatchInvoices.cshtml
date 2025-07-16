@@ -29,7 +29,7 @@
                     </p>
                     @if (Model.ActionableBillableAssetsCount > 0)
                     {
-                        <p class="bg-gray-lighter text-blackish mb-2 rounded p-2">
+                        <p class="bg-blue-lighter text-blackish mb-2 rounded p-2">
                             Currently, there are <strong>@Model.ActionableBillableAssetsCount</strong> billable asset(s) with assigned contacts that will be processed. The specific 'Assessment Fee' set for each individual asset will be used to determine the amount for each invoice.
                         </p>
                     }
@@ -42,7 +42,7 @@
                     }
                     <p class="card-text text-blackish">
                         These invoices will be created with a 'Draft' status and can be reviewed and finalized 
-                        via the 'Review Batch Invoices' page before they become active.
+                        via the 'Review Draft Batches' page before they become active.
                     </p>
                     <hr />
 
@@ -65,19 +65,19 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Description" class="form-label text-blackish"></label>
+                            <label asp-for="Input.Description" class="form-label text-blackish ms-2"></label>
                             <input asp-for="Input.Description" class="form-control text-blackish shadow" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-sm-6 mb-3">
-                                <label asp-for="Input.InvoiceDate" class="form-label text-blackish"></label>
+                                <label asp-for="Input.InvoiceDate" class="form-label text-blackish ms-2"></label>
                                 <input asp-for="Input.InvoiceDate" class="form-control text-blackish shadow" type="date" />
                                 <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
-                                <label asp-for="Input.DueDate" class="form-label text-blackish"></label>
+                                <label asp-for="Input.DueDate" class="form-label text-blackish ms-2"></label>
                                 <input asp-for="Input.DueDate" class="form-control text-blackish shadow" type="date" />
                                 <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                             </div>

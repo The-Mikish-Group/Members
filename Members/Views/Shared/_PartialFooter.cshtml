@@ -19,10 +19,10 @@
 
             <div class="col-4 pb-md-2">
                 <ul class="navbar-nav flex-nowrap ps-2 pt-2" style="max-width:160px;">
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/">Welcome</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/About">About Us</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/Facilities">Facilities</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Image/GalleryList">Galleries</a></li>
+                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/">Welcome</a></li>
+                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/About">About Us</a></li>
+                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/Facilities">Facilities</a></li>
+                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Image/GalleryList">Galleries</a></li>
                 </ul>
             </div>
 
@@ -30,13 +30,13 @@
                 <ul class="navbar-nav flex-nowrap ps-2 pt-2" style="max-width:160px;">
 
                     <!-- Contact in the footer -->
-                    <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/Contact">Contact</a>
+                    <li class="nav-item text-light mb-2">
+                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:90px;" href="~/Info/Contact">Contact</a>
                     </li>
 
                     <!-- More Links in the footer -->
-                    <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/MoreLinks">More Links</a>
+                    <li class="nav-item text-light mb-2">
+                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:100px;" href="~/Info/MoreLinks">More Links</a>
                     </li>
 
                      <!-- Members Dropdown -->
@@ -45,63 +45,66 @@
                         <!-- Members Dropdown in the footer -->
                         <li class="nav-item dropdown pt-lg-0 pt-0">
 
-                        <!-- Members Dropdown Toggle in the footer -->
-                        <a class="rounded-4 nav-link dropdown-toggle text-light footer-fs ps-2" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-people-fill"></i> Members
-                        </a>
+                            <!-- Members Dropdown Toggle in the footer -->
+                            <a class="rounded-4 nav-link dropdown-toggle text-light footer-fs px-2" style="max-width:135px;" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-people-fill"></i> Members
+                            </a>
 
-                        <!-- Members Dropdown Menu in the footer -->
-                        <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="membersFooterDropdown" style="max-width:180px;">
+                            <!-- Members Dropdown Menu in the footer -->
+                            <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="membersFooterDropdown" style="max-width:180px;">
 
-                            <!-- News and Notices -->
-                            <li class="nav-item text-light">
-                                <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
-                                    <i class="bi bi-newspaper"></i> News and Notices
-                                </a>
-                            </li>
+                                <!-- News and Notices -->
+                                <li class="nav-item text-light">
+                                    <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" style="max-width:175px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
+                                        <i class="bi bi-newspaper"></i> News and Notices
+                                    </a>
+                                </li>
 
-                            <!-- Start of Nested "PDF Documents" Dropdown (wrapping the loop) -->
-                            <li class="nav-item dropdown">
+                                <!-- Start of Nested "PDF Documents" Dropdown (wrapping the loop) -->
+                                <li class="nav-item dropdown">
 
-                                <!-- PDF Documents Dropdown Toggle in the footer -->
-                                <a class="rounded-4 nav-link dropdown-toggle text-blackish footer-fs ps-2" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-file-earmark-pdf-fill text-blackish me-0"></i> PDF Documents
-                                </a>
+                                    <!-- PDF Documents Dropdown Toggle in the footer -->
+                                    <a class="rounded-4 nav-link dropdown-toggle text-blackish footer-fs px-2" style="max-width:180px;" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-file-earmark-pdf-fill text-blackish me-0"></i> PDF Documents
+                                    </a>
 
-                                <!-- PDF Documents Menu in the footer -->
-                                <ul class="dropdown-menu rounded-4 border-0 bg-transparent ps-2" aria-labelledby="pdfDocumentsFooterDropdown" style="max-width:160px">
-                                    @{
-                                        // Fetch the non-empty categories directly in the layout
-                                        var dynamicCategories = DbContext.PDFCategories
-                                        .Where(c => c.IsAdminOnly != true) 
-                                        .OrderBy(c => c.SortOrder)
-                                        .ThenBy(c => c.CategoryName)
-                                        .ToList(); 
+                                    <!-- PDF Documents Menu in the footer -->
+                                    <ul class="dropdown-menu rounded-4 border-0 bg-transparent ps-2" aria-labelledby="pdfDocumentsFooterDropdown" style="max-width:160px">
+                                        @{
+                                            // Fetch the non-empty categories directly in the layout
+                                            var dynamicCategories = DbContext.PDFCategories
+                                            .Where(c => c.IsAdminOnly != true) 
+                                            .OrderBy(c => c.SortOrder)
+                                            .ThenBy(c => c.CategoryName)
+                                            .ToList(); 
 
-                                        // Check if any categories were found
-                                        if (dynamicCategories != null && dynamicCategories.Any())
-                                        {
-                                            // Loop through the categories and create a link for each
-                                            foreach (var category in dynamicCategories)
+                                            // Check if any categories were found
+                                            if (dynamicCategories != null && dynamicCategories.Any())
                                             {
-                                                // Maintain footer styles for nested list items
-                                                <li class="nav-item text-light">
-                                                    <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
-                                                        <i class="bi bi-list-ul text-blackish ms-2"></i> @category.CategoryName
-                                                    </a>
-                                                </li>
+                                                // Loop through the categories and create a link for each
+                                                foreach (var category in dynamicCategories)
+                                                {
+                                                    // Maintain footer styles for nested list items
+                                                    <li class="nav-item text-light">
+                                                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:155px;" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
+                                                            <i class="bi bi-list-ul text-blackish ms-2"></i> @category.CategoryName
+                                                        </a>
+                                                    </li>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // Optional: Display a placeholder if no categories are found
+                                                <li><span class="dropdown-item-text text-light">No PDF categories available</span></li> <!-- Add text-light -->
                                             }
                                         }
-                                        else
-                                        {
-                                            // Optional: Display a placeholder if no categories are found
-                                            <li><span class="dropdown-item-text text-light">No PDF categories available</span></li> <!-- Add text-light -->
-                                        }
-                                    }
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
+
+                                    </ul>
+                                </li>
+
+                            </ul>
+
+                        </li>
                     }
 
                 </ul>
@@ -109,16 +112,16 @@
 
             <!-- TOS and Privacy Links in the footer -->
             <div class="col-4 pe-0">
-                <ul class="navbar-nav ms-auto flex-nowrap ps-2 pt-2" style="max-width:160px">
+                <ul class="navbar-nav ms-auto flex-nowrap px-2 pt-2" style="max-width:160px">
 
                     <!-- TOS -->
                     <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/TOS">TOS</a>
+                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:60px" href="~/Info/TOS">TOS</a>
                     </li>
 
                     <!-- Privacy -->
                     <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" href="~/Info/Privacy">Privacy</a>
+                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:80px" href="~/Info/Privacy">Privacy</a>
                     </li>
 
                 </ul>

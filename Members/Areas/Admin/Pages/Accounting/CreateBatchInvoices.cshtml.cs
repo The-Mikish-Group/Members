@@ -33,11 +33,11 @@ namespace Members.Areas.Admin.Pages.Accounting
             // AmountDue removed from InputModel
             [Required]
             [DataType(DataType.Date)]
-            [Display(Name = "Invoice Date")]
+            [Display(Name = "Invoice Date:")]
             public DateTime InvoiceDate { get; set; } = DateTime.Today;
             [Required]
             [DataType(DataType.Date)]
-            [Display(Name = "Due Date")]
+            [Display(Name = "Due Date:")]
             public DateTime DueDate { get; set; } = DateTime.Today.AddDays(30);
         }
         public async Task OnGetAsync()
