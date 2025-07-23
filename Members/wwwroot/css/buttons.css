@@ -40,6 +40,26 @@
         background-color: green;
     }
 
+
+.buttonClass {
+    border-width: 1px;
+    color: rgba(0, 0, 0, 1);
+    /*box-shadow: 3px 4px 0px 0px rgba(48, 41, 41, 1);
+    border-color: rgba(214, 201, 188, 1);*/
+    /*background: linear-gradient(rgba(107, 106, 106, 1), rgba(242, 241, 241, 1));*/
+}
+
+    .buttonClass:hover,
+    .buttonClass:focus,
+    .buttonClass:active {
+        color: rgba(0, 0, 0, 1);
+        box-shadow: 3px 4px 0px 0px rgba(48, 41, 41, 1);
+        border-color: rgba(214, 201, 188, 1);
+        background: linear-gradient(rgba(107, 106, 106, 1), rgba(242, 241, 241, 1));
+    }
+              
+
+
 /*  btn-Upload Defaults */
 .btn-upload {
     border-bottom-left-radius: 0px;

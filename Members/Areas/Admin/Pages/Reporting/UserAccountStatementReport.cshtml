@@ -22,7 +22,7 @@
     <form method="get" class="mb-3">
         <div class="row align-items-end gy-2">
             <div class="col-md-4">
-                <label for="SelectedUserId" class="ms-2 form-label text-blackish">Select Member:</label>
+                <label for="SelectedUserId" class="ms-2 mb-0 form-label text-blackish">Member:</label>
                 <select asp-for="SelectedUserId" name="SelectedUserId" id="SelectedUserId" class="form-select shadow">
                     <option value="">-- Select a Member --</option>
                     @if (Model.UserSelectList != null && Model.UserSelectList.Any())
@@ -50,13 +50,13 @@
 
             <!-- Start Date -->
             <div class="col-md-3">
-                <label for="StartDate" class="ms-2 form-label text-blackish">Start Date:</label>
+                <label for="StartDate" class="ms-2 mb-0 form-label text-blackish">Start Date:</label>
                 <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")"/>
             </div>
 
             <!-- End Date -->
             <div class="col-md-3">
-                <label for="EndDate" class="ms-2 form-label text-blackish">End Date:</label>
+                <label for="EndDate" class="ms-2 mb-0 form-label text-blackish">End Date:</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")"/>
             </div>
 
@@ -68,7 +68,7 @@
             </div>
             @if (Model.StatementData != null && Model.StatementData.Transactions.Any())
             {
-                <!-- Export to CSV Button -->
+                <!-- Export to CSV Button (Only show if there is report data) -->
                 <div class="col-md-auto">
                     <button type="button" class="btn btn-success rounded-4 mx-2 shadow"
                             data-bs-toggle="modal" data-bs-target="#exportStatementConfirmModal">
