@@ -304,6 +304,32 @@ text-red-lighter {
 }    
     
 /* #endregion */
+
+/* #region NavBar Colors */
+.text-navbar-lighter {
+    color: #fffbe8;
+}
+
+.bg-navbar-lighter {
+    background-color: #fffbe8;
+}
+
+.text-navbar-light {
+    color: #fdf5cc;
+}
+
+.bg-navbar-light {
+    background-color: #fdf5cc;
+}
+
+.text-navbar {
+    color: #fbeb97;
+}
+
+.bg-navbar {
+    background-color: #fbeb97;
+}
+/* #endregion */
 /* #endregion */
 /* #endregion */
 
@@ -388,9 +414,10 @@ a {
     .nav-link:active,
     .nav-link:hover,
     .nav-link:focus {
-        font-weight:500;
-        color: #ffffff !important; /* almost black */
-        background-color: gray;
+        font-weight: 500;
+        color: darkgray !important;
+        /*text-shadow: .5px .5px .5px #000000;*/
+        /*background-color: gray;*/
     }
 
 /* my nav-link */
