@@ -48,7 +48,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             public static LateFeeApplicationResult SkippedRecentFeeExists(string userName, string userId) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) already has a recent late fee. Skipped." };
             public static LateFeeApplicationResult SkippedNoOverdueInvoice(string userName, string userId) =>
-                new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) has an outstanding balance but no overdue DUES invoices. No late fee applied." };
+                new() { Success = false, UserId = userId, UserName = userName, Message = $"User {userName} (ID: {userId}) has an outstanding balance but no overdue invoices. No late fee applied." };
             public static LateFeeApplicationResult Error(string userName, string userId, string errorMessage, Exception? ex = null) =>
                 new() { Success = false, UserId = userId, UserName = userName, Message = $"Error applying late fee to {userName} (ID: {userId}): {errorMessage}{(ex != null ? " Details: " + ex.Message : "")}" };
             public static LateFeeApplicationResult FeeApplied(string userName, string userId, decimal feeAmount, int invoiceId, decimal creditsApplied, InvoiceStatus status) =>
@@ -154,7 +154,7 @@ namespace Members.Areas.Admin.Pages.Accounting
             
             if (latestOverdueInvoice == null)
             {
-                _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has an outstanding balance but no overdue invoices. No late fee will be applied.", userNameForDisplay, userId);
+                _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has an outstanding balance but no overdue invoices. No late fee applied.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.SkippedNoOverdueInvoice(userNameForDisplay, userId);
             }
 
