@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-namespace Members.Areas.Admin.Pages.Accounting
+namespace Members.Areas.Admin.Pages.AccountsReceivable
 {
     [Authorize(Roles = "Admin,Manager")]
     public class AddInvoiceModel(

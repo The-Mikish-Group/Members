@@ -25,25 +25,29 @@
     <NoWarn>1701;1702;CA1862</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Areas\Admin\Pages\Accounting\**" />
     <Compile Remove="Data\Migrations\**" />
     <Compile Remove="Pdf\**" />
     <Compile Remove="Views\Admin\**" />
     <Compile Remove="wwwroot\js\ej2\**" />
+    <Content Remove="Areas\Admin\Pages\Accounting\**" />
     <Content Remove="Data\Migrations\**" />
     <Content Remove="Pdf\**" />
     <Content Remove="Views\Admin\**" />
     <Content Remove="wwwroot\js\ej2\**" />
+    <EmbeddedResource Remove="Areas\Admin\Pages\Accounting\**" />
     <EmbeddedResource Remove="Data\Migrations\**" />
     <EmbeddedResource Remove="Pdf\**" />
     <EmbeddedResource Remove="Views\Admin\**" />
     <EmbeddedResource Remove="wwwroot\js\ej2\**" />
+    <None Remove="Areas\Admin\Pages\Accounting\**" />
     <None Remove="Data\Migrations\**" />
     <None Remove="Pdf\**" />
     <None Remove="Views\Admin\**" />
     <None Remove="wwwroot\js\ej2\**" />
   </ItemGroup>
   <ItemGroup>       
-    <Compile Remove="Areas\Admin\Pages\Accounting\AccountsReceivable.cshtml.cs" />       
+    <Compile Remove="Areas\Admin\Pages\AccountsReceivable\AccountsReceivable.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MembersGrid.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml.cs" />       
@@ -67,7 +71,7 @@
     <Compile Remove="Services\UserService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Remove="Areas\Admin\Pages\Accounting\AccountsReceivable.cshtml" />
+    <Content Remove="Areas\Admin\Pages\AccountsReceivable\AccountsReceivable.cshtml" />
     <Content Remove="Areas\Identity\Pages\body.cshtml" />
     <Content Remove="Areas\Identity\Pages\MembersGrid.cshtml" />
     <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />

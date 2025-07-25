@@ -31,14 +31,14 @@
 
             <!-- Run Report Button -->
             <div class="col-md-auto mt-2">
-                <button type="submit" class="btn btn-success rounded-4 px-2 py-1 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
+                <button type="submit" class="btn btn-success rounded-2 px-2 py-1 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
             </div>
 
             @if (Model.ReportData.Any())
             {
                 <!-- Export to CSV Button (Only show if there is report data) -->
                 <div class="col-md-auto mt-2">
-                    <button type="button" class="btn btn-success rounded-4 px-2 py-1 shadow" id="exportArAgingTriggerButton"
+                    <button type="button" class="btn btn-success rounded-2 px-2 py-1 shadow" id="exportArAgingTriggerButton"
                             data-bs-toggle="modal" data-bs-target="#exportArAgingConfirmModal">
                         <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
                     </button>
@@ -46,7 +46,7 @@
 
                 <!-- Print Button (Only show if there is report data) -->
                 <div class="col-md-auto mt-2">
-                    <button type="button" class="btn btn-success shaadow rounded-4 px-2 py-1" id="printReportButton">
+                    <button type="button" class="btn btn-success shaadow rounded-2 px-2 py-1" id="printReportButton">
                         <i class="bi bi-printer-fill"></i> Print
                     </button>
                 </div>
@@ -78,10 +78,10 @@
                 <div class="modal-footer">
 
                     <!-- Cancel Button -->
-                    <button type="button" class="btn btn-sm btn-secondary rounded-4 shadow" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">Cancel</button>
                     
                     <!-- Confirm Export Button -->
-                    <button type="button" id="confirmExportArAgingBtn" class="btn btn-sm btn-success rounded-4 shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
+                    <button type="button" id="confirmExportArAgingBtn" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
 
                 </div>
             </div>

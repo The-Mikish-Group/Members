@@ -10,7 +10,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
-namespace Members.Areas.Admin.Pages.Accounting
+namespace Members.Areas.Admin.Pages.AccountsReceivable
 {
     public class EditInvoiceModel(
         ApplicationDbContext context,

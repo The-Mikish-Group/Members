@@ -1,5 +1,5 @@
 ﻿@page "{userId?}"
-@model Members.Areas.Admin.Pages.Accounting.RecordPaymentModel
+@model Members.Areas.Admin.Pages.AccountsReceivable.RecordPaymentModel
 @{
     ViewData["Title"] = "Record New Payment";
     Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
@@ -149,14 +149,14 @@
                                         }
                                     </div>
                                     <div class="col-md-auto mb-2 text-center">
-                                        <button type="submit" asp-page-handler="RecordNewPayment" class="btn btn-sm btn-success rounded-4 shadow">
+                                        <button type="submit" asp-page-handler="RecordNewPayment" class="btn btn-sm btn-success rounded-2 shadow">
                                             <i class="bi bi-cash-coin"></i> Record New Payment
                                         </button>
                                     </div>
                                     @if (Model.AvailableUserCredits.Any())
                                     {
                                         <div class="col-md-auto mb-2 text-center">
-                                            <button type="submit" asp-page-handler="ApplyCredit" class="btn btn-sm btn-success rounded-4 shadow">
+                                            <button type="submit" asp-page-handler="ApplyCredit" class="btn btn-sm btn-success rounded-2 shadow">
                                                 <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
                                             </button>
                                         </div>

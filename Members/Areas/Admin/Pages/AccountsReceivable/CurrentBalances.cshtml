@@ -1,5 +1,5 @@
 ﻿@page
-@model Members.Areas.Admin.Pages.Accounting.CurrentBalancesModel
+@model Members.Areas.Admin.Pages.AccountsReceivable.CurrentBalancesModel
 @{
     ViewData["Title"] = "Current Member Balances";
     Layout = "/Views/Shared/_Layout.cshtml";
@@ -65,7 +65,7 @@
 
                     <!-- Email Late Fee Warnings -->
                     <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-subtle-danger rounded-4"
+                        <button type="submit" class="btn btn-sm btn-subtle-danger rounded-2"
                                 onclick="return confirm('Are you sure you want to send late fee warning emails to all members with an outstanding balance? This should typically be done between the 1st and 5th of the month.');">
                             <i class="bi bi-exclamation-triangle"></i> Email Late Fee Warnings
                         </button>
@@ -73,7 +73,7 @@
 
                     <!-- Apply Late Fee -->
                     <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-danger rounded-4"
+                        <button type="submit" class="btn btn-sm btn-danger rounded-2"
                                 onclick="return confirm('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances? This may take a moment.');">
                             <i class="bi bi-alarm"></i> Apply Late Fees to All Eligible
                         </button>
@@ -81,7 +81,7 @@
 
                     <!-- Email Balance Notifications -->
                     <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-search-fill rounded-4"
+                        <button type="submit" class="btn btn-sm btn-search-fill rounded-2"
                                 onclick="return confirm('Are you sure you want to send balance notification emails to all members with a balance?');">
                             <i class="bi bi-envelope"></i> Email Balance Notifications
                         </button>
@@ -91,7 +91,7 @@
                     @if (Model.MemberBalances.Any())
                     {
                         <div class="ms-1"style="display: inline-block;">
-                            <button type="button" class="btn btn-sm btn-success rounded-4" id="exportCurrentBalancesTriggerButton"
+                            <button type="button" class="btn btn-sm btn-success rounded-2" id="exportCurrentBalancesTriggerButton"
                                     data-bs-toggle="modal" data-bs-target="#exportCurrentBalancesConfirmModal">
                                 <i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Export to CSV
                             </button>

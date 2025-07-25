@@ -173,10 +173,10 @@ namespace Members.Areas.Member.Pages
             // Modify BackToEditUserUrl if conditions are met
             if (!string.IsNullOrEmpty(this.BackToEditUserUrl) && 
                 !string.IsNullOrEmpty(this.ViewedUserId) && 
-                (this.BackToEditUserUrl.Contains("/Admin/Accounting/CurrentBalances") || 
-                 this.BackToEditUserUrl.Contains("/Admin/Accounting/CurrentBalances") || // Future name
-                 this.BackToEditUserUrl.Contains("/Admin/Accounting/ReviewBatchInvoices") ||
-                 this.BackToEditUserUrl.Contains("/Admin/Accounting/ManageBillableAssets") ))
+                (this.BackToEditUserUrl.Contains("/Admin/AccountsReceivable/CurrentBalances") || 
+                 this.BackToEditUserUrl.Contains("/Admin/AccountsReceivable/CurrentBalances") || // Future name
+                 this.BackToEditUserUrl.Contains("/Admin/AccountsReceivable/ReviewBatchInvoices") ||
+                 this.BackToEditUserUrl.Contains("/Admin/AccountsReceivable/BillableAssets") ))
             {
                 string separator = this.BackToEditUserUrl.Contains('?') ? "&" : "?";
                 this.BackToEditUserUrl = $"{this.BackToEditUserUrl}{separator}returnedFromUserId={this.ViewedUserId}";

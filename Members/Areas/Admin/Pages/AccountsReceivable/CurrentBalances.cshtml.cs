@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Text; // Added for StringBuilder and Encoding
 
-namespace Members.Areas.Admin.Pages.Accounting
+namespace Members.Areas.Admin.Pages.AccountsReceivable
 {
     [Authorize(Roles = "Admin,Manager")] // Or your specific admin/manager roles
     public class CurrentBalancesModel(

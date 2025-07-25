@@ -14,7 +14,7 @@
         if (User.Identity?.IsAuthenticated ?? false)
         {
             <form class="form-inline" asp-area="Identity" action="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Info")" method="post">
-                <button type="submit" class="nav-link btn btn-sm btn-link text-blackish rounded-4">Click here to Logout</button>
+                <button type="submit" class="nav-link btn btn-sm btn-link text-blackish rounded-2">Click here to Logout</button>
             </form>
         }
         else

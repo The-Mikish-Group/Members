@@ -19,10 +19,10 @@
 
             <div class="col-4 pb-md-2">
                 <ul class="navbar-nav flex-nowrap ps-2 pt-2" style="max-width:160px;">
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/">Welcome</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/About">About Us</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/Facilities">Facilities</a></li>
-                    <li class="nav-item text-light"><a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Image/GalleryList">Galleries</a></li>
+                    <li class="nav-item text-light"><a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/">Welcome</a></li>
+                    <li class="nav-item text-light"><a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/About">About Us</a></li>
+                    <li class="nav-item text-light"><a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Info/Facilities">Facilities</a></li>
+                    <li class="nav-item text-light"><a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:85px;" href="~/Image/GalleryList">Galleries</a></li>
                 </ul>
             </div>
 
@@ -31,12 +31,12 @@
 
                     <!-- Contact in the footer -->
                     <li class="nav-item text-light mb-2">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:90px;" href="~/Info/Contact">Contact</a>
+                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:90px;" href="~/Info/Contact">Contact</a>
                     </li>
 
                     <!-- More Links in the footer -->
                     <li class="nav-item text-light mb-2">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:100px;" href="~/Info/MoreLinks">More Links</a>
+                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:100px;" href="~/Info/MoreLinks">More Links</a>
                     </li>
 
                      <!-- Members Dropdown -->
@@ -46,7 +46,7 @@
                         <li class="nav-item dropdown pt-lg-0 pt-0">
 
                             <!-- Members Dropdown Toggle in the footer -->
-                            <a class="rounded-4 nav-link dropdown-toggle text-light footer-fs px-2" style="max-width:135px;" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="rounded-2 nav-link dropdown-toggle text-light footer-fs px-2" style="max-width:135px;" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-people-fill"></i> Members
                             </a>
 
@@ -55,7 +55,7 @@
 
                                 <!-- News and Notices -->
                                 <li class="nav-item text-light">
-                                    <a class="rounded-4 nav-link footer-fs text-nowrap ps-2" style="max-width:175px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
+                                    <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="max-width:175px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
                                         <i class="bi bi-newspaper"></i> News and Notices
                                     </a>
                                 </li>
@@ -64,12 +64,12 @@
                                 <li class="nav-item dropdown">
 
                                     <!-- PDF Documents Dropdown Toggle in the footer -->
-                                    <a class="rounded-4 nav-link dropdown-toggle text-blackish footer-fs px-2" style="max-width:180px;" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="rounded-2 nav-link dropdown-toggle text-blackish footer-fs px-2" style="max-width:180px;" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-file-earmark-pdf-fill text-blackish me-0"></i> PDF Documents
                                     </a>
 
                                     <!-- PDF Documents Menu in the footer -->
-                                    <ul class="dropdown-menu rounded-4 border-0 bg-transparent ps-2" aria-labelledby="pdfDocumentsFooterDropdown" style="max-width:160px">
+                                    <ul class="dropdown-menu rounded-2 border-0 bg-transparent ps-2" aria-labelledby="pdfDocumentsFooterDropdown" style="max-width:160px">
                                         @{
                                             // Fetch the non-empty categories directly in the layout
                                             var dynamicCategories = DbContext.PDFCategories
@@ -86,7 +86,7 @@
                                                 {
                                                     // Maintain footer styles for nested list items
                                                     <li class="nav-item text-light">
-                                                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:155px;" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
+                                                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:155px;" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
                                                             <i class="bi bi-list-ul text-blackish ms-2"></i> @category.CategoryName
                                                         </a>
                                                     </li>
@@ -116,12 +116,12 @@
 
                     <!-- TOS -->
                     <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:60px" href="~/Info/TOS">TOS</a>
+                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:60px" href="~/Info/TOS">TOS</a>
                     </li>
 
                     <!-- Privacy -->
                     <li class="nav-item text-light">
-                        <a class="rounded-4 nav-link footer-fs text-nowrap px-2" style="max-width:80px" href="~/Info/Privacy">Privacy</a>
+                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:80px" href="~/Info/Privacy">Privacy</a>
                     </li>
 
                 </ul>

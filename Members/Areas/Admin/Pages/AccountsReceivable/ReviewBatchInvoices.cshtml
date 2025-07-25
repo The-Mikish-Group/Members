@@ -1,5 +1,5 @@
 ﻿@page "{batchId?}"
-@model Members.Areas.Admin.Pages.Accounting.ReviewBatchInvoicesModel
+@model Members.Areas.Admin.Pages.AccountsReceivable.ReviewBatchInvoicesModel
 @{
     ViewData["Title"] = $"Review Draft Batches";
     Layout = "/Views/Shared/_Layout.cshtml";
@@ -45,7 +45,7 @@
         </div> *@
 
         <div class="mt-4">
-            <a asp-page="./CreateBatchInvoices" class="btn btn-sm btn-success rounded-4"><i class="bi bi-plus-square rounded-4 shadow"></i> Create a New Batch</a>
+            <a asp-page="./CreateBatchInvoices" class="btn btn-sm btn-success rounded-2"><i class="bi bi-plus-square rounded-2 shadow"></i> Create a New Batch</a>
         </div>
 
         return;
@@ -85,7 +85,7 @@
                         There are currently no draft batches available for review.
                     </div>
                     <div class="mt-4">
-                        <a asp-page="./CreateBatchInvoices" class="btn btn-success rounded-4 shadow">Create a New Batch</a>
+                        <a asp-page="./CreateBatchInvoices" class="btn btn-success rounded-2 shadow">Create a New Batch</a>
                     </div>
                     return;
                 }
@@ -98,7 +98,7 @@
                         <div class="col-auto">
                             <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
                                   onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">
-                                <button type="submit" class="btn btn-sm btn-danger rounded-4 shadow">
+                                <button type="submit" class="btn btn-sm btn-danger rounded-2 shadow">
                                     <i class="bi bi-x-circle"></i> Cancel & Delete Batch
                                 </button>
                             </form>
@@ -108,7 +108,7 @@
                         <div class="col-auto">
                             <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
                                   onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">
-                                <button type="submit" class="btn btn-sm btn-success rounded-4 shadow">
+                                <button type="submit" class="btn btn-sm btn-success rounded-2 shadow">
                                     <i class="bi bi-check-circle"></i> Finalize Batch
                                 </button>
                             </form>
@@ -116,7 +116,7 @@
 
                         <!-- Export to CSV -->
                         <div class="col-auto">
-                            <button type="button" class="btn btn-sm btn-success rounded-4 shadow" id="exportReviewBatchInvoicesTriggerButton"
+                            <button type="button" class="btn btn-sm btn-success rounded-2 shadow" id="exportReviewBatchInvoicesTriggerButton"
                                     data-bs-toggle="modal" data-bs-target="#exportReviewBatchInvoicesConfirmModal">
                                 <i class="bi-file-earmark-spreadsheet-fill"></i> Export to CSV
                             </button>
@@ -136,8 +136,8 @@
                                 Are you sure you want to download the CSV export for this batch of invoices?
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-back rounded-4" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-success rounded-4" id="confirmReviewBatchInvoicesExportButton">Yes, Export</button>
+                                <button type="button" class="btn btn-back rounded-2" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success rounded-2" id="confirmReviewBatchInvoicesExportButton">Yes, Export</button>
                             </div>
                         </div>
                     </div>

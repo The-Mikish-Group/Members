@@ -42,7 +42,7 @@
             @if (!Model.IsViewingSelf && !string.IsNullOrEmpty(Model.BackToEditUserUrl))
             {
                 <div class="my-2 text-center">
-                    <a href="@Model.BackToEditUserUrl" class="btn btn-sm btn-back rounded-4 shadow">
+                    <a href="@Model.BackToEditUserUrl" class="btn btn-sm btn-back rounded-2 shadow">
                         <i class="bi bi-arrow-left"></i> Back
                     </a>
                 </div>
@@ -64,26 +64,26 @@
                     <div class="row gx-2 gy-2 justify-content-center mb-3 mt-3">
 
                         <div class="col-auto">
-                            <a asp-area="Admin" asp-page="/Accounting/AddInvoice"
+                            <a asp-area="Admin" asp-page="/AccountsReceivable/AddInvoice"
                                asp-route-userId="@Model.ViewedUserId"
                                asp-route-returnUrl="@myBillingReturnUrl"
-                               class="btn btn-sm btn-success rounded-4 shadow">
+                               class="btn btn-sm btn-success rounded-2 shadow">
                                 <i class="bi bi-file-earmark-plus"></i> Invoice
                             </a>
                         </div>
 
                         <div class="col-auto">
-                            <a asp-area="Admin" asp-page="/Accounting/RecordPayment"
+                            <a asp-area="Admin" asp-page="/AccountsReceivable/RecordPayment"
                                asp-route-userId="@Model.ViewedUserId"
                                asp-route-returnUrl="@myBillingReturnUrl"
-                               class="btn btn-sm btn-success rounded-4 shadow">
+                               class="btn btn-sm btn-success rounded-2 shadow">
                                 <i class="bi bi-cash-coin"></i> Payment
                             </a>
                         </div>
 
                         <div class="col-auto">
                             <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@Model.ViewedUserId" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger rounded-4 shadow"
+                                <button type="submit" class="btn btn-sm btn-danger rounded-2 shadow"
                                         title="Apply Late Fee if Dues/Assessments are overdue"
                                         onclick="return confirm('Are you sure you want to attempt to apply a late fee for @Model.DisplayName.Replace("'s", "")? This will check for overdue Dues/Assessments and apply a fee if appropriate.');"
                                         @(Model.TargetUserIsBillingContact ? "" : "disabled")>
@@ -320,7 +320,7 @@
                                                     if (trans.Type == "Invoice" && trans.InvoiceID.HasValue &&
                                                     (trans.StatusOrMethod == InvoiceStatus.Draft.ToString() || trans.StatusOrMethod == InvoiceStatus.Due.ToString()))
                                                     {
-                                                        <a asp-area="Admin" asp-page="/Accounting/EditInvoice"
+                                                        <a asp-area="Admin" asp-page="/AccountsReceivable/EditInvoice"
                                                            asp-route-invoiceId="@trans.InvoiceID.Value"
                                                            asp-route-returnUrl="@Url.Page("/MyBilling", new { area = "Member", userId = Model.ViewedUserId, sortOrder = Model.CurrentSort, returnUrl = Model.BackToEditUserUrl })"
                                                            class="btn btn-sm btn-rename" title="Edit Invoice">

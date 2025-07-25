@@ -37,14 +37,14 @@
 
             <!-- Run Report Button -->
             <div class="col-md-auto">
-                <button type="submit" class="btn btn-success rounded-4 mx-2 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
+                <button type="submit" class="btn btn-success rounded-2 mx-2 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
             </div>
 
             @if (Model.ReportData.Any())
             {
                 <!-- Export to CVS Button (Only show if there is report data) -->
                 <div class="col-md-auto">
-                    <button type="button" class="btn btn-success rounded-4 shadow"
+                    <button type="button" class="btn btn-success rounded-2 shadow"
                             data-bs-toggle="modal" data-bs-target="#exportLateFeeRegisterConfirmModal">
                         <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
                     </button>
@@ -52,7 +52,7 @@
 
                 <!-- Print Button (Only show if there is report data) -->
                 <div class="col-md-auto">
-                    <button type="button" class="btn btn-success rounded-4 shadow" id="printReportButton">
+                    <button type="button" class="btn btn-success rounded-2 shadow" id="printReportButton">
                         <i class="bi bi-printer-fill"></i> Print
                     </button>
                 </div>
@@ -82,8 +82,8 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary rounded-4 shadow" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="confirmExportLateFeeRegisterBtn" class="btn btn-success rounded-4 shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
+                    <button type="button" class="btn btn-secondary rounded-2 shadow" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmExportLateFeeRegisterBtn" class="btn btn-success rounded-2 shadow"><i class="bi bi-file-earmark-spreadsheet-fill"></i> Confirm Export</button>
                 </div>
 
             </div>

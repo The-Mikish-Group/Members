@@ -1,5 +1,5 @@
 ﻿@page "{userId?}"
-@model Members.Areas.Admin.Pages.Accounting.AddInvoiceModel
+@model Members.Areas.Admin.Pages.AccountsReceivable.AddInvoiceModel
 @{
     ViewData["Title"] = "Add New Invoice";
     Layout = "/Views/Shared/_Layout.cshtml"; 
@@ -87,16 +87,16 @@
                                 <div class="col-6 text-center">
                                     @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
                                     {
-                                        <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-4 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                        <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-2 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
                                     }
                                     else
                                     {
-                                        <a href="~/Info/" class="btn btn-sm btn-back rounded-4 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                        <a href="~/Info/" class="btn btn-sm btn-back rounded-2 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
                                     }
                                 </div>
 
                                 <div class="col-6 text-center">
-                                    <button type="submit" class="btn btn-sm btn-success rounded-4 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
+                                    <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
                                 </div>
                             </div>                                                      
                             

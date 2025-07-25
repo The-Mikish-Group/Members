@@ -1,4 +1,4 @@
-@model Members.Areas.Admin.Pages.Accounting.ManageBillableAssetsModel
+@model Members.Areas.Admin.Pages.AccountsReceivable.BillableAssetsModel
 
 <tbody id="assetsTableBody">
     @{
@@ -18,7 +18,7 @@
                 {
                     <a asp-area="Member" asp-page="/MyBilling"
                        asp-route-userId="@asset.UserID"
-                       asp-route-returnUrl="@Url.Page("./ManageBillableAssets", new {
+                       asp-route-returnUrl="@Url.Page("./BillableAssets", new {
                                                 searchTerm = Model.SearchTerm,
                                                 pageNumber = Model.PageNumber,
                                                 currentSort = Model.CurrentSort,
@@ -45,7 +45,6 @@
         i++;
     }
 </tbody>
-@* <p>[MARKER_AFTER_TBODY]</p> *@ @* Optionally remove this marker - REMOVED FOR CLEANLINESS *@
 
 <div id="assetsPaginationControls" class="mt-3">
     @if (Model.TotalPages > 1)
