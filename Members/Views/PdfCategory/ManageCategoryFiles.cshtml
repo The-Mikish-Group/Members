@@ -40,7 +40,7 @@
         <!-- Category Selection Dropdown -->
         <form method="get" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" class="mb-4">
 
-            <label for="categoryIdSelection" class="fw-bold fw-bold">Select Category to Manage Files:</label>
+            <label for="categoryIdSelection" class="fw-bold">Select Category to Manage Files:</label>
             <select name="categoryId" id="categoryIdSelection" class="form-select" asp-items="@(new SelectList(allMembersCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
                 <option value="">-- Select a Category --</option>
             </select>

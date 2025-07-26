@@ -29,7 +29,7 @@
                         {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
-                                <label class="fw-bold fw-bold">Member</label>
+                                <label class="fw-bold">Member</label>
                                 <p class="form-control shadow">@Model.TargetUserName</p>
                             </div>
                         }
@@ -62,7 +62,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Description" class="fw-bold fw-bold"></label>
+                            <label asp-for="Input.Description" class="fw-bold"></label>
                             <input asp-for="Input.Description" class="form-control shadow" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>

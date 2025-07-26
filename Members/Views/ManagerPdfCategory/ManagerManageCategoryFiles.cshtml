@@ -44,7 +44,7 @@
         <!-- Category Selection Dropdown -->
         <form method="get" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" class="mb-4">
 
-            <label for="categoryIdSelection" class="fw-bold fw-bold">Select Confidential Category to Manage:</label>
+            <label for="categoryIdSelection" class="fw-bold">Select Confidential Category to Manage:</label>
             <select name="categoryId" id="categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allConfidentialCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
                 <option value="">-- Select a Category --</option>
             </select>
@@ -78,7 +78,7 @@
                         <div class="row gx-0 gy-2 mx-0 mb-3 align-items-center">
 
                             <div class="col-8">
-                                <label for="fileUpload" class="fw-bold fw-bold ms-2">PDF Document:</label>
+                                <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
                                 <input type="file" name="file" id="fileUpload" class="form-control no-right-radius" required accept=".pdf">
                             </div>
 
@@ -165,11 +165,11 @@
                         <div class="modal-body pb-0">
                             <input type="hidden" id="mmcfRenameFileId" /><input type="hidden" id="mmcfOldFileName" /><input type="hidden" id="mmcfFileCategoryId" />
                             <div class="row align-items-center mb-2">
-                                <div class="col-sm-3"><label for="mmcfNewFileName" class="col-fw-bold fw-bold">File Name:</label></div>
+                                <div class="col-sm-3"><label for="mmcfNewFileName" class="col-fw-bold">File Name:</label></div>
                                 <div class="col-sm-9"><input type="text" class="form-control" id="mmcfNewFileName"></div>
                             </div>
                             <div class="row align-items-center mb-3">
-                                <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-fw-bold fw-bold">Sort Order:</label></div>
+                                <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-fw-bold">Sort Order:</label></div>
                                 <div class="col-sm-9"><input type="number" class="form-control" id="mmcfNewSortOrder" min="1"></div>
                             </div>
                             <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
