@@ -5,7 +5,7 @@
 }
 
 <!-- Gallery Name -->
-<h1 class="text-blackish mb-2 mt-4 text-center">Gallery: @ViewBag.GalleryName</h1>
+<h1 class="text-black mb-2 mt-4 text-center">Gallery: @ViewBag.GalleryName</h1>
 
 <!-- Back to Galleries Button -->
 <div class="mb-2 mt-2 text-center">
@@ -15,7 +15,7 @@
 </div>
 
 <div class="mb-3 text-center">
-    <h6 class="text-blackish">(Click to Enlarge)</h6> 
+    <h6 class="text-black">(Click to Enlarge)</h6> 
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -39,12 +39,12 @@
         foreach (var image in Model)
         {
             <div class="col-md-6 col-lg-4 col-xl-2 mb-2">
-                <div class="card bg-card-light h-100 rounded p-2 shadow">
+                <div class="card h-100 rounded p-2 shadow">
                     <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
                         <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
                     </a>
                     <div class="card-body py-1 text-center">
-                        <p class="card-text text-blackish">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
+                        <p class="card-text">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
     }
     else
     {
-        <div class="col-12 text-blackish p-4 text-center">
+        <div class="col-12 p-4 text-center">
             <p>This gallery is empty.</p>
         </div>
     }

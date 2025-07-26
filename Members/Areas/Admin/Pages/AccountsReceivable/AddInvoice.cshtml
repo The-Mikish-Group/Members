@@ -5,12 +5,12 @@
     Layout = "/Views/Shared/_Layout.cshtml"; 
 }
 
-<div class="container mt-4">
+<div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card bg-card-light mb-2 shadow">
+            <div class="card mb-2 shadow">
                 <div class="card-header bg-gray-light text-white">
-                    <h4 class="text-blackish mb-0">
+                    <h4 class="text-black mb-0">
                         @ViewData["Title"]
                     </h4>
                 </div>
@@ -29,14 +29,14 @@
                         {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-blackish">Member</label>
+                                <label class="fw-bold fw-bold">Member</label>
                                 <p class="form-control shadow">@Model.TargetUserName</p>
                             </div>
                         }
                         else
                         {
                             <div class="mb-3">
-                                <label asp-for="Input.SelectedUserID" class="form-label text-blackish"></label>
+                                <label asp-for="Input.SelectedUserID" class="fw-bold"></label>
                                 <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
                                     <option value="">-- Select User --</option>
                                 </select>
@@ -50,32 +50,32 @@
                         }
                         <div class="row mb-3">
                             <div class="col-sm-6">
-                                <label asp-for="Input.InvoiceDate" class="form-label text-blackish"></label>
-                                <input asp-for="Input.InvoiceDate" class="form-control text-blackish shadow" />
+                                <label asp-for="Input.InvoiceDate" class="fw-bold"></label>
+                                <input asp-for="Input.InvoiceDate" class="form-control shadow" />
                                 <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
-                                <label asp-for="Input.DueDate" class="form-label text-blackish"></label>
-                                <input asp-for="Input.DueDate" class="form-control text-blackish shadow" />
+                                <label asp-for="Input.DueDate" class="fw-bold"></label>
+                                <input asp-for="Input.DueDate" class="form-control shadow" />
                                 <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Input.Description" class="form-label text-blackish"></label>
-                            <input asp-for="Input.Description" class="form-control text-blackish shadow" />
+                            <label asp-for="Input.Description" class="fw-bold fw-bold"></label>
+                            <input asp-for="Input.Description" class="form-control shadow" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>
                         
                         <div class="row mb-3">
                             <div class="col-sm-6">
-                                <label asp-for="Input.AmountDue" class="form-label text-blackish"></label>
-                                <input asp-for="Input.AmountDue" type="text" class="form-control text-blackish shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
+                                <label asp-for="Input.AmountDue" class="fw-bold"></label>
+                                <input asp-for="Input.AmountDue" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                 <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
-                                <label asp-for="Input.Type" class="form-label text-blackish"></label>
-                                <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select text-blackish">
+                                <label asp-for="Input.Type" class="fw-bold"></label>
+                                <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select">
                                 </select>
                                 <span asp-validation-for="Input.Type" class="text-danger"></span>
                             </div>

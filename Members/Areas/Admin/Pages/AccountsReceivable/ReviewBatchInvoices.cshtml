@@ -5,12 +5,15 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Top Button placed here -->
+<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+
 <div class="container">
 
     @if (!string.IsNullOrEmpty(Model.BatchId))
     {
         <!-- Title -->
-        <h1 class="text-blackish mb-2 mt-4 text-center"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
+        <h1 class="text-black mb-2 mt-4 text-center"><i class="bi bi-list-check"></i> @ViewData["Title"]</h1>
 
     }
 
@@ -54,12 +57,12 @@
     @if (!string.IsNullOrEmpty(Model.BatchDescription))
     {       
         <!-- Display Batch Summary -->
-        <div class="card bg-card-light mb-4 shadow">
+        <div class="card mb-4 shadow">
 
             <!-- Card Header Text -->
-            <div class="card-header">
+            <div class="card-header bg-card-light">
 
-                <h5 class="d-flex align-items-start text-blackish mb-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
+                <h5 class="d-flex align-items-start mb-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
 
                 @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
                 {
@@ -67,7 +70,7 @@
                         <div class="row mb-3">
 
                             <div class="col-12 text-start">
-                                <label for="SelectedBatchId" class="form-label visually-hidden text-blackish">Select Batch:</label>
+                                <label for="SelectedBatchId" class="fw-bold visually-hidden">Select Batch:</label>
                             </div>
 
                             <div class="col-12 px-0">
@@ -128,7 +131,7 @@
                 <div class="modal fade" id="exportReviewBatchInvoicesConfirmModal" tabindex="-1" aria-labelledby="exportReviewBatchInvoicesConfirmModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header">
+                            <div class="modal-header bg-card-light">
                                 <h5 class="modal-title" id="exportReviewBatchInvoicesConfirmModalLabel">Confirm Export</h5>
                                 <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
@@ -144,7 +147,7 @@
                 </div>
 
                 <!-- Heading -->
-                <h5 class="d-flex justify-content-between align-items-center text-blackish mb-0">
+                <h5 class="d-flex justify-content-between align-items-center mb-0">
                     <span><i class="bi bi-list"></i> Invoices</span>
                     <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices @Model.TotalInvoiceAmount.ToString("C")</span>
                 </h5>
@@ -352,5 +355,30 @@
             // --- End Export CSV Modal Logic ---
 
         });
+    </script>
+
+    <!-- Top Button Script -->
+    <script>
+
+        //Get the button
+        var mybutton = document.getElementById("top-button");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
     </script>
 }

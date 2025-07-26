@@ -288,7 +288,7 @@ text-red-lighter {
     background-color: #AD8003;
 }
 
-.text-blackish {
+.text-black {
     color: #8C6412;
 }
 
@@ -296,165 +296,27 @@ text-red-lighter {
     background-color: #8C6412;
 }
 
-.text-blackisher {
+.text-blacker {
     color: #4E3802;
 }
-.text-blackish {
+.text-black {
     color: #424143 !important; /* almost black */
 }    
     
 /* #endregion */
 
-/* #region NavBar Colors */
-.text-navbar-lighter {
-    color: #fffbe8;
-}
 
-.bg-navbar-lighter {
-    background-color: #fffbe8;
-}
-
-.text-navbar-light {
-    color: #fdf5cc;
-}
-
-.bg-navbar-light {
-    background-color: #fdf5cc;
-}
-
-.text-navbar {
-    color: #fbeb97;
-}
-
-.bg-navbar {
-    background-color: #fbeb97;
-}
-/* #endregion */
 /* #endregion */
 /* #endregion */
 
-/* Pagination Styles to match Users.cshtml */
-.pagination .page-link {
-    background-color: white !important;
-    border-color: darkgray !important;
-    color: #4E3802 !important; /* text-blackish */
-}
 
-.pagination .page-item.active .page-link {
-    background-color: darkgray !important; /* text-gold (active bg) */
-    border-color: darkgray !important;
-    color: #fff !important; /* white text for active */
-}
-
-.pagination .page-link:hover {
-    background-color: lightgray !important; /* text-gold-lighter (hover bg) */
-    color: #424143 !important; /* almost black */
-}
-
-.pagination .page-item.disabled .page-link {
-    background-color: #f8f9fa !important;
-    border-color: darkgray !important;
-    color: #6c757d !important;
-}
-
-/* Table Striping */
-.table-striped > tbody > tr:nth-of-type(odd) > td {
-    background-color: lightgray !important; /* Your desired color for odd rows */
-}
-
-.table-striped > tbody > tr:nth-of-type(even) > td {
-    background-color: #ffffff !important; /* Your desired color for even rows */
-}
-
-.row-even {
-    background-color: lightgray !important;
-}
-
-.row-odd {
-    background-color: #ffffff !important;
-}
-
-    .row-even > td, .row-odd > td {
-        background-color: inherit !important;
-    }
 
 /* bg-card-light */
-.bg-card-light {   
-    background-color:ghostwhite;
-}
-
-/* #region Resposive color changes */
-
-/* Default <a> link */
-a {
-    color: #ffffff
-}
-
-    a:hover,
-    a:focus {
-        color: #DEDFE0;
-    }
-
-/* link */
-.link {
-    color: #424143 !important; /* almost black */
-}
-
-    .link:hover,
-    .link:active,
-    .link:focus {
-        color: darkgray; 
-    }
-
-/* nav-link */
-.nav-link {
-    color: #424143 !important; /* almost black */
-}
-
-    .nav-link:active,
-    .nav-link:hover,
-    .nav-link:focus {
-        font-weight: 500;
-        color: darkgray !important;
-        /*text-shadow: .5px .5px .5px #000000;*/
-        /*background-color: gray;*/
-    }
-
-/* my nav-link */
-.my-nav-link {
-    color: #424143 !important; /* almost black */
-}
-
-    .my-nav-link:active,
-    .my-nav-link:hover,
-    .my-nav-link:focus {
-        color: darkgray !important;
-    }
-
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-    background-color: #28a745; /* Green background color */
-    color: white; /* White text color when active */
-}
-
-.nav-pills .nav-link {
-    color: #28a745; /* Green text color */
-}
-
-    .nav-pills .nav-link:hover {
-        color: white;
-        background-color: lightgreen;
-    }
-
-.list-group .even-row {
-    background-color: #f8f9fa; /* Light gray for even rows */
-}
-
-.list-group .odd-row {
-    background-color: #e9ecef; /* Slightly darker gray for odd rows */
+.bg-card-light {
+    background-color: #fdf5cc;
+    
 }
 
 
-/* #endregion */
 
 

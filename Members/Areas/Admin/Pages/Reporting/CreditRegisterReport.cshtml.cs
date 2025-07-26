@@ -15,38 +15,31 @@ using Microsoft.Extensions.Logging;
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class CreditRegisterReportModel : PageModel
+    public class CreditRegisterReportModel(ApplicationDbContext context,
+                                     UserManager<IdentityUser> userManager,
+                                     ILogger<CreditRegisterReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<CreditRegisterReportModel> _logger;
-
-        public CreditRegisterReportModel(ApplicationDbContext context,
-                                         UserManager<IdentityUser> userManager,
-                                         ILogger<CreditRegisterReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<CreditRegisterReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        public IList<CreditRegisterItemViewModel> ReportData { get; set; } = new List<CreditRegisterItemViewModel>();
+        public IList<CreditRegisterItemViewModel> ReportData { get; set; } = [];
         public CreditRegisterSummaryViewModel Totals { get; set; } = new CreditRegisterSummaryViewModel();
 
 
         private async Task GenerateReportDataAsync()
         {
-            ReportData = new List<CreditRegisterItemViewModel>();
+            ReportData = [];
             Totals = new CreditRegisterSummaryViewModel();
 
             DateTime effectiveStartDate = StartDate.Date;
@@ -92,7 +85,7 @@ namespace Members.Areas.Admin.Pages.Reporting
                     Reason = credit.Reason,
                     SourceInfo = sourceInfo,
                     IsVoided = credit.IsVoided,
-                    AppliedApplications = new List<AppliedApplicationViewModel>()
+                    AppliedApplications = []
                 };
 
                 // Determine Status using calculatedOriginalAmount
@@ -100,12 +93,12 @@ namespace Members.Areas.Admin.Pages.Reporting
                 else if (credit.IsApplied && credit.Amount <= 0) itemVM.Status = "Fully Applied"; // This implies original was > 0 if IsApplied is true
                 else if (calculatedOriginalAmount > 0 && credit.Amount < calculatedOriginalAmount && credit.Amount > 0) itemVM.Status = "Partially Applied";
                 else if (calculatedOriginalAmount > 0 && credit.Amount == calculatedOriginalAmount && !credit.IsApplied) itemVM.Status = "Available";
-                else if (calculatedOriginalAmount == 0 && credit.Amount == 0 && (credit.IsApplied || applicationsForThisCredit.Any())) itemVM.Status = "Fully Applied (Zero Value)";
-                else if (calculatedOriginalAmount == 0 && credit.Amount == 0 && !credit.IsApplied && !applicationsForThisCredit.Any()) itemVM.Status = "Available (Zero Value)";
+                else if (calculatedOriginalAmount == 0 && credit.Amount == 0 && (credit.IsApplied || applicationsForThisCredit.Count != 0)) itemVM.Status = "Fully Applied (Zero Value)";
+                else if (calculatedOriginalAmount == 0 && credit.Amount == 0 && !credit.IsApplied && applicationsForThisCredit.Count == 0) itemVM.Status = "Available (Zero Value)";
                 else itemVM.Status = "N/A"; // Fallback
 
                 decimal amountAppliedFromThisCreditInLoop = 0; // Renamed to avoid conflict with sumOfApplications
-                if (applicationsForThisCredit.Any())
+                if (applicationsForThisCredit.Count != 0)
                 {
                     foreach (var app in applicationsForThisCredit)
                     {
@@ -147,7 +140,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             foreach (var creditItem in ReportData)
             {
                 string creditIdCsv = $"UC-{creditItem.CreditId:D5}";
-                if (creditItem.AppliedApplications.Any())
+                if (creditItem.AppliedApplications.Count != 0)
                 {
                     foreach (var appItem in creditItem.AppliedApplications)
                     {
@@ -217,7 +210,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             public string SourceInfo { get; set; } = string.Empty; // e.g., "From Payment P-XXXXX", "Manual Adjustment"
             public bool IsVoided { get; set; }
             public string Status { get; set; } = string.Empty; // e.g. "Fully Applied", "Partially Applied", "Available", "Voided"
-            public List<AppliedApplicationViewModel> AppliedApplications { get; set; } = new List<AppliedApplicationViewModel>();
+            public List<AppliedApplicationViewModel> AppliedApplications { get; set; } = [];
         }
 
         // ViewModel for displaying details of each credit application

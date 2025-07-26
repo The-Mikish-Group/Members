@@ -22,128 +22,128 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card bg-gray-lighter rounded p-2 shadow">
-                <div class="card-body p-0">
-                    <div class="mb-1 p-0 text-center">
-                        <h2 class="text-blackish pb-2">
-                            <i class="bi bi-envelope-fill"></i> Contact Us
-                        </h2>
-                        <p class="text-blackish fw-bold">Fill in the form below to send us an email.</p>
+            <div class="card-header rounded p-2 shadow">
+                
+                <div class="mb-1 p-0 text-center">
+                    <h2 class="text-black pb-2">
+                        <i class="bi bi-envelope-fill"></i> Contact Us
+                    </h2>
+                    <p class="text-black fw-bold">Fill in the form below to send us an email.</p>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
+                <!-- Contact Form -->
+                <form action="@Url.Action("SendEmail", "Info")" method="post" class="needs-validation" novalidate>
+
+                    <!-- fullName -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="fullName" name="Name" required>
+                        <label for="fullName" class="fw-bold">Your Full Name</label>
+                        <div class="invalid-feedback">Please enter your full name.</div>
                     </div>
 
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-                    }
+                    <!-- Emasil -->
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="Email" required>
+                        <label for="email" class="fw-bold">Your Email</label>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
 
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-                    }
+                    <!-- Subject -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="subject" name="Subject" required>
+                        <label for="subject" class="fw-bold">Subject</label>
+                        <div class="invalid-feedback">Please enter a subject.</div>
+                    </div>
 
-                    <!-- Contact Form -->
-                    <form action="@Url.Action("SendEmail", "Info")" method="post" class="needs-validation" novalidate>
+                    <!-- Message -->
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="message" name="Message" rows="12" style="resize: vertical; min-height: 150px;" required></textarea>
+                        <label for="message" class="fw-bold">Message</label>
+                        <div class="invalid-feedback">Please enter your message.</div>
+                    </div>
 
-                        <!-- fullName -->
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="fullName" name="Name" required>
-                            <label for="fullName" class="form-label">Your Full Name</label>
-                            <div class="invalid-feedback">Please enter your full name.</div>
-                        </div>
+                    <!-- Phone Number -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="phoneNumber" name="Phone Number (Opt.)">
+                        <label for="phoneNumber" class="fw-bold">Phone Number (Opt.)</label>
+                    </div>
 
-                        <!-- Emasil -->
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" name="Email" required>
-                            <label for="email" class="form-label">Your Email</label>
-                            <div class="invalid-feedback">Please enter a valid email address.</div>
-                        </div>
+                    <!-- Spammy -->
+                    <div class="d-none">
+                        <label aria-label="Spam Protection: Please don't fill this in:">Spam Protection: Please don't fill this in:</label>
+                        <textarea name="Comment" rows="1" cols="1" aria-hidden="true"></textarea>
+                    </div>
 
-                        <!-- Subject -->
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="subject" name="Subject" required>
-                            <label for="subject" class="form-label">Subject</label>
-                            <div class="invalid-feedback">Please enter a subject.</div>
-                        </div>
+                    <!-- Send or Cancel -->
+                    <div class="d-flex justify-content-between">
 
-                        <!-- Message -->
-                        <div class="form-floating mb-3">
-                            <textarea class="form-control" id="message" name="Message" rows="12" style="resize: vertical; min-height: 150px;" required></textarea>
-                            <label for="message" class="form-label">Message</label>
-                            <div class="invalid-feedback">Please enter your message.</div>
-                        </div>
+                        <!-- Cancel Button -->
+                        <a href="~/" class="btn btn-sm btn-secondary rounded-2 me-2 shadow" title="Discard Changes and Return Home">
+                            <i class="bi bi-box-arrow-left"></i> Cancel
+                        </a>
 
-                        <!-- Phone Number -->
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="phoneNumber" name="Phone Number (Opt.)">
-                            <label for="phoneNumber" class="form-label">Phone Number (Opt.)</label>
-                        </div>
+                        <!-- Reset Button -->
+                        <button type="reset" class="btn btn-sm btn-danger btn-sm rounded-2 me-2 shadow">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
 
-                        <!-- Spammy -->
-                        <div class="d-none">
-                            <label aria-label="Spam Protection: Please don't fill this in:">Spam Protection: Please don't fill this in:</label>
-                            <textarea name="Comment" rows="1" cols="1" aria-hidden="true"></textarea>
-                        </div>
+                        <!-- Send Button -->
+                        <button type="submit" class="btn btn-sm btn-success btn-sm rounded-2 shadow">
+                            <i class="bi bi-check-lg"></i> Send
+                        </button>
 
-                        <!-- Send or Cancel -->
-                        <div class="d-flex justify-content-between">
+                    </div>
+                </form>
 
-                            <!-- Cancel Button -->
-                            <a href="~/" class="btn btn-sm btn-secondary rounded-2 me-2 shadow" title="Discard Changes and Return Home">
-                                <i class="bi bi-box-arrow-left"></i> Cancel
-                            </a>
+                <!-- Contact Card -->
+                <div class="text-black my-4">
+                    <div class="card-body mx-auto rounded p-3 shadow" style="max-width: 350px;">
+                        <div class="d-flex flex-column">
 
-                            <!-- Reset Button -->
-                            <button type="reset" class="btn btn-sm btn-danger btn-sm rounded-2 me-2 shadow">
-                                <i class="bi bi-arrow-clockwise"></i> Reset
-                            </button>
+                            <div class="mb-2 ps-3">
+                                <strong>Chad Pritchett, HOA President</strong><br>
+                            </div>
 
-                            <!-- Send Button -->
-                            <button type="submit" class="btn btn-sm btn-success btn-sm rounded-2 shadow">
-                                <i class="bi bi-check-lg"></i> Send
-                            </button>
+                            <div class="mb-3 ps-5">
+                                1515 Isis Lake Dr<br>
+                                Avon Park FL 33825
+                            </div>
 
-                        </div>
-                    </form>
+                            <div class="mb-1 ps-3">
+                                <strong>
+                                    To visit Oaks Village, enter the clubhouse address in your GPS:
+                                </strong>
+                            </div>
 
-                    <!-- Contact Card -->
-                    <div class="text-blackish mt-4">
-                        <div class="card bg-card-light mx-auto rounded p-3 shadow" style="max-width: 350px;">
-                            <div class="d-flex flex-column">
+                            <div class="pb-2 ps-5">
+                                1042 N Brainerd<br>
+                                Avon Park FL 33825
+                            </div>
 
-                                <div class="mb-2 ps-3">
-                                    <strong>Chad Pritchett, HOA President</strong><br>
-                                </div>
-
-                                <div class="mb-3 ps-5">
-                                    1515 Isis Lake Dr<br>
-                                    Avon Park FL 33825
-                                </div>
-
-                                <div class="mb-1 ps-3">
-                                    <strong>
-                                        To visit Oaks Village, enter the clubhouse address in your GPS:
-                                    </strong>
-                                </div>
-
-                                <div class="pb-2 ps-5">
-                                    1042 N Brainerd<br>
-                                    Avon Park FL 33825
-                                </div>
-
-                                <div class="ps-4 text-center">
-                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Open Google Maps">
-                                        <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
-                                                onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
-                                            <img style="height:32px; width:32px;" src="/Images/Svg/Buttons/Google-Square.svg" alt="Google Maps Icon">
-                                            <b>Google Maps</b>
-                                        </button>
-                                    </span>
-                                </div>
+                            <div class="ps-4 text-center">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Open Google Maps">
+                                    <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
+                                            onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
+                                        <img style="height:32px; width:32px;" src="/Images/Svg/Buttons/Google-Square.svg" alt="Google Maps Icon">
+                                        <b>Google Maps</b>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </div>
-
                 </div>
+
+               
             </div>
         </div>
     </div>

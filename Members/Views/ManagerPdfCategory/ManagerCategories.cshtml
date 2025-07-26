@@ -7,8 +7,8 @@
 <div class="container mb-2 mt-4">
 
     <!-- Title -->
-    <div class="text-blackish mb-2 mt-4 text-center">
-        <h3 class="text-blackish"><i class="bi bi-shield-lock-fill ms-1"></i> @ViewData["Title"]</h3>
+    <div class="text-black mb-2 mt-4 text-center">
+        <h3 class="text-black"><i class="bi bi-shield-lock-fill ms-1"></i> @ViewData["Title"]</h3>
         @* <p class="text-muted">Use this page to create, edit names/sort order, and delete categories designated as 'Admin Only'. Files for these categories are managed separately.</p> *@
     </div>
 
@@ -27,46 +27,47 @@
             }
 
             <!-- Card with Shadow -->
-            <div class="card m-sm-0 bg-card-light rounded p-2 shadow">
-                <div class="card-body m-1 p-2">
+            <div class="card m-sm-0 rounded m-1 p-2 shadow">                
 
-                    <!-- Heading: Add a New Category -->
-                    <div class="mb-2">
-                        <h5 class="text-blackish"><i class="bi bi-plus-square-fill me-1"></i> Add A New Category</h5>                        
-                    </div>
+                <!-- Heading: Add a New Category -->
+                <div class="mb-2">
+                    <h5 class="text-black"><i class="bi bi-plus-square-fill me-1"></i> Add A New Category</h5>                        
+                </div>
 
-                    <!-- Create Category form -->
-                    <form id="addManagerConfidentialCategoryForm" method="post" asp-controller="ManagerPdfCategory" asp-action="CreateManagerCategory">
-                        @Html.AntiForgeryToken()
-                        <div class="row align-items-center">
+                <!-- Create Category form -->
+                <form id="addManagerConfidentialCategoryForm" method="post" asp-controller="ManagerPdfCategory" asp-action="CreateManagerCategory">
 
-                            <!-- New Category Name -->
-                            <div class="col-8 px-0">
-                                <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
-                                <input type="text" class="no-right-radius form-control" id="newCategoryName" name="CategoryName" placeholder="Category Name" required value="@ViewData["CurrentCategoryName"]">
-                            </div>
+                    @Html.AntiForgeryToken()
 
-                            <!-- Sort Order -->
-                            <div class="col-2 px-0">
-                                <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
-                                <input type="number" class="no-left-radius no-right-radius form-control" id="newSortOrder" name="SortOrder" value="@(ViewBag.NextSortOrder ?? 1)" min="1">
-                            </div>
+                    <div class="row align-items-center mx-0">
 
-                            <!-- Add Button -->
-                            <div class="col-2 px-0">
-                                <button type="submit" class="btn btn-success no-left-radius w-100"><i class="bi bi-plus-square-fill"></i></button>
-                            </div>
-
+                        <!-- New Category Name -->
+                        <div class="col-8 px-0">
+                            <label for="newCategoryName" class="fw-bold visually-hidden">Category Name</label>
+                            <input type="text" class="no-right-radius form-control" id="newCategoryName" name="CategoryName" placeholder="Category Name" required value="@ViewData["CurrentCategoryName"]">
                         </div>
 
-                        @if (!ViewData.ModelState.IsValid) {
-                            <div class="text-danger small mt-2 py-1">
-                                @Html.ValidationSummary(false, "", new { @class = "list-unstyled" })
-                            </div>
-                        }
+                        <!-- Sort Order -->
+                        <div class="col-2 px-0">
+                            <label for="newSortOrder" class="fw-bold visually-hidden">Sort Order</label>
+                            <input type="number" class="no-left-radius no-right-radius form-control" id="newSortOrder" name="SortOrder" value="@(ViewBag.NextSortOrder ?? 1)" min="1">
+                        </div>
 
-                    </form>
-                </div>
+                        <!-- Add Button -->
+                        <div class="col-2 px-0">
+                            <button type="submit" class="btn btn-success no-left-radius w-100"><i class="bi bi-plus-square-fill"></i></button>
+                        </div>
+
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid) {
+                        <div class="text-danger small mt-2 py-1">
+                            @Html.ValidationSummary(false, "", new { @class = "list-unstyled" })
+                        </div>
+                    }
+
+                </form>
+               
             </div>
         </div>
     </div>
@@ -76,95 +77,96 @@
         <div class="col-md-8 mx-auto my-0 p-2">
 
             <!-- Shadowed Card -->
-            <div class="card m-sm-0 bg-card-light rounded p-0 shadow">
-                <div class="card-body m-1 p-2">
+            <div class="card m-sm-0 rounded m-1 p-2 shadow">                
 
-                    <!-- Edit Existing Categories Heading -->
-                    <div class="mb-3 ms-2">
-                        <h5 class="text-blackish"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
-                    </div>
-
-                    @if (Model != null && Model.Any())
-                    {
-                        <!-- Table -->
-                        <table class="table-striped w-100 shadow">
-                            
-                            <!-- Table Header -->
-                            <thead>
-                                <tr class="bg-gray-dark text-white">
-                                    <th class="bg-gray-dark header-text ps-2 text-white">Edit</th>
-                                    <th class="bg-gray-dark header-text text-white">Category</th>
-                                    <th class="bg-gray-dark header-text text-center text-white">Sort</th>
-                                    @* <th class="bg-gray-dark header-text text-center text-white">Visibility</th> *@
-                                    <th class="bg-gray-dark header-text pe-2 text-end text-white">Delete</th>
-                                </tr>
-                            </thead>
-
-                            <!-- Table Body -->
-                            <tbody id="manageConfidentialCategoriesTableBody">
-                                @foreach (var item in Model)
-                                {
-                                    <!-- Table Row -->
-                                    <tr data-category-id="@item.CategoryID" data-category-name="@item.CategoryName" data-sort-order="@item.SortOrder">
-                                        
-                                        <!-- Edit Button -->
-                                        <td class="edit-cell py-0 align-middle">
-                                            <button type="button" class="btn btn-sm btn-link btn-rename"
-                                                    onclick="showEditConfidentialCatModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </button>
-                                        </td>
-
-                                        <!-- Category Name -->
-                                        <td class="category-name-cell align-middle" style="cursor:pointer;" onclick="showEditConfidentialCatModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
-                                            @item.CategoryName
-                                        </td>
-
-                                        <!-- Sort Order -->
-                                        <td class="text-blackish text-center align-middle">@item.SortOrder</td>
-                                        
-                                        <!-- Admin Only -->
-                                        @* <td class="text-blackish text-center align-middle"><span class="badge bg-danger">Admin Only</span></td> *@
-                                        
-                                        <!-- Delete Button -->
-                                        <td class="delete-cell py-0 text-end align-middle">
-                                            <form method="post" class="d-inline" asp-controller="ManagerPdfCategory" asp-action="DeleteManagerCategoryConfirmed" asp-route-id="@item.CategoryID">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-delete px-2 py-1" 
-                                                        onclick="return confirm('Are you sure you want to delete the confidential category: @Html.Raw(HttpUtility.JavaScriptStringEncode(item.CategoryName))? All its files will be unlinked and potentially deleted if not used elsewhere.');">
-                                                    @using System.Web
-                                                    <i class="bi bi-trash-fill"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-
-                                    </tr>
-                                    <tr id="edit-row-@item.CategoryID" class="d-none">
-                                        <td colspan="4">
-                                            <div class="row align-items-center container">
-                                                <div class="col-7 px-0">
-                                                    <label for="editCategoryName_@item.CategoryID" class="form-label visually-hidden">New Category Name</label>
-                                                    <input type="text" class="form-control form-control-sm rounded-start rounded-0" id="editCategoryName_@item.CategoryID" name="newCategoryName" value="@item.CategoryName" placeholder="New Category Name">
-                                                </div>
-                                                <div class="col-2 px-0">
-                                                    <label for="editSortOrder_@item.CategoryID" class="form-label visually-hidden">New Sort Order</label>
-                                                    <input type="number" class="form-control form-control-sm rounded-end rounded-0 ps-4" id="editSortOrder_@item.CategoryID" name="newSortOrder" value="@item.SortOrder" min="1">
-                                                </div>
-                                                <div class="col-3 pe-0 text-end">
-                                                    <button type="button" class="btn btn-sm btn-success update-button" onclick="saveCategoryEdit('@item.CategoryID')"><i class="bi bi-save-fill me-1"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-back cancel-button ms-2" onclick="cancelEditRow('@item.CategoryID')"><i class="bi bi-x-octagon-fill me-1"></i></button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        
-                    }
-                    else
-                    { <div class="text-blackish mt-2 text-center">No confidential categories found. Use the form above to add one.</div> }
+                <!-- Edit Existing Categories Heading -->
+                <div class="mb-2 ms-2">
+                    <h5 class="text-black"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
                 </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <!-- Table -->
+                    <table class="table-striped w-100 shadow">
+                            
+                        <!-- Table Header -->
+                        <thead>
+                            <tr class="bg-gray-dark text-white">
+                                <th class="header-text ps-2 text-white">Edit</th>
+                                <th class="header-text text-white">Category</th>
+                                <th class="header-text text-center text-white">Sort</th>
+                                @* <th class="header-text text-center text-white">Visibility</th> *@
+                                <th class="header-text pe-2 text-end text-white">Delete</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Table Body -->
+                        <tbody id="manageConfidentialCategoriesTableBody">
+                            @foreach (var item in Model)
+                            {
+                                <!-- Table Row -->
+                                <tr data-category-id="@item.CategoryID" data-category-name="@item.CategoryName" data-sort-order="@item.SortOrder">
+                                        
+                                    <!-- Edit Button -->
+                                    <td class="edit-cell py-0 align-middle">
+                                        <button type="button" class="btn btn-sm btn-link btn-rename"
+                                                onclick="showEditConfidentialCatModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </td>
+
+                                    <!-- Category Name -->
+                                    <td class="category-name-cell align-middle" style="cursor:pointer;" onclick="showEditConfidentialCatModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                        @item.CategoryName
+                                    </td>
+
+                                    <!-- Sort Order -->
+                                    <td class="text-black text-center align-middle">@item.SortOrder</td>
+                                        
+                                    <!-- Admin Only -->
+                                    @* <td class="text-black text-center align-middle"><span class="badge bg-danger">Admin Only</span></td> *@
+                                        
+                                    <!-- Delete Button -->
+                                    <td class="delete-cell py-0 text-end align-middle">
+                                        <form method="post" class="d-inline" asp-controller="ManagerPdfCategory" asp-action="DeleteManagerCategoryConfirmed" asp-route-id="@item.CategoryID">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-delete px-2 py-1" 
+                                                    onclick="return confirm('Are you sure you want to delete the confidential category: @Html.Raw(HttpUtility.JavaScriptStringEncode(item.CategoryName))? All its files will be unlinked and potentially deleted if not used elsewhere.');">
+                                                @using System.Web
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                </tr>
+                                <tr id="edit-row-@item.CategoryID" class="d-none">
+                                    <td colspan="4">
+                                        <div class="row align-items-center container">
+                                            <div class="col-7 px-0">
+                                                <label for="editCategoryName_@item.CategoryID" class="fw-bold visually-hidden">New Category Name</label>
+                                                <input type="text" class="form-control form-control-sm rounded-start rounded-0" id="editCategoryName_@item.CategoryID" name="newCategoryName" value="@item.CategoryName" placeholder="New Category Name">
+                                            </div>
+                                            <div class="col-2 px-0">
+                                                <label for="editSortOrder_@item.CategoryID" class="fw-bold visually-hidden">New Sort Order</label>
+                                                <input type="number" class="form-control form-control-sm rounded-end rounded-0 ps-4" id="editSortOrder_@item.CategoryID" name="newSortOrder" value="@item.SortOrder" min="1">
+                                            </div>
+                                            <div class="col-3 pe-0 text-end">
+                                                <button type="button" class="btn btn-sm btn-success update-button" onclick="saveCategoryEdit('@item.CategoryID')"><i class="bi bi-save-fill me-1"></i></button>
+                                                <button type="button" class="btn btn-sm btn-back cancel-button ms-2" onclick="cancelEditRow('@item.CategoryID')"><i class="bi bi-x-octagon-fill me-1"></i></button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                        
+                }
+                else
+                { 
+                    <div class="text-black mt-2 text-center">No confidential categories found. Use the form above to add one.</div> 
+                }
+
             </div>
         </div>
 
@@ -190,18 +192,18 @@
 <div class="modal fade" id="editConfidentialCategoryModal" tabindex="-1" aria-labelledby="editConfidentialModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-gray-light">
-                <h5 class="modal-title text-blackish" id="editConfidentialModalLabel">Edit Confidential Category</h5>
+            <<div class="modal-header bg-card-light">
+                <h5 class="modal-title" id="editConfidentialModalLabel">Edit Confidential Category</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pb-0">
                 <input type="hidden" id="editConfCatId" />
                 <div class="row align-items-center mb-2">
-                    <div class="col-sm-3"><label for="editConfCatNameInput" class="col-form-label fw-bold text-blackish">Name:</label></div>
+                    <div class="col-sm-3"><label for="editConfCatNameInput" class="col-fw-bold fw-bold">Name:</label></div>
                     <div class="col-sm-9"><input type="text" class="form-control" id="editConfCatNameInput"></div>
                 </div>
                 <div class="row align-items-center mb-3">
-                     <div class="col-sm-3"><label for="editConfCatSortOrderInput" class="col-form-label fw-bold text-blackish">Sort Order:</label></div>
+                     <div class="col-sm-3"><label for="editConfCatSortOrderInput" class="col-fw-bold fw-bold">Sort Order:</label></div>
                      <div class="col-sm-9"><input type="number" class="form-control" id="editConfCatSortOrderInput" min="1"></div>
                 </div>
                 @* <div class="alert alert-info small p-2">This category will remain 'Admin Only'. To change its overall visibility to public (making it a non-confidential category), please use the main 'Manage Public Categories' interface and edit it there.</div> *@

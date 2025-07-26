@@ -14,46 +14,45 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card bg-card-light m-0 rounded p-0 shadow">
-                <div class="card-body p-2">
+            <div class="card m-0 rounded p-2 shadow">
+                
+                <!-- Title -->
+                <h1 class="text-black mb-4 text-center">
+                    <i class="bi bi-envelope-check-fill"></i> @ViewData["Title"]
+                </h1>
 
-                    <!-- Title -->
-                    <h1 class="text-blackish mb-4 text-center">
-                        <i class="bi bi-envelope-check-fill"></i> @ViewData["Title"]
-                    </h1>
+                <!-- Subtitle -->
+                <h4 class="text-black mb-2 text-center">Enter email address:</h4>
 
-                    <!-- Subtitle -->
-                    <h4 class="text-blackish mb-2 text-center">Enter email address:</h4>
+                <!-- Resend Email Confirmation Form -->
+                <form method="post">
 
-                    <!-- Resend Email Confirmation Form -->
-                    <form method="post">
+                    <!-- Alert -->
+                    <div asp-validation-summary="All" class="text-danger text-center" role="alert"></div>
 
-                        <!-- Alert -->
-                        <div asp-validation-summary="All" class="text-danger text-center" role="alert"></div>
+                    <!-- Email field -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="text-black form-control shadow" aria-required="true" placeholder="name@example.com" />
+                        <label asp-for="Input.Email" class="text-black form-label">Email</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
 
-                        <!-- Email field -->
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="text-blackish form-control shadow" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email" class="text-blackish form-label">Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
-                        </div>
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between">
 
-                        <!-- Buttons -->
-                        <div class="d-flex justify-content-between">
+                        <!-- Cancel -->
+                        <a href="~/" class="btn btn-sm btn-back rounded-2 me-2 shadow" title="Discard Changes and Return Home">
+                            <i class="bi bi-box-arrow-left"></i> Cancel
+                        </a>
 
-                            <!-- Cancel -->
-                            <a href="~/" class="btn btn-sm btn-back rounded-2 me-2 shadow" title="Discard Changes and Return Home">
-                                <i class="bi bi-box-arrow-left"></i> Cancel
-                            </a>
+                        <!-- Send -->                            
+                        <button type="submit" class="btn btn-sm btn-success rounded-2 shadow">
+                            <i class="bi bi-arrow-clockwise"></i> Send
+                        </button>
 
-                            <!-- Send -->                            
-                            <button type="submit" class="btn btn-sm btn-success rounded-2 shadow">
-                                <i class="bi bi-arrow-clockwise"></i> Send
-                            </button>
-
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+               
             </div>
         </div>
     </div>

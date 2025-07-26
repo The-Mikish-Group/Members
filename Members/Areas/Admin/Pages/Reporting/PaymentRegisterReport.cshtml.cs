@@ -15,38 +15,31 @@ using Microsoft.Extensions.Logging; // Added for ILogger
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class PaymentRegisterReportModel : PageModel
+    public class PaymentRegisterReportModel(ApplicationDbContext context,
+                                      UserManager<IdentityUser> userManager,
+                                      ILogger<PaymentRegisterReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<PaymentRegisterReportModel> _logger;
-
-        public PaymentRegisterReportModel(ApplicationDbContext context,
-                                          UserManager<IdentityUser> userManager,
-                                          ILogger<PaymentRegisterReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<PaymentRegisterReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        public IList<PaymentRegisterItem> ReportData { get; set; } = new List<PaymentRegisterItem>();
+        public IList<PaymentRegisterItem> ReportData { get; set; } = [];
         public PaymentRegisterSummary Totals { get; set; } = new PaymentRegisterSummary();
 
 
         private async Task GenerateReportDataAsync()
         {
-            ReportData = new List<PaymentRegisterItem>();
+            ReportData = [];
             Totals = new PaymentRegisterSummary(); // Reset totals
 
             DateTime effectiveStartDate = StartDate.Date;

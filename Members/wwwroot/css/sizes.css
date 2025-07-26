@@ -1,6 +1,6 @@
 /* #region Sizes */
-.carousel-item {
-    height: auto;
+.dropdown-menu {
+    min-width: 210px;
 }
 
 /* Buttons */

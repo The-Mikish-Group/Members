@@ -19,7 +19,7 @@
     <div class="text-center">
 
         <!-- Title -->
-        <h3 class="text-blackish mb-3">
+        <h3 class="text-black mb-3">
             <i class="bi bi-shield-lock-fill"></i>
             @if (selectedCategory != null) {
                 <span>@ViewData["Title"]</span>
@@ -35,13 +35,13 @@
 
     </div>
 
-    <div class="card bg-card-light mb-3 rounded p-2 shadow">
+    <div class="card mb-3 rounded p-2 shadow">
 
         <!-- Category Selection Dropdown -->
         <form method="get" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" class="mb-4">
 
-            <label for="categoryIdSelection" class="form-label fw-bold text-blackish">Select Category to Manage Files:</label>
-            <select name="categoryId" id="categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allMembersCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
+            <label for="categoryIdSelection" class="fw-bold fw-bold">Select Category to Manage Files:</label>
+            <select name="categoryId" id="categoryIdSelection" class="form-select" asp-items="@(new SelectList(allMembersCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
                 <option value="">-- Select a Category --</option>
             </select>
 
@@ -55,8 +55,8 @@
     @if (selectedCategoryId.HasValue && selectedCategory != null)
     {
         <!-- Upload Form -->
-        <div class="card bg-card-light mb-4 rounded shadow">
-            <div class="card-header bg-gray-light text-blackish fw-bold">
+        <div class="card mb-4 rounded shadow">
+            <div class="card-header fw-bold ">
                 <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
             <div class="card-body px-1">
@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="col-2">
-                            <label for="sortOrder" class="form-label">Sort:</label>
+                            <label for="sortOrder" class="fw-bold">Sort:</label>
                             <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
                         </div>
 
@@ -84,22 +84,22 @@
         </div>
 
         <!-- Existing Files Table -->
-        <h5 class="text-blackish mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
+        <h5 class="text-black mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
         @if (Model == null || !Model.Any())
         {
-            <div class="alert alert-secondary mt-2">No files in this category.</div>
+            <div class="alert alert-primary mt-2">No files in this category.</div>
         }
         else
         {
             <div class="table-responsive rounded shadow">
                 <table class="table-striped w-100 shadow">
-                    <thead class="bg-gray-light text-blackish">
-                        <tr class="bg-gray-dark text-white">
-                            <th class="bg-gray-dark header-text text-center">Edit</th>
-                            <th class="bg-gray-dark header-text text-center">View</th>
-                            <th class="bg-gray-dark header-text text-start">File Name (Click to Edit)</th>
-                            <th class="bg-gray-dark header-text text-center">Sort Order</th>
-                            <th class="bg-gray-dark header-text text-end">Delete</th>
+                    <thead>
+                        <tr>
+                            <th class="header-text text-center">Edit</th>
+                            <th class="header-text text-center">View</th>
+                            <th class="header-text text-start">File Name (Click to Edit)</th>
+                            <th class="header-text text-center">Sort Order</th>
+                            <th class="header-text text-end">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,9 +107,9 @@
                         {
                             <tr id="display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
                                 <td class="p-0 text-center align-middle">
-                                    <button type="button" class="btn btn-sm btn-link" title="Edit name/sort order"
+                                    <button type="button" class="btn btn-sm" title="Edit name/sort order"
                                             onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
-                                        <i class="bi bi-pencil-square"></i>
+                                        <i class="bi bi-pencil-square text-green"></i>
                                     </button>
                                 </td>
                                 <td class="p-0 text-center align-middle">
@@ -117,7 +117,7 @@
                                         <i class="bi bi-eye text-blue-light"></i>
                                     </a>
                                 </td>
-                                <td class="filename-cell align-middle" style="cursor:pointer;" title="Edit name/sort order"
+                                <td class="nav  py-2 filename-cell align-middle" style="cursor:pointer;" title="Edit name/sort order"
                                     onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
                                     @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
                                 </td>
@@ -146,16 +146,21 @@
 <div class="modal fade" id="RenameModal" tabindex="-1" aria-labelledby="RenameModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-gray-light"><h5 class="modal-title text-blackish" id="RenameModalLabel">Edit File Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+
+            <div class="modal-header card-header">
+                <h5 class="modal-title" id="RenameModalLabel">Edit File Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
             <div class="modal-body pb-0">
                 <input type="hidden" id="RenameFileId" /><input type="hidden" id="OldFileName" /><input type="hidden" id="FileCategoryId" />
                 <div class="row align-items-center mb-2">
-                    <div class="col-sm-3"><label for="NewFileName" class="col-form-label fw-bold text-blackish">File Name:</label></div>
+                    <div class="col-sm-3"><label for="NewFileName" class="col-form-label fw-bold">File Name:</label></div>
                     <div class="col-sm-9"><input type="text" class="form-control" id="NewFileName"></div>
                 </div>
                 <div class="row align-items-center mb-3">
-                    <div class="col-sm-3"><label for="NewSortOrder" class="col-form-label fw-bold text-blackish">Sort Order:</label></div>
-                    <div class="col-sm-9"><input type="number" class="form-control" id="NewSortOrder" min="1"></div>
+                    <div class="col-sm-3"><label for="NewSortOrder" class="col-form-label fw-bold">Sort Order:</label></div>
+                    <div class="col-sm-9"><input type="number" class="col-form-control" id="NewSortOrder" min="1"></div>
                 </div>
                 <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
             </div>

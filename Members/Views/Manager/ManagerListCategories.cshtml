@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-blackish mb-3 mt-4 text-center">
+<div class="text-black mb-3 mt-4 text-center">
     <h1><i class="bi bi-shield-lock-fill me-2"></i> @ViewData["Title"]</h1> @* Updated Icon & Title *@
 </div>
 @* <div class="mb-3 text-center">
@@ -14,32 +14,32 @@
 
 <div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
-        <div class="card bg-card-light rounded border shadow">
-            <div class="card-body p-0">
-                @if (Model != null && Model.Any())
+        <div class="card rounded border shadow p-0">
+           
+            @if (Model != null && Model.Any())
+            {
+                <ul class="list-group list-group-flush">
+                @foreach (var category in Model) // Model is already filtered by ManagerController
                 {
-                    <ul class="list-group list-group-flush">
-                    @foreach (var category in Model) // Model is already filtered by ManagerController
-                    {
-                        <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
+                    <li class="list-group-item bg-transparent nav-link" style="cursor: pointer; border: none;">
                             
-                            <a asp-controller="Manager" asp-action="ManagerListFiles" asp-route-categoryId="@category.CategoryID" class="text-decoration-none text-blackish d-block">
-                                    <i class="bi bi-folder2-open me-2"></i> @category.CategoryName 
-                            </a>
+                        <a asp-controller="Manager" asp-action="ManagerListFiles" asp-route-categoryId="@category.CategoryID" class="nav-link d-block">
+                                <i class="bi bi-folder2-open me-2"></i> @category.CategoryName 
+                        </a>
 
-                        </li>
-                    }
-                    </ul>
+                    </li>
                 }
-                else
-                {
-                    <p class="text-blackish m-3 mt-0 pt-0 text-start">
-                        No confidential PDF categories are currently available.
-                        <br/><br />
-                        Use the <a class="my-nav-link" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories">Manage Confidential Categories</a> page to create them.
-                    </p>
-                }
-            </div>
+                </ul>
+            }
+            else
+            {
+                <p class="text-black m-3 mt-0 pt-0 text-start">
+                    No confidential PDF categories are currently available.
+                    <br/><br />
+                    Use the <a class="my-nav-link" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories">Manage Confidential Categories</a> page to create them.
+                </p>
+            }
+           
         </div>
     </div>
 </div>
@@ -58,10 +58,10 @@
         .card-body .list-group-item { border-bottom: none !important; }
         .card-body .list-group-item:first-child { border-top: none !important; }
         .card-body .list-group-item:last-child { border-bottom: none !important; }
-        .card-body .list-group-item:hover a.text-blackish,
-        .card-body .list-group-item:focus a.text-blackish,
-        .card-body .list-group-item a.text-blackish:hover,
-        .card-body .list-group-item a.text-blackish:focus { color: #3b3726 !important; }
+        .card-body .list-group-item:hover a.text-black,
+        .card-body .list-group-item:focus a.text-black,
+        .card-body .list-group-item a.text-black:hover,
+        .card-body .list-group-item a.text-black:focus { color: #3b3726 !important; }
         .card-body .list-group-item:hover,
         .card-body .list-group-item:focus { background-color: rgba(0, 0, 0, 0.05) !important; }
         .list-group-item .badge { font-size: 0.75em; vertical-align: middle;}

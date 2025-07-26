@@ -14,10 +14,10 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card bg-card-light rounded p-2 shadow">
+            <div class="card rounded p-2 shadow">
 
                 <!-- Title -->
-                <h2 class="text-blackish mb-4 text-center">
+                <h2 class="text-black mb-4 text-center">
                     <i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]
                 </h2>
 
@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- Remember Me -->
-                        <div class="form-check text-blackish mb-3">
+                        <div class="form-check mb-3">
                             <input class="form-check-input" asp-for="Input.RememberMe" id="rememberMe" />
                             <label class="form-check-label" asp-for="Input.RememberMe" for="rememberMe">
                                 @Html.DisplayNameFor(m => m.Input.RememberMe)

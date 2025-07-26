@@ -16,20 +16,13 @@ using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class UserAccountStatementReportModel : PageModel
+    public class UserAccountStatementReportModel(ApplicationDbContext context,
+                                           UserManager<IdentityUser> userManager,
+                                           ILogger<UserAccountStatementReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<UserAccountStatementReportModel> _logger;
-
-        public UserAccountStatementReportModel(ApplicationDbContext context,
-                                               UserManager<IdentityUser> userManager,
-                                               ILogger<UserAccountStatementReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<UserAccountStatementReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [Display(Name = "Select Member")]
@@ -38,12 +31,12 @@ namespace Members.Areas.Admin.Pages.Reporting
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = DateTime.Today.AddMonths(-1).AddDays(1 - DateTime.Today.Day); // First day of last month
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
         public AccountStatementViewModel? StatementData { get; set; }
@@ -58,7 +51,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             else
             {
                 StatementData = new AccountStatementViewModel {
-                    Transactions = new List<StatementTransactionItemViewModel>(),
+                    Transactions = [],
                     SelectedUserName = "Please select a member.", // Updated text
                     ReportStartDate = StartDate.Date,
                     ReportEndDate = EndDate.Date
@@ -70,7 +63,7 @@ namespace Members.Areas.Admin.Pages.Reporting
         {
             if (string.IsNullOrEmpty(SelectedUserId))
             {
-                StatementData = new AccountStatementViewModel { Transactions = new List<StatementTransactionItemViewModel>(), SelectedUserName = "Please select a member." }; // Ensure consistency
+                StatementData = new AccountStatementViewModel { Transactions = [], SelectedUserName = "Please select a member." }; // Ensure consistency
                 return;
             }
 
@@ -263,7 +256,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             _logger.LogInformation("Fetched {ProfileCount} billing contact UserProfiles.", billingContactProfiles.Count);
 
             var userList = new List<SelectListItem>();
-            if (billingContactProfiles.Any())
+            if (billingContactProfiles.Count != 0)
             {
                 var userIds = billingContactProfiles.Select(p => p.UserId).ToList();
                 var identityUsers = await _userManager.Users
@@ -302,7 +295,7 @@ namespace Members.Areas.Admin.Pages.Reporting
             public decimal OpeningBalance { get; set; }
             [DataType(DataType.Currency)]
             public decimal ClosingBalance { get; set; }
-            public List<StatementTransactionItemViewModel> Transactions { get; set; } = new List<StatementTransactionItemViewModel>();
+            public List<StatementTransactionItemViewModel> Transactions { get; set; } = [];
         }
 
         public class StatementTransactionItemViewModel

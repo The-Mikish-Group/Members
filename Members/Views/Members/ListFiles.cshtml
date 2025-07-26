@@ -7,16 +7,16 @@
 }
 
 <!-- View Headings -->
-<div class="text-blackish mb-2 mt-4 text-center">
+<div class="text-black mb-2 mt-4 text-center">
 
     <!-- Category Name -->
-    <h1 class="text-blackish mb-2">
-        <i class="bi bi-file-earmark-pdf-fill text-blackish me-0"></i> @ViewBag.CategoryName
+    <h1 class="text-black mb-2">
+        <i class="bi bi-file-earmark-pdf-fill me-0"></i> @ViewBag.CategoryName
     </h1>
 
     <!-- Back to Categories Button -->
     <p>
-        <a asp-controller="Members" asp-action="ListCategories" class="btn btn-sm btn-back text-decoration-none text-blackish rounded-2 shadow" title="Back to PDF Categories">
+        <a asp-controller="Members" asp-action="ListCategories" class="btn btn-sm btn-back text-decoration-none rounded-2 shadow" title="Back to PDF Categories">
             <i class="bi bi-arrow-left"></i> Back to PDF Categories
         </a>
     </p>
@@ -24,33 +24,33 @@
 </div>
 
 <!-- Card Container -->
-<div class="row justify-content-center container mx-auto p-1">
+<div class="row justify-content-center container mx-auto p-1 mb-3">
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Card -->
-        <div class="card bg-card-light rounded border shadow">
-            <div class="card-body p-0">
+        <div class="card rounded border p-0 shadow">           
 
-                <!-- Create the List of File Names -->
-                @if (Model != null && Model.Any())
-                {
-                    <ul class="list-group list-group-flush"> <!-- flush blends the list bg with card bg -->
-                        @foreach (var file in Model)
-                        {
-                            <li class="list-group-item bg-transparent" style="cursor: pointer;">
-                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="text-decoration-none text-blackish d-block">
-                                    <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-blackish text-center">No files found in this category.</p>
-                }
-            </div>
+            <!-- Create the List of File Names -->
+            @if (Model != null && Model.Any())
+            {
+                <ul class="list-group list-group-flush"> <!-- flush blends the list bg with card bg -->
+                    @foreach (var file in Model)
+                    {
+                        <li class="list-group-item bg-transparent nav-link" style="cursor: pointer; border: none;">
+                            <a href="/identity/ViewPdf?fileName=@file.FileName" class="nav-link d-block">
+                                <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-black text-center">No files found in this category.</p>
+            }
+
         </div>
+
     </div>
 </div>
 
@@ -69,10 +69,10 @@
 
             /* Add CSS to control the link color on hover/focus */
             /* Target the link directly within the list item on hover/focus */
-            .card-body .list-group-item:hover a.text-blackish,
-            .card-body .list-group-item:focus a.text-blackish,
-            .card-body .list-group-item a.text-blackish:hover,
-            .card-body .list-group-item a.text-blackish:focus {
+            .card-body .list-group-item:hover a.text-black,
+            .card-body .list-group-item:focus a.text-black,
+            .card-body .list-group-item a.text-black:hover,
+            .card-body .list-group-item a.text-black:focus {
                 color: #4E3802 !important; /* Use !important to ensure it overrides Bootstrap/defaults */
             }
 

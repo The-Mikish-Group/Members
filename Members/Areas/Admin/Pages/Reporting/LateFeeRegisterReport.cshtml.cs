@@ -11,37 +11,31 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions; // For parsing description
+using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class LateFeeRegisterReportModel : PageModel
+    public partial class LateFeeRegisterReportModel(ApplicationDbContext context,
+                                      UserManager<IdentityUser> userManager,
+                                      ILogger<LateFeeRegisterReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<LateFeeRegisterReportModel> _logger;
-
-        public LateFeeRegisterReportModel(ApplicationDbContext context,
-                                          UserManager<IdentityUser> userManager,
-                                          ILogger<LateFeeRegisterReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<LateFeeRegisterReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        public IList<LateFeeRegisterItemViewModel> ReportData { get; set; } = new List<LateFeeRegisterItemViewModel>();
+        public IList<LateFeeRegisterItemViewModel> ReportData { get; set; } = [];
         public LateFeeRegisterSummaryViewModel Totals { get; set; } = new LateFeeRegisterSummaryViewModel();
 
 
@@ -67,7 +61,7 @@ namespace Members.Areas.Admin.Pages.Reporting
 
         private async Task GenerateReportDataAsync()
         {
-            ReportData = new List<LateFeeRegisterItemViewModel>();
+            ReportData = [];
             Totals = new LateFeeRegisterSummaryViewModel();
 
             DateTime effectiveStartDate = StartDate.Date;
@@ -171,6 +165,8 @@ namespace Members.Areas.Admin.Pages.Reporting
             public decimal TotalLateFeesInvoiced { get; set; }
             public decimal TotalLateFeesPaid { get; set; }
             public decimal TotalLateFeesOutstanding { get; set; }
-        }
+        }  
+        
     }
 }
+

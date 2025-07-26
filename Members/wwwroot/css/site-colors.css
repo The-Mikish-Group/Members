@@ -1,0 +1,258 @@
+/* #region Guideline Colors */
+/* #region Black and White */
+.text-black {
+    color: #424143 !important;
+}
+
+.bg-black {
+    background-color: #424143 !important;
+}
+
+.text-white {
+    color: #FFFFFF !important;
+}
+
+.bg-white {
+    background-color: #FFFFFF !important;
+}
+/* #endregion */
+
+/* #region NavBar Colors */
+.text-navbar-lighter {
+    color: #fffbe8 !important;
+}
+
+.bg-navbar-lighter {
+    background-color: #fffbe8 !important;
+}
+
+.text-navbar-light {
+    color: #fdf5cc !important;
+}
+
+.bg-navbar-light {
+    background-color: #fdf5cc !important;
+}
+
+.text-navbar {
+    color: #fbeb97 !important;
+}
+
+.bg-navbar-dark {
+    background-color: #cec9ad !important;
+}
+
+.text-navbar-dark {
+    color: #cec9ad !important;
+}
+
+.bg-navbar {
+    background-color: #fbeb97 !important;
+}
+/* #endregion */
+
+/* #region Card Colors */
+/* bg-card-light */
+.bg-card-light {
+    background-color: #fdf5cc;
+}
+
+.card {
+    background-color: #fffbe8 !important;
+    color: black !important;
+}
+
+.card-header {
+    background-color: #fdf5cc !important;
+    color: black !important;
+}
+
+.card-body {
+    background-color: #f5f5f5 !important;
+    color: black !important;
+}
+
+.card-footer {
+    background-color: #fdf5cc !important;
+    color: black;
+}
+
+/* #endregion Card Colors */
+
+/* #region Pagination Styles */
+.pagination .page-link {
+    background-color: white !important;
+    border-color: darkgray !important;
+    color: #424143 !important; /* */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: darkgray !important; /* text-gold (active bg) */
+    border-color: darkgray !important;
+    color: #fff !important; /* white text for active */
+}
+
+.pagination .page-link:hover {
+    background-color: lightgray !important; /* text-gold-lighter (hover bg) */
+    color: #424143 !important; /* almost black */
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa !important;
+    border-color: darkgray !important;
+    color: #6c757d !important;
+}
+/* #endregion Pagination Styles */
+
+/* #region Dropdowns*/
+a#welcomeDropdown[aria-expanded="true"],
+a#accountsReceivableDropdown[aria-expanded="true"],
+a#invoiceDraftBatchesDropdown[aria-expanded="true"],
+a#reportingDropdown[aria-expanded="true"],
+a#managementDropdown[aria-expanded="true"],
+a#membersDropdown[aria-expanded="true"],
+a#membersPdfDocumentsDisplayDropdown[aris="true"],
+a#ManagementDropdown[aria-expanded="true"],
+a#manageMembersDropdown[aria-expanded="true"],
+a#managePdfDocumentsDropdown[aria-expanded="true"],
+a#membersPdfDocumentsDropdown[aria-expanded="true"],
+a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
+a#pdfDocumentsFooterDropdown[aria-expanded="true"],
+a#membersfooterDropdown[aria-expanded="true"]
+a {
+    color: black !important;
+}
+
+li.show > a#welcomeDropdown,
+li.show > a#accountsReceivableDropdown,
+li.show > a#invoiceDraftBatchesDropdown,
+li.show > a#reportingDropdown,
+li.show > a#managementDropdown,
+li.show > a#membersDropdown,
+li.show > a#membersPdfDocumentsDisplayDropdown,
+li.show > a#ManagementDropdown,
+li.show > a#manageMembersDropdown,
+li.show > a#managePdfDocumentsDropdown,
+li.show > a#membersPdfDocumentsDropdown,
+li.show > a#confidentialPdfDocumentsDropdown,
+li.show > a#pdfDocumentsFooterDropdown,
+li.show > a#membersFooterDropdown {
+    color: black !important;
+}
+
+li .dropdown-menu .nav-link i {
+    color: var(--text-black) !important;
+}
+/* #endregion Dropdowns */
+
+/* #region Tables */
+
+/* Table Header colors */
+thead th {
+    background-color: #4d4b3b;
+    color: white;
+}
+
+/* Table Striping */
+.table-striped > tbody > tr:nth-of-type(odd) > td,
+.row-even {
+    background-color: #fdf5cc !important; /* Your desired color for odd rows */
+}
+
+.table-striped > tbody > tr:nth-of-type(even) > td,
+.row-odd {
+    background-color: #ffffff !important; /* Your desired color for even rows */
+}
+
+.row-even > td, .row-odd > td {
+    background-color: inherit !important;
+}
+
+/* Table settings */
+table th, table td {
+    vertical-align: middle;
+    padding: 0.5rem 0.5rem;
+}
+
+thead th {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.table th a .bi { /* For sort indicators */
+    font-size: 0.9em;
+    margin-left: 0.25rem;
+}
+/*  #endregion Tables */
+
+/* #region Resposive color changes */
+
+/* Default <a> link */
+a {
+    color: #ffffff
+}
+
+    a:hover,
+    a:focus {
+        color: #DEDFE0;
+    }
+
+/* link */
+.link {
+    color: #424143 !important; /* almost black */
+}
+
+    .link:hover,
+    .link:active,
+    .link:focus {
+        color: darkgray; 
+    }
+
+/* nav-link */
+.nav-link {
+    color: #424143 !important; /* almost black */
+}
+
+    .nav-link:active,
+    .nav-link:hover,
+    .nav-link:focus {
+        font-weight: 500;
+        color: black !important;
+    }
+
+/* my nav-link */
+.my-nav-link {
+    color: #424143 !important; /* almost black */
+}
+
+    .my-nav-link:active,
+    .my-nav-link:hover,
+    .my-nav-link:focus {
+        color: darkgray !important;
+    }
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: #28a745; /* Green background color */
+    color: white; /* White text color when active */
+}
+
+.nav-pills .nav-link {
+    color: #28a745; /* Green text color */
+}
+
+    .nav-pills .nav-link:hover {
+        color: white;
+        background-color: lightgreen;
+    }
+
+.list-group .even-row {
+    background-color: #f8f9fa; /* Light gray for even rows */
+}
+
+.list-group .odd-row {
+    background-color: #e9ecef; /* Slightly darker gray for odd rows */
+}
+
+/* #endregion */
+

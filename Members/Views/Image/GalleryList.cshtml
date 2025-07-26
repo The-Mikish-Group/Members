@@ -20,28 +20,28 @@
 }
 
 <!-- Title: Image Galleries -->
-<h1 class="text-blackish mb-2 mt-4 text-center"><i class="bi bi-image"></i> Image Galleries</h1>
+<h1 class="text-black mb-2 mt-4 text-center"><i class="bi bi-image"></i> Image Galleries</h1>
 
 <!-- Row and Column setup for Card -->
 <div class="row justify-content-center container mx-auto p-1">
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Shadowed Card -->
-        <div class="card bg-card-light rounded border shadow">
+        <div class="card rounded border shadow">
             <div class="card-body p-0">
                 
                 <!-- Check to see if there are any Galleries -->
                 @if (Model != null && Model.Any())
                 {
                     <!-- List of Galleries -->
-                    <ul class="list-group list-group-flush">
+                    <ul class="card list-group list-group-flush">
 
                         <!-- Loop through each gallery and create a list item for it -->                        
                         @foreach (var gallery in Model)
                         {
                             <!-- List item with link to the gallery view -->
-                            <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
-                                <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="text-decoration-none text-blackish d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
+                            <li class="list-group-item bg-transparent" style="cursor: pointer;">
+                                <a asp-controller="Image" asp-action="GalleryView" asp-route-galleryName="@gallery.Name" class="nav-link d-block"><i class="bi bi-images"></i> @gallery.Name (Images: @gallery.ImageCount)</a>
                             </li>                         
                         }
                     </ul>  
@@ -49,7 +49,7 @@
                 else
                 {
                     <div class="py-4 text-center">
-                        <p class="text-blackish">No galleries available yet.</p>
+                        <p class="text-black">No galleries available yet.</p>
                     </div>
                 }
 
@@ -82,10 +82,10 @@
 
             /* CSS to control the link color on hover/focus */
             /* Target the link directly within the list item on hover/focus */
-            .list-group-item:hover a.text-blackish,
-            .list-group-item:focus a.text-blackish,
-            .list-group-item a.text-blackish:hover,
-            .list-group-item a.text-blackish:focus {
+            .list-group-item:hover a.text-black,
+            .list-group-item:focus a.text-black,
+            .list-group-item a.text-black:hover,
+            .list-group-item a.text-black:focus {
                 color: #3b3726 !important; 
             }
 

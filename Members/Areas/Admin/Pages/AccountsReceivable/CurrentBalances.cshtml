@@ -11,7 +11,7 @@
 <div class="container my-4">
 
     <!-- Title -->
-    <h2 class="text-blackish mb-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
+    <h2 class="text-black mb-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
 
     @if (TempData["StatusMessage"] != null)
     {
@@ -45,7 +45,7 @@
     }
     else
     {
-        <div class="card m-1 p-1 shadow">
+        <div class="bg-card-light card m-1 p-1 shadow">
 
             <div class="row mb-3">
 
@@ -53,8 +53,8 @@
                 <div class="col-md-3">
                     <form method="get" class="my-2">
                         <div class="form-check">
-                            <input asp-for="ShowOnlyOutstanding" class="text-blackish form-check-input shadow" onchange="this.form.submit()" />
-                            <label asp-for="ShowOnlyOutstanding" class="text-blackish form-check-label">Only Show Members with Balances</label>
+                            <input asp-for="ShowOnlyOutstanding" class="text-black form-check-input shadow" onchange="this.form.submit()" />
+                            <label asp-for="ShowOnlyOutstanding" class="text-black form-check-label">Only Show Members with Balances</label>
                         </div>
                         <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
                     </form>
@@ -165,9 +165,9 @@
 
                         @foreach (var member in Model.MemberBalances)
                         {
-                            <tr class="user-row text-blackish @(i % 2 == 0 ? "row-even" : "row-odd")">
-                                <td class="text-blackish text-nowrap py-1 ps-1">@Html.DisplayFor(modelItem => member.FullName)</td>
-                                <td class="text-blackish text-nowrap py-1">@Html.DisplayFor(modelItem => member.Email)</td>
+                            <tr class="user-row @(i % 2 == 0 ? "row-even" : "row-odd")">
+                                <td class="text-black text-nowrap py-1 ps-1">@Html.DisplayFor(modelItem => member.FullName)</td>
+                                <td class="text-black text-nowrap py-1">@Html.DisplayFor(modelItem => member.Email)</td>
                                 <td class="text-nowrap py-1 text-end @(member.CurrentBalance > 0 ? "text-danger fw-bold" : "")">
                                     @member.CurrentBalance.ToString("C")
                                 </td>
@@ -176,7 +176,7 @@
                                 </td>
 
                                 <!-- Apply Late Fee -->
-                                <td class="text-blackish text-nowrap py-1 pe-2 text-center">
+                                <td class="text-black text-nowrap py-1 pe-2 text-center">
                                     @if (member.CurrentBalance > 0 || member.CreditBalance > 0) // Also consider CreditBalance for enabling actions
                                     {
                                         <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
@@ -198,7 +198,7 @@
                                 </td>
 
                                 <!-- Billing History -->
-                                <td class="text-blackish text-nowrap py-1 pe-2 text-center">
+                                <td class="text-black text-nowrap py-1 pe-2 text-center">
                                     @if (!string.IsNullOrEmpty(member.UserId))
                                     {
                                         <a asp-area="Member"
@@ -227,12 +227,12 @@
                             <td colspan="2" class="fw-bold py-1 pe-2 text-end">Totals:</td>
 
                             <!-- Current Balance Total -->
-                            <td class="text-blackish fw-bold text-nowrap py-1 text-end @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
+                            <td class="text-black fw-bold text-nowrap py-1 text-end @(Model.TotalCurrentBalance > 0 ? "text-danger" : "")">
                                 @Model.TotalCurrentBalance.ToString("C")
                             </td>
 
                             <!-- Credit Balance Total -->
-                            <td class="text-blackish fw-bold text-nowrap py-1 text-end @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
+                            <td class="text-black fw-bold text-nowrap py-1 text-end @(Model.TotalCreditBalance > 0 ? "text-success" : "")">
                                 @Model.TotalCreditBalance.ToString("C")
                             </td>
                             <td class="py-1"></td>
@@ -253,7 +253,7 @@
         <div class="modal fade" id="exportCurrentBalancesConfirmModal" tabindex="-1" aria-labelledby="exportCurrentBalancesConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-card-light">
                         <h5 class="modal-title" id="exportCurrentBalancesConfirmModalLabel">Confirm Export</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

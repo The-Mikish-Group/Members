@@ -7,10 +7,10 @@
 }
 
 <!-- View Headings -->
-<div class="text-blackish mb-2 mt-4 text-center">
+<div class="text-black mb-2 mt-4 text-center">
 
     <!-- Category Name -->
-    <h1 class="text-blackish mb-3">
+    <h1 class="text-black mb-3">
         <i class="bi bi-shield-lock-fill me-1"></i> @ViewBag.CategoryName <span class="fs-5 bg-danger rounded p-1 text-white">Confidential</span>
     </h1>
 
@@ -27,30 +27,31 @@
     <div class="col-lg-6 col-md-10 m-1 p-1">
 
         <!-- Card -->
-        <div class="card bg-card-light rounded border shadow">
-            <div class="card-body p-0">
+        <div class="card rounded border p-0 shadow">           
 
-                <!-- Create the List of File Names -->
-                @if (Model != null && Model.Any())
-                {
-                    <ul class="list-group list-group-flush"> 
-                        @foreach (var file in Model) 
-                        {
-                            <li class="list-group-item text-blackish bg-transparent" style="cursor: pointer;">
-                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="text-decoration-none text-blackish d-block">
-                                    <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
-                                    @* <small class="text-muted float-end">Sort: @file.SortOrder</small> *@
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-blackish m-3 text-center">No files found in this confidential category.</p>
-                }
-            </div>
+            <!-- Create the List of File Names -->
+            @if (Model != null && Model.Any())
+            {
+                <ul class="list-group list-group-flush"> 
+                    @foreach (var file in Model) 
+                    {
+                        <li class="list-group-item bg-transparent" style="cursor: pointer; border: none;">
+                            <a href="/identity/ViewPdf?fileName=@file.FileName" class="nav-link d-block">
+                                <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
+                                @* <small class="text-muted float-end">Sort: @file.SortOrder</small> *@
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-black m-3 text-center">No files found in this confidential category.</p>
+            }
+
+
         </div>
+
          <div class="mt-3 text-center">
             <a asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" asp-route-categoryId="@categoryId" class="btn btn-info btn-sm rounded-2 shadow">
                 <i class="bi bi-pencil-fill"></i> Manage Files in This Category
@@ -65,10 +66,10 @@
         .card-body .list-group-item { border-bottom: none !important; }
         .card-body .list-group-item:first-child { border-top: none !important; }
         .card-body .list-group-item:last-child { border-bottom: none !important; }
-        .card-body .list-group-item:hover a.text-blackish,
-        .card-body .list-group-item:focus a.text-blackish,
-        .card-body .list-group-item a.text-blackish:hover,
-        .card-body .list-group-item a.text-blackish:focus { color: #3b3726 !important; }
+        .card-body .list-group-item:hover a.text-black,
+        .card-body .list-group-item:focus a.text-black,
+        .card-body .list-group-item a.text-black:hover,
+        .card-body .list-group-item a.text-black:focus { color: #3b3726 !important; }
         .card-body .list-group-item:hover,
         .card-body .list-group-item:focus { background-color: rgba(0, 0, 0, 0.05) !important; }
         .badge.small { font-size: 0.8em; vertical-align: middle; }

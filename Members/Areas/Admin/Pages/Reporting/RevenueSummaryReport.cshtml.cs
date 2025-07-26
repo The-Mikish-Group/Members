@@ -14,25 +14,19 @@ using Microsoft.Extensions.Logging;
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class RevenueSummaryReportModel : PageModel
+    public class RevenueSummaryReportModel(ApplicationDbContext context, ILogger<RevenueSummaryReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<RevenueSummaryReportModel> _logger;
-
-        public RevenueSummaryReportModel(ApplicationDbContext context, ILogger<RevenueSummaryReportModel> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<RevenueSummaryReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
         public RevenueSummaryViewModel? SummaryData { get; set; }

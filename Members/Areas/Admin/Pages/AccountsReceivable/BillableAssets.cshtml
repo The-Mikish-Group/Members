@@ -5,7 +5,7 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="text-blackish my-4 text-center"><i class="bi bi-house"></i> @ViewData["Title"]</h2>
+<h2 class="text-black my-4 text-center"><i class="bi bi-house"></i> @ViewData["Title"]</h2>
 
 @if (TempData["StatusMessage"] != null)
 {
@@ -29,13 +29,13 @@
 
 <div class="mb-4"> 
     
-    <div class="card bg-card-light m-1 p-2 shadow">
+    <div class="card m-1 p-2 shadow">
 
-        <h5 class="text-blackish my-2 ms-2"><i class="bi bi-filter"></i> Filter Assets</h5>
+        <h5 class="text-black my-2 ms-2"><i class="bi bi-filter"></i> Filter Assets</h5>
 
         <form method="get" id="filterAssetsForm">
             <div class="input-group mb-2">
-                <input type="text" class="form-control text-blackish shadow-sm" placeholder="Search by Plot ID, Description, Contact Name/Email..." asp-for="SearchTerm" id="assetsSearchInput" />
+                <input type="text" class="form-control shadow-sm" placeholder="Search by Plot ID, Description, Contact Name/Email..." asp-for="SearchTerm" id="assetsSearchInput" />
                 <button class="btn btn-sm btn-outline-secondary bg-success-subtle" type="button" id="clearAssetsSearch" style="display: none;">
                     <i class="bi bi-x text-black"></i>
                 </button>
@@ -47,7 +47,7 @@
         </form>
 
         <div class="mt-1 ps-1">
-            <span id="assetCountSpan" class="text-blackish">Total Assets: @Model.TotalAssets</span>
+            <span id="assetCountSpan" class="text-black">Total Assets: @Model.TotalAssets</span>
         </div>
 
     </div>
@@ -56,7 +56,7 @@
 <div class="card mx-1 mb-4 mt-1 p-1 shadow">
 
     <div class="d-flex justify-content-between align-items-center mb-0 ms-2">
-        <h5 class="text-blackish my-2"><i class="bi bi-list"></i> Existing Assets</h5>
+        <h5 class="text-black my-2"><i class="bi bi-list"></i> Existing Assets</h5>
         <button type="button" class="btn btn-sm btn-success rounded-2 my-2 me-2 shadow" id="exportBillableAssetsTriggerButton"
                 data-bs-toggle="modal" data-bs-target="#exportBillableAssetsConfirmModal">
             <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
@@ -259,35 +259,35 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="post" asp-page-handler="AddAsset">
-                <div class="modal-header">
-                    <h5 class="modal-title text-blackish" id="addAssetModalLabel"><i class="bi bi-plus-square"></i> Add A New Billable Asset</h5>
+                <div class="modal-header bg-card-light">
+                    <h5 class="modal-title" id="addAssetModalLabel"><i class="bi bi-plus-square"></i> Add A New Billable Asset</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="NewAssetInput.PlotID" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="NewAssetInput.PlotID" class="form-control text-blackish shadow" />
+                            <label asp-for="NewAssetInput.PlotID" class="fw-bold ms-2"></label>
+                            <input asp-for="NewAssetInput.PlotID" class="form-control shadow" />
                             <span asp-validation-for="NewAssetInput.PlotID" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="NewAssetInput.AssessmentFee" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="NewAssetInput.AssessmentFee" type="number" step="0.01" class="form-control text-blackish shadow" placeholder="0.00" />
+                            <label asp-for="NewAssetInput.AssessmentFee" class="fw-bold ms-2"></label>
+                            <input asp-for="NewAssetInput.AssessmentFee" type="number" step="0.01" class="form-control shadow" placeholder="0.00" />
                             <span asp-validation-for="NewAssetInput.AssessmentFee" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label asp-for="NewAssetInput.SelectedUserID" class="form-label text-blackish ms-2"></label>
-                            <select asp-for="NewAssetInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select text-blackish shadow">
+                            <label asp-for="NewAssetInput.SelectedUserID" class="fw-bold ms-2"></label>
+                            <select asp-for="NewAssetInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow">
                                 <option value="">-- Select Billing Contact --</option>
                             </select>
                             <span asp-validation-for="NewAssetInput.SelectedUserID" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="NewAssetInput.Description" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="NewAssetInput.Description" class="form-control text-blackish shadow" />
+                            <label asp-for="NewAssetInput.Description" class="fw-bold ms-2"></label>
+                            <input asp-for="NewAssetInput.Description" class="form-control shadow" />
                             <span asp-validation-for="NewAssetInput.Description" class="text-danger"></span>
                         </div>
                     </div>
@@ -305,8 +305,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="post" asp-page-handler="UpdateAsset">
-                <div class="modal-header">
-                    <h5 class="modal-title text-blackish" id="editAssetModalLabel"><i class="bi bi-box-pencil"></i> Edit Billable Asset</h5>
+                <div class="modal-header bg-card-light">
+                    <h5 class="modal-title" id="editAssetModalLabel"><i class="bi bi-box-pencil"></i> Edit Billable Asset</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -315,27 +315,27 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="EditInput.PlotID" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="EditInput.PlotID" class="form-control text-blackish shadow" />
+                            <label asp-for="EditInput.PlotID" class="fw-bold ms-2"></label>
+                            <input asp-for="EditInput.PlotID" class="form-control shadow" />
                             <span asp-validation-for="EditInput.PlotID" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="EditInput.AssessmentFee" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="EditInput.AssessmentFee" type="number" step="0.01" class="form-control text-blackish shadow" placeholder="0.00" />
+                            <label asp-for="EditInput.AssessmentFee" class="fw-bold ms-2"></label>
+                            <input asp-for="EditInput.AssessmentFee" type="number" step="0.01" class="form-control shadow" placeholder="0.00" />
                             <span asp-validation-for="EditInput.AssessmentFee" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label asp-for="EditInput.SelectedUserID" class="form-label text-blackish ms-2"></label>
-                            <select asp-for="EditInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select text-blackish shadow">
+                            <label asp-for="EditInput.SelectedUserID" class="fw-bold ms-2"></label>
+                            <select asp-for="EditInput.SelectedUserID" asp-items="Model.BillingContactUsersSL" class="form-select shadow">
                                 <option value="">-- Unassign / Select Contact --</option>
                             </select>
                             <span asp-validation-for="EditInput.SelectedUserID" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="EditInput.Description" class="form-label text-blackish ms-2"></label>
-                            <input asp-for="EditInput.Description" class="form-control text-blackish shadow" />
+                            <label asp-for="EditInput.Description" class="fw-bold ms-2"></label>
+                            <input asp-for="EditInput.Description" class="form-control shadow" />
                             <span asp-validation-for="EditInput.Description" class="text-danger"></span>
                         </div>
                     </div>
@@ -353,7 +353,7 @@
 <div class="modal fade" id="exportBillableAssetsConfirmModal" tabindex="-1" aria-labelledby="exportBillableAssetsConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+           <div class="modal-header bg-card-light">
                 <h5 class="modal-title" id="exportBillableAssetsConfirmModalLabel">Confirm Export</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -367,7 +367,6 @@
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     <script>

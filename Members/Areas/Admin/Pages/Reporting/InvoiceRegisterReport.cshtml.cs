@@ -15,32 +15,25 @@ using Microsoft.Extensions.Logging; // Corrected placement
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class InvoiceRegisterReportModel : PageModel
+    public class InvoiceRegisterReportModel(ApplicationDbContext context,
+                                      UserManager<IdentityUser> userManager,
+                                      ILogger<InvoiceRegisterReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<InvoiceRegisterReportModel> _logger;
-
-        public InvoiceRegisterReportModel(ApplicationDbContext context,
-                                          UserManager<IdentityUser> userManager,
-                                          ILogger<InvoiceRegisterReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<InvoiceRegisterReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "Start Date")]
+        [Display(Name = "Start Date:")]
         public DateTime StartDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
-        [Display(Name = "End Date")]
+        [Display(Name = "End Date:")]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        public IList<InvoiceRegisterItem> ReportData { get; set; } = new List<InvoiceRegisterItem>();
+        public IList<InvoiceRegisterItem> ReportData { get; set; } = [];
         public InvoiceRegisterSummary Totals { get; set; } = new InvoiceRegisterSummary();
 
         // Data fetching and CSV export logic will be added in later steps.
@@ -50,7 +43,7 @@ namespace Members.Areas.Admin.Pages.Reporting
         // For now, OnGetAsync can be minimal or call a placeholder for data generation.
         private async Task GenerateReportDataAsync()
         {
-            ReportData = new List<InvoiceRegisterItem>();
+            ReportData = [];
             Totals = new InvoiceRegisterSummary(); // Reset totals
 
             DateTime effectiveStartDate = StartDate.Date;

@@ -13,7 +13,7 @@
     <!-- Title -->
     <div class="row">
         <div class="col">
-            <h2 class="text-blackish">@ViewData["Title"]</h2>
+            <h2 class="text-black">@ViewData["Title"]</h2>
             <hr />
         </div>
     </div>
@@ -23,13 +23,13 @@
 
             <!-- Start Date -->
             <div class="col-md-3">
-                <label for="StartDate" class="ms-2 mb-0 form-label text-blackish">Start Date</label>
+                <label for="StartDate" class="ms-2 mb-0 fw-bold">Start Date:</label>
                 <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
             </div>
 
             <!-- End Date -->
             <div class="col-md-3">
-                <label for="EndDate" class="ms-2 mb-0 form-label text-blackish">End Date</label>
+                <label for="EndDate" class="ms-2 mb-0 fw-bold">End Date:</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
 
@@ -64,11 +64,11 @@
     <div class="modal fade" id="exportRevenueSummaryConfirmModal" tabindex="-1" aria-labelledby="exportRevenueSummaryConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content bg-Card-Modal">
-                <div class="modal-header">
-                    <h5 class="modal-title text-blackish" id="exportRevenueSummaryConfirmModalLabel">Confirm Export</h5>
+                <div class="modal-header bg-card-light">
+                    <h5 class="modal-title" id="exportRevenueSummaryConfirmModalLabel">Confirm Export</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-blackish">
+                <div class="modal-body">
                     Are you sure you want to export the Revenue Summary to CSV?
                     The report will be generated for the period:
                     <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> to <strong>@Model.EndDate.ToString("yyyy-MM-dd")</strong>.
@@ -85,13 +85,13 @@
     {
         var summary = Model.SummaryData!; // Introduce non-nullable local variable
 
-        <div class="card bg-card-light mb-4 shadow">
+        <div class="card mb-4 shadow">
             <div class="card-header bg-white text-black">
                 Summary for period: @summary.ReportStartDate.ToString("yyyy-MM-dd") to @summary.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
             <div class="card-body">
                 <dl class="row gx-0 gy-0">
-                    <dt class="col-4 text-nowrap text-blackish border-bottom pb-2">Invoiced Amounts</dt>
+                    <dt class="col-4 text-nowrap border-bottom pb-2">Invoiced Amounts</dt>
                     <dd class="col-8 text-end border-bottom pb-2">&nbsp;</dd>
 
                     <dt class="col-4 ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_Dues)</dt>
@@ -109,7 +109,7 @@
                     <dt class="col-4 fw-bold ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.GrandTotalAmountInvoiced)</dt>
                     <dd class="col-8 fw-bold text-end">@summary.GrandTotalAmountInvoiced.ToString("C")</dd>
 
-                    <dt class="col-4 text-blackish border-bottom py-2 text-nowrap">Payments & Credits</dt>
+                    <dt class="col-4 border-bottom py-2 text-nowrap">Payments & Credits</dt>
                     <dd class="col-8 border-bottom py-2 text-end">&nbsp;</dd>
 
                     <dt class="col-4 ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.TotalPaymentsReceived)</dt>
@@ -121,7 +121,7 @@
                     <dt class="col-4 ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.TotalCreditsApplied)</dt>
                     <dd class="col-8 text-end">@summary.TotalCreditsApplied.ToString("C")</dd>
 
-                    <dt class="col-4 text-blackish border-bottom py-2 text-nowrap">Net Change</dt>
+                    <dt class="col-4 border-bottom py-2 text-nowrap">Net Change</dt>
                     <dd class="col-8 border-bottom py-2 text-end">&nbsp;</dd>
 
                     <dt class="col-4 fw-bold ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.NetChange)</dt>

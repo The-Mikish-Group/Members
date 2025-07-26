@@ -14,7 +14,7 @@
     <!-- Title -->
     <div class="row">
         <div class="col">
-            <h2 class="text-blackish">@ViewData["Title"]</h2>
+            <h2 class="text-black">@ViewData["Title"]</h2>
             <hr />
         </div>
     </div>
@@ -25,13 +25,13 @@
 
             <!-- Start Date -->
             <div class="col-md-3">
-                <label for="StartDate" class="ms-2 mb-0 form-label text-blackish">Start Date:</label>
+                <label for="StartDate" class="ms-2 mb-0 form-label">Start Date:</label>
                 <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
             </div>
 
             <!-- End Date -->
             <div class="col-md-3">
-                <label for="EndDate" class="ms-2 mb-0 form-label text-blackish">End Date:</label>
+                <label for="EndDate" class="ms-2 mb-0 form-label">End Date:</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
 
@@ -68,13 +68,13 @@
             <div class="modal-content bg-Card-Modal">
 
                 <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title text-blackish" id="exportCreditRegisterConfirmModalLabel">Confirm Export</h5>
+                <div class="modal-header bg-card-light">
+                    <h5 class="modal-title" id="exportCreditRegisterConfirmModalLabel">Confirm Export</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <!-- Modal Body -->
-                <div class="modal-body text-blackish">
+                <div class="modal-body">
                     Are you sure you want to export the Credit Register to CSV?
                     The report will be generated for credits created in the period:
                     <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> to <strong>@Model.EndDate.ToString("yyyy-MM-dd")</strong>.
@@ -94,7 +94,7 @@
     {
         <div class="table-responsive rounded shadow">
             <table class="table-striped table-hover table-bordered bg-Card-Stripe mb-0 table">
-                <thead class="bg-gray-light text-blackish">
+                <thead class="bg-gray-light">
                     <tr>
                         <th>Credit ID</th>
                         <th>Customer</th>
@@ -155,7 +155,7 @@
                         }
                     }
                 </tbody>
-                <tfoot class="bg-gray-light text-blackish fw-bold">
+                <tfoot class="bg-gray-light fw-bold">
                     <tr>
                         <td colspan="5" class="text-end">Totals:</td>
                         <td class="text-end">@Model.Totals.TotalOriginalCreditAmount.ToString("C")</td>

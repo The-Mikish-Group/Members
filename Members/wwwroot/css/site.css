@@ -31,23 +31,9 @@ textarea:focus,
     border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
 }
 
-/* Table settings */
-table th, table td {
-    vertical-align: middle;
-    padding: 0.5rem 0.5rem;
-}
 
-thead th {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-}
 
-.table th a .bi { /* For sort indicators */
-    font-size: 0.9em;
-    margin-left: 0.25rem;
-}
-
-.form-label { /* This was for modal labels, might not be needed if not used elsewhere */
+.fw-bold { /* This was for modal labels, might not be needed if not used elsewhere */
     font-weight: 500;
 }
 /* This rule for sort indicators in table headers is good to keep */
@@ -154,53 +140,7 @@ html > body header {
         /* Check horizontal padding too if needed */
     }
 
-.dropdown-menu {
-    min-width: 210px;
-}
 
-/*Dropdowns*/
-a#welcomeDropdown[aria-expanded="true"],
-a#accountsReceivableDropdown[aria-expanded="true"],
-a#invoiceDraftBatchesDropdown[aria-expanded="true"],
-a#reportingDropdown[aria-expanded="true"],
-a#managementDropdown[aria-expanded="true"],
-a#membersDropdown[aria-expanded="true"],
-a#membersPdfDocumentsDisplayDropdown[aris="true"],
-a#ManagementDropdown[aria-expanded="true"],
-a#manageMembersDropdown[aria-expanded="true"],
-a#managePdfDocumentsDropdown[aria-expanded="true"],
-a#membersPdfDocumentsDropdown[aria-expanded="true"],
-a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
-a#pdfDocumentsFooterDropdown[aria-expanded="true"],
-a#membersfooterDropdown[aria-expanded="true"]
-a {
-    /*text-shadow: .5px .5px .5px #000000;*/
-    color: darkgray !important;
-    /*background-color: rgba(0, 0, 0, 0.3) !important;*/
-}
-
-li.show > a#welcomeDropdown,
-li.show > a#accountsReceivableDropdown,
-li.show > a#invoiceDraftBatchesDropdown,
-li.show > a#reportingDropdown,
-li.show > a#managementDropdown,
-li.show > a#membersDropdown,
-li.show > a#membersPdfDocumentsDisplayDropdown,
-li.show > a#ManagementDropdown,
-li.show > a#manageMembersDropdown,
-li.show > a#managePdfDocumentsDropdown,
-li.show > a#membersPdfDocumentsDropdown,
-li.show > a#confidentialPdfDocumentsDropdown,
-li.show > a#pdfDocumentsFooterDropdown,
-li.show > a#membersFooterDropdown {
-    /*text-shadow: .5px .5px .5px #000000;*/
-    color: darkgray !important;
-    /*background-color: rgba(0, 0, 0, 0.3) !important;*/
-}
-
-li .dropdown-menu .nav-link i {
-    color: var(--text-blackish) !important;
-}
 
 .footer-spacing {
     margin-bottom: 50px;

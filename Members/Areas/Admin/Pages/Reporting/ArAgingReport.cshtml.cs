@@ -15,32 +15,25 @@ using Microsoft.Extensions.Logging; // Corrected placement
 namespace Members.Areas.Admin.Pages.Reporting
 {
     [Authorize(Roles = "Admin,Manager")]
-    public class ArAgingReportModel : PageModel
+    public class ArAgingReportModel(ApplicationDbContext context,
+                              UserManager<IdentityUser> userManager,
+                              ILogger<ArAgingReportModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ILogger<ArAgingReportModel> _logger;
-
-        public ArAgingReportModel(ApplicationDbContext context,
-                                  UserManager<IdentityUser> userManager,
-                                  ILogger<ArAgingReportModel> logger)
-        {
-            _context = context;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<ArAgingReportModel> _logger = logger;
 
         [BindProperty(SupportsGet = true)]
         [DataType(DataType.Date)]
         [Display(Name = "As of Date")]
         public DateTime AsOfDate { get; set; } = DateTime.Today;
 
-        public IList<AgingReportItem> ReportData { get; set; } = new List<AgingReportItem>();
+        public IList<AgingReportItem> ReportData { get; set; } = [];
         public AgingReportSummary Totals { get; set; } = new AgingReportSummary();
 
         private async Task GenerateReportDataAsync()
         {
-            ReportData = new List<AgingReportItem>();
+            ReportData = [];
             Totals = new AgingReportSummary(); // Reset totals
 
             // Ensure AsOfDate has the Date part only for consistent comparisons
@@ -66,10 +59,13 @@ namespace Members.Areas.Admin.Pages.Reporting
                     InvoiceDate = invoice.InvoiceDate,
                     DueDate = invoice.DueDate,
                     TotalAmountDue = invoice.AmountDue,
-                    AmountRemaining = amountRemaining
+                    AmountRemaining = amountRemaining,
+                    Current = 0,
+                    Overdue1_30 = 0,
+                    Overdue31_60 = 0,
+                    Overdue61_90 = 0,
+                    Overdue90Plus = 0
                 };
-
-                reportItem.Current = 0; reportItem.Overdue1_30 = 0; reportItem.Overdue31_60 = 0; reportItem.Overdue61_90 = 0; reportItem.Overdue90Plus = 0;
 
                 if (invoice.DueDate.Date >= effectiveAsOfDate) { // Due on or after AsOfDate
                     reportItem.Current = amountRemaining;
