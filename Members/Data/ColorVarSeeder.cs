@@ -18,7 +18,7 @@ namespace Members.Data
             }
 
             var cssContent = await System.IO.File.ReadAllTextAsync(cssFilePath);
-            var regex = new Regex(@"--(?<name>[\w-]+):\s*(?<value>#[\da-fA-F]{3,6});");
+            var regex = new Regex(@"--(?<name>[\w-]+)\s*:\s*(?<value>[^;)]+)(?=[;\)])");
             var matches = regex.Matches(cssContent);
 
             foreach (Match match in matches)
