@@ -26,7 +26,10 @@ namespace Members.Data
                 var name = match.Groups["name"].Value;
                 var value = match.Groups["value"].Value;
 
-                context.ColorVars.Add(new ColorVar { Name = name, Value = value });
+                if (!context.ColorVars.Any(c => c.Name == name))
+                {
+                    context.ColorVars.Add(new ColorVar { Name = name, Value = value });
+                }
             }
 
             await context.SaveChangesAsync();
