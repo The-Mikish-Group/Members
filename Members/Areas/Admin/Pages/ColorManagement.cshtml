@@ -1,0 +1,29 @@
+@page
+@model Members.Areas.Admin.Pages.ColorManagementModel
+@{
+    ViewData["Title"] = "Color Management";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-black my-4 text-center"><i class="bi bi-palette-fill"></i> @ViewData["Title"]</h2>
+
+<div class="card m-1 p-2 shadow">
+    <form method="post">
+        <div class="row">
+            @if (Model.ColorVars != null)
+            {
+                @foreach (var color in Model.ColorVars)
+                {
+                    <div class="col-md-4">
+                        <div class="form-group">
+                        <label>@color.Name</label>
+                        <input type="color" name="colors[@color.Name]" value="@color.Value" class="form-control" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-save"></i> Save Colors</button>
+        </div>
+    </form>
+</div>

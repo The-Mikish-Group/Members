@@ -1,32 +1,32 @@
 /* #region Guideline Colors */
 
 .bg-copyright {
-    background-color: #7D7E81 !important;
+    background-color: var(--bg-copyright, #7D7E81) !important;
 }
 .text-black {
-    color: #424143 !important;
+    color: var(--text-black, #424143) !important;
 }
 
 .text-white {
-    color: #FFFFFF !important;
+    color: var(--text-white, #FFFFFF) !important;
 }
 
 .text-eye-view {
-    color: #50B8D4;
+    color: var(--text-eye-view, #50B8D4);
 }
 /* #endregion Guideline Colors */
 
 /* #region Navbar */
 .bg-navbar-header {
-    background-color: #BC9133 /*#f2e8b4*/ !important;
+    background-color: var(--bg-navbar-header, #BC9133) /*#f2e8b4*/ !important;
 }
 
 .bg-navbar-header-dropdown {
-    background-color: #dacfbe !important;
+    background-color: var(--bg-navbar-header-dropdown, #dacfbe) !important;
 }
 
 .bg-navbar-footer {
-    background-color: #dacfbe /*#cec9ad*/ !important;
+    background-color: var(--bg-navbar-footer, #dacfbe) /*#cec9ad*/ !important;
 }
 /* #endregion Navbar */
 
@@ -46,7 +46,7 @@ a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
 a#pdfDocumentsFooterDropdown[aria-expanded="true"],
 a#membersfooterDropdown[aria-expanded="true"]
 a {
-    color: #424143 !important;
+    color: var(--text-black, #424143) !important;
 }
 
 li.show > a#welcomeDropdown,
@@ -63,7 +63,7 @@ li.show > a#membersPdfDocumentsDropdown,
 li.show > a#confidentialPdfDocumentsDropdown,
 li.show > a#pdfDocumentsFooterDropdown,
 li.show > a#membersFooterDropdown {
-    color: #424143 !important;
+    color: var(--text-black, #424143) !important;
 }
 
 li .dropdown-menu .nav-link i {
@@ -74,26 +74,26 @@ li .dropdown-menu .nav-link i {
 /* #region Card Colors */
 
 .card {
-    background-color: #f1e8d5 !important;
-    color: #424143 !important;
+    background-color: var(--card-bg, #f1e8d5) !important;
+    color: var(--card-text, #424143) !important;
 }
 
 .modal-header,
 .card-header {
-    background-color: #ecd9b5 !important;
-    color: #424143 !important;
+    background-color: var(--card-header-bg, #ecd9b5) !important;
+    color: var(--card-header-text, #424143) !important;
 }
 
 .modal-body,
 .card-body {
-    background-color: #f7f4e2 !important;
-    color: #424143 !important;
+    background-color: var(--card-body-bg, #f7f4e2) !important;
+    color: var(--card-body-text, #424143) !important;
 }
 
 .modal-footer,
 .card-footer {
-    background-color: #BC9133 !important;
-    color: #424143;
+    background-color: var(--card-footer-bg, #BC9133) !important;
+    color: var(--card-footer-text, #424143);
 }
 
 /* #endregion Card Colors */
@@ -102,19 +102,19 @@ li .dropdown-menu .nav-link i {
 
 /* Table Header colors */
 thead th {
-    background-color: #4d4b3b;
-    color: white;
+    background-color: var(--table-header-bg, #4d4b3b);
+    color: var(--table-header-text, white);
 }
 
 /* Table Striping */
 .table-striped > tbody > tr:nth-of-type(odd) > td,
 .row-even {
-    background-color: #f1e8d5 !important; /* Your desired color for odd rows */
+    background-color: var(--table-striped-odd, #f1e8d5) !important; /* Your desired color for odd rows */
 }
 
 .table-striped > tbody > tr:nth-of-type(even) > td,
 .row-odd {
-    background-color: white !important; /* Your desired color for even rows */
+    background-color: var(--table-striped-even, white) !important; /* Your desired color for even rows */
 }
 
 .row-even > td,
@@ -141,26 +141,26 @@ thead th {
 
 /* #region Pagination Colors */
 .pagination .page-link {
-    background-color: white !important;
-    border-color: darkgray !important;
-    color: #424143 !important; /* */
+    background-color: var(--pagination-bg, white) !important;
+    border-color: var(--pagination-border, darkgray) !important;
+    color: var(--pagination-text, #424143) !important; /* */
 }
 
 .pagination .page-item.active .page-link {
-    background-color: darkgray !important; /* text-gold (active bg) */
-    border-color: darkgray !important;
-    color: #fff !important; /* white text for active */
+    background-color: var(--pagination-active-bg, darkgray) !important; /* text-gold (active bg) */
+    border-color: var(--pagination-active-border, darkgray) !important;
+    color: var(--pagination-active-text, #fff) !important; /* white text for active */
 }
 
 .pagination .page-link:hover {
-    background-color: lightgray !important; /* text-gold-lighter (hover bg) */
-    color: #424143 !important; /* almost black */
+    background-color: var(--pagination-hover-bg, lightgray) !important; /* text-gold-lighter (hover bg) */
+    color: var(--pagination-hover-text, #424143) !important; /* almost black */
 }
 
 .pagination .page-item.disabled .page-link {
-    background-color: #f8f9fa !important;
-    border-color: darkgray !important;
-    color: #6c757d !important;
+    background-color: var(--pagination-disabled-bg, #f8f9fa) !important;
+    border-color: var(--pagination-disabled-border, darkgray) !important;
+    color: var(--pagination-disabled-text, #6c757d) !important;
 }
 
 /* #endregion Pagination Colors */
@@ -170,7 +170,7 @@ thead th {
 /* nav-link */
 .my-nav-link,
 .nav-link {
-    color: #424143 !important; /* almost black */
+    color: var(--nav-link-text, #424143) !important; /* almost black */
 }
     .my-nav-link:active,
     .my-nav-link:hover,
@@ -179,23 +179,23 @@ thead th {
     .nav-link:hover,
     .nav-link:focus {
         font-weight: 500;
-        color: #424143 !important;
+        color: var(--nav-link-hover-text, #424143) !important;
     }
 
 /* Nav Pills */
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
-    background-color: #28a745;
-    color: white;
+    background-color: var(--nav-pills-active-bg, #28a745);
+    color: var(--nav-pills-active-text, white);
 }
 
 .nav-pills .nav-link {
-    color: #28a745;
+    color: var(--nav-pills-text, #28a745);
 }
 
     .nav-pills .nav-link:hover {
-        background-color: lightgreen;
-        color: white;       
+        background-color: var(--nav-pills-hover-bg, lightgreen);
+        color: var(--nav-pills-hover-text, white);
     }
 
 
