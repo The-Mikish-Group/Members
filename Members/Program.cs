@@ -170,15 +170,17 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
+        logger.LogInformation("Seeding database...");
         var context = services.GetRequiredService<Members.Data.ApplicationDbContext>();
         var cssPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "css", "site-colors.css");
         Members.Data.ColorVarSeeder.SeedAsync(context, cssPath).Wait();
+        logger.LogInformation("Database seeding complete.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while seeding the database.");
     }
 }
