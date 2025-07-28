@@ -18,15 +18,15 @@
 
 /* #region Navbar */
 .bg-navbar-header {
-    background-color: #f2e8b4 !important;
+    background-color: #BC9133 /*#f2e8b4*/ !important;
 }
 
 .bg-navbar-header-dropdown {
-    background-color: #f2e8b4 !important;
+    background-color: #dacfbe !important;
 }
 
 .bg-navbar-footer {
-    background-color: #cec9ad !important;
+    background-color: #dacfbe /*#cec9ad*/ !important;
 }
 /* #endregion Navbar */
 
@@ -74,13 +74,13 @@ li .dropdown-menu .nav-link i {
 /* #region Card Colors */
 
 .card {
-    background-color: #fffbe8 !important;
+    background-color: #f1e8d5 !important;
     color: #424143 !important;
 }
 
 .modal-header,
 .card-header {
-    background-color: #fdf5cc !important;
+    background-color: #ecd9b5 !important;
     color: #424143 !important;
 }
 
@@ -92,7 +92,7 @@ li .dropdown-menu .nav-link i {
 
 .modal-footer,
 .card-footer {
-    background-color: #f1ebcc !important;
+    background-color: #BC9133 !important;
     color: #424143;
 }
 
@@ -109,7 +109,7 @@ thead th {
 /* Table Striping */
 .table-striped > tbody > tr:nth-of-type(odd) > td,
 .row-even {
-    background-color: #fdf5cc !important; /* Your desired color for odd rows */
+    background-color: #f1e8d5 !important; /* Your desired color for odd rows */
 }
 
 .table-striped > tbody > tr:nth-of-type(even) > td,

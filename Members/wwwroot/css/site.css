@@ -12,7 +12,8 @@ body {
     /* font-size: 14px;*/
     font-weight: 400;
     text-rendering: optimizeLegibility;
-    background-color: #fcfcf7; /* #fffae4; */
+    background-color: #f2f2f2; /*#fcfcf7;*/ /* #fffae4; */
+    
     /*background-color: cornsilk;*/
     height: 100%;
     width: 100%;

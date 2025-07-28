@@ -13,7 +13,7 @@
 /* #endregion */
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
-@media (min-width: 575px) and (max-width: 768px) {
+@media (min-width: 575px) {
 
     .about-text-fs {
         font-size: 18px;
@@ -27,7 +27,7 @@
 /* #endregion  */
 
 /* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
-@media (min-width: 768.01px) and (max-width: 991px) {
+@media (min-width: 768.01px) {
 
     .about-text-fs {
         font-size: 20px;
