@@ -113,6 +113,7 @@
     <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/buttons.css" asp-append-version=" true" />
     <link rel="stylesheet" href="~/css/site-colors.css" asp-append-version=" true" />
+    <link rel="stylesheet" href="~/css/dynamic-colors.css" asp-append-version="true" />
 
     @RenderSection("Styles", required: false)
 
@@ -172,7 +173,8 @@
     </script>
     
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>    
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>    
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/dynamic-colors.js" asp-append-version="true"></script>
    
     @await RenderSectionAsync("Scripts", required: false)
 

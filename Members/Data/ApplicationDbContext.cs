@@ -14,6 +14,7 @@ namespace Members.Data
         public DbSet<UserCredit> UserCredits { get; set; }
         public DbSet<BillableAsset> BillableAssets { get; set; }
         public DbSet<CreditApplication> CreditApplications { get; set; } // Added DbSet for CreditApplications
+        public DbSet<ColorVar> ColorVars { get; set; }
         // ... other DbSets
         protected override void OnModelCreating(ModelBuilder builder)
         {
