@@ -103,7 +103,7 @@ li .dropdown-menu .nav-link i {
 /* Table Header colors */
 thead th {
     background-color: var(--table-header-bg, #4d4b3b);
-    color: var(--table-header-text, white);
+    color: var(--table-header-text, #FFFFFF);
 }
 
 /* Table Striping */
@@ -114,7 +114,7 @@ thead th {
 
 .table-striped > tbody > tr:nth-of-type(even) > td,
 .row-odd {
-    background-color: var(--table-striped-even, white) !important; /* Your desired color for even rows */
+    background-color: var(--table-striped-even, #FFFFFF) !important; /* Your desired color for even rows */
 }
 
 .row-even > td,
@@ -141,25 +141,25 @@ thead th {
 
 /* #region Pagination Colors */
 .pagination .page-link {
-    background-color: var(--pagination-bg, white) !important;
-    border-color: var(--pagination-border, darkgray) !important;
+    background-color: var(--pagination-bg, #FFFFFF) !important;
+    border-color: var(--pagination-border, #a9a9a9) !important;
     color: var(--pagination-text, #424143) !important; /* */
 }
 
 .pagination .page-item.active .page-link {
-    background-color: var(--pagination-active-bg, darkgray) !important; /* text-gold (active bg) */
-    border-color: var(--pagination-active-border, darkgray) !important;
-    color: var(--pagination-active-text, #fff) !important; /* white text for active */
+    background-color: var(--pagination-active-bg, #a9a9a9) !important; /* text-gold (active bg) */
+    border-color: var(--pagination-active-border, #a9a9a9) !important;
+    color: var(--pagination-active-text, #ffffff) !important; /* white text for active */
 }
 
 .pagination .page-link:hover {
-    background-color: var(--pagination-hover-bg, lightgray) !important; /* text-gold-lighter (hover bg) */
+    background-color: var(--pagination-hover-bg, #D3D3D3) !important; /* text-gold-lighter (hover bg) */
     color: var(--pagination-hover-text, #424143) !important; /* almost black */
 }
 
 .pagination .page-item.disabled .page-link {
     background-color: var(--pagination-disabled-bg, #f8f9fa) !important;
-    border-color: var(--pagination-disabled-border, darkgray) !important;
+    border-color: var(--pagination-disabled-border, #a9a9a9) !important;
     color: var(--pagination-disabled-text, #6c757d) !important;
 }
 
@@ -186,7 +186,7 @@ thead th {
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     background-color: var(--nav-pills-active-bg, #28a745);
-    color: var(--nav-pills-active-text, white);
+    color: var(--nav-pills-active-text, #FFFFFF);
 }
 
 .nav-pills .nav-link {
@@ -194,8 +194,8 @@ thead th {
 }
 
     .nav-pills .nav-link:hover {
-        background-color: var(--nav-pills-hover-bg, lightgreen);
-        color: var(--nav-pills-hover-text, white);
+        background-color: var(--nav-pills-hover-bg, #90EE90);
+        color: var(--nav-pills-hover-text, #FFFFFF);
     }
 
 
