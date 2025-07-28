@@ -8,22 +8,27 @@
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card mb-2 shadow">
-                <div class="card-header bg-gray-light text-white">
-                    <h4 class="text-black mb-0">
-                        @ViewData["Title"]
-                    </h4>
-                </div>
-                <div class="card-body">
-                    @if (TempData["StatusMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+            
+            <form method="post">
 
-                    <form method="post">
+                <div class="card mb-2 shadow">
+
+                    <div class="card-header">
+                        <h4 class="text-black text-center mb-0">
+                            @ViewData["Title"]
+                        </h4>
+                    </div>
+
+                    <div class="card-body rounded-2">
+
+                        @if (TempData["StatusMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                          @if (Model.IsUserPreselected)
                         {
@@ -80,30 +85,35 @@
                                 <span asp-validation-for="Input.Type" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="d-grid mt-4 gap-2">
+                        
+                    </div>
 
-                            <div class="row justify-content-center">
-                                
-                                <div class="col-6 text-center">
-                                    @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
-                                    {
-                                        <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-2 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
-                                    }
-                                    else
-                                    {
-                                        <a href="~/Info/" class="btn btn-sm btn-back rounded-2 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
-                                    }
-                                </div>
+                    <div class="card-footer d-grid py-4 gap-2">
 
-                                <div class="col-6 text-center">
-                                    <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
-                                </div>
-                            </div>                                                      
-                            
+                        <div class="row justify-content-center">
+
+                            <div class="col-6 text-center">
+                                @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                {
+                                    <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-2 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                }
+                                else
+                                {
+                                    <a href="~/Info/" class="btn btn-sm btn-back rounded-2 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                }
+                            </div>
+
+                            <div class="col-6 text-center">
+                                <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
+                            </div>
                         </div>
-                    </form>
+
+                    </div>
+
                 </div>
-            </div> 
+
+            </form>
+               
         </div> 
     </div>
 </div> 

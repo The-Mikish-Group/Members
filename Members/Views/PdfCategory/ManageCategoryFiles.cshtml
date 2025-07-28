@@ -59,7 +59,7 @@
             <div class="card-header fw-bold ">
                 <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
-            <div class="card-body px-1">
+            <div class="card-body rounded-2 px-1">
                 <form method="post" enctype="multipart/form-data" asp-controller="PdfCategory" asp-action="UploadFileToCategory">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
@@ -72,7 +72,7 @@
 
                         <div class="col-2">
                             <label for="sortOrder" class="fw-bold">Sort:</label>
-                            <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
+                            <input type="number" name="sortOrder" id="sortOrder" class="form-control no-left-radius no-right-radius mt-2" value="1" min="1" required>
                         </div>
 
                         <div class="col-2 align-self-end">
@@ -114,7 +114,7 @@
                                 </td>
                                 <td class="p-0 text-center align-middle">
                                     <a class="btn btn-sm px-2 py-1" href="/identity/ViewPdf?fileName=@file.FileName" title="View PDF">
-                                        <i class="bi bi-eye text-blue-light"></i>
+                                        <i class="bi bi-eye text-eye-view"></i>
                                     </a>
                                 </td>
                                 <td class="nav  py-2 filename-cell align-middle" style="cursor:pointer;" title="Edit name/sort order"
@@ -160,7 +160,7 @@
                 </div>
                 <div class="row align-items-center mb-3">
                     <div class="col-sm-3"><label for="NewSortOrder" class="col-form-label fw-bold">Sort Order:</label></div>
-                    <div class="col-sm-9"><input type="number" class="col-form-control" id="NewSortOrder" min="1"></div>
+                    <div class="col-sm-9"><input type="number" class="form-control" id="NewSortOrder" min="1"></div>
                 </div>
                 <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
             </div>

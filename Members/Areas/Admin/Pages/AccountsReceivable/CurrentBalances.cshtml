@@ -45,7 +45,7 @@
     }
     else
     {
-        <div class="bg-card-light card m-1 p-1 shadow">
+        <div class="card m-1 p-1 shadow">
 
             <div class="row mb-3">
 
@@ -253,16 +253,16 @@
         <div class="modal fade" id="exportCurrentBalancesConfirmModal" tabindex="-1" aria-labelledby="exportCurrentBalancesConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header bg-card-light">
+                    <div class="modal-header">
                         <h5 class="modal-title" id="exportCurrentBalancesConfirmModalLabel">Confirm Export</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to download the Member Balances CSV export?
+                        Download the Member Balances CSV export?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmCurrentBalancesExportButton">Yes, Export</button>
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
+                        <button type="button" class="btn btn-sm btn-success" id="confirmCurrentBalancesExportButton"><i class="bi bi-save"></i> Yes, Export</button>
                     </div>
                 </div>
             </div>

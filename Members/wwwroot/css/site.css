@@ -31,31 +31,21 @@ textarea:focus,
     border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
 }
 
+.logo {
+    height: 60px;
+}
 
+.nbLogo {
+    height: 18px;
+}
 
-.fw-bold { /* This was for modal labels, might not be needed if not used elsewhere */
+.fw-bold { 
     font-weight: 500;
 }
 /* This rule for sort indicators in table headers is good to keep */
 #mainAssetsTable thead th .bi {
     font-size: 0.9em;
     margin-left: 0.25rem;
-}
-
-#categoryFilesContainer {
-    overflow-x: auto; /* Enable horizontal scrolling */
-}
-
-/* Specific styles for Select2 with Bootstrap 4 theme */
-.select2-container--bootstrap4.select2-container--focus .select2-selection {
-    box-shadow: none !important;
-    border-color: initial !important; /* Ensure Select2's specific border also resets */
-}
-
-/* For file input, which often has its own styling */
-.custom-file-input:focus ~ .custom-file-label {
-    box-shadow: none !important;
-    border-color: initial !important;
 }
 
 /* No Radius Right or  Left */
@@ -69,28 +59,10 @@ textarea:focus,
     border-bottom-left-radius: 0 !important;
 }
 
-.video-container {
-    position: relative;
-    height: 100%;
-    width: 100%;
-}
-
 @media (max-width: 767.98px) {
     .list-group-item span.flex-grow-1 {
         word-break: break-word;
     }
-}
-
-.image-container {
-    position: relative;
-    height: 100%;
-    width: 100%;
-}
-/* don't like padding and margins on elements by default */
-container, div, h1, h2, h3, h4, h5, p {
-    cursor: default;
-    padding: 0;
-    margin: 0;
 }
 
 /* make everything a borderbox */
@@ -183,19 +155,7 @@ html > body header {
     max-width: 280px;
 }
 
-/* Main Container (Set for Auto Push of Footer) */
-#MainContainer {
-    flex: 1;
-    min-height: 100%;
-    margin-top: 0px;
-    margin-bottom: 70px;
-}
 
-/* Carousel item and images */
-#carousel-items, #carousel-item {
-    height: auto !important;
-    width: 100%;
-}
 
 /* Svg Container (put Svg files inside a #container for scaling */
 svg, #container {
@@ -296,55 +256,7 @@ img {
 
 /* #endregion */
 
-/* #region Slideshow bar buttons */
-#Previous {
-    border: 1px solid transparent;
-}
 
-    #Previous:hover,
-    #Previous:active,
-    #Previous:focus {
-        border: 1px solid black;
-    }
-
-#Next {
-    border: 1px solid transparent;
-}
-
-    #Next:hover,
-    #Next:active,
-    #Next:focus {
-        border: 1px solid black;
-    }
-
-#Copy {
-    border: 1px solid transparent;
-}
-
-    #Copy:hover,
-    #Copy:active,
-    #Copy:focus {
-        border: 1px solid black;
-    }
-
-.slideshow-button {
-    height: 28px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-}
-
-    .slideshow-button:hover,
-    .slideshow-button:hover,
-    .slideshow-button:hover {
-        border: 1px solid black;
-    }
-
-.slideshow-button-image {
-    width: 26px;
-    height: 26px;
-}
-
-/* #endregion */
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Small tablet styles */
 @media (min-width: 575px) and (max-width: 768px) {

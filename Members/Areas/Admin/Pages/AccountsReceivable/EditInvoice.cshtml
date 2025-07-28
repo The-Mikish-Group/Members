@@ -11,55 +11,78 @@
     <div class="row justify-content-center">
 
         <div class="col-md-8 col-lg-6">
+            <form method="post">
+                <div class="card rounded-2 m-1 shadow">               
 
-            <div class="card m-1 p-2 shadow">
-                <form method="post">
+                    <div class="card-header">
+                        <h4 class="text-black ms-2">Invoice details:</h4>
+                    </div>
+                    
+                    <div class="card-body">
 
-                    <h4 class="text-black ms-2">Invoice details:</h4>
-
-                    <div class="form-group mt-0">
-                        <label for="InvoiceIdDisplay" class="text-black ms-2">Invoice ID:</label>
-                        <input type="text" id="InvoiceIdDisplay" class="form-control shadow" readonly value="@Model.InvoiceId" />
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="BatchIdDisplay" class="text-black ms-2">Batch ID:</label>
-                        <input type="text" id="BatchIdDisplay" class="form-control shadow" readonly value="@Model.BatchId" />
-                    </div>
-
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    <input type="hidden" asp-for="ReturnUrl" />
-                    <div class="form-group mt-0">
-                        <label asp-for="Input.DueDate" class="text-black ms-2"></label>
-                        <input asp-for="Input.DueDate" class="form-control shadow" />
-                        <span asp-validation-for="Input.DueDate" class="text-danger"></span>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label asp-for="Input.Description" class="text-black ms-2"></label>
-                        <input asp-for="Input.Description" class="form-control shadow" />
-                        <span asp-validation-for="Input.Description" class="text-danger"></span>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label asp-for="Input.AmountDue" class="text-black ms-2"></label>
-                        <input asp-for="Input.AmountDue" class="form-control shadow" />
-                        <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Input.Status" hidden class="text-black ms-2"></label>
-                        <input asp-for="Input.Status" hidden class="form-control shadow" />
-                        <span asp-validation-for="Input.Status" class="text-danger"></span>
-                    </div>
-
-                    <div class="row justify-content-center">
-                        <div class="col-6 text-start">
-                            <a href="@Model.ReturnUrl" class="btn btn-sm btn-secondary rounded-2 mb-2 mt-3 shadow"><i class="bi bi-arrow-left"></i> Cancel</a>
+                        <!-- Invoice ID -->
+                        <div class="form-group mt-0">
+                            <label for="InvoiceIdDisplay" class="text-black ms-2">Invoice ID:</label>
+                            <input type="text" id="InvoiceIdDisplay" class="form-control shadow" readonly value="@Model.InvoiceId" />
                         </div>
-                        <div class="col-6 text-end">
-                            <button type="submit" class="btn btn-sm btn-success rounded-2 mb-2 mt-3 shadow"><i class="bi bi-pencil-square"></i> Save Changes</button>
+
+                        <!-- Batch ID -->
+                        <div class="form-group mt-3">
+                            <label for="BatchIdDisplay" class="text-black ms-2">Batch ID:</label>
+                            <input type="text" id="BatchIdDisplay" class="form-control shadow" readonly value="@Model.BatchId" />
                         </div>
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <!-- Due Date -->
+                        <div class="form-group mt-0">
+                            <label asp-for="Input.DueDate" class="text-black ms-2"></label>
+                            <input asp-for="Input.DueDate" class="form-control shadow" />
+                            <span asp-validation-for="Input.DueDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mt-3">
+                            <label asp-for="Input.Description" class="text-black ms-2"></label>
+                            <input asp-for="Input.Description" class="form-control shadow" />
+                            <span asp-validation-for="Input.Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Amount Due -->
+                        <div class="form-group mt-3">
+                            <label asp-for="Input.AmountDue" class="text-black ms-2"></label>
+                            <input asp-for="Input.AmountDue" class="form-control shadow" />
+                            <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label asp-for="Input.Status" hidden class="text-black ms-2"></label>
+                            <input asp-for="Input.Status" hidden class="form-control shadow" />
+                            <span asp-validation-for="Input.Status" class="text-danger"></span>
+                        </div>
+
                     </div>
-                  
-                </form>
-            </div>
+
+                    <div class="card-footer">
+
+                        <!-- Buttons -->
+                        <div class="row justify-content-center">
+                            <div class="col-6 text-center">
+                                <a href="@Model.ReturnUrl" class="btn btn-sm btn-secondary rounded-2 mb-2 mt-3 shadow"><i class="bi bi-arrow-left"></i> Cancel</a>
+                            </div>
+                            <div class="col-6 text-center">
+                                <button type="submit" class="btn btn-sm btn-success rounded-2 mb-2 mt-3 shadow"><i class="bi bi-pencil-square"></i> Save Changes</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+            
         </div>
 
     </div>

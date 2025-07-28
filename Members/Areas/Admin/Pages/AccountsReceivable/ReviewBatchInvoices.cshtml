@@ -60,7 +60,7 @@
         <div class="card mb-4 shadow">
 
             <!-- Card Header Text -->
-            <div class="card-header bg-card-light">
+            <div class="card-header">
 
                 <h5 class="d-flex align-items-start mb-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
 
@@ -131,16 +131,16 @@
                 <div class="modal fade" id="exportReviewBatchInvoicesConfirmModal" tabindex="-1" aria-labelledby="exportReviewBatchInvoicesConfirmModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <div class="modal-header bg-card-light">
+                            <div class="modal-header">
                                 <h5 class="modal-title" id="exportReviewBatchInvoicesConfirmModalLabel">Confirm Export</h5>
                                 <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to download the CSV export for this batch of invoices?
+                                Download the CSV export for this batch of invoices?
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-back rounded-2" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-success rounded-2" id="confirmReviewBatchInvoicesExportButton">Yes, Export</button>
+                                <button type="button" class="btn btn-sm btn-secondary rounded-2" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-sm btn-success rounded-2" id="confirmReviewBatchInvoicesExportButton"><i class="bi bi-save"></i> Yes, Export</button>
                             </div>
                         </div>
                     </div>
@@ -153,7 +153,7 @@
                 </h5>
 
             </div>
-            <div class="card-body p-1">
+            <div class="card-body rounded-2 p-1">
                 <div class="table-responsive">
                     <table class="table-striped table-hover w-100 mb-0">
                         <thead>

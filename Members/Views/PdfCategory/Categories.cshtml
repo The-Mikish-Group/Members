@@ -5,85 +5,145 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Title -->
 <div class="text-black mb-2 mt-4 text-center">
     <h3><i class="bi bi-list-ul ms-2"></i> @ViewData["Title"]</h3>
 </div>
 
+<!-- Row and Column -->
 <div class="row mx-0 mb-3 p-0">
-    <div class="col-md-8 mx-auto my-0 p-2">
+    <div class="col-12 mx-auto my-0 p-2">
 
+        <!-- Status Messsage -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-success alert-dismissible fade show my-2" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-danger alert-dismissible fade show my-2" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+        }
+
+        <!-- Card with Shadow -->
         <div class="card rounded shadow m-1 p-2">
-            
+
+            <!-- Heading: Add a New Category -->
             <div class="mb-2 ms-2 text-start">
                 <h5 class="text-black"><i class="bi bi-plus-square-fill me-2"></i> Add a New Category</h5>
             </div>
 
-            <form id="addCategoryForm" method="post" asp-action="CreateCategory">
+            <!-- Create Category form -->
+            <form id="addCategoryForm" method="post" asp-controller="PdfCategory" asp-action="CreateCategory">
+               
                 @Html.AntiForgeryToken()
+                
                 <div class="row mx-0">
+
+                    <!-- New Category Name -->
                     <div class="col-8 px-0">
                         <label for="newCategoryName" class="form-label visually-hidden">Category Name</label>
                         <input type="text" class="form-control no-right-radius" id="newCategoryName" name="CategoryName" placeholder="Category Name" required>
                     </div>
+
+                    <!-- Sort Order -->
                     <div class="col-2 px-0">
                         <label for="newSortOrder" class="form-label visually-hidden">Sort Order</label>
                         <input type="number" class="form-control rounded-0" id="newSortOrder" name="SortOrder" value="@ViewBag.NextSortOrder" min="1">
                     </div>
+
+                    <!-- Add Button -->
                     <div class="col-2 px-0">
-                        <button type="submit" class="btn btn-primary no-left-radius w-100"><i class="bi bi-upload"></i></button>
+                        <button type="submit" class="btn btn-success no-left-radius w-100"><i class="bi bi-upload"></i></button>
                     </div>
+
                 </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="text-danger small mt-2 py-1">
+                        @Html.ValidationSummary(false, "", new { @class = "list-unstyled" })
+                    </div>
+                }
+
             </form>
             
         </div>
     </div>
 </div>
 
+<!-- Category Table -->
 <div class="row mx-0 p-0">
-    <div class="col-md-8 mx-auto my-0 p-2">
+    <div class="col-12 mx-auto my-0 p-2">
+
+        <!-- Shadowed Card -->
         <div class="card rounded shadow m-1 p-2">
             
+            <!-- Edit Existing Categories Heading -->
             <div class="mb-3 ms-2 text-start">
                 <h5 class="text-black"><i class="bi bi-pencil-fill me-2"></i> Edit Existing Categories</h5>
             </div>
                
             @if (Model != null && Model.Any())
-                {
-               <div class="table-responsive rounded shadow">
+            {
+                <!-- Table -->
+                <div class="table-responsive rounded shadow">
                     <table class="table-striped w-100 shadow">
-                        <thead class="bg-gray-light text-white">
-                            <tr class="bg-gray-dark text-white">
-                                <th id="EditHeader"><span class="header-text ps-2 text-white">Rename</span></th>
-                                <th id="CategoryHeader"><span class="header-text text-white">Category</span></th>
-                                <th id="SortHeader"><span class="header-text text-white">Sort</span></th>
-                                <th id="DeleteHeader" class="text-end text-white"><span class="header-text pe-2">Delete</span></th>
+
+                        <!-- Table Head -->
+                        <thead>
+                            <tr>
+                                <th class="header-text ps-2 text-white">Rename</th>
+                                <th class="header-text text-white">Category</th>
+                                <th class="header-text text-center text-white">Sort</th>
+                                <th class="header-text text-end text-white pe-2">Delete</th>
                             </tr>
                         </thead>
 
+                        <!-- Table Body -->
                         <tbody id="manageCategoriesTableBody">
                             @foreach (var item in Model)
-                                {
-                                    <tr  data-category-id="@item.CategoryID" id="display-row-@item.CategoryID"
-                                    data-category-name="@item.CategoryName"
-                                    data-sort-order="@item.SortOrder"> 
-                                    <td class="edit-cell py-0">
-                                       
+                            {
+                                <!-- Table Row -->                                       
+                                <tr data-category-id="@item.CategoryID"                                        
+                                data-category-name="@item.CategoryName"
+                                data-sort-order="@item.SortOrder" 
+                                id="display-row-@item.CategoryID">
+
+                                    <!-- Edit Button -->
+                                    <td class="edit-cell py-0">                                       
                                         <button type="button" class="btn btn-sm btn-link btn-rename mt-1"
-                                                data-bs-toggle="modal" data-bs-target="#renameModal"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#renameModal"
                                                 onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                     </td>
-                                    
-                                    <td class="category-name-cell" style="cursor: pointer;">@item.CategoryName</td>
-                                    <td class="text-black">@item.SortOrder</td>
+
+                                    <!-- Category Name -->
+                                    <td class="category-name-cell" 
+                                        style="cursor: pointer;"
+                                        onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                        @item.CategoryName
+                                    </td>
+
+                                    <!-- Sort Order -->                                        
+                                    <td class="text-black text-center">@item.SortOrder</td>
+
+                                    <!-- Delete Button -->
                                     <td class="delete-cell py-0 text-end">
-                                        <form method="post" class="d-inline d-flex justify-content-end w-100" action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
-                                            <button type="submit" class="btn btn-sm btn-delete delete-button px-2 py-2" onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                        <form method="post" 
+                                            class="d-inline d-flex justify-content-end w-100" 
+                                            action="/PdfCategory/DeleteCategoryConfirmed/@item.CategoryID">
+                                                
+                                            <button type="submit" 
+                                                class="btn btn-sm btn-delete delete-button px-2 py-2" 
+                                                onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
+                                            
                                         </form>
                                     </td>
+
                                 </tr>                               
                             }
 
@@ -91,66 +151,105 @@
 
                     </table>
                 </div>
-                }
-                else
-                {                    
-                     <div class="text-black mt-2 text-center">
-                         No categories found.
-                     </div>
-                }
-
+            }
+            else
+            {                    
+                <div class="text-black mt-2 text-center">
+                    No categories found.
+                </div>
+            }
            
         </div>
     </div>
 
+    <!-- Button(s) -->
     <div class="row justify-content-center mx-auto p-0">
         <div class="col-md-8 bg-transparent pe-2 pt-2">
-            <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-sm btn-back rounded-2 shadow" href="/PdfCategory/ManageCategoryFiles" title="Edit PDF Category Files">
-                    Edit PDF Category Files <i class="bi bi-arrow-right"></i>
+            <div class="d-flex justify-content-center mb-3">
+
+                <!-- Manage Categories -->
+                <a class="btn btn-sm btn-outline-info rounded-2 shadow"
+                   href="/PdfCategory/ManageCategoryFiles" 
+                    title="Edit PDF Category Files">
+                    <span><i class="bi bi-folder-symlink"></i> Manage</span><br /><span class="text-nowrap">Category Files</span>                    
                 </a>
+
             </div>
         </div>
     </div>
 
 </div>
 
-
-<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+<!-- Edit Modal for Confidential Categories -->
+<div class="modal fade" 
+    id="renameModal" 
+    tabindex="-1" 
+    aria-labelledby="renameModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+
+            <!-- Modal Head -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="renameModalLabel">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
             <div class="modal-body pb-0">
                 
-                <input type="hidden" id="renameCategoryId" name="renameCategoryId" />
+                <input type="hidden" 
+                    id="renameCategoryId" 
+                    name="renameCategoryId" />
                 
+                <!-- New Category Name -->
                 <div class="row align-items-center mb-2">
+
+                    <!-- New Name Label -->
                     <div class="col-3"> 
                         <label for="newCategoryName" class="col-form-label fw-bold">New Name:</label>
                     </div>
+
+                    <!-- New Name -->
                     <div class="col-9"> 
-                        <input type="text" class="col-form-control" id="newCategoryNameInput" name="newCategoryName">
+                        <input type="text" 
+                            class="form-control" 
+                            id="newCategoryName" 
+                            name="newCategoryName" />
                     </div>
+
                 </div>
 
+                <!-- New Sort Order -->
                 <div class="row align-items-center mb-1">
                      <div class="col-3">
                         <label for="newSortOrder" class="col-form-label fw-bold">Sort Order:</label>
                      </div>
                      <div class="col-9">
-                        <input type="number" class="col-form-control" id="newSortOrderInput" name="newSortOrder" min="0">
+                        <input type="number" 
+                                class="form-control" 
+                                id="newSortOrderInput" 
+                                name="newSortOrder" 
+                                min="1">
                      </div>
                 </div>
+
             </div>
             
+            <!-- Modal Footer -->
             <div class="modal-footer">
 
                 <!-- Cancel Button -->
-                <button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">
+                <button type="button" 
+                        class="btn btn-sm btn-secondary rounded-2 shadow"
+                        data-bs-dismiss="modal">
                     <i class="bi bi-box-arrow-left"></i> Cancel
                 </button>
 
                 <!-- Save Button -->
-                <button type="button" class="btn btn-sm btn-success rounded-2 shadow" onclick="submitCategoryRenameForm()">
+                <button type="button" 
+                        class="btn btn-sm btn-success rounded-2 shadow" 
+                        onclick="submitCategoryRenameForm()">
                     <i class="bi bi-save-fill"></i> Save Changes
                 </button>
 
@@ -160,41 +259,6 @@
     </div> 
 </div>
 
-@section Styles {
-    <style>
-        
-         /* Specific styles for the 'Add Category' sort order input if needed */
-        #newSortOrder.rounded-0 {
-            border-left: none; /* Remove border between category name and sort order inputs */
-        }
-
-
-        /* Delete button icon size */
-        .delete-button i {
-            font-size: 0.9em;
-        }
-
-        /* Rename button icon size */
-        .btn-rename i {
-            font-size: 0.9em;
-        }
-
-         /* Ensure the table container handles overflow */
-        #categoryFilesContainer { /* This ID is not present in this view's main table, but keep if used elsewhere or intended */
-             overflow-x: auto; /* Enable horizontal scrolling */
-        }
-
-        /* --- Modal Specific Styles --- */
-
-        /* Remove the top border of the modal footer to get rid of the line above the buttons */
-        #renameModal .modal-footer {
-            border-top: none;
-        } 
-
-    </style>
-}
-
-
 @section Scripts {
     <script>
         // --- Standalone Helper Functions (Global Scope) ---
@@ -203,10 +267,10 @@
 
         // Function to populate and show the rename category modal
         function showRenameCategoryModal(categoryId, categoryName, sortOrder) {
-            console.log('showRenameCategoryModal called for categoryId:', categoryId);
+            
             // Populate modal inputs with data from the clicked category row
             document.getElementById('renameCategoryId').value = categoryId;
-            document.getElementById('newCategoryNameInput').value = categoryName;
+            document.getElementById('newCategoryName').value = categoryName;
             document.getElementById('newSortOrderInput').value = sortOrder;
 
             // Ensure the sort order input allows 0 or more (or 1 if you prefer)
@@ -221,13 +285,18 @@
         // Function to handle the category rename/sort order update form submission via Fetch API
         // This function is called from the onclick of the modal's "Save Changes" button.
         function submitCategoryRenameForm() {
+
             console.log('submitCategoryRenameForm called');
+
             // Get values from modal inputs
             var categoryId = document.getElementById('renameCategoryId').value;
-            var newCategoryName = document.getElementById('newCategoryNameInput').value;
+            var newCategoryName = document.getElementById('newCategoryName').value;
             var newSortOrder = document.getElementById('newSortOrderInput').value;
 
-            var url = '@Url.Action("EditMemberCategory", "PdfCategory")'; // Corrected Action URL
+            var url = '@Url.Action("EditMemberCategory", "PdfCategory")';
+
+            if (!newCategoryName.trim()) { alert('Category name cannot be empty.'); return; }
+            if (parseInt(newSortOrder) < 1) { alert('Sort order must be 1 or greater.'); return; }
 
             // Use FormData to easily collect and send data for the POST request
             var formData = new FormData();
@@ -236,7 +305,6 @@
             formData.append("SortOrder", newSortOrder); // Match parameter name expected by EditCategory action
 
             // Get the Request Verification Token for security against CSRF
-            
             var token = $('input[name="__RequestVerificationToken"]').val();
             var headers = {};
             if (token) {
@@ -250,7 +318,7 @@
             fetch(url, {
                 method: 'POST',
                 body: formData, // Send collected data. Fetch with FormData automatically sets Content-Type.
-                 headers: headers // Include the security token in headers
+                headers: headers // Include the security token in headers
             })
             .then(response => {
                 // Check if the response was successful (HTTP status 2xx)

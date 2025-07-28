@@ -40,42 +40,20 @@
         background-color: green;
     }
 
-
-.buttonClass {
-    border-width: 1px;
-    color: rgba(0, 0, 0, 1);
-    /*box-shadow: 3px 4px 0px 0px rgba(48, 41, 41, 1);
-    border-color: rgba(214, 201, 188, 1);*/
-    /*background: linear-gradient(rgba(107, 106, 106, 1), rgba(242, 241, 241, 1));*/
+/*  btn-delete Defaults */
+.btn-delete {
+    border-color: transparent;
+    background-color: transparent;
+    color: darkred;
+    font-size: 0.9em;
 }
 
-    .buttonClass:hover,
-    .buttonClass:focus,
-    .buttonClass:active {
-        color: rgba(0, 0, 0, 1);
-        box-shadow: 3px 4px 0px 0px rgba(48, 41, 41, 1);
-        border-color: rgba(214, 201, 188, 1);
-        background: linear-gradient(rgba(107, 106, 106, 1), rgba(242, 241, 241, 1));
-    }
-              
-
-
-/*  btn-Upload Defaults */
-.btn-upload {
-    border-bottom-left-radius: 0px;
-    border-top-left-radius: 0px;
-    border-color: darkgray;
-    background-color: green;
-    color: white;
-}
-
-    .btn-upload:focus,
-    .btn-upload:hover {
-        border-bottom-left-radius: 0px;
-        border-top-left-radius: 0px;
-        border-color: darkgray;
-        background-color: lightgreen;
-        color: #424143 !important; /* almost black */
+    .btn-delete:focus,
+    .btn-delete:hover {
+        border-color: transparent;
+        color: darkred;
+        background-color: lightpink;
+        font-size: 0.9em;
     }
 
 /* btn-back Defaults */
@@ -97,13 +75,15 @@
     border-color: transparent;
     background-color: transparent;
     color: green;
+    font-size: 0.9em;
 }
 
     .btn-rename:focus,
     .btn-rename:hover {
         border-color: transparent;
         color: darkgreen;
-        background-color: lightgreen
+        background-color: lightgreen;
+        font-size: 0.9em;
     }
 
 /*  btn-billing Defaults */
@@ -111,28 +91,18 @@
     border-color: transparent;
     background-color: transparent;
     color: blue;
+    font-size: 0.9em;
 }
 
     .btn-billing:focus,
     .btn-billing:hover {
         border-color: transparent;
         color: blue;
-        background-color: lightblue
+        background-color: lightblue;
+        font-size: 0.9em;
     }
 
-/*  btn-delete Defaults */
-.btn-delete {
-    border-color: transparent;
-    background-color: transparent;
-    color: darkred;
-}
 
-    .btn-delete:focus,
-    .btn-delete:hover {
-        border-color: transparent;
-        color: darkred;
-        background-color: lightpink
-    }
 
 /*  btn-search-fill Defaults */
 .btn-search-fill {
@@ -178,20 +148,20 @@
 /*  btn-warning Defaults */
 .btn-warning {
     color: #705103 !important;
-    background-color: goldenrod !important;
+    background-color: lightpink !important;
     border-color: #414042 !important;
 }
 
     .btn-warning:focus,
     .btn-warning:hover {
         color: #705103 !important;
-        background-color: #dec383 !important;
+        background-color: crimson !important;
         border-color: #7d7e81 !important;
     }
 
 .btn-warning-reverse {
     color: #705103;
-    background-color: #dec383;
+    background-color: crimson;
     border-color: darkgray;
 }
 
@@ -199,7 +169,7 @@
     .btn-warning-reverse:hover,
     .btn-warning-reverse:active {
         color: #705103;
-        background-color: antiquewhite;
+        background-color: lightpink;
         border-color: gray; /* gray */
     }
 

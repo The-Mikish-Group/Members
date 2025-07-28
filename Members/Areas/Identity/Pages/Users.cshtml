@@ -45,7 +45,7 @@
                 </div>
 
                 <!-- Shadow Card for Search Term and User Count -->
-                <div class="card m-sm-0 bg-card-light rounded p-1 shadow">
+                <div class="card m-sm-0 rounded p-1 shadow">
 
                     <!-- Searchterm input field and button -->
                     <div class="mb-3">
@@ -58,7 +58,7 @@
 
                             <div class="input-group">
 
-                                <button class="btn btn-sm btn-add" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
+                                <button class="btn btn-sm btn-success" type="submit" id="searchButton"><i class="bi bi-search"></i></button>
                                 <input type="text" class="form-control shadow-none" placeholder="Search..." asp-for="SearchTerm" id="searchInput" />
 
                                 <!-- Hidden fields for storing Table status  -->
@@ -581,12 +581,12 @@
     <div class="modal fade" id="exportConfirmModal" tabindex="-1" aria-labelledby="exportConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-card-light">
+                <div class="modal-header">
                     <h5 class="modal-title" id="exportConfirmModalLabel">Confirm Export</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to download the CSV export?
+                    Download the CSV Members export?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary rounded-2" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>

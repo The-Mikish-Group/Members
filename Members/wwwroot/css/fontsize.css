@@ -1,7 +1,4 @@
 
-.italic {
-    font-style: italic;
-}
 
 /* #region Font Sizes (-fs) */
 
@@ -13,21 +10,6 @@
     font-size: 20px;
 }
 
-.nav-link-fs {
-    font-size: 24px;
-}
-
-.link-fs {
-    font-size: 16px;
-}
-.nav-text-fs {
-    font-size: 20px;
-}
-
-nav-link-footer-fs {
-    font-size: 12px;
-    width: 100%;
-}
 /* #endregion */
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
@@ -40,22 +22,7 @@ nav-link-footer-fs {
     .welcome-text-fs {
         font-size: 24px;
     }
-
-   .nav-link-footer-fs {
-        font-size: 16px;
-    }
-
-    .nav-link-fs {
-        font-size: 18px;
-    }
-
-    .link-fs {
-        font-size: 20px;
-    }
-
-    .nav-text-fs {
-        font-size: 24px;
-    }
+       
 }
 /* #endregion  */
 
@@ -63,51 +30,21 @@ nav-link-footer-fs {
 @media (min-width: 768.01px) and (max-width: 991px) {
 
     .about-text-fs {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .welcome-text-fs {
         font-size: 28px;
     }
-
-    .nav-link-footer-fs {
-        font-size: 16px;
-    }
-
-    .nav-link-fs {
-        font-size: 24px;
-    }
-
-    .link-fs {
-        font-size: 16px;
-    }
-
-    .nav-text-fs {
-        font-size: 24px;
-    }
+   
 }
 /* #endregion */
 
-/* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
-@media (min-width: 992px) {
-
-    .about-text-fs {
-        font-size: 18px;
-    }
-    .welcome-text-fs {
-        font-size: 28px;
-    }
-    nav-link-footer-fs {
-        font-size: 16px;
-    }
-
-}
-/* #endregion*/
-
 /* #region (BS -lx- ) (min-width: 1200px) Medium Desktop*/
 @media (min-width: 1200px) {
+
     .about-text-fs {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .welcome-text-fs {
@@ -119,8 +56,9 @@ nav-link-footer-fs {
 
 /* #region (BS - xlg- ) (min-width: 1399.98px) Large Desktop */
 @media (min-width: 1399.98px) {
+
     .about-text-fs {
-        font-size: 18px;
+        font-size: 22px;
     }
 
     .welcome-text-fs {

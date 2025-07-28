@@ -120,13 +120,11 @@
                         <!-- Modal Rename Form -->
                         <div class="modal fade" id="renameGalleryModal_@gallery.Name.Replace(" ", "-")" tabindex="-1" aria-labelledby="renameGalleryModalLabel_@gallery.Name.Replace(" ", "-")" aria-hidden="true"> @* Fixed: Replaced spaces for modal ID *@
                             <div class="modal-dialog">
-                            <div class="modal-content rounded">
+                                <div class="modal-content rounded">
 
-                                <form asp-controller="Image" asp-action="RenameGallery" method="post">
-
+                                    <form asp-controller="Image" asp-action="RenameGallery" method="post">
                                     
-                                        <div class="card-header">
-
+                                        <div class="card-body rounded-2">
 
                                             <!-- Old Name -->
                                             <input type="hidden" name="oldGalleryName" value="@gallery.Name" />
@@ -137,7 +135,7 @@
                                             
                                         </div>
 
-                                        <div class="modal-footer text-end pb-2">
+                                        <div class="card-footer rounded-bottom text-end pb-2">
 
                                                 <!-- Cancel Button -->
                                                 <button type="button" class="btn btn-sm btn-secondary rounded-2 me-2 shadow" data-bs-dismiss="modal" aria-label="Cancel">
@@ -152,7 +150,8 @@
                                         </div>
                                                                            
                                     </form>
-                                 </div>
+
+                                </div>
                                 
                             </div>
                         </div>
@@ -175,11 +174,7 @@
 </div>
 
 @section Styles {
-    <style>    
-
-        #categoryFilesContainer {
-            overflow-x: auto; /* Enable horizontal scrolling */
-        }
+    <style>  
 
         a:hover,
         a:focus {

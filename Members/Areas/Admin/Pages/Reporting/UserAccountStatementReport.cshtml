@@ -94,7 +94,7 @@
             <div class="modal-content bg-Card-Modal">
 
                 <!-- Modal Header -->
-                <div class="modal-header bg-card-light">
+                <div class="modal-header">
                     <h5 class="modal-title" id="exportStatementConfirmModalLabel">Confirm Export</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -119,11 +119,11 @@
     @if (!string.IsNullOrEmpty(Model.SelectedUserId) && Model.StatementData != null)
     {
         <div class="card mb-4 shadow">
-            <div class="card-header bg-light text-black">
+            <div class="card-header text-black">
                 Statement for: <strong>@Model.StatementData.SelectedUserName</strong> <br />
                 Period: @Model.StatementData.ReportStartDate.ToString("yyyy-MM-dd") to @Model.StatementData.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
-            <div class="card-body bg-card-light">
+            <div class="card-body rounded-2">
                 <div class="table-responsive">
                     <table class="table-striped table-hover table-sm table">
                         <thead class="bg-white text-black">

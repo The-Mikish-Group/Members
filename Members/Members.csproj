@@ -28,22 +28,46 @@
     <Compile Remove="Areas\Admin\Pages\Accounting\**" />
     <Compile Remove="Data\Migrations\**" />
     <Compile Remove="Pdf\**" />
+    <Compile Remove="ProtectedFiles\**" />
     <Compile Remove="Views\Admin\**" />
+    <Compile Remove="wwwroot\Galleries\2025 July 4\**" />
+    <Compile Remove="wwwroot\Galleries\2025 Memorial Day\**" />
+    <Compile Remove="wwwroot\Galleries\Chapel\**" />
+    <Compile Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <Compile Remove="wwwroot\Galleries\Traveling\**" />
     <Compile Remove="wwwroot\js\ej2\**" />
     <Content Remove="Areas\Admin\Pages\Accounting\**" />
     <Content Remove="Data\Migrations\**" />
     <Content Remove="Pdf\**" />
+    <Content Remove="ProtectedFiles\**" />
     <Content Remove="Views\Admin\**" />
+    <Content Remove="wwwroot\Galleries\2025 July 4\**" />
+    <Content Remove="wwwroot\Galleries\2025 Memorial Day\**" />
+    <Content Remove="wwwroot\Galleries\Chapel\**" />
+    <Content Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <Content Remove="wwwroot\Galleries\Traveling\**" />
     <Content Remove="wwwroot\js\ej2\**" />
     <EmbeddedResource Remove="Areas\Admin\Pages\Accounting\**" />
     <EmbeddedResource Remove="Data\Migrations\**" />
     <EmbeddedResource Remove="Pdf\**" />
+    <EmbeddedResource Remove="ProtectedFiles\**" />
     <EmbeddedResource Remove="Views\Admin\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\2025 July 4\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\2025 Memorial Day\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\Chapel\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\Traveling\**" />
     <EmbeddedResource Remove="wwwroot\js\ej2\**" />
     <None Remove="Areas\Admin\Pages\Accounting\**" />
     <None Remove="Data\Migrations\**" />
     <None Remove="Pdf\**" />
+    <None Remove="ProtectedFiles\**" />
     <None Remove="Views\Admin\**" />
+    <None Remove="wwwroot\Galleries\2025 July 4\**" />
+    <None Remove="wwwroot\Galleries\2025 Memorial Day\**" />
+    <None Remove="wwwroot\Galleries\Chapel\**" />
+    <None Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <None Remove="wwwroot\Galleries\Traveling\**" />
     <None Remove="wwwroot\js\ej2\**" />
   </ItemGroup>
   <ItemGroup>       
@@ -97,29 +121,6 @@
   <ItemGroup>
     <None Remove="Areas\Identity\Pages\EditUser.cshtml.cs_save" />
     <None Remove="Areas\Identity\Pages\EditUser.cshtml_Save" />
-    <None Remove="ProtectedFiles\Agenda_2025.pdf" />
-    <None Remove="ProtectedFiles\Architectural Standards 4th Revision.pdf" />
-    <None Remove="ProtectedFiles\Architectural Standards August 2024 Additions.pdf" />
-    <None Remove="ProtectedFiles\Assessment Fee Covers.pdf" />
-    <None Remove="ProtectedFiles\Bits and Pieces.pdf" />
-    <None Remove="ProtectedFiles\Budget Report 2025.pdf" />
-    <None Remove="ProtectedFiles\Clubhouse Use Rules.pdf" />
-    <None Remove="ProtectedFiles\Directory 5-2025.pdf" />
-    <None Remove="ProtectedFiles\Directory.pdf" />
-    <None Remove="ProtectedFiles\Financial Report 01-2025.pdf" />
-    <None Remove="ProtectedFiles\Financial Report 02-2025.pdf" />
-    <None Remove="ProtectedFiles\Financial Report 03-2025.pdf" />
-    <None Remove="ProtectedFiles\Financial Report 04-2025.pdf" />
-    <None Remove="ProtectedFiles\First Amendment to Covenants.pdf" />
-    <None Remove="ProtectedFiles\Minutes Feb-19-2025.pdf" />
-    <None Remove="ProtectedFiles\Miscellaneous Information.pdf" />
-    <None Remove="ProtectedFiles\Oaks Village Deed Restrictions.pdf" />
-    <None Remove="ProtectedFiles\Official Directory.pdf" />
-    <None Remove="ProtectedFiles\Paying Assessment Fee.pdf" />
-    <None Remove="ProtectedFiles\Pet Rules.pdf" />
-    <None Remove="ProtectedFiles\Pool Rules.pdf" />
-    <None Remove="ProtectedFiles\Regulations for Generators.pdf" />
-    <None Remove="ProtectedFiles\Welcome Letter.pdf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\avonparknaz-001-site7 - FTP.pubxml.user" />
@@ -149,7 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Pages\Reporting\" />
-    <Folder Include="ProtectedFiles\" />
     <Folder Include="wwwroot\Galleries\" />
   </ItemGroup>
 </Project>

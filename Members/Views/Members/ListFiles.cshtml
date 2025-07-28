@@ -38,7 +38,7 @@
                     {
                         <li class="list-group-item bg-transparent nav-link" style="cursor: pointer; border: none;">
                             <a href="/identity/ViewPdf?fileName=@file.FileName" class="nav-link d-block">
-                                <i class="bi bi-eye text-blue-light me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
+                                <i class="bi bi-eye text-eye-view me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
                             </a>
                         </li>
                     }
@@ -53,37 +53,6 @@
 
     </div>
 </div>
-
-@section Styles {
-        <style>
-            /* Styles to remove borders */
-            .card-body .list-group-item {
-                border-bottom: none !important;
-            }
-             .card-body .list-group-item:first-child {
-                 border-top: none !important;
-             }
-             .card-body .list-group-item:last-child {
-                  border-bottom: none !important;
-             }
-
-            /* Add CSS to control the link color on hover/focus */
-            /* Target the link directly within the list item on hover/focus */
-            .card-body .list-group-item:hover a.text-black,
-            .card-body .list-group-item:focus a.text-black,
-            .card-body .list-group-item a.text-black:hover,
-            .card-body .list-group-item a.text-black:focus {
-                color: #4E3802 !important; /* Use !important to ensure it overrides Bootstrap/defaults */
-            }
-
-            /* Optional: Adjust the background color of the list item on hover/focus if needed */
-            .card-body .list-group-item:hover,
-            .card-body .list-group-item:focus {
-                 background-color: rgba(0, 0, 0, 0.05) !important; /* Subtle light gray background, or 'transparent' */
-            }
-
-        </style>
-}
 
 @section Scripts {
 <!-- Add any necessary scripts here -->

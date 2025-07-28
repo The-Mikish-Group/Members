@@ -43,7 +43,7 @@
 			{
 				<div class="my-2 text-center">
 					<a href="@Model.BackToEditUserUrl" class="btn btn-sm btn-back rounded-2 shadow">
-						<i class="bi bi-arrow-left"></i> Back
+						<i class="bi bi-arrow-left"></i> Go Back...
 					</a>
 				</div>
 			}
@@ -106,7 +106,7 @@
 				</div>
 
 				<!-- Display the current balance with appropriate styling -->
-				<div class="card-body">
+				<div class="card-body rounded-2">
 					<h3 class="text-@(Model.CurrentBalance > 0 ? "danger" : "success")">
 						@Model.CurrentBalance.ToString("C")
 					</h3>
@@ -138,7 +138,7 @@
 					</div>
 
 					@* Card body *@
-					<div class="card-body">
+					<div class="card-body rounded-2">
 
 						@* Display the total available credit with appropriate styling *@
 						<h4 class="text-success">
@@ -175,7 +175,7 @@
 
 				@if (!Model.Transactions.Any())
 				{
-					<p class="p-3 text-center">No transactions found.</p>
+					<p class="p-3 text-center bg-info-subtle rounded-2 mx-2 my-1">No transactions found.</p>
 				}
 				else
 				{
