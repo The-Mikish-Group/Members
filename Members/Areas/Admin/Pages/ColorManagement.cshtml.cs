@@ -26,22 +26,18 @@ namespace Members.Areas.Admin.Pages
             ColorVars = await _context.ColorVars.ToListAsync();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(Dictionary<string, string> colors)
         {
-            foreach (var key in Request.Form.Keys)
+            foreach (var color in colors)
             {
-                if (key.StartsWith("colors["))
+                var colorVar = await _context.ColorVars.FirstOrDefaultAsync(c => c.Name == color.Key);
+                if (colorVar != null)
                 {
-                    var name = key.Substring(7, key.Length - 8);
-                    var colorVar = await _context.ColorVars.FirstOrDefaultAsync(c => c.Name == name);
-                    if (colorVar != null)
-                    {
-                        colorVar.Value = Request.Form[key]!;
-                    }
-                    else
-                    {
-                        _context.ColorVars.Add(new ColorVar { Name = name, Value = Request.Form[key]! });
-                    }
+                    colorVar.Value = color.Value;
+                }
+                else
+                {
+                    _context.ColorVars.Add(new ColorVar { Name = color.Key, Value = color.Value });
                 }
             }
 
