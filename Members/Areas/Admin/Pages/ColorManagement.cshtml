@@ -9,6 +9,7 @@
 
 <div class="card m-1 p-2 shadow">
     <form method="post">
+        @Html.AntiForgeryToken()
         <div class="row">
             @if (Model.ColorVars != null)
             {
