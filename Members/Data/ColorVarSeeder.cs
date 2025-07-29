@@ -12,15 +12,11 @@ namespace Members.Data
     {
         public static async Task SeedAsync(ApplicationDbContext context, string cssFilePath)
         {
-            if (context.ColorVars.Any())
-            {
-                return; // DB has been seeded
-            }
-
             var cssContent = await System.IO.File.ReadAllTextAsync(cssFilePath);
-            var regex = new Regex(@"--(?<name>[\w-]+)\s*,\s*(?<value>#[0-9a-fA-F]{3,6})\)");
+            var regex = new Regex(@"--(?<name>[\w-]+)\s*:\s*(?<value>#[0-9a-fA-F]{3,6})");
             var matches = regex.Matches(cssContent);
 
+            Console.WriteLine($"Found {matches.Count} matches in css file.");
             foreach (Match match in matches)
             {
                 var name = match.Groups["name"].Value;
@@ -28,6 +24,7 @@ namespace Members.Data
 
                 if (!context.ColorVars.Any(c => c.Name == name))
                 {
+                    Console.WriteLine($"Adding color {name} with value {value}");
                     context.ColorVars.Add(new ColorVar { Name = name, Value = value });
                 }
             }
