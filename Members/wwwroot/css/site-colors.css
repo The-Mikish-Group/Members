@@ -1,40 +1,35 @@
-/* #region Guideline Colors */
-
-body {
+.bg-body {
     background-color: var(--bg-body, #f2f2f2);
 }
 
 .bg-copyright {
-    background-color: var(--bg-copyright, #7D7E81) !important;
+    background-color: var(--bg-copyright, #7D7E81);
 }
+
 .text-black {
-    color: var(--text-black, #424143) !important;
+    color: var(--text-black, #424143);
 }
 
 .text-white {
-    color: var(--text-white, #FFFFFF) !important;
+    color: var(--text-white, #FFFFFF);
 }
 
 .text-eye-view {
     color: var(--text-eye-view, #50B8D4);
 }
-/* #endregion Guideline Colors */
 
-/* #region Navbar */
 .bg-navbar-header {
-    background-color: var(--bg-navbar-header, #BC9133) /*#f2e8b4*/ !important;
+    background-color: var(--bg-navbar-header, #BC9133);
 }
 
 .bg-navbar-header-dropdown {
-    background-color: var(--bg-navbar-header-dropdown, #dacfbe) !important;
+    background-color: var(--bg-navbar-header-dropdown, #dacfbe);
 }
 
 .bg-navbar-footer {
-    background-color: var(--bg-navbar-footer, #dacfbe) /*#cec9ad*/ !important;
+    background-color: var(--bg-navbar-footer, #dacfbe);
 }
-/* #endregion Navbar */
 
-/* #region Navbar Dropdowns*/
 a#w#elcomeDropdown[aria-expanded="true"],
 a#accountsReceivableDropdown[aria-expanded="true"],
 a#invoiceDraftBatchesDropdown[aria-expanded="true"],
@@ -50,7 +45,7 @@ a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
 a#pdfDocumentsFooterDropdown[aria-expanded="true"],
 a#membersfooterDropdown[aria-expanded="true"]
 a {
-    color: var(--text-black, #424143) !important;
+    color: var(--text-black, #424143);
 }
 
 li.show > a#welcomeDropdown,
@@ -67,66 +62,57 @@ li.show > a#membersPdfDocumentsDropdown,
 li.show > a#confidentialPdfDocumentsDropdown,
 li.show > a#pdfDocumentsFooterDropdown,
 li.show > a#membersFooterDropdown {
-    color: var(--text-black, #424143) !important;
+    color: var(--text-black, #424143);
 }
 
 li .dropdown-menu .nav-link i {
-    color: var(--text-black) !important;
+    color: var(--text-black, #424143);
 }
-/* #endregion Dropdowns */
-
-/* #region Card Colors */
 
 .card {
-    background-color: var(--card-bg, #f1e8d5) !important;
-    color: var(--card-text, #424143) !important;
+    background-color: var(--card-bg, #f1e8d5);
+    color: var(--card-text, #424143);
 }
 
 .modal-header,
 .card-header {
-    background-color: var(--card-header-bg, #ecd9b5) !important;
-    color: var(--card-header-text, #424143) !important;
+    background-color: var(--card-header-bg, #ecd9b5);
+    color: var(--card-header-text, #424143);
 }
 
 .modal-body,
 .card-body {
-    background-color: var(--card-body-bg, #f7f4e2) !important;
-    color: var(--card-body-text, #424143) !important;
+    background-color: var(--card-body-bg, #f7f4e2);
+    color: var(--card-body-text, #424143);
 }
 
 .modal-footer,
 .card-footer {
-    background-color: var(--card-footer-bg, #BC9133) !important;
+    background-color: var(--card-footer-bg, #BC9133);
     color: var(--card-footer-text, #424143);
 }
 
-/* #endregion Card Colors */
 
-/* #region Tables */
-
-/* Table Header colors */
 thead th {
     background-color: var(--table-header-bg, #4d4b3b);
     color: var(--table-header-text, #FFFFFF);
 }
 
-/* Table Striping */
 .table-striped > tbody > tr:nth-of-type(odd) > td,
 .row-even {
-    background-color: var(--table-striped-odd, #f1e8d5) !important; /* Your desired color for odd rows */
+    background-color: var(--table-striped-odd, #f1e8d5);
 }
 
 .table-striped > tbody > tr:nth-of-type(even) > td,
 .row-odd {
-    background-color: var(--table-striped-even, #FFFFFF) !important; /* Your desired color for even rows */
+    background-color: var(--table-striped-even, #FFFFFF);
 }
 
 .row-even > td,
 .row-odd > td {
-    background-color: inherit !important;
+    background-color: inherit;
 }
 
-/* Table settings */
 table th, table td {
     vertical-align: middle;
     padding: 0.5rem 0.5rem;
@@ -137,44 +123,37 @@ thead th {
     padding-bottom: 0.75rem;
 }
 
-.table th a .bi { /* For sort indicators */
+.table th a .bi { 
     font-size: 0.9em;
     margin-left: 0.25rem;
 }
-/*  #endregion Tables */
 
-/* #region Pagination Colors */
 .pagination .page-link {
-    background-color: var(--pagination-bg, #FFFFFF) !important;
-    border-color: var(--pagination-border, #808080) !important;
-    color: var(--pagination-text, #424143) !important; /* */
+    background-color: var(--pagination-bg, #FFFFFF);
+    border-color: var(--pagination-border, #808080);
+    color: var(--pagination-text, #424143); 
 }
 
 .pagination .page-item.active .page-link {
-    background-color: var(--pagination-active-bg, #808080) !important; /* text-gold (active bg) */
-    border-color: var(--pagination-active-border, #808080) !important;
-    color: var(--pagination-active-text, #FFFFFF) !important; /* white text for active */
+    background-color: var(--pagination-active-bg, #808080);
+    border-color: var(--pagination-active-border, #808080);
+    color: var(--pagination-active-text, #FFFFFF); 
 }
 
 .pagination .page-link:hover {
-    background-color: var(--pagination-hover-bg, #D3D3D3) !important; /* text-gold-lighter (hover bg) */
-    color: var(--pagination-hover-text, #424143) !important; /* almost black */
+    background-color: var(--pagination-hover-bg, #D3D3D3); 
+    color: var(--pagination-hover-text, #424143); 
 }
 
 .pagination .page-item.disabled .page-link {
-    background-color: var(--pagination-disabled-bg, #f8f9fa) !important;
-    border-color: var(--pagination-disabled-border, #808080) !important;
-    color: var(--pagination-disabled-text, #6c757d) !important;
+    background-color: var(--pagination-disabled-bg, #f8f9fa);
+    border-color: var(--pagination-disabled-border, #808080);
+    color: var(--pagination-disabled-text, #6c757d);
 }
 
-/* #endregion Pagination Colors */
-
-/* #region Resposive color changes */
-
-/* nav-link */
 .my-nav-link,
 .nav-link {
-    color: var(--nav-link-text, #424143) !important; /* almost black */
+    color: var(--nav-link-text, #424143); 
 }
     .my-nav-link:active,
     .my-nav-link:hover,
@@ -183,10 +162,9 @@ thead th {
     .nav-link:hover,
     .nav-link:focus {
         font-weight: 500;
-        color: var(--nav-link-hover-text, #424143) !important;
+        color: var(--nav-link-hover-text, #424143);
     }
 
-/* Nav Pills */
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     background-color: var(--nav-pills-active-bg, #28a745);
@@ -201,7 +179,3 @@ thead th {
         background-color: var(--nav-pills-hover-bg, #90EE90);
         color: var(--nav-pills-hover-text, #FFFFFF);
     }
-
-
-/* #endregion Resposive color changes */
-
