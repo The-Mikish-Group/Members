@@ -53,7 +53,7 @@ namespace Members.Areas.Admin.Pages
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostExportToCsvAsync()
+        public async Task<IActionResult> OnGetExportToCsv()
         {
             var colors = await _context.ColorVars.ToListAsync();
             var builder = new StringBuilder();
