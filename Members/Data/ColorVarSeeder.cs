@@ -13,13 +13,13 @@ namespace Members.Data
         public static async Task SeedAsync(ApplicationDbContext context, string cssFilePath)
         {
             var cssContent = await System.IO.File.ReadAllTextAsync(cssFilePath);
-            var regex = new Regex(@"--(?<name>[\w-]+)\s*,\s*(?<value>#[0-9a-fA-F]{3,6})\)");
+            var regex = new Regex(@"(--(?<name>[\w-]+))\s*,\s*(?<value>#[0-9a-fA-F]{3,6})\)");
             var matches = regex.Matches(cssContent);
 
             Console.WriteLine($"Found {matches.Count} matches in css file.");
             foreach (Match match in matches)
             {
-                var name = match.Groups["name"].Value;
+                var name = match.Groups[1].Value;
                 var value = match.Groups["value"].Value;
 
                 if (!context.ColorVars.Any(c => c.Name == name))
