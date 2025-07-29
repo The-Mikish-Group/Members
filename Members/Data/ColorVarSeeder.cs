@@ -19,7 +19,7 @@ namespace Members.Data
             Console.WriteLine($"Found {matches.Count} matches in css file.");
             foreach (Match match in matches)
             {
-                var name = "--" + match.Groups["name"].Value;
+                var name = match.Groups["name"].Value;
                 var value = match.Groups["value"].Value;
 
                 if (!context.ColorVars.Any(c => c.Name == name))
