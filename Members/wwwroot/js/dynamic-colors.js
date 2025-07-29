@@ -4,7 +4,7 @@
         .then(colors => {
             let css = ':root {\n';
             for (const [key, value] of Object.entries(colors)) {
-                css += `    --${key}: ${value};\n`;
+                css += `    ${key}: ${value};\n`;
             }
             css += '}';
             const style = document.createElement('style');
