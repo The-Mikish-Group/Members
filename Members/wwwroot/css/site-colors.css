@@ -1,5 +1,5 @@
-.bg-body {
-    background-color: var(--bg-body, #f2f2f2);
+.body {
+    background-color: var(--bg-body, #FFFFFF);    
 }
 
 .bg-copyright {
