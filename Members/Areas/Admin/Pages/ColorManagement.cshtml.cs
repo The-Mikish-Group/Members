@@ -33,14 +33,15 @@ namespace Members.Areas.Admin.Pages
             {
                 if (Regex.IsMatch(color.Value, @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
                 {
-                    var colorVar = await _context.ColorVars.FirstOrDefaultAsync(c => c.Name == color.Key);
+                    var name = "--" + color.Key;
+                    var colorVar = await _context.ColorVars.FirstOrDefaultAsync(c => c.Name == name);
                     if (colorVar != null)
                     {
                         colorVar.Value = color.Value;
                     }
                     else
                     {
-                        _context.ColorVars.Add(new ColorVar { Name = color.Key, Value = color.Value });
+                        _context.ColorVars.Add(new ColorVar { Name = name, Value = color.Value });
                     }
                 }
             }
