@@ -22,8 +22,15 @@ namespace Members.Controllers
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetColors()
         {
-            var colors = await _context.ColorVars.ToListAsync();
-            return colors.ToDictionary(c => c.Name, c => c.Value);
+            try
+            {
+                var colors = await _context.ColorVars.ToListAsync();
+                return colors.GroupBy(c => c.Name).ToDictionary(g => g.Key, g => g.First().Value);
+            }
+            catch (System.Exception)
+            {
+                return new StatusCodeResult(500);
+            }
         }
     }
 }
