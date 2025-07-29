@@ -28,7 +28,7 @@
 <header>
     
     <!-- Navbar -->  
-    <nav class="navbar navbar-expand-lg bg-navbar-header position-relative px-0">
+    <nav class="navbar navbar-expand-lg navbar-header-bg position-relative px-0">
         <div class="d-flex flex-grow-1 ps-2">  
             
             <!-- Set to show on lg -->  
@@ -59,7 +59,7 @@
                     </a>
                     
                     <!-- Welcome Dropdown Menu -->
-                    <ul class="dropdown-menu bg-navbar-header-dropdown border ps-2" style="margin-top: 0; min-width: 160px;" aria-labelledby="welcomeDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border navbar-header-dropdown-border ps-2" style="margin-top: 0; min-width: 160px;" aria-labelledby="welcomeDropdown" aria-expanded="false" data-bs-auto-close="outside">
                         <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:120px;" asp-area="" asp-controller="Info" asp-action="Index"><i class="bi bi-house-fill"></i> Welcome</a></li>
                         <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:120px;" asp-area="" asp-controller="Info" asp-action="About"><i class="bi bi-info-circle-fill"></i> About</a></li>
                         <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:120px;" asp-area="" asp-controller="Info" asp-action="Facilities"><i class="bi bi-building-fill"></i> Facilities</a></li>
@@ -79,7 +79,7 @@
                         </a>
 
                         <!-- Accounts Receivable -->
-                        <ul class="dropdown-menu bg-navbar-header-dropdown border ps-2" style="margin-top: 0; min-width: 235px;" aria-labelledby="accountsReceivableDropdown" data-bs-auto-close="outside">
+                        <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-2" style="margin-top: 0; min-width: 235px;" aria-labelledby="accountsReceivableDropdown" data-bs-auto-close="outside">
 
                             <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:150px;" asp-area="Admin" asp-page="/AccountsReceivable/BillableAssets" title="Manage Billable Assets"><i class="bi bi-house"></i> Billable Assets</a></li>
                             <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:165px;" asp-area="Admin" asp-page="/AccountsReceivable/CurrentBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
@@ -93,7 +93,7 @@
                                 </a>
 
                                 <!-- Invoice Draft Batches -->
-                                <ul class="dropdown-menu bg-navbar-header-dropdown ms-2 border ps-2" aria-labelledby="invoiceDraftBatchesDropdown" style="margin-top: 0; width: 225px;" aria-expanded="false" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 border ps-2" aria-labelledby="invoiceDraftBatchesDropdown" style="margin-top: 0; width: 225px;" aria-expanded="false" data-bs-auto-close="outside">
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 190px;" asp-area="Admin" asp-page="/AccountsReceivable/CreateBatchInvoices" title="Create Draft Batches"><i class="bi bi-plus-square"></i> Create Draft Batches</a></li>
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 195px;" asp-area="Admin" asp-page="/AccountsReceivable/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
                                 </ul>
@@ -109,7 +109,7 @@
                                 </a>
 
                                 <!-- Reporting -->
-                                <ul class="dropdown-menu bg-navbar-header-dropdown ms-2 border ps-2" style="margin-top: 0; width: 280px;" aria-labelledby="reportingDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 border ps-2" style="margin-top: 0; width: 280px;" aria-labelledby="reportingDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 180px;" asp-area="Admin" asp-page="/Reporting/ArAgingReport" title="A/R Aging Report"><i class="bi bi-calendar-range"></i> A/R Aging Report</a></li>
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 160px;" asp-area="Admin" asp-page="/Reporting/InvoiceRegisterReport" title="Invoice Register Report"><i class="bi bi-list-ul"></i> Invoice Register</a></li>
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 170px;" asp-area="Admin" asp-page="/Reporting/PaymentRegisterReport" title="Payment Register Report"><i class="bi bi-cash-coin"></i> Payment Register</a></li>
@@ -132,7 +132,7 @@
                         </a>
 
                         <!-- Management -->
-                        <ul class="dropdown-menu bg-navbar-header-dropdown border ps-2" style="margin-top: 0; width: 260px;" aria-labelledby="managementDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                        <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-2" style="margin-top: 0; width: 260px;" aria-labelledby="managementDropdown" aria-expanded="false" data-bs-auto-close="outside">
 
                             <!-- Manage Members Dropdown -->
                             <li class="nav-item dropdown">
@@ -143,7 +143,7 @@
                                 </a>
 
                                 <!-- Manage Members -->
-                                <ul class="dropdown-menu bg-navbar-header-dropdown ps-lg-2 border ms-2 ps-2" style="margin-top: 0; width: 260px;" aria-labelledby="manageMembersDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-lg-2 border ms-2 ps-2" style="margin-top: 0; width: 260px;" aria-labelledby="manageMembersDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:190px;" asp-area="Identity" asp-page="/Users" title="Manage Members"><i class="bi bi-person-gear"></i> Manage Members</a></li>
                                     <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:190px;" asp-area="Identity" asp-page="/Account/ResendEmailConfirmation"><i class="bi bi-envelope-check"></i> Re-Confirm Email</a></li>
                                     <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:190px;" asp-area="Identity" asp-page="/AddUser" title="Add Member"><i class="bi bi-plus-square"></i> Add a New Member</a></li>
@@ -174,7 +174,7 @@
                                 </a>
 
                                 <!-- Manage Pdf Documents Dropdown Menu -->
-                                <ul class="dropdown-menu bg-navbar-header-dropdown border ms-2 ps-2" style="margin-top: 0; width: 290px;" aria-labelledby="managePdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 290px;" aria-labelledby="managePdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     
                                     <!-- Members PDF Documents Dropdown -->
                                     <li class="nav-item dropdown">
@@ -185,7 +185,7 @@
                                         </a>
 
                                         <!-- Members Pdf Documents -->
-                                        <ul class="dropdown-menu bg-navbar-header-dropdown border ms-2 ps-2" style="margin-top: 0; width: 290px;" aria-labelledby="membersPdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 290px;" aria-labelledby="membersPdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:255px;" asp-area="" asp-controller="PdfCategory" asp-action="MembersCategories" title="Manage Member PDF Categories"><i class="bi bi-file-earmark-pdf-fill me-0"></i> Manage Member Categories</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:260px;" asp-area="" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" title="Manage Member PDF Documents"><i class="bi bi-file-earmark-richtext-fill me-0"></i> Manage Member Documents</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:180px;" asp-area="" asp-controller="PdfGeneration" asp-action="CreatePdf" title="New Directory PDF"><i class="bi bi-file-earmark-plus me-0"></i> New Directory PDF</a></li>
@@ -202,7 +202,7 @@
                                         </a>
 
                                         <!-- Confidential Pdf Documents Toggle -->
-                                        <ul class="dropdown-menu bg-navbar-header-dropdown border ms-2 ps-2" style="margin-top: 0; width: 300px;" aria-labelledby="confidentialPdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 300px;" aria-labelledby="confidentialPdfDocumentsDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:260px;" asp-area="" asp-controller="Manager" asp-action="ManagerListCategories" title="Confidential PDF Documents"><i class="bi bi-file-earmark-plus"></i> Confidential PDF Documents</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:280px;" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" title="Manage Confidential PDF Categories"><i class="bi bi-file-earmark-pdf-fill"></i> Manage Confidential Categories</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:285px;" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" title="Manage Confidential PDF Documents"><i class="bi bi-file-earmark-richtext-fill"></i> Manage Confidential Documents</a></li>
@@ -231,7 +231,7 @@
                         </a>
 
                         <!-- Members -->
-                        <ul class="dropdown-menu bg-navbar-header-dropdown border ps-2" style="margin-top: 0; width: 200px;" aria-labelledby="membersDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                        <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-2" style="margin-top: 0; width: 200px;" aria-labelledby="membersDropdown" aria-expanded="false" data-bs-auto-close="outside">
                         
                             <!-- News and Notifacation Blog -->  
                             <li>
@@ -247,7 +247,7 @@
                                 </a>  
 
                                 <!-- Members PDF Documents -->
-                                <ul class="dropdown-menu bg-navbar-header-dropdown border ms-2 ps-2" style="margin-top: 0; width: 200px;" aria-labelledby="membersPdfDocumentsDisplayDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 200px;" aria-labelledby="membersPdfDocumentsDisplayDropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     @{
                                         // Fetch the non-empty categories directly in the layout
                                         var dynamicCategories = DbContext.PDFCategories

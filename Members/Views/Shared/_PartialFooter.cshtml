@@ -12,7 +12,7 @@
 @inject UserManager<IdentityUser> UserManager
 @inject Members.Data.ApplicationDbContext DbContext
 
-<div id="footer" class="navbar navbar-dark border-top bg-navbar-footer" role="contentinfo" aria-label="Site footer">
+<div id="footer" class="navbar navbar-dark border-top navbar-footer-bg" role="contentinfo" aria-label="Site footer">
 
     <div class="container text-left">
         <div class="row w-100 gx-0 gx-lg-5">
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Footer logo and text -->
-    <div class="w-100 bg-copyright py-2 text-white">
+    <div class="w-100 copyright-bg py-2 text-white">
         <p class="py-2 text-center text-white" style="font-size: 10px;"><img class="footer-logo" src="~/Images/Svg/Logos/SmallLogo.svg" /> @Environment.GetEnvironmentVariable("SITE_NAME") Copyright © @DateTime.Now.Year</p>
     </div>
 
