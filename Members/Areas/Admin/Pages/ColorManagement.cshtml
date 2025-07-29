@@ -7,54 +7,110 @@
 
 <h2 class="text-black my-4 text-center"><i class="bi bi-palette-fill"></i> @ViewData["Title"]</h2>
 
-<div class="card m-1 p-2 shadow">
-    <form method="post">
+<!-- Action Buttons -->
+<div class="text-center mb-4">
+    <button type="button" class="btn btn-sm btn-info rounded-2 shadow me-2" data-bs-toggle="modal" data-bs-target="#importModal">
+        <i class="bi bi-box-arrow-up"></i> Import Colors
+    </button>
+    <a href="@Url.Page("ColorManagement", "ExportCsv")" class="btn btn-sm btn-primary rounded-2 shadow me-2">
+        <i class="bi bi-box-arrow-down"></i> Export Colors
+    </a>
+    <button type="submit" form="colorForm" class="btn btn-sm btn-success rounded-2 shadow">
+        <i class="bi bi-save"></i> Save Colors
+    </button>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["WarningMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card m-1 p-2 shadow mb-4">
+    <form method="post" id="colorForm">
         @Html.AntiForgeryToken()
         <div class="row">
             @if (Model.ColorVars != null)
             {
                 @foreach (var color in Model.ColorVars)
                 {
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>@color.Name</label>
-                            <input type="color" name="colors[@color.Name]" value="@color.Value" class="form-control" />
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                        <div class="form-group mb-3 px-2">
+                            <label class="form-label">@color.Name</label>
+                            <input type="color" name="colors[@color.Name]" value="@color.Value" class="form-control form-control-color w-100" style="height: 60px;" />
                         </div>
                     </div>
                 }
             }
         </div>
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-save"></i> Save Colors</button>
-            <button type="submit" class="btn btn-sm btn-primary rounded-2 shadow" asp-page-handler="ExportToCsvAsync"><i class="bi bi-box-arrow-down"></i> Export Colors</button>
-            <button type="button" class="btn btn-sm btn-info rounded-2 shadow" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bi bi-box-arrow-up"></i> Import Colors</button>
-        </div>
     </form>
 </div>
 
-@section Scripts {
-    <script src="~/js/color-management.js" asp-append-version="true"></script>
-}
-
+<!-- Import Modal -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="Import" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Import Colors</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Colors</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data" action="/Admin/ColorManagement?handler=Import">
+                @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="csvFile" class="form-label">Select CSV File</label>
-                        <input class="form-control" type="file" id="csvFile" name="csvFile">
+                        <input class="form-control" type="file" id="csvFile" name="csvFile" accept=".csv" required>
+                        <div class="form-text">
+                            CSV format: Name,Value (e.g., "--primary-color",#FF0000)
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="submit" class="btn btn-primary" id="importButton">
+                        <i class="bi bi-upload"></i> Import
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/color-management.js" asp-append-version="true"></script>
+    <script>
+        console.log('Color management page loaded');
+
+        // Simple file validation
+        document.getElementById('csvFile').addEventListener('change', function() {
+            const file = this.files[0];
+            const importButton = document.getElementById('importButton');
+
+            if (file && file.name.endsWith('.csv')) {
+                importButton.disabled = false;
+                console.log('Valid CSV file selected:', file.name);
+            } else {
+                importButton.disabled = true;
+                console.log('Invalid file selected');
+            }
+        });
+    </script>
+}
