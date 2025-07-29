@@ -3,7 +3,7 @@
 /* #region Font Sizes (-fs) */
 
 .about-text-fs {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .welcome-text-fs {
@@ -16,7 +16,7 @@
 @media (min-width: 575px) {
 
     .about-text-fs {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .welcome-text-fs {
@@ -30,7 +30,7 @@
 @media (min-width: 768.01px) {
 
     .about-text-fs {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .welcome-text-fs {

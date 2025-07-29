@@ -55,7 +55,14 @@
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group mb-3 px-2">
                             <label class="form-label">@color.Name</label>
-                            <input type="color" name="colors[@color.Name]" value="@color.Value" class="form-control form-control-color w-100" style="height: 60px;" />
+                            <div class="pickr-container" style="width: 100%;">
+                                <input type="hidden" name="colors[@color.Name]" value="@color.Value" class="color-input" />
+                                <div class="pickr-element"
+                                     data-color="@color.Value"
+                                     style="width: 100%; height: 60px; border: 2px solid #ddd; border-radius: 5px; background-color: @color.Value; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
+                                    @color.Value
+                                </div>
+                            </div>
                         </div>
                     </div>
                 }
@@ -95,21 +102,101 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/color-management.js" asp-append-version="true"></script>
-    <script>
-        console.log('Color management page loaded');
+    <!-- Pickr Color Picker -->
+    <script src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/pickr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/classic.min.css">
 
-        // Simple file validation
+    <style>
+        .pickr-element-full,
+        .pickr button {
+            width: 100% !important; 
+            padding: 3px;
+            margin: 3px;
+            box-sizing: border-box !important;
+            border: 1px solid darkgray !important;
+        }
+
+            .pickr-element-full:hover,
+            .pickr button:hover {
+                border: 2px solid black !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px gray !important;
+            }
+    </style>
+
+    <script>
+        console.log('Clean Pickr - No Button Styling');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const pickrElements = document.querySelectorAll('.pickr-element');
+            console.log('Found', pickrElements.length, 'pickr elements');
+
+            pickrElements.forEach(function(element) {
+                const colorValue = element.dataset.color;
+                const hiddenInput = element.parentElement.querySelector('.color-input');
+
+                const pickr = Pickr.create({
+                    el: element,
+                    theme: 'classic',
+                    default: colorValue,
+
+                    swatches: [
+                        '#ffffff', '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd', '#6c757d', '#495057', '#343a40', '#212529',
+                        '#007bff', '#0056b3', '#004085', '#28a745', '#1e7e34', '#155724', '#dc3545', '#c82333', '#bd2130',
+                        '#ffc107', '#e0a800', '#d39e00', '#17a2b8', '#138496', '#117a8b', '#6f42c1', '#59359a', '#4c2a85'
+                    ],
+
+                    components: {
+                        preview: true,
+                        opacity: false,
+                        hue: true,
+
+                        interaction: {
+                            hex: true,
+                            rgba: true,
+                            hsla: true,
+                            hsva: true,
+                            cmyk: true,
+                            input: true,
+                            clear: false,
+                            save: true
+                        }
+                    }
+                });
+
+                pickr.on('change', (color) => {
+                    const hexColor = color.toHEXA().toString();
+                    hiddenInput.value = hexColor;
+                    element.style.backgroundColor = hexColor;
+                    element.textContent = hexColor;
+                });
+
+                pickr.on('save', (color) => {
+                    const hexColor = color.toHEXA().toString();
+                    hiddenInput.value = hexColor;
+                    element.style.backgroundColor = hexColor;
+                    element.textContent = hexColor;
+                    pickr.hide();
+                });
+            });
+
+            // Apply full-width styling with CSS class after Pickr initialization
+            setTimeout(() => {
+                pickrElements.forEach(function(element) {
+                    element.classList.add('pickr-element-full');
+                });
+            }, 200);
+        });
+
+        // File validation
         document.getElementById('csvFile').addEventListener('change', function() {
             const file = this.files[0];
             const importButton = document.getElementById('importButton');
 
             if (file && file.name.endsWith('.csv')) {
                 importButton.disabled = false;
-                console.log('Valid CSV file selected:', file.name);
             } else {
                 importButton.disabled = true;
-                console.log('Invalid file selected');
             }
         });
     </script>

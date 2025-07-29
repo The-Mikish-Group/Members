@@ -14,16 +14,10 @@ using System.Threading.Tasks;
 namespace Members.Areas.Admin.Pages
 {
     [Authorize(Roles = "Admin")]
-    public class ColorManagementModel : PageModel
+    public class ColorManagementModel(ApplicationDbContext context, ILogger<ColorManagementModel> logger) : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<ColorManagementModel> _logger;
-
-        public ColorManagementModel(ApplicationDbContext context, ILogger<ColorManagementModel> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly ILogger<ColorManagementModel> _logger = logger;
 
         public IList<ColorVar>? ColorVars { get; set; }
 
@@ -31,7 +25,7 @@ namespace Members.Areas.Admin.Pages
         {
             _logger.LogInformation("OnGetAsync called - Loading color management page");
             ColorVars = await _context.ColorVars.ToListAsync();
-            _logger.LogInformation($"Loaded {ColorVars?.Count ?? 0} color variables");
+            _logger.LogInformation("Loaded {ColorVars?.Count ?? 0} color variables", ColorVars?.Count ?? 0);
         }
 
         public async Task<IActionResult> OnPostAsync(Dictionary<string, string> colors)
@@ -44,7 +38,7 @@ namespace Members.Areas.Admin.Pages
                 return RedirectToPage();
             }
 
-            _logger.LogInformation($"Received {colors.Count} colors to save");
+            _logger.LogInformation("Received {colors.Count} colors to save", colors.Count);
 
             foreach (var color in colors)
             {
@@ -62,17 +56,17 @@ namespace Members.Areas.Admin.Pages
                     if (colorVar != null)
                     {
                         colorVar.Value = color.Value;
-                        _logger.LogInformation($"Updated color {color.Key} to {color.Value}");
+                        _logger.LogInformation("Updated color {color.Key} to {color.Value}", color.Key, color.Value);
                     }
                     else
                     {
                         _context.ColorVars.Add(new ColorVar { Name = color.Key, Value = color.Value });
-                        _logger.LogInformation($"Added new color {color.Key} with value {color.Value}");
+                        _logger.LogInformation("Added new color {color.Key} with value {color.Value}", color.Key, color.Value);
                     }
                 }
                 else
-                {
-                    _logger.LogWarning($"Invalid color format for {color.Key}: {color.Value}");
+                {                   
+                    _logger.LogWarning("Invalid color format for {ColorKey}: {ColorValue}", color.Key, color.Value);
                 }
             }
 
@@ -88,24 +82,24 @@ namespace Members.Areas.Admin.Pages
             try
             {
                 var colors = await _context.ColorVars.ToListAsync();
-                _logger.LogInformation($"Retrieved {colors?.Count ?? 0} colors from database");
+                _logger.LogInformation("Retrieved {colors?.Count ?? 0} colors from database", colors?.Count ?? 0);
 
                 var builder = new StringBuilder();
                 builder.AppendLine("Name,Value");
 
-                if (colors != null && colors.Any())
+                if (colors != null && colors.Count != 0)
                 {
                     foreach (var color in colors)
                     {
                         // Debug: Log the actual values from database
-                        _logger.LogInformation($"Processing color - Name: '{color.Name}', Value: '{color.Value}'");
+                        _logger.LogInformation("Processing color - Name: '{color.Name}', Value: '{color.Value}'", color.Name, color.Value);
 
                         var colorName = color.Name ?? "Unknown";
                         var colorValue = color.Value ?? "#000000";
 
                         var line = $"{colorName},{colorValue}";
                         builder.AppendLine(line);
-                        _logger.LogInformation($"Added to CSV: {line}");
+                        _logger.LogInformation("Added to CSV: {line}", line );
                     }
                 }
                 else
@@ -117,8 +111,8 @@ namespace Members.Areas.Admin.Pages
                 var content = builder.ToString();
                 var buffer = Encoding.UTF8.GetBytes(content);
 
-                _logger.LogInformation($"Generated CSV file via GET: {fileName}");
-                _logger.LogInformation($"Content size: {buffer.Length} bytes");
+                _logger.LogInformation("Generated CSV file via GET: {fileName}", fileName);
+                _logger.LogInformation("Content size: {buffer.Length} bytes", buffer.Length);
 
                 return File(buffer, "text/csv", fileName);
             }
@@ -136,7 +130,7 @@ namespace Members.Areas.Admin.Pages
             if (string.IsNullOrEmpty(field))
                 return string.Empty;
 
-            if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
             {
                 return $"\"{field.Replace("\"", "\"\"")}\"";
             }
@@ -157,7 +151,7 @@ namespace Members.Areas.Admin.Pages
 
             try
             {
-                _logger.LogInformation($"Processing CSV file: {csvFile.FileName}, Size: {csvFile.Length}");
+                _logger.LogInformation("Processing CSV file: {csvFile.FileName}, Size: {csvFile.Length}", csvFile.FileName, csvFile.Length);
 
                 var importCount = 0;
                 var errorCount = 0;
@@ -165,14 +159,14 @@ namespace Members.Areas.Admin.Pages
                 using (var reader = new StreamReader(csvFile.OpenReadStream()))
                 {
                     var header = await reader.ReadLineAsync(); // Skip header
-                    _logger.LogInformation($"CSV header: {header}");
+                    _logger.LogInformation("CSV header: {header}", header);
 
                     while (!reader.EndOfStream)
                     {
                         var line = await reader.ReadLineAsync();
                         if (string.IsNullOrWhiteSpace(line)) continue;
 
-                        _logger.LogInformation($"Processing line: {line}");
+                        _logger.LogInformation("Processing line: {line}", line);
 
                         // Simple split since your CSV doesn't have quoted fields with commas
                         var values = line.Split(',');
@@ -181,39 +175,39 @@ namespace Members.Areas.Admin.Pages
                             var name = values[0].Trim();
                             var value = values[1].Trim();
 
-                            _logger.LogInformation($"Parsed - Name: '{name}', Value: '{value}'");
+                            _logger.LogInformation("Parsed - Name: '{name}', Value: '{value}'", name, value);
 
                             if (!string.IsNullOrEmpty(name) && Regex.IsMatch(value, @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
                             {
                                 var colorVar = await _context.ColorVars.FirstOrDefaultAsync(c => c.Name == name);
                                 if (colorVar != null)
                                 {
-                                    _logger.LogInformation($"Updating existing color {name} from {colorVar.Value} to {value}");
+                                    _logger.LogInformation("Updating existing color {name} from {colorVar.Value} to {value}", name, colorVar.Value, value);
                                     colorVar.Value = value;
                                 }
                                 else
                                 {
-                                    _logger.LogInformation($"Adding new color {name} with value {value}");
+                                    _logger.LogInformation("Adding new color {name} with value {value}", name, value);
                                     _context.ColorVars.Add(new ColorVar { Name = name, Value = value });
                                 }
                                 importCount++;
                             }
                             else
                             {
-                                _logger.LogWarning($"Invalid color data in import: Name='{name}', Value='{value}'");
+                                _logger.LogWarning("Invalid color data in import: Name='{name}', Value='{value}'", name, value);
                                 errorCount++;
                             }
                         }
                         else
                         {
-                            _logger.LogWarning($"Invalid line format: {line}");
+                            _logger.LogWarning("Invalid line format: {line}", line);
                             errorCount++;
                         }
                     }
                 }
 
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Import completed - {importCount} imported, {errorCount} errors");
+                _logger.LogInformation("Import completed - {importCount} imported, {errorCount} errors", importCount, errorCount);
 
                 if (importCount > 0)
                 {
@@ -267,7 +261,7 @@ namespace Members.Areas.Admin.Pages
             }
 
             result.Add(currentField.ToString());
-            return result.ToArray();
+            return [.. result];
         }
     }
 }

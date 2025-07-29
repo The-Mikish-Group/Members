@@ -10,14 +10,9 @@ namespace Members.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ColorsController : ControllerBase
+    public class ColorsController(ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public ColorsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         [HttpGet]
         public async Task<ActionResult<Dictionary<string, string>>> GetColors()
