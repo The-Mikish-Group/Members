@@ -1,5 +1,9 @@
 /* #region Guideline Colors */
 
+body {
+    background-color: var(--bg-body, #f2f2f2);
+}
+
 .bg-copyright {
     background-color: var(--bg-copyright, #7D7E81) !important;
 }
@@ -200,3 +204,4 @@ thead th {
 
 
 /* #endregion Resposive color changes */
+
