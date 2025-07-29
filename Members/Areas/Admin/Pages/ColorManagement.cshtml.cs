@@ -53,19 +53,26 @@ namespace Members.Areas.Admin.Pages
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostExportAsync()
+        public async Task<IActionResult> OnGetExportToCsvAsync()
         {
             var colors = await _context.ColorVars.ToListAsync();
             var builder = new StringBuilder();
             builder.AppendLine("Name,Value");
             foreach (var color in colors)
             {
-                builder.AppendLine($"{color.Name},{color.Value}");
+                builder.AppendLine($"{EscapeCsvField(color.Name)},{EscapeCsvField(color.Value)}");
             }
 
-            var fileName = "colors.csv";
+            var fileName = $"colors_{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
             var buffer = Encoding.UTF8.GetBytes(builder.ToString());
             return File(buffer, "text/csv", fileName);
+        }
+
+        private static string EscapeCsvField(string? field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return string.Empty;
+            return field.Replace("\"", "\"\"");
         }
 
         public async Task<IActionResult> OnPostImportAsync(IFormFile csvFile)
