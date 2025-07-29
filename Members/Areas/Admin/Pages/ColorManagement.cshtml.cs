@@ -63,7 +63,8 @@ namespace Members.Areas.Admin.Pages
                 builder.AppendLine($"{color.Name},{color.Value}");
             }
 
-            return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "colors.csv");
+            Response.Headers["Content-Disposition"] = "attachment; filename=colors.csv";
+            return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv");
         }
 
         public async Task<IActionResult> OnPostImportAsync(IFormFile csvFile)
