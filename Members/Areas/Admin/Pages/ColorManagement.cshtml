@@ -10,13 +10,13 @@
 <!-- Action Buttons -->
 <div class="text-center mb-4">
     <button type="button" class="btn btn-sm btn-info rounded-2 shadow me-2" data-bs-toggle="modal" data-bs-target="#importModal">
-        <i class="bi bi-box-arrow-up"></i> Import Colors
+        <i class="bi bi-box-arrow-down"></i> Import Colors
     </button>
     <a href="@Url.Page("ColorManagement", "ExportCsv")" class="btn btn-sm btn-primary rounded-2 shadow me-2">
-        <i class="bi bi-box-arrow-down"></i> Export Colors
+        <i class="bi bi-box-arrow-up"></i> Export Colors
     </a>
     <button type="submit" form="colorForm" class="btn btn-sm btn-success rounded-2 shadow">
-        <i class="bi bi-save"></i> Save Colors
+        <i class="bi bi-save"></i> Update Colors
     </button>
 </div>
 
@@ -54,7 +54,7 @@
                 {
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group mb-3 px-2">
-                            <label class="form-label">@color.Name</label>
+                            <label class="mb-0 form-label color-label" data-original-name="@color.Name">@color.Name - @color.Value</label>
                             <div class="pickr-container" style="width: 100%;">
                                 <input type="hidden" name="colors[@color.Name]" value="@color.Value" class="color-input" />
                                 <div class="pickr-element"
@@ -109,7 +109,7 @@
     <style>
         .pickr-element-full,
         .pickr button {
-            width: 100% !important; 
+            width: 100% !important;
             padding: 3px;
             margin: 3px;
             box-sizing: border-box !important;
@@ -169,6 +169,13 @@
                     hiddenInput.value = hexColor;
                     element.style.backgroundColor = hexColor;
                     element.textContent = hexColor;
+
+                    // Update the label to show the new hex value
+                    const label = element.closest('.form-group').querySelector('.color-label');
+                    if (label) {
+                        const originalName = label.getAttribute('data-original-name');
+                        label.textContent = `${originalName} - ${hexColor}`;
+                    }
                 });
 
                 pickr.on('save', (color) => {
@@ -176,6 +183,14 @@
                     hiddenInput.value = hexColor;
                     element.style.backgroundColor = hexColor;
                     element.textContent = hexColor;
+
+                    // Update the label to show the new hex value
+                    const label = element.closest('.form-group').querySelector('.color-label');
+                    if (label) {
+                        const originalName = label.getAttribute('data-original-name');
+                        label.textContent = `${originalName} - ${hexColor}`;
+                    }
+
                     pickr.hide();
                 });
             });

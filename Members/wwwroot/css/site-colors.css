@@ -3,11 +3,11 @@
 }
 
 .navbar-header-bg {
-    background-color: var(--navbar-header-bg, #BC9133);
+    background-color: var(--navbar-header-bg, #faf6dd);
 }
 
-.navbar-header-dropdown-bg {   
-    background-color: var(--navbar-header-dropdown-bg, #dacfbe);
+.navbar-header-dropdown-bg {
+    background-color: var(--navbar-header-dropdown-bg, #ffffee);
 }
 
 .navbar-header-dropdown-border {
@@ -15,7 +15,7 @@
 }
 
 .navbar-footer-bg {
-    background-color: var(--navbar-footer-bg, #dacfbe);
+    background-color: var(--navbar-footer-bg, #ecdfa1);
 }
 
 .copyright-bg {
@@ -23,7 +23,7 @@
 }
 
 .card {
-    background-color: var(--card-bg, #f1e8d5);
+    background-color: var(--card-bg, #fffdea);
     color: var(--card-text, #424143);
 }
 
@@ -52,7 +52,7 @@ thead th {
 
 .table-striped > tbody > tr:nth-of-type(odd) > td,
 .row-even {
-    background-color: var(--table-striped-odd, #f1e8d5);
+    background-color: var(--table-striped-odd, #f8f5d5);
 }
 
 .table-striped > tbody > tr:nth-of-type(even) > td,
@@ -160,11 +160,6 @@ li.show > a#membersFooterDropdown {
 li .dropdown-menu .nav-link i {
     color: var(--text-black, #424143);
 }
-
-
-
-
-
 
 .pagination .page-link {
     background-color: var(--pagination-bg, #FFFFFF);
