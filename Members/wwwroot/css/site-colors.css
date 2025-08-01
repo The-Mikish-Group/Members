@@ -1,5 +1,5 @@
 .body-bg {
-    background-color: var(--body-bg, #FFFFFF);    
+    background-color: var(--body-bg, #FFFFFF);
 }
 
 .navbar-header-bg {
@@ -164,18 +164,18 @@ li .dropdown-menu .nav-link i {
 .pagination .page-link {
     background-color: var(--pagination-bg, #FFFFFF);
     border-color: var(--pagination-border, #808080);
-    color: var(--pagination-text, #424143); 
+    color: var(--pagination-text, #424143);
 }
 
 .pagination .page-item.active .page-link {
     background-color: var(--pagination-active-bg, #808080);
     border-color: var(--pagination-active-border, #808080);
-    color: var(--pagination-active-text, #FFFFFF); 
+    color: var(--pagination-active-text, #FFFFFF);
 }
 
 .pagination .page-link:hover {
-    background-color: var(--pagination-hover-bg, #D3D3D3); 
-    color: var(--pagination-hover-text, #424143); 
+    background-color: var(--pagination-hover-bg, #D3D3D3);
+    color: var(--pagination-hover-text, #424143);
 }
 
 .pagination .page-item.disabled .page-link {

@@ -111,7 +111,8 @@
 
                     <!-- Email Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox shadow" id="emailConfirmedCheckbox" />
+                        custom-checkbox-green" class=
+                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox custom-checkbox-green shadow" id="emailConfirmedCheckbox" />
                         <label class="form-check-label" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
 
@@ -127,7 +128,7 @@
 
                     <!-- Phone Number Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox shadow" id="PhoneNumberConfirmedCheckbox" />
+                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox custom-checkbox-green shadow" id="PhoneNumberConfirmedCheckbox" />
                         <label class="form-check-label" for="PhoneNumberConfirmedCheckbox">Cell Phone Confirmed</label>
                     </div>
 
@@ -223,7 +224,7 @@
                         <!-- Is Billing Contact -->
                         <div class="col-6 mb-4">
                             <div class="form-check ms-2">
-                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox shadow" id="IsBillingContactCheckbox" />
+                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox custom-checkbox-green shadow" id="IsBillingContactCheckbox" />
                                 <label asp-for="Input.IsBillingContact" class="form-check-label"></label>
                             </div>
                             <span asp-validation-for="Input.IsBillingContact" class="text-danger"></span>
@@ -232,7 +233,7 @@
                         <!-- Two Factor Enabled -->
                         <div class="col-6 mb-4">
                             <div class="form-check mb-3">
-                                <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox shadow" id="twoFactorEnabledCheckbox" />
+                                <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox custom-checkbox-green shadow" id="twoFactorEnabledCheckbox" />
                                 <label class="form-check-label" asp-for="Input.TwoFactorEnabled"></label>
                                 <span asp-validation-for="Input.TwoFactorEnabled" class="text-danger"></span>
                             </div>
@@ -263,7 +264,7 @@
             transform: translateY(-50%);
         }
 
-        .form-check-input[type=checkbox].twoFactorEnabled-checkbox,
+        /* .form-check-input[type=checkbox].twoFactorEnabled-checkbox,
         .form-check-input[type=checkbox].isBillingContact-checkbox,
         .form-check-input[type=checkbox].email-confirmed-checkbox,
         .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox,
@@ -285,8 +286,8 @@
             .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
             .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked,
             .form-check-input[type=checkbox].role-checkbox:checked {
-                background-color: #fff; /* White background when checked */
-                border-color: #28a745; /* Green border when checked */
+                background-color: #fff;
+                border-color: #28a745;
             }
 
                 .form-check-input[type=checkbox].twoFactorEnabled-checkbox:checked::before,
@@ -294,15 +295,15 @@
                 .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
                 .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,
                 .form-check-input[type=checkbox].role-checkbox:checked::before {
-                    content: '\2713'; /* Unicode checkmark character */
+                    content: '\2713';
                     display: block;
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                     font-size: 1em;
-                    color: #28a745; /* Green checkmark */
-                }
+                    color: #28a745;
+                } */
     </style>
 }
 

@@ -63,7 +63,7 @@
                                         {
                                             <!-- Render checkbox disabled for Admin role if user is a Manager -->                                               
                                             <input type="checkbox" asp-for="AllRoles[i].Selected"
-                                                class="form-check-input"
+                                                class="form-check-input custom-checkbox-green"
                                                 id="role-@i"
                                                 data-role-name="@Model.AllRoles[i].Text"
                                                 disabled />
@@ -82,7 +82,7 @@
                                         {
                                             <!-- Render enabled checkbox for other roles or if user is Admin -->
                                             <input type="checkbox" asp-for="AllRoles[i].Selected"
-                                                    class="form-check-input"
+                                                    class="form-check-input custom-checkbox-green"
                                                     id="role-@i"
                                                     data-role-name="@Model.AllRoles[i].Text" />
                                         }
