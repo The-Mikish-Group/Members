@@ -95,6 +95,9 @@ html > body header {
     top: 20px;
     transform: translateY(-10%);
 }
+.siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
+    padding-left: 120px;
+}
 
 /* Adjust form styling within nav-item to prevent misalignment */
 .navbar-nav .nav-item form.form-inline {

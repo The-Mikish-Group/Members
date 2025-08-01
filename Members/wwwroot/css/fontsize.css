@@ -10,6 +10,14 @@
     font-size: 20px;
 }
 
+.delete-button i {
+    font-size: 0.9em;
+}
+
+.btn-rename i {
+    font-size: 0.9em;
+}
+
 /* #endregion */
 
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */

@@ -215,8 +215,7 @@
     border-radius: 4px;
 }
 
-    #top-button:hover,
-    #top-button:focus {
+    #top-button:hover {
         background-color: #4A4B4C; /* bg-gray-dark */
     }
 
@@ -227,8 +226,8 @@
 /* Responsive Nav colors */
 .siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
     padding-left: 120px;
-    /*color: #4f7d1f !important;*/
-    /*transition: color 0.3s ease;*/
+    /*color: #4f7d1f !important;
+    transition: color 0.3s ease;*/
 }
 /* #endregion */
 
@@ -237,8 +236,8 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    width: 1.1em;
-    height: 1.1em;
+    width: 1.2em;
+    height: 1.2em;
     border: 1px solid #ccc;
     border-radius: 0.2em;
     outline: none;
@@ -262,7 +261,7 @@
             display: block;
             position: absolute;
             /* Adjust top and left based on visual inspection.
-                               Start with 50% and then fine-tune by a pixel or two if needed. */
+               Start with 50% and then fine-tune by a pixel or two if needed. */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%); /* Centering trick */

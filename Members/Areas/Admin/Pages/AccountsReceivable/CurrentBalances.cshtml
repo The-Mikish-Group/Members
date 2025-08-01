@@ -53,7 +53,7 @@
                 <div class="col-md-3">
                     <form method="get" class="my-2">
                         <div class="form-check">
-                            <input asp-for="ShowOnlyOutstanding" class="text-black form-check-input shadow custom-checkbox-green" onchange="this.form.submit()" />
+                            <input asp-for="ShowOnlyOutstanding" class="text-black form-check-input custom-checkbox-green shadow" onchange="this.form.submit()" />
                             <label asp-for="ShowOnlyOutstanding" class="text-black form-check-label">Only Show Members with Balances</label>
                         </div>
                         <input type="hidden" name="sortOrder" value="@Model.CurrentSort" />
@@ -243,8 +243,6 @@
                 </table>
             </div>
         </div>
-
-
     }
 
     <!-- Export Confirmation Modal -->
