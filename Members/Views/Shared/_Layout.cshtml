@@ -98,15 +98,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" integrity="sha512-tze+o/xG0w3yxxE8xe32piisVvI/LfcEuf6LW7lFLUxhio2SfFQ9mQ0TqB0avvonmxUXT7/l8+fnWkR03u85fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
-    <!-- Select2 Dropdown -->
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js" integrity="sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" integrity="sha512-aD9ophpFQ61nFZP6hXYu4Q/b/USW7rpLCQLX6Bi0WJHXNO7Js/fUENpBQf/+P4NtpzNX0jSgR5zVvPOJp+W2Kg==" crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
-
-
-    @* <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap4-theme/1.5.2/select2-bootstrap4.min.css" rel="stylesheet" /> *@
-
     <!-- Project CSS files -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version=" true" />
     
@@ -132,44 +123,50 @@
     <partial name="_PartialFooter" />
 
     <script>
-
-        // Adjust the position of the footer based on actual content and footer height
-        function adjustFooterPosition() {
-            var mainContainer = document.getElementById('MainContainer');
+        // Alternative approach using CSS flexbox-like behavior
+        function adjustFooterPositionFlexible() {
+            var body = document.body;
             var footer = document.getElementById('footer');
 
-            // Calculate the space between content, footer, and the bottom of the page
-            var spaceToBottom = window.innerHeight - mainContainer.offsetHeight - footer.offsetHeight;
+            if (!footer) return;
 
-            // Adjust the position of the footer if the space is less than 0
-            footer.style.bottom = (spaceToBottom < 0) ? -spaceToBottom + 'px' : 'auto';
-        }
-
-        // Call the function when the page loads and when it resizes
-        window.addEventListener('load', adjustFooterPosition);
-        window.addEventListener('resize', adjustFooterPosition);
-
-        // Add event listeners with stopPropagation for nested dropdown toggles
-        // This prevents clicks on sub-toggles from closing their parent dropdowns
-        document.addEventListener('DOMContentLoaded', function() {
-            // Helper function to add stopPropagation
-            function addStopPropagation(selector) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.addEventListener('click', function(event) {
-                        event.stopPropagation();
-                    });
-                } else {
-                    // console.warn('stopPropagation: Element not found for selector:', selector); // Optional: for debugging if selectors are wrong
-                }
+            // Ensure body takes full height
+            if (body.style.minHeight !== '100vh') {
+                body.style.minHeight = '100vh';
+                body.style.display = 'flex';
+                body.style.flexDirection = 'column';
             }
 
-            // --- Top Level Dropdowns that need stopPropagation because they have data-bs-auto-close="outside" 
-            // Footer dropdowns (if it's a nested structure and needs similar behavior)
-            addStopPropagation('#pdfDocumentsFooterDropdown');
-            addStopPropagation('#membersFooterDropdown');
-        });
+            // Find the main content wrapper (everything before footer)
+            var mainContent = document.getElementById('MainContainer');
+            if (mainContent && !mainContent.style.flex) {
+                mainContent.style.flex = '1';
+            }
+        }
 
+        // Debounced version to prevent excessive calls during resize
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Use the debounced version for resize events - FIXED TO CALL THE RIGHT FUNCTION
+        const debouncedAdjustFooter = debounce(adjustFooterPositionFlexible, 100);
+
+        // Call the function when the page loads and when it resizes - FIXED TO CALL THE RIGHT FUNCTION
+        window.addEventListener('load', adjustFooterPositionFlexible);
+        window.addEventListener('resize', debouncedAdjustFooter);
+        window.addEventListener('DOMContentLoaded', adjustFooterPositionFlexible);
+
+        // Export for external use
+        window.adjustFooterPosition = adjustFooterPositionFlexible;
     </script>
     
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>    

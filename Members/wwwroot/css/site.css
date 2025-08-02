@@ -1,5 +1,22 @@
 /* #region Default Stuff */
 
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Make the main content area grow to fill available space */
+#MainContainer {
+    flex: 1 0 auto;
+}
+
+/* Ensure the footer stays at bottom */
+#footer {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -8,13 +25,9 @@ body {
     padding: 0;
     margin: 0;
     line-height: 1.4;
-    /* font-family: "Bell MT", serif;*/
-    /* font-size: 14px;*/
     font-weight: 400;
     text-rendering: optimizeLegibility;
-    background-color: #f2f2f2; /*#fcfcf7;*/ /* #fffae4; */
-    
-    /*background-color: cornsilk;*/
+    background-color: #f2f2f2;
     height: 100%;
     width: 100%;
 }
@@ -43,8 +56,9 @@ textarea:focus,
 .fw-bold { 
     font-weight: 500;
 }
+
 /* This rule for sort indicators in table headers is good to keep */
-#mainAssetsTable thead th .bi {
+thead th .bi {
     font-size: 0.9em;
     margin-left: 0.25rem;
 }
