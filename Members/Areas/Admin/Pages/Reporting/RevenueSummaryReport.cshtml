@@ -13,8 +13,7 @@
     <!-- Title -->
     <div class="row">
         <div class="col">
-            <h2 class="text-black">@ViewData["Title"]</h2>
-            <hr />
+            <h2 class="text-black text-center">@ViewData["Title"]</h2>            
         </div>
     </div>
 
@@ -86,13 +85,13 @@
         var summary = Model.SummaryData!; // Introduce non-nullable local variable
 
         <div class="card mb-4 shadow">
-            <div class="card-header bg-white text-black">
+            <div class="card-header print-table-header-bg">
                 Summary for period: @summary.ReportStartDate.ToString("yyyy-MM-dd") to @summary.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
-            <div class="card-body rounded-2">
+            <div class="card-body bg-white rounded-2">
                 <dl class="row gx-0 gy-0">
                     <dt class="col-4 text-nowrap border-bottom pb-2">Invoiced Amounts</dt>
-                    <dd class="col-8 text-end border-bottom pb-2">&nbsp;</dd>
+                    <dd class="col-8 text-end border-bottom mb-0 pb-2">&nbsp;</dd>
 
                     <dt class="col-4 ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.TotalAmountInvoiced_Dues)</dt>
                     <dd class="col-8 text-end">@summary.TotalAmountInvoiced_Dues.ToString("C")</dd>
@@ -110,7 +109,7 @@
                     <dd class="col-8 fw-bold text-end">@summary.GrandTotalAmountInvoiced.ToString("C")</dd>
 
                     <dt class="col-4 border-bottom py-2 text-nowrap">Payments & Credits</dt>
-                    <dd class="col-8 border-bottom py-2 text-end">&nbsp;</dd>
+                    <dd class="col-8 border-bottom mb-0 py-2 text-end">&nbsp;</dd>
 
                     <dt class="col-4 ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.TotalPaymentsReceived)</dt>
                     <dd class="col-8 text-end">@summary.TotalPaymentsReceived.ToString("C")</dd>
@@ -122,7 +121,7 @@
                     <dd class="col-8 text-end">@summary.TotalCreditsApplied.ToString("C")</dd>
 
                     <dt class="col-4 border-bottom py-2 text-nowrap">Net Change</dt>
-                    <dd class="col-8 border-bottom py-2 text-end">&nbsp;</dd>
+                    <dd class="col-8 border-bottom mb-0 py-2 text-end">&nbsp;</dd>
 
                     <dt class="col-4 fw-bold ps-4 text-nowrap">@Html.DisplayNameFor(model => summary.NetChange)</dt>
                     <dd class="col-8 fw-bold text-end">@summary.NetChange.ToString("C")</dd>

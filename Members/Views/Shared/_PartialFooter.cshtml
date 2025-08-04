@@ -46,60 +46,25 @@
                         <li class="nav-item dropdown pt-lg-0 pt-0">
 
                             <!-- Members Dropdown Toggle in the footer -->
-                            <a class="rounded-2 nav-link dropdown-toggle footer-fs px-2" style="max-width:135px;" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="rounded-2 nav-link dropdown-toggle footer-fs px-2" style="width:135px;" href="#" id="membersFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-people-fill"></i> Members
                             </a>
 
                             <!-- Members Dropdown Menu in the footer -->
-                            <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="membersFooterDropdown" style="margin-top: 0; max-width:180px;">
+                            <ul class="dropdown-menu ps-lg-2 border-0 bg-transparent ps-4" aria-labelledby="membersFooterDropdown" style="margin-top: 0; width:180px;">
 
                                 <!-- News and Notices -->
                                 <li class="nav-item text-light">
-                                    <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="max-width:175px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
+                                    <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="width:175px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank">
                                         <i class="bi bi-newspaper"></i> News and Notices
                                     </a>
                                 </li>
 
-                                <!-- Start of Nested "PDF Documents" Dropdown (wrapping the loop) -->
-                                <li class="nav-item dropdown">
-
-                                    <!-- PDF Documents Dropdown Toggle in the footer -->
-                                    <a class="rounded-2 nav-link dropdown-toggle footer-fs px-2" style="max-width:180px;" href="#" id="pdfDocumentsFooterDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!--  "PDF Documents" -->
+                                <li class="nav-item text-light">
+                                    <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="width:180px;" asp-area="" asp-controller="Members" asp-action="ListCategories">
                                         <i class="bi bi-file-earmark-pdf-fill me-0"></i> PDF Documents
                                     </a>
-
-                                    <!-- PDF Documents Menu in the footer -->
-                                    <ul class="dropdown-menu rounded-2 border-0 bg-transparent ps-2" aria-labelledby="pdfDocumentsFooterDropdown" style="margin-top: 0; max-width:160px">
-                                        @{
-                                            // Fetch the non-empty categories directly in the layout
-                                            var dynamicCategories = DbContext.PDFCategories
-                                            .Where(c => c.IsAdminOnly != true) 
-                                            .OrderBy(c => c.SortOrder)
-                                            .ThenBy(c => c.CategoryName)
-                                            .ToList(); 
-
-                                            // Check if any categories were found
-                                            if (dynamicCategories != null && dynamicCategories.Any())
-                                            {
-                                                // Loop through the categories and create a link for each
-                                                foreach (var category in dynamicCategories)
-                                                {
-                                                    // Maintain footer styles for nested list items
-                                                    <li class="nav-item text-light">
-                                                        <a class="rounded-2 nav-link footer-fs text-nowrap px-2" style="max-width:155px;" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
-                                                            <i class="bi bi-list-ul ms-2"></i> @category.CategoryName
-                                                        </a>
-                                                    </li>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                // Optional: Display a placeholder if no categories are found
-                                                <li><span class="dropdown-item-text text-light">No PDF categories available</span></li> <!-- Add text-light -->
-                                            }
-                                        }
-
-                                    </ul>
                                 </li>
 
                             </ul>

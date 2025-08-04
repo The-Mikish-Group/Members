@@ -37,7 +37,7 @@ namespace Members.Models
         public decimal Amount { get; set; }
         [Required]
         public PaymentMethod Method { get; set; }
-        [StringLength(100)]
+        [StringLength(1000)]
         [Display(Name = "Reference Number")]
         public string? ReferenceNumber { get; set; } // E.g., Check number, transaction ID
         [StringLength(200)]

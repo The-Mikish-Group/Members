@@ -14,8 +14,7 @@
     <!-- Title -->
     <div class="row">
         <div class="col">
-            <h2 class="text-black">@ViewData["Title"]</h2>
-            <hr />
+            <h2 class="text-black text-center">@ViewData["Title"]</h2>            
         </div>
     </div>
 
@@ -118,13 +117,13 @@
 
     @if (!string.IsNullOrEmpty(Model.SelectedUserId) && Model.StatementData != null)
     {
-        <div class="card mb-4 shadow">
-            <div class="card-header text-black">
+        <div class="card mb-4 shadow print-table-header-bg">
+            <div class="card-header print-table-header-bg">
                 Statement for: <strong>@Model.StatementData.SelectedUserName</strong> <br />
                 Period: @Model.StatementData.ReportStartDate.ToString("yyyy-MM-dd") to @Model.StatementData.ReportEndDate.ToString("yyyy-MM-dd")
             </div>
-            <div class="card-body rounded-2">
-                <div class="table-responsive">
+            
+            <div class="table-responsive">
                     <table class="table-striped table-hover table-sm table">
                         <thead class="bg-white text-black">
                             <tr>
@@ -154,7 +153,7 @@
                                     <td>@item.TransactionDate.ToString("yyyy-MM-dd")</td>
                                     <td>@Html.DisplayFor(modelItem => item.TransactionType)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Reference)</td>
-                                    <td style="max-width: 485px;" class="statement-description-cell text-nowrap">@Html.DisplayFor(modelItem => item.Description)</td>
+                                    <td style="max-width: 485px; word-wrap: break-word;" class="statement-description-cell text-wrap">@Html.DisplayFor(modelItem => item.Description)</td>
                                     <td class="text-end">@(item.DebitAmount?.ToString("C"))</td>
                                     <td class="text-end">@(item.CreditAmount?.ToString("C"))</td>
                                     <td class="text-end">@item.RunningBalance.ToString("C")</td>
@@ -169,7 +168,7 @@
                         </tfoot>
                     </table>
                 </div>
-            </div>
+            
         </div>
     }
     else if (string.IsNullOrEmpty(Model.SelectedUserId) && (Request.Query.ContainsKey("StartDate") || Request.Query.ContainsKey("SelectedUserId")) && (Model.UserSelectList != null && !Model.UserSelectList.Any(x=>x.Selected))) // Added null check for UserSelectList

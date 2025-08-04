@@ -36,11 +36,6 @@ namespace Members.Areas.Admin.Pages.Reporting
         public IList<InvoiceRegisterItem> ReportData { get; set; } = [];
         public InvoiceRegisterSummary Totals { get; set; } = new InvoiceRegisterSummary();
 
-        // Data fetching and CSV export logic will be added in later steps.
-        // For now, OnGetAsync can be minimal or call a placeholder for data generation.
-
-        // Data fetching and CSV export logic will be added in later steps.
-        // For now, OnGetAsync can be minimal or call a placeholder for data generation.
         private async Task GenerateReportDataAsync()
         {
             ReportData = [];
@@ -51,11 +46,15 @@ namespace Members.Areas.Admin.Pages.Reporting
 
             var users = await _context.UserProfile.ToDictionaryAsync(up => up.UserId, up => $"{up.FirstName} {up.LastName}".Trim());
 
+            // Removed the OrderBy from the database query since we'll sort after processing
+            // Exclude Draft status invoices
             var invoices = await _context.Invoices
-                .Where(i => i.InvoiceDate >= effectiveStartDate && i.InvoiceDate <= effectiveEndDate)
-                .OrderBy(i => i.InvoiceDate)
-                .ThenBy(i => i.InvoiceID)
+                .Where(i => i.InvoiceDate >= effectiveStartDate &&
+                           i.InvoiceDate <= effectiveEndDate &&
+                           i.Status != InvoiceStatus.Draft)
                 .ToListAsync();
+
+            var reportItems = new List<InvoiceRegisterItem>();
 
             foreach (var invoice in invoices)
             {
@@ -74,7 +73,8 @@ namespace Members.Areas.Admin.Pages.Reporting
                     Status = invoice.Status.ToString(),
                     Type = invoice.Type.ToString() // Get the string representation of the enum
                 };
-                ReportData.Add(reportItem);
+
+                reportItems.Add(reportItem);
 
                 Totals.TotalAmountDue += invoice.AmountDue;
                 Totals.TotalAmountPaid += invoice.AmountPaid;
@@ -86,6 +86,12 @@ namespace Members.Areas.Admin.Pages.Reporting
                     Totals.TotalLateFeeValue += invoice.AmountDue;
                 }
             }
+
+            // Sort by Customer Name first, then by Invoice ID
+            ReportData = reportItems
+                .OrderBy(x => x.CustomerName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.InvoiceId)
+                .ToList();
         }
 
         public async Task OnGetAsync()

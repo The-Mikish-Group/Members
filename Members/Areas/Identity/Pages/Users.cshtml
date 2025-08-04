@@ -118,14 +118,14 @@
 
 
                             <!-- Table for displaying users -->
-                            <table class="table table-striped xtable-transparent table-bordered shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
+                            <table class="w-100 table-striped shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
                 
                                 <!-- Table Column Headings -->
                                 <thead>                   
                                     <tr>                       
                                         <th>
                                             <!-- Sort by Full Name -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="fullname"
                                                 data-sort-column="fullname"
@@ -139,7 +139,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Email -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="email"
                                                 data-sort-column="email"
@@ -153,7 +153,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Email Confirmed -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="emailconfirmed"
                                                 data-sort-column="emailconfirmed"
@@ -167,7 +167,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Cell Phone -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="phonenumber"
                                                 data-sort-column="phonenumber"
@@ -181,7 +181,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Cell Phone Confirmed -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="phonenumberconfirmed"
                                                 data-sort-column="phonenumberconfirmed"
@@ -195,7 +195,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Is Billing Contact -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="isbillingcontact"
                                                 data-sort-column="isbillingcontact"
@@ -209,7 +209,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Roles -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="roles"
                                                 data-sort-column="roles"
@@ -223,7 +223,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Last Login -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="lastlogin"
                                                 data-sort-column="lastlogin"
@@ -237,7 +237,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by First Name -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="firstname"
                                                 data-sort-column="firstname"
@@ -251,7 +251,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Middle Name -->
-                                            <a class="nav-link"
+                                        <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="middlename"
                                                 data-sort-column="middlename"
@@ -265,7 +265,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Last Name -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="lastname"
                                                 data-sort-column="lastname"
@@ -279,7 +279,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Home Phone -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="homephonenumber"
                                                 data-sort-column="homephonenumber"
@@ -293,7 +293,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Address Line 1 -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="addressline1"
                                                 data-sort-column="addressline1"
@@ -307,7 +307,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Address Line 2 -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="addressline2"
                                                 data-sort-column="addressline2"
@@ -321,7 +321,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by City -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="city"
                                                 data-sort-column="city"
@@ -335,7 +335,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by State -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="state"
                                                 data-sort-column="state"
@@ -349,7 +349,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Zip Code -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="zipcode"
                                                 data-sort-column="zipcode"
@@ -363,7 +363,7 @@
                                         </th>                                    
                                         <th class="extra-field">
                                             <!-- Sort by Birthday -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="birthday"
                                                 data-sort-column="birthday"
@@ -377,7 +377,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Anniversary -->
-                                            <a class="nav-link"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="anniversary"
                                                 data-sort-column="anniversary"
@@ -402,44 +402,44 @@
                                     @foreach (var user in Model.Users)
                                     {
                                         <!-- User Row -->
-                       
-                                        <tr class="user-row @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
+
+                                    <tr class="text-decoration-none text-nowrap user-row @(i % 2 == 0 ? "row-even" : "row-odd")" data-user-id="@user.Id" data-show-extra-fields="@Model.ShowExtraFields">
 
                                             <!-- Full Name -->
-                                            <td>@user.FullName</td>
+                                        <td class ="text-decoration-none text-nowrap">@user.FullName</td>
 
                                             <!-- Email -->
-                                            <td>@user.Email</td>
+                                        <td class="text-decoration-none text-nowrap">@user.Email</td>
 
                                             <!-- Email Confirmed -->
-                                            <td>
+                                        <td class="text-decoration-none text-nowrap">
                                                 @if (user.EmailConfirmed)
                                                 {
                                                     <i class="bi bi-check-lg text-success"></i>
                                                 }
-                                            </td>
+                                        </td>
 
                                             <!-- Cell Phone -->
-                                            <td>@user.PhoneNumber</td>
+                                        <td class="text-decoration-none text-nowrap">@user.PhoneNumber</td>
 
                                             <!-- Cell Phone Confirmed -->
-                                            <td>
+                                        <td class="text-decoration-none text-nowrap">
                                                 @if (user.PhoneNumberConfirmed)
                                                 {
                                                     <i class="bi bi-check-lg text-success"></i>
                                                 }
-                                            </td>
+                                        </td>
 
                                             <!-- Is Billing Contact -->
-                                            <td>
+                                        <td class="text-decoration-none text-nowrap">
                                                 @if (user.IsBillingContact)
                                                 {
                                                     <i class="bi bi-check-lg text-success"></i>
                                                 }
-                                            </td>
+                                        </td>
                            
                                             <!-- Roles -->
-                                            <td>
+                                        <td class="text-decoration-none text-nowrap">
                                                 @if (user.Roles != null)
                                                 {
                                                     @foreach (var role in user.Roles)
@@ -448,29 +448,28 @@
                                                         <br />
                                                     }
                                                 }
-                                            </td>
+                                        </td>
 
                                             <!-- Last Login -->
-                                            <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                                        <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="text-decoration-none text-nowrap local-login-time">
                                                 @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
                                             </td>
 
                                             <!-- Extra Fields -->
                                             @if (Model.ShowExtraFields)
                                             {
-                                                <td class="extra-field">@user.FirstName</td>
-                                                <td class="extra-field">@user.MiddleName</td>
-                                                <td class="extra-field">@user.LastName</td>
-                                                <td class="extra-field">@user.HomePhoneNumber</td>
-                                                <td class="extra-field">@user.AddressLine1</td>
-                                                <td class="extra-field">@user.AddressLine2</td>
-                                                <td class="extra-field">@user.City</td>
-                                                <td class="extra-field">@user.State</td>
-                                                <td class="extra-field">@user.ZipCode</td>
-                                                <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
-                                                <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.FirstName</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.MiddleName</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.LastName</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.HomePhoneNumber</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.AddressLine1</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.AddressLine2</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.City</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.State</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@user.ZipCode</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
+                                            <td class="text-decoration-none text-nowrap extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
                                             }
-
 
                                         </tr>
                                     }
@@ -617,6 +616,7 @@ else
         .table-responsive {
             padding-bottom: .5em;
         }
+
         /* Green Border around hovered row */
         .table-striped tbody tr.user-row:nth-of-type(odd):hover,
         .table-striped tbody tr.user-row:nth-of-type(even):hover,
@@ -624,49 +624,6 @@ else
             cursor: pointer;
             border: 2px solid green;
         }
-
-      
-
-         /* Field Border Color */
-        /* .form-control {
-            border-color: lightgray !important;
-        }
-
-            .form-control:focus,
-            .form-control:hover,
-            .form-control:active {
-                border-color: lightgray !important;
-                box-shadow: none !important;
-            }
-
-            .form-control:focus,
-            .form-control:hover,
-            .form-control:active {
-                border-color: lightgray !important;
-                box-shadow: none !important;
-            } */
-
-       /*  .page-link {
-            background-color: white !important;
-            border-color: darkgray !important;
-            color: #4E3802 !important;
-        }
-
-            .active>.page-link, .page-link.active { 
-            background-color: #DAA425 !important;
-            border-color: darkgray !important;
-            color: #fff !important;
-            }
-
-            .page-link:hover {
-                background-color: #F2CA46 !important;
-            }
-
-        .page-link a {
-            color: #4E3802;
-        }
- */
-       
 
     </style>
 }

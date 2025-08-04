@@ -36,29 +36,29 @@
         @foreach (var user in Model.Users)
         {
             <tr class="user-row" id="display-row-@usercount" data-user-id="@user.Id">
-                <td>@user.FullName</td>
-                <td>@user.Email</td>
-                <td>
+                <td class="text-decoration-none text-nowrap">@user.FullName</td>
+                <td class="text-decoration-none text-nowrap">@user.Email</td>
+                <td class="text-decoration-none text-nowrap">
                     @if (user.EmailConfirmed)
                     {
                         <i class="bi bi-check-lg text-success"></i>
                     }
                 </td>
-                <td>@user.PhoneNumber</td>
-                <td>
+                <td class="text-decoration-none text-nowrap">@user.PhoneNumber</td>
+                <td class="text-decoration-none text-nowrap">
                     @if (user.PhoneNumberConfirmed)
                     {
                         <i class="bi bi-check-lg text-success"></i>
                     }
                 </td>
-                <td>
+                <td class="text-decoration-none text-nowrap">
                     @if (user.IsBillingContact)
                     {
                         <i class="bi bi-check-lg text-success"></i>
                     }
                 </td>
 
-                <td>
+                <td class="text-decoration-none text-nowrap">
                     @if (user.Roles != null)
                     {
                         @foreach (var role in user.Roles)
@@ -69,23 +69,23 @@
                     }
                 </td>
                 @* The local-login-time span will be updated by client-side script *@
-                <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="local-login-time">
+                <td data-utc-time="@user.LastLogin?.ToString("yyyy-MM-ddTHH:mm:ssZ")" class="text-decoration-none text-nowrap local-login-time">
                     @user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss UTC")
                 </td>
 
                 @if (Model.ShowExtraFields)
                 {
-                    <td class="extra-field">@user.FirstName</td>
-                    <td class="extra-field">@user.MiddleName</td>
-                    <td class="extra-field">@user.LastName</td>
-                    <td class="extra-field">@user.HomePhoneNumber</td>
-                    <td class="extra-field">@user.AddressLine1</td>
-                    <td class="extra-field">@user.AddressLine2</td>
-                    <td class="extra-field">@user.City</td>
-                    <td class="extra-field">@user.State</td>
-                    <td class="extra-field">@user.ZipCode</td>                    
-                    <td class="extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
-                    <td class="extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.FirstName</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.MiddleName</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.LastName</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.HomePhoneNumber</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.AddressLine1</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.AddressLine2</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.City</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.State</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@user.ZipCode</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@(user.Birthday.HasValue? user.Birthday.Value.ToShortDateString() : "")</td>
+                    <td class="text-decoration-none text-nowrap extra-field">@(user.Anniversary.HasValue? user.Anniversary.Value.ToShortDateString() : "")</td>
                 }
             </tr>
             { usercount++; }

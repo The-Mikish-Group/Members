@@ -47,7 +47,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             [Display(Name = "Due Date")]
             public DateTime DueDate { get; set; } = DateTime.Today.AddDays(30);
             [Required]
-            [StringLength(200)]
+            [StringLength(10000)]
             [Display(Name = "Description")]
             public string Description { get; set; } = string.Empty;
             [Required]

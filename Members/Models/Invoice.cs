@@ -41,7 +41,7 @@ namespace Members.Models
         [Display(Name = "Due Date")]
         public DateTime DueDate { get; set; }
         [Required]
-        [StringLength(200, ErrorMessage = "Description cannot be longer than 200 characters.")]
+        [StringLength(1000, ErrorMessage = "Description cannot be longer than 200 characters.")]
         public string Description { get; set; }
         [Required]
         [Column(TypeName = "decimal(18, 2)")]

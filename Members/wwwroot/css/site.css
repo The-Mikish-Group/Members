@@ -1,5 +1,6 @@
-/* #region Default Stuff */
+/* #region General Site CSS Stuff */
 
+/* Necessary to ensure footer stays at bottom */
 html {
     height: 100%;
     margin: 0;
@@ -15,83 +16,8 @@ html {
 #footer {
     flex-shrink: 0;
     margin-top: auto;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow-y: scroll;
-    padding: 0;
-    margin: 0;
-    line-height: 1.4;
-    font-weight: 400;
-    text-rendering: optimizeLegibility;
-    background-color: #f2f2f2;
-    height: 100%;
-    width: 100%;
-}
-
-/* General input and select focus styles */
-page-item:focus,
-page-link:focus,
-input:focus,
-select:focus,
-textarea:focus,
-.form-control:focus, /* Targets standard Bootstrap form controls */
-.custom-select:focus /* Targets Bootstrap custom select elements */ {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
-}
-
-.logo {
-    height: 60px;
-}
-
-.nbLogo {
-    height: 18px;
-}
-
-.fw-bold { 
-    font-weight: 500;
-}
-
-/* This rule for sort indicators in table headers is good to keep */
-thead th .bi {
-    font-size: 0.9em;
-    margin-left: 0.25rem;
-}
-
-/* No Radius Right or  Left */
-.no-right-radius {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-}
-
-.no-left-radius {
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-}
-
-@media (max-width: 767.98px) {
-    .list-group-item span.flex-grow-1 {
-        word-break: break-word;
-    }
-}
-
-/* make everything a borderbox */
-* {
-    box-sizing: border-box;
-}
-
-/* Cursors */
-.no-cursor {
-    cursor: none;
-}
-
-.pointer-cursor {
-    cursor: pointer;
+    padding: 0px;
+    position: inherit;
 }
 
 header {
@@ -106,11 +32,78 @@ html > body header {
 
 .navbar-overhang {
     position: absolute;
-    top: 20px;
+    top: 22px;
     transform: translateY(-10%);
 }
-.siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
+
+.siteNameBig, .siteNameSmall > a {
     padding-left: 120px;
+}
+
+/* Svg Container (put Svg files inside a #container for scaling */
+svg, #container {
+    height: 100%;
+    width: 100%;
+}
+
+/* Svg Nav Bar Small Logo */
+.logo {
+    height: 60px;
+}
+
+/* SVG Nav Bar 'Name' Logo */
+.nbLogo {
+    height: 18px;
+}
+
+/* Svg Footer Logo */
+.footer-logo {
+    height: 20px;
+}
+
+.footer-spacing {
+    margin-bottom: 50px;
+}
+
+.fw-bold { 
+    font-weight: 500;
+}
+
+/* No Radius Right or Left */
+.no-right-radius {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.no-left-radius {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+/* List Word Break */
+@media (max-width: 767.98px) {
+    .list-group-item span.flex-grow-1 {
+        word-break: break-word;
+    }
+}
+
+/* make everything a borderbox */
+* {
+    box-sizing: border-box;
+}
+
+/* General input and select focus styles */
+page-item:focus,
+page-link:focus,
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus, /* Targets standard Bootstrap form controls */
+.custom-select:focus /* Targets Bootstrap custom select elements */ {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: initial !important; /* Resets the border color to its default state, removing any blue tint */
+    background-color: initial !important;
 }
 
 /* Adjust form styling within nav-item to prevent misalignment */
@@ -130,12 +123,6 @@ html > body header {
         /* Check horizontal padding too if needed */
     }
 
-
-
-.footer-spacing {
-    margin-bottom: 50px;
-}
-
 #pdf-viewer-container {
     width: 100%; /* Use 100% width */
     margin: 0 auto;
@@ -144,252 +131,13 @@ html > body header {
     align-items: center;
 }
 
-.uniform-card-height .card-body {
-    height: 75px; /* Adjust the height as needed */
-    display: flex; /* Flexbox for vertical centering */
-    align-items: center; /* Center vertically */
-    justify-content: center; /* Center horizontally if needed */
-    text-align: center; /* Center text */
-}
-
-.uniform-card-height .card-title {
-    margin-bottom: 0; /* Remove default margin from card title */
-}
-
-.footer-logo {
-    height: 20px;
-}
-
-#footer {
-    padding: 0px;
-    position: inherit;
-}
-
-.table td, .table th {
-    white-space: nowrap;
-}
-
-.form-input-field {
-    max-width: 280px;
-}
-
-
-
-/* Svg Container (put Svg files inside a #container for scaling */
-svg, #container {
-    height: 100%;
-    width: 100%;
-}
-
-/* Set Horizontal Line */
-hr {
-    border: none;
-    border-top: 3px dotted #ffffff;
-}
-
 /* Set Image pointer and border transition */
 img {
     cursor: pointer;
     transition: border 0.3s ease-in-out;
 }
 
-/* #endregion */
-
-/* #region Menu */
-.menu-item {
-    min-width: 128px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.menu-link {
-    text-decoration: none;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
-    padding: 8px;
-    display: inline-block;
-}
-
-    .menu-link:hover {
-        color: black !important;
-        font-weight: bold !important;
-    }
-
-    .menu-link.selected {
-        color: black !important;
-        font-weight: bold !important;
-    }
-
-.border-link {
-    text-decoration: none;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
-    padding: 8px;
-    display: inline-block;
-    border-color: darkgray !important;
-}
-
-    .border-link:hover {
-        color: black !important;
-        border-color: darkgray !important;
-        font-weight: bold !important;
-    }
-
-    .border-link.selected {
-        font-weight: bold !important;
-    }
-/* #endregion */
-
-/* #region Top Button */
-#top-button {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 30px;
-    z-index: 99;
-    font-size: 18px;
-    border: none;
-    outline: none;
-    background-color: #C72D27; /* bg-red-dark*/
-    color: white;
-    cursor: pointer;
-    padding: 8px 24px;
-    border-radius: 4px;
-}
-
-    #top-button:hover {
-        background-color: #4A4B4C; /* bg-gray-dark */
-    }
-
-    #top-button:active {
-        background-color: #C72D27; /* bg-red-dark*/
-    }
-
-.siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
-    padding-left: 120px;
-}
-
-/* #endregion */
+/* #endregion General Site CSS Stuff */
 
 
 
-/* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Small tablet styles */
-@media (min-width: 575px) and (max-width: 768px) {
-}
-
-/* #endregion */
-
-/* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
-@media (min-width: 768.01px) and (max-width: 991px) {
-}
-/* #endregion */
-
-/* #region (BS -lg- ) (min-width: 992px) Start of Desktop */
-@media (min-width: 992px) {
-}
-
-/* #endregion */
-
-/* #region (min-width: 1200px) */
-@media (min-width: 1200px) {
-}
-
-/* #endregion */
-
-/* #region (min-width: 1400px) */
-@media (min-width: 1400px) {
-}
-
-/* #endregion*/
-
-/* Print Styles */
-@media print {
-    body {
-        font-size: 10pt !important; /* Smaller font for print */
-        color: #000 !important; /* Ensure text is black for print */
-        background-color: #fff !important; /* Ensure background is white */
-        -webkit-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
-        print-color-adjust: exact !important; /* Standard */
-    }
-
-    #SelectedUserId {
-        border: none;
-        background: transparent;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none;
-    }
-
-    input[type="date"] {
-        border: none;
-        background: transparent;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-
-    header, .navbar, footer, .btn, .modal, #exportArAgingTriggerButton, .no-print /* Hide non-essential elements */ {
-        display: none !important;
-    }
-
-    .table, .table th, .table td {
-        border: 1px solid #dee2e6 !important; 
-        color: #000 !important;
-        background-color: #fff !important; /* Ensure table backgrounds are white */
-    }
-
-    .table th {
-        font-weight: bold;
-        background-color: #f8f9fa !important; /* Light gray for table headers in print if needed */
-    }
-    
-    .table-responsive {
-        overflow-x: visible !important; /* Allow table to use full page width */
-    }
-
-    /* Specific to A/R Aging Report table if it has an ID, e.g., id="arAgingTable" 
-       If not, these general table cell adjustments might be okay, or use a class.
-    */
-    #arAgingTable th, #arAgingTable td { /* Assuming you might add id="arAgingTable" to your table */
-        padding: 0.25rem 0.4rem !important; /* Reduce padding */
-        font-size: 9pt !important;
-    }
-    /* More generic approach if no ID is on the table in ArAgingReport.cshtml */
-    .table td, .table th {
-        padding: 0.25rem 0.4rem !important;
-        font-size: 9pt !important;
-    }
-
-    a {
-        text-decoration: none !important;
-        color: #000 !important;
-    }
-
-    /* Avoid printing full URLs for links unless specifically desired */
-    a[href^="/"]:after { content: " (" attr(href) ")"; }
-
-    .container, .container-fluid {
-        width: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-    }
-
-    /* Ensure report title is visible and black */
-    h2 { /* Assuming report titles are h2 */
-        color: #000 !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    /* Remove shadows for print */
-    .shadow, .shadow-sm, .shadow-lg {
-        box-shadow: none !important;
-    }
-}

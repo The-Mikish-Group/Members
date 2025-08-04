@@ -65,7 +65,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             [StringLength(100)]
             [Display(Name = "Reference Number (e.g., Check #)")]
             public string? ReferenceNumber { get; set; }
-            [StringLength(200)]
+            [StringLength(1000)]
             [Display(Name = "Notes (Optional for new payment)")]
             public string? Notes { get; set; }
             // --- NEW PROPERTIES FOR CREDIT APPLICATION ---
@@ -607,14 +607,14 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                                     InvoiceID = otherInvoice.InvoiceID,
                                     AmountApplied = amountToApplyToOtherInvoice,
                                     ApplicationDate = DateTime.UtcNow,
-                                    Notes = $"Auto-applied from overpayment (Payment P{payment.PaymentID}, UserCredit UC{overpaymentEventCredit.UserCreditID})"
+                                    Notes = $"Applied from overpayment (Payment P{payment.PaymentID}, UserCredit UC{overpaymentEventCredit.UserCreditID})"
                                 };
                                 newCreditApplications.Add(creditApplication); // Add to list, will batch add later
                                 _context.CreditApplications.Add(creditApplication);
 
 
                                 overpaymentEventCredit.Amount -= amountToApplyToOtherInvoice;
-                                payment.Notes = (payment.Notes ?? "") + $" Auto-applied ${amountToApplyToOtherInvoice:F2} from UC{overpaymentEventCredit.UserCreditID} to INV-{otherInvoice.InvoiceID:D5}.";
+                                payment.Notes = (payment.Notes ?? "") + $" Applied ${amountToApplyToOtherInvoice:F2} from UC{overpaymentEventCredit.UserCreditID} to INV-{otherInvoice.InvoiceID:D5}.";
                                 _logger.LogInformation("Recorded CreditApplication: {AmountApplied} from UserCredit {UserCreditId} to Invoice {OtherInvoiceId}. UserCredit remaining: {UserCreditRemaining}",
                                                        amountToApplyToOtherInvoice, overpaymentEventCredit.UserCreditID, otherInvoice.InvoiceID, overpaymentEventCredit.Amount);
                             }
@@ -640,7 +640,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 }
 
                 // Final truncation safeguard for payment notes (might have been updated)
-                const int dbColumnMaxLength = 200;
+                const int dbColumnMaxLength = 1000;
                 if (payment.Notes != null && payment.Notes.Length > dbColumnMaxLength)
                 {
                     _logger.LogWarning("Payment.Notes for UserID {UserId} (PaymentID {PaymentId}) was truncated from {OriginalLength} to {MaxLength} characters.",
@@ -661,7 +661,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                     decimal totalAppliedToOthersFromOverpayment = overpaymentAmount - overpaymentEventCredit.Amount;
                     if (totalAppliedToOthersFromOverpayment > 0)
                     {
-                        statusMessageBuilder.Append($" ${totalAppliedToOthersFromOverpayment:C} of the overpayment (from UC{overpaymentEventCredit.UserCreditID}) was automatically applied to other due invoices.");
+                        statusMessageBuilder.Append($" {totalAppliedToOthersFromOverpayment:C} of the overpayment (from UC{overpaymentEventCredit.UserCreditID}) was automatically applied to other due invoices.");
                     }
 
                     if (overpaymentEventCredit.Amount > 0) // If there's still a balance on the overpayment credit

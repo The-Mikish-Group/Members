@@ -8,7 +8,7 @@
 <!-- Top Button placed here -->
 <button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
-<div class="container">
+<div class="container p-1">
 
     @if (!string.IsNullOrEmpty(Model.BatchId))
     {
@@ -60,21 +60,21 @@
         <div class="card mb-4 shadow">
 
             <!-- Card Header Text -->
-            <div class="card-header">
+            @* <div class="card-header"> *@
 
-                <h5 class="d-flex align-items-start mb-2 mt-2"><i class="bi bi-list"></i> Select Draft Batch:</h5>
+                <h5 class="text-black d-flex align-items-start ms-2 mb-2 mt-2"><i class="bi bi-list"></i>  Select Draft Batch:</h5>
 
                 @if (Model.AvailableDraftBatches != null && Model.AvailableDraftBatches.Any())
                 {
                     <form method="get" id="selectBatchForm">
-                        <div class="row mb-3">
+                    <div class="container row ps-0 pe-2 mb-3">
 
                             <div class="col-12 text-start">
-                                <label for="SelectedBatchId" class="fw-bold visually-hidden">Select Batch:</label>
+                                <label for="SelectedBatchId" class="text-black fw-bold visually-hidden">Select Batch:</label>
                             </div>
 
                             <div class="col-12 px-0">
-                                <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText", Model.BatchId))" class="form-select">
+                                <select name="batchId" id="SelectedBatchId" asp-for="BatchId" asp-items="@(new SelectList(Model.AvailableDraftBatches, "BatchId", "DisplayText", Model.BatchId))" class="text-black form-select mx-3">
                                     <option value="">-- Select a Batch to Review --</option>
                                 </select>
                             </div>
@@ -88,7 +88,7 @@
                         There are currently no draft batches available for review.
                     </div>
                     <div class="mt-4">
-                        <a asp-page="./CreateBatchInvoices" class="btn btn-success rounded-2 shadow">Create a New Batch</a>
+                        <a asp-page="./CreateBatchInvoices" class="text-black btn btn-sm btn-success rounded-2 shadow">Create a New Batch</a>
                     </div>
                     return;
                 }
@@ -145,25 +145,28 @@
                         </div>
                     </div>
                 </div>
+            @* </div> *@
 
-                <!-- Heading -->
-                <h5 class="d-flex justify-content-between align-items-center mb-0">
-                    <span><i class="bi bi-list"></i> Invoices</span>
-                    <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices @Model.TotalInvoiceAmount.ToString("C")</span>
-                </h5>
+        </div>
 
-            </div>
+        <div class="card mb-4 shadow">
+
+            <!-- Heading -->
+            <h5 class="text-black d-flex justify-content-between align-items-center mb-0 mt-2 ms-2 me-1">Invoices
+                <span class="badge bg-secondary rounded-pill">@Model.TotalInvoiceCount Invoices @Model.TotalInvoiceAmount.ToString("C")</span>
+            </h5>
+
             <div class="card-body rounded-2 p-1">
                 <div class="table-responsive">
                     <table class="table-striped table-hover w-100 mb-0">
                         <thead>
-                            <tr class="bg-gray-dark text-white">
+                            <tr>
                                 <th>
                                     <a asp-page="./ReviewBatchInvoices"
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.UserSort"
-                                       class="text-decoration-none text-nowrap text-white">User</a>
+                                       class="text-decoration-none text-nowrap">User</a>
                                     @if (Model.CurrentSort == "user_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -178,7 +181,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.EmailSort"
-                                       class="text-decoration-none text-nowrap text-white">Email</a>
+                                       class="text-decoration-none text-nowrap">Email</a>
                                     @if (Model.CurrentSort == "email_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -193,7 +196,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.DescriptionSort"
-                                       class="text-decoration-none text-nowrap text-white">Description</a>
+                                       class="text-decoration-none text-nowrap">Description</a>
                                     @if (Model.CurrentSort == "desc_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -208,7 +211,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.AmountDueSort"
-                                       class="text-decoration-none text-nowrap text-white">Amount Due</a>
+                                       class="text-decoration-none text-nowrap">Amount Due</a>
                                     @if (Model.CurrentSort == "amount_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -223,7 +226,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.InvoiceDateSort"
-                                       class="text-decoration-none text-nowrap ps-2 text-white">Invoice Date</a>
+                                       class="text-decoration-none text-nowrap ps-2">Invoice Date</a>
                                     @if (Model.CurrentSort == "invdate_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -238,7 +241,7 @@
                                        asp-route-batchId="@Model.BatchId"
                                        asp-route-returnedFromUserId="@Model.ReturnedFromUserId"
                                        asp-route-CurrentSort="@Model.DueDateSort"
-                                       class="text-decoration-none my-2 text-nowrap text-white">Due Date</a>
+                                       class="text-decoration-none my-2 text-nowrap">Due Date</a>
                                     @if (Model.CurrentSort == "duedate_asc")
                                     {
                                         <i class="bi bi-arrow-down"></i>
@@ -248,7 +251,7 @@
                                         <i class="bi bi-arrow-up"></i>
                                     }
                                 </th>
-                                <th class="text-center">Billing</th> <!-- New Header -->
+                                <th class="text-center">Billing</th>
                             </tr>
                         </thead>
                         <tbody>

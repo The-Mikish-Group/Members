@@ -237,9 +237,16 @@
                             <li>
                                 <a class="nav-link text-dark rounded-2 mb-1 ps-2" style="width: 180px;" asp-area="" asp-controller="Home" asp-action="Notices" target="_blank"><i class="bi bi-newspaper me-2"></i> News and Notices</a>
                             </li>
-                        
+
+                            <!--  "PDF Documents" -->
+                            <li class="nav-item text-light">
+                                <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="width:180px;" asp-area="" asp-controller="Members" asp-action="ListCategories">
+                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i> PDF Documents
+                                </a>
+                            </li>
+
                             <!-- Members PDF Documents Display Dropdown -->  
-                            <li class="nav-item dropdown"> 
+                            @* <li class="nav-item dropdown"> 
                                 
                                 <!-- Members PDF Documents Display Toggle -->
                                 <a class="dropdown-toggle text-dark nav-link rounded-2 mb-1 ps-2" style="width: 180px;" href="#" id="membersPdfDocumentsDisplayDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
@@ -276,7 +283,7 @@
                                         }  
                                     }                                      
                                 </ul>  
-                            </li>
+                            </li> *@
 
                             <!-- Profile -->
                             @if (SignInManager.IsSignedIn(User))

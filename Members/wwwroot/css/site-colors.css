@@ -1,7 +1,43 @@
 .body-bg {
-    background-color: var(--body-bg, #FFFFFF);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: scroll;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+    background-color: var(--body-bg, #F8F9FA);
 }
 
+.copyright-bg {
+    background-color: var(--copyright-bg, #7D7E81);
+}
+
+.text-black,
+li .dropdown-menu .nav-link i {
+    color: var(--text-black, #424143) !important;
+}
+
+.text-white {
+    color: var(--text-white, #FFFFFF);
+}
+
+.text-eye-view {
+    color: var(--text-eye-view, #50B8D4);
+}
+
+/* Set Horizontal Line */
+hr {
+    border: none;
+    border-top: 3px solid;
+    border-top-color: var(--hr, #ffffff);
+}
+
+/* #region Navbar */
 .navbar-header-bg {
     background-color: var(--navbar-header-bg, #faf6dd);
 }
@@ -18,10 +54,9 @@
     background-color: var(--navbar-footer-bg, #ecdfa1);
 }
 
-.copyright-bg {
-    background-color: var(--copyright-bg, #7D7E81);
-}
+/* #endregion Navbar */
 
+/* #region Cards */
 .card {
     background-color: var(--card-bg, #fffdea);
     color: var(--card-text, #424143);
@@ -45,9 +80,14 @@
     color: var(--card-footer-text, #424143);
 }
 
-thead th {
-    background-color: var(--table-header-bg, #4d4b3b);
-    color: var(--table-header-text, #FFFFFF);
+/* #endregion Cards */
+
+/* #region Tables */
+thead th,
+thead th a,
+thead th a i {
+    background-color: var(--table-header-bg, #FFFFFF);
+    color: var(--table-header-text, #4d4b3b);
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > td,
@@ -66,7 +106,7 @@ thead th {
     }
 
 table th, table td {
-    vertical-align: middle;
+    vertical-align: top;
     padding: 0.5rem 0.5rem;
 }
 
@@ -75,92 +115,29 @@ thead th {
     padding-bottom: 0.75rem;
 }
 
+/* This rule for sort indicators in table headers is good to keep */
+thead th,
+table th a .bi,
+.thead th .bi,
 .table th a .bi {
     font-size: 0.9em;
     margin-left: 0.25rem;
 }
 
-.my-nav-link,
-.nav-link {
-    color: var(--nav-link-text, #424143);
+/* Keep Table Headers from Wrapping */
+.table td, .table th {
+    white-space: nowrap;
 }
 
-    .my-nav-link:active,
-    .my-nav-link:hover,
-    .my-nav-link:focus,
-    .nav-link:active,
-    .nav-link:hover,
-    .nav-link:focus {
-        font-weight: 500;
-        color: var(--nav-link-hover-text, #424143);
-    }
-
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-    background-color: var(--nav-pills-active-bg, #28a745);
-    color: var(--nav-pills-active-text, #FFFFFF);
+.print-table-header-bg {
+    background-color: var(--print-table-header-bg, #D3D3D3);
+    color: var(--print-table-header-text, #424143);
+    font-weight: 500;
 }
 
-.nav-pills .nav-link {
-    color: var(--nav-pills-text, #28a745);
-}
+/* #endregion Tables */
 
-    .nav-pills .nav-link:hover {
-        background-color: var(--nav-pills-hover-bg, #90EE90);
-        color: var(--nav-pills-hover-text, #FFFFFF);
-    }
-
-.text-black {
-    color: var(--text-black, #424143);
-}
-
-.text-white {
-    color: var(--text-white, #FFFFFF);
-}
-
-.text-eye-view {
-    color: var(--text-eye-view, #50B8D4);
-}
-
-a#w#elcomeDropdown[aria-expanded="true"],
-a#accountsReceivableDropdown[aria-expanded="true"],
-a#invoiceDraftBatchesDropdown[aria-expanded="true"],
-a#reportingDropdown[aria-expanded="true"],
-a#managementDropdown[aria-expanded="true"],
-a#membersDropdown[aria-expanded="true"],
-a#membersPdfDocumentsDisplayDropdown[aris="true"],
-a#ManagementDropdown[aria-expanded="true"],
-a#manageMembersDropdown[aria-expanded="true"],
-a#managePdfDocumentsDropdown[aria-expanded="true"],
-a#membersPdfDocumentsDropdown[aria-expanded="true"],
-a#confidentialPdfDocumentsDropdown[aria-expanded="true"],
-a#pdfDocumentsFooterDropdown[aria-expanded="true"],
-a#membersfooterDropdown[aria-expanded="true"]
-a {
-    color: var(--text-black, #424143);
-}
-
-li.show > a#welcomeDropdown,
-li.show > a#accountsReceivableDropdown,
-li.show > a#invoiceDraftBatchesDropdown,
-li.show > a#reportingDropdown,
-li.show > a#managementDropdown,
-li.show > a#membersDropdown,
-li.show > a#membersPdfDocumentsDisplayDropdown,
-li.show > a#ManagementDropdown,
-li.show > a#manageMembersDropdown,
-li.show > a#managePdfDocumentsDropdown,
-li.show > a#membersPdfDocumentsDropdown,
-li.show > a#confidentialPdfDocumentsDropdown,
-li.show > a#pdfDocumentsFooterDropdown,
-li.show > a#membersFooterDropdown {
-    color: var(--text-black, #424143);
-}
-
-li .dropdown-menu .nav-link i {
-    color: var(--text-black, #424143);
-}
-
+/* #region Paginagion */
 .pagination .page-link {
     background-color: var(--pagination-bg, #FFFFFF);
     border-color: var(--pagination-border, #808080);
@@ -183,3 +160,167 @@ li .dropdown-menu .nav-link i {
     border-color: var(--pagination-disabled-border, #808080);
     color: var(--pagination-disabled-text, #6c757d);
 }
+
+/* #endregion Pagination */
+
+/* #region Top Button */
+#top-button {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 99;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color: #C72D27; /* bg-red-dark*/
+    color: white;
+    cursor: pointer;
+    padding: 8px 24px;
+    border-radius: 4px;
+}
+
+    #top-button:hover {
+        background-color: #4A4B4C; /* bg-gray-dark */
+    }
+
+    #top-button:active {
+        background-color: #C72D27; /* bg-red-dark*/
+    }
+
+.siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
+    padding-left: 120px;
+}
+/* #endregion Top Button */
+
+/* #region Print Styles */
+@media print {
+    body {
+        font-size: 10pt !important; /* Smaller font for print */
+        color: #000 !important; /* Ensure text is black for print */
+        background-color: #fff !important; /* Ensure background is white */
+        -webkit-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+        print-color-adjust: exact !important; /* Standard */
+    }
+
+    #SelectedUserId {
+        border: none;
+        background: transparent;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+    }
+
+    input[type="date"] {
+        border: none;
+        background: transparent;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    header, .navbar, footer, .btn, .modal, #exportArAgingTriggerButton, .no-print /* Hide non-essential elements */ {
+        display: none !important;
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid #dee2e6 !important;
+        color: #000 !important;
+        background-color: #fff !important; /* Ensure table backgrounds are white */
+    }
+
+    td {
+        vertical-align: top;
+    }
+
+    .table th {
+        font-weight: bold;
+        background-color: #f8f9fa !important; /* Light gray for table headers in print if needed */
+    }
+
+    .table-responsive {
+        overflow-x: visible !important; /* Allow table to use full page width */
+    }
+
+    /* Specific to A/R Aging Report table if it has an ID, e.g., id="arAgingTable" 
+       If not, these general table cell adjustments might be okay, or use a class.
+    */
+    #arAgingTable th, #arAgingTable td { /* Assuming you might add id="arAgingTable" to your table */
+        padding: 0.25rem 0.4rem !important; /* Reduce padding */
+        font-size: 9pt !important;
+    }
+    /* More generic approach if no ID is on the table in ArAgingReport.cshtml */
+    .table td, .table th {
+        padding: 0.25rem 0.4rem !important;
+        font-size: 9pt !important;
+    }
+
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+        /* Avoid printing full URLs for links unless specifically desired */
+        a[href^="/"]:after {
+            content: " (" attr(href) ")";
+        }
+
+    .container, .container-fluid {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
+    /* Ensure report title is visible and black */
+    h2 { /* Assuming report titles are h2 */
+        color: #000 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Remove shadows for print */
+    .shadow, .shadow-sm, .shadow-lg {
+        box-shadow: none !important;
+    }
+}
+/* #endregion Print Styles */
+
+/* #region Nav-Link and Pills */
+
+.my-nav-link,
+.nav-link {
+    color: var(--nav-link-text, #424143) !important;    
+}
+
+    .my-nav-link:active,
+    .my-nav-link:hover,
+    .my-nav-link:focus,
+    .nav-link:active,
+    .nav-link:hover,
+    .nav-link:focus {
+        font-weight: 500;
+        color: var(--nav-link-hover-text, #424143) !important;
+    }
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--nav-pills-active-bg, #28a745);
+    color: var(--nav-pills-active-text, #FFFFFF);
+}
+
+.nav-pills .nav-link {
+    color: var(--nav-pills-text, #28a745);
+}
+
+    .nav-pills .nav-link:hover {
+        background-color: var(--nav-pills-hover-bg, #90EE90);
+        color: var(--nav-pills-hover-text, #FFFFFF);
+    }
+
+
+/* #endregion Nav-links and Pills */
+

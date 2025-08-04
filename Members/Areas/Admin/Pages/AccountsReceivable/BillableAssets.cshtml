@@ -66,89 +66,89 @@
     <div class="table-responsive">
         <table class="w-100 mb-0" id="mainAssetsTable">
             <thead>
-                <tr class="bg-gray-dark text-white">
+                <tr>
 
                     <!-- Contact -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="contact" data-sort-value="contact">Assigned Billing Contact</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="contact" data-sort-value="contact">Assigned Billing Contact</a>
                         @if (Model.CurrentSort == "contact_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "contact_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
 
                     <!-- Plot ID-->
-                    <th class="py-2 ps-2">
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="plotid" data-sort-value="Asset Identifier">Asset Identifier</a>
+                    <th class="text-nowrap text-start">
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="plotid" data-sort-value="Asset Identifier">Asset Identifier</a>
                         @if (Model.CurrentSort == "plotid_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "plotid_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
 
                     <!-- Assessment Fee -->
                     <th class="text-nowrap text-end">
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
                         @if (Model.CurrentSort == "fee_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "fee_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
                     
                     <!-- Description -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
                         @if (Model.CurrentSort == "desc_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "desc_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
 
                     <!-- Created -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
                         @if (Model.CurrentSort == "created_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "created_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
 
                     <!-- Last Updated -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap text-white" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
+                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
                         @if (Model.CurrentSort == "updated_asc")
                         {
-                            <i class="bi bi-arrow-down ms-1 text-white"></i>
+                            <i class="bi bi-arrow-down ms-1"></i>
                         }
                         else if (Model.CurrentSort == "updated_desc")
                         {
 
-                            <i class="bi bi-arrow-up ms-1 text-white"></i>
+                            <i class="bi bi-arrow-up ms-1"></i>
                         }
                     </th>
 
@@ -609,9 +609,9 @@
 
                     let iconHtml = '';
                     if (currentSortActual === columnKey + '_asc') {
-                        iconHtml = '<i class="bi bi-arrow-down ms-1 text-white"></i>';
+                        iconHtml = '<i class="bi bi-arrow-down ms-1"></i>';
                     } else if (currentSortActual === columnKey + '_desc') {
-                        iconHtml = '<i class="bi bi-arrow-up ms-1 text-white"></i>';
+                        iconHtml = '<i class="bi bi-arrow-up ms-1"></i>';
                     }
 
                     if (iconHtml) {

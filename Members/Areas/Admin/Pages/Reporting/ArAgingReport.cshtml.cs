@@ -47,6 +47,8 @@ namespace Members.Areas.Admin.Pages.Reporting
                               i.AmountDue > i.AmountPaid)
                 .ToListAsync();
 
+            var reportItems = new List<AgingReportItem>();
+
             foreach (var invoice in invoices)
             {
                 var amountRemaining = invoice.AmountDue - invoice.AmountPaid;
@@ -67,16 +69,20 @@ namespace Members.Areas.Admin.Pages.Reporting
                     Overdue90Plus = 0
                 };
 
-                if (invoice.DueDate.Date >= effectiveAsOfDate) { // Due on or after AsOfDate
+                if (invoice.DueDate.Date >= effectiveAsOfDate)
+                { // Due on or after AsOfDate
                     reportItem.Current = amountRemaining;
-                } else { // Due before AsOfDate (i.e. Overdue)
+                }
+                else
+                { // Due before AsOfDate (i.e. Overdue)
                     int daysStrictlyOverdue = (effectiveAsOfDate - invoice.DueDate.Date).Days;
                     if (daysStrictlyOverdue >= 1 && daysStrictlyOverdue <= 30) reportItem.Overdue1_30 = amountRemaining;
                     else if (daysStrictlyOverdue >= 31 && daysStrictlyOverdue <= 60) reportItem.Overdue31_60 = amountRemaining;
                     else if (daysStrictlyOverdue >= 61 && daysStrictlyOverdue <= 90) reportItem.Overdue61_90 = amountRemaining;
                     else if (daysStrictlyOverdue >= 91) reportItem.Overdue90Plus = amountRemaining;
                 }
-                ReportData.Add(reportItem);
+
+                reportItems.Add(reportItem);
 
                 Totals.TotalAmountRemaining += reportItem.AmountRemaining;
                 Totals.TotalCurrent += reportItem.Current;
@@ -85,6 +91,12 @@ namespace Members.Areas.Admin.Pages.Reporting
                 Totals.TotalOverdue61_90 += reportItem.Overdue61_90;
                 Totals.TotalOverdue90Plus += reportItem.Overdue90Plus;
             }
+
+            // Sort by Customer Name first, then by Invoice ID
+            ReportData = reportItems
+                .OrderBy(x => x.CustomerName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(x => x.InvoiceId)
+                .ToList();
         }
 
         public async Task OnGetAsync()

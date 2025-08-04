@@ -5,6 +5,9 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Top Button placed here -->
+<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+
 <h2 class="text-black my-4 text-center"><i class="bi bi-palette-fill"></i> @ViewData["Title"]</h2>
 
 <!-- Action Buttons -->
@@ -54,7 +57,7 @@
                 {
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group mb-3 px-2">
-                            <label class="form-label">@color.Name</label>
+                            <label class="form-label" data-original-name="@color.Name">@color.Name - @color.Value</label>
                             <div class="pickr-container" style="width: 100%;">
                                 <input type="hidden" name="colors[@color.Name]" value="@color.Value" class="color-input" />
                                 <div class="pickr-element"
@@ -199,5 +202,30 @@
                 importButton.disabled = true;
             }
         });
+    </script>
+
+    <!-- Top Button Script -->
+    <script>
+
+        //Get the button
+        var mybutton = document.getElementById("top-button");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
     </script>
 }
