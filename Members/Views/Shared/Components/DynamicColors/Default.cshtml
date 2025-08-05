@@ -1,0 +1,10 @@
+﻿@model Dictionary<string, string>
+
+<style>
+    :root {
+        @foreach (var color in Model)
+        {
+                @($"{color.Key}: {color.Value} !important;")
+        }
+    }
+</style>

@@ -11,7 +11,6 @@
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject Members.Data.ApplicationDbContext DbContext
 
 @{
     // This Site
@@ -39,6 +38,11 @@
     string ogImage = ViewData["OGImage"]?.ToString() ?? siteURL + "/Images/LinkImages/SmallLogo.png";
     string ogImageWidth = "1000";
     string ogImageHeight = "1000";
+
+    // Get dynamic colors from ViewBag
+    var dynamicColors = ViewBag.DynamicColors as Dictionary<string, string> ?? new Dictionary<string, string>();
+           
+   
 }
 
 <!DOCTYPE html>
@@ -85,32 +89,41 @@
     <meta name="twitter:image:height" content=@ogImageHeight />
     
     <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>   
-    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
     <!-- Bootstrap 5.3.2 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
+
     <!-- Bootstrap Font Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    
+
     <!-- PDF.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" integrity="sha512-tze+o/xG0w3yxxE8xe32piisVvI/LfcEuf6LW7lFLUxhio2SfFQ9mQ0TqB0avvonmxUXT7/l8+fnWkR03u85fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <!-- Project CSS files -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version=" true" />
-    
-    <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version=" true" />
-    <link rel="stylesheet" href="~/css/buttons.css" asp-append-version=" true" />
-    <link rel="stylesheet" href="~/css/site-colors.css" asp-append-version=" true" />
+
+    <!-- Project CSS files FIRST -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/fontsize.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/buttons.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-colors.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dynamic-colors.css" asp-append-version="true" />
+
+    <!-- Dynamic Colors LAST to override static CSS -->
+    <style>
+        :root {
+            @foreach (var color in dynamicColors)
+            {
+                @($"{color.Key}: {color.Value} !important;")
+            }
+        }
+    </style>
 
     @RenderSection("Styles", required: false)
 
 </head>
 
-<body class="body-bg">
+<body class="body-bg">  
 
     <partial name="_PartialHeader" />
 

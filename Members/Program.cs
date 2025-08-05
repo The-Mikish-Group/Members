@@ -1,15 +1,20 @@
 using Members.Data;
+using Members.Filters;
 using Members.Models; // Add this to access UserProfile
 using Members.Services;
+using Microsoft.AspNetCore.DataProtection; // Added for Data Protection
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure; // For IActionContextAccessor and ActionContextAccessor
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.DataProtection; // Added for Data Protection
+
 var builder = WebApplication.CreateBuilder(args);
+
 // Register Syncfusion license
 string SYNCFUSION_KEY = Environment.GetEnvironmentVariable("SYNCFUSION_KEY")!;
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(SYNCFUSION_KEY);
+
 // Retrieve connection string from environment variables
 string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER")!;
 string DB_USER = Environment.GetEnvironmentVariable("DB_USER")!;
@@ -21,9 +26,11 @@ if (string.IsNullOrEmpty(DB_SERVER) || string.IsNullOrEmpty(DB_USER) || string.I
     throw new InvalidOperationException("Database environment variables (DB_SERVER, DB_USER, DB_PASSWORD, or DB_NAME) are not set.");
 }
 string connectionString = $"Data Source={DB_SERVER};Initial Catalog={DB_NAME};User Id={DB_USER};Password={DB_PASSWORD}";
+
 // Add services for view rendering to string
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
 // Configure DbContext with retry-on-failure and connection string from env vars
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -43,18 +50,35 @@ builder.Services.AddDbContext<DataProtectionKeyDbContext>(options =>
 // Configure Data Protection to use Entity Framework Core store
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<DataProtectionKeyDbContext>()
-    .SetApplicationName("MembersApplication"); // Unique name for the application
+    .SetApplicationName("MembersApplication"); // Unique name for the application   
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 // Register IEmailSender and EmailService
 builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddTransient<EmailService>();
-builder.Services.AddControllersWithViews();
+
+// Register both filters (ONLY ONCE)
+builder.Services.AddScoped<LoadDynamicColorsFilter>();
+builder.Services.AddScoped<RazorPageLoadColorsFilter>();
+
+// Apply filters globally to both MVC and Razor Pages
+builder.Services.Configure<MvcOptions>(options =>
+{
+    options.Filters.Add<LoadDynamicColorsFilter>();
+    options.Filters.Add<RazorPageLoadColorsFilter>();
+});
+
+builder.Services.AddControllersWithViews()
+    .AddViewComponentsAsServices();
+
 builder.Services.AddRazorPages();
+
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -65,9 +89,10 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting(); 
+app.UseRouting();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(
@@ -76,6 +101,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 app.MapRazorPages()
     .WithStaticAssets();
+
 //Create the Roles if they have been deleted.
 using (var scope = app.Services.CreateScope())
 {
@@ -90,6 +116,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+
 // Create the Administrator Account if it has been deleted.
 using (var scope = app.Services.CreateScope())
 {
