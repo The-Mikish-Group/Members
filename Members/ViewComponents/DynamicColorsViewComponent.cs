@@ -5,14 +5,9 @@ using Members.Data;
 namespace Members.ViewComponents
 {
     [ViewComponent(Name = "DynamicColors")]
-    public class DynamicColorsViewComponent : ViewComponent
+    public class DynamicColorsViewComponent(ApplicationDbContext context) : ViewComponent
     {
-        private readonly ApplicationDbContext _context;
-
-        public DynamicColorsViewComponent(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
@@ -21,7 +16,7 @@ namespace Members.ViewComponents
                 var dynamicColors = await _context.ColorVars.ToDictionaryAsync(c => c.Name, c => c.Value);
                 return View(dynamicColors);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception if you have logging set up
                 // Return empty dictionary as fallback

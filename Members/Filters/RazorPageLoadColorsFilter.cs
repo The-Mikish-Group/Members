@@ -5,14 +5,9 @@ using Members.Data;
 
 namespace Members.Filters
 {
-    public class RazorPageLoadColorsFilter : IAsyncPageFilter
+    public class RazorPageLoadColorsFilter(ApplicationDbContext context) : IAsyncPageFilter
     {
-        private readonly ApplicationDbContext _context;
-
-        public RazorPageLoadColorsFilter(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
         {
@@ -23,23 +18,33 @@ namespace Members.Filters
         {
             try
             {
-                var colorQuery = await _context.ColorVars
+                // Check if we have a valid context
+                if (_context?.ColorVars == null)
+                {
+                    // Skip color loading if context is not available
+                    await next();
+                    return;
+                }
+
+                // Load colors and handle duplicates in memory to avoid null warnings
+                var allColors = await _context.ColorVars.ToListAsync();
+                var colorQuery = allColors
                     .GroupBy(c => c.Name)
-                    .Select(g => new { Name = g.Key, Value = g.FirstOrDefault().Value })
-                    .ToDictionaryAsync(c => c.Name, c => c.Value);
+                    .ToDictionary(g => g.Key, g => g.First().Value);
 
                 if (context.HandlerInstance is PageModel pageModel)
                 {
                     pageModel.ViewData["DynamicColors"] = colorQuery;
-                    
                 }
             }
             catch (Exception ex)
             {
+                // Log the exception if possible and continue without colors
+                System.Diagnostics.Debug.WriteLine($"RazorPageLoadColorsFilter error: {ex.Message}");
+
                 if (context.HandlerInstance is PageModel pageModel)
                 {
                     pageModel.ViewData["DynamicColors"] = new Dictionary<string, string>();
-                    
                 }
             }
 

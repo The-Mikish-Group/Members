@@ -5,29 +5,30 @@
     Layout = "/Views/Shared/_Layout.cshtml"; // Ensure this path is correct
 }
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7"> @* Slightly wider for more invoice details *@
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="my-4">
+
+    <div class="card m-1 p-2 shadow">
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7"> @* Slightly wider for more invoice details *@
             
-            <form method="post">
+                <form method="post">
 
-                <div class="card mb-2 shadow">
-                    <div class="card-header text-white">
-                        <h4 class="text-center text-black mb-0">
-                            @ViewData["Title"]
-                        </h4>
+                    <div class="card-header rounded-top shadow">
+                        <h4 class="text-center text-black mb-0">@ViewData["Title"]</h4>                                          
                     </div>
-                    <div class="card-body rounded-2">
-                        @if (TempData["StatusMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
-
+                
+                    <div class="card-body p-2">
+                        
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
                         @if (Model.IsUserPreselected)
                         {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
@@ -41,7 +42,7 @@
                                 <label asp-for="Input.SelectedInvoiceID" class="form-label"></label>
                                 @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
                                 {
-                                    <div class="card list-group py-2 ps-3 shadow" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                    <div class="card list-group shadow" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
                                         @foreach (var invoice in Model.OpenInvoicesForUser)
                                         {
                                             <label class="list-group-item list-group-item-action">
@@ -106,17 +107,23 @@
                                                 
                         @if (!string.IsNullOrEmpty(Model.Input.SelectedUserID)) 
                         {
-                            <div class="row mb-3">
+                            <!-- Invoice Date and Due Date fields -->
+                            <div class="row gy-3 mb-3">
+
+                                <!-- Invoice Date -->
                                 <div class="col-sm-6">
                                     <label asp-for="Input.PaymentDate" class="form-label"></label>
                                     <input asp-for="Input.PaymentDate" class="form-control shadow" />
                                     <span asp-validation-for="Input.PaymentDate" class="text-danger"></span>
                                 </div>
+
+                                <!-- Due Date -->
                                 <div class="col-sm-6">
                                     <label asp-for="Input.Amount" class="form-label"></label>
                                     <input asp-for="Input.Amount" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.Amount" class="text-danger"></span>
                                 </div>
+
                             </div>
                             
                             <div class="mb-3">
@@ -140,9 +147,9 @@
                             
                         }
                         
-                    </div>
+                            </div>
 
-                    <div class="card-footer d-grid py-4 gap-2">
+                    <div class="card-footer rounded-bottom d-grid py-4 gap-2">
                         <div class="row gy-2 justify-content-center">
 
                             <div class="col-6 mb-2 text-center">
@@ -157,8 +164,8 @@
                             </div>
 
                             <div class="col-6 mb-2 text-center">
-                                <button type="submit" asp-page-handler="RecordNewPayment" class="btn btn-sm btn-success rounded-2 shadow">
-                                    <i class="bi bi-cash-coin"></i> Record New Payment
+                                <button type="submit" asp-page-handler="RecordNewPayment" class="px-1 btn btn-sm btn-success rounded-2 shadow">
+                                    <i class="bi bi-cash-coin"></i> Record Payment
                                 </button>
                             </div>
 
@@ -173,12 +180,10 @@
 
                         </div>
                     </div>
-
-
-
-                </div>
-            </form>
                 
+                </form>
+                
+            </div>
         </div>
     </div>
 </div>

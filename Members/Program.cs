@@ -61,7 +61,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddTransient<EmailService>();
 
-// Register both filters (ONLY ONCE)
+// Register Color filters
 builder.Services.AddScoped<LoadDynamicColorsFilter>();
 builder.Services.AddScoped<RazorPageLoadColorsFilter>();
 
@@ -94,11 +94,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
 app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Info}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.MapRazorPages()
     .WithStaticAssets();
 

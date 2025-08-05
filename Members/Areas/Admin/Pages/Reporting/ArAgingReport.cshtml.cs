@@ -93,10 +93,9 @@ namespace Members.Areas.Admin.Pages.Reporting
             }
 
             // Sort by Customer Name first, then by Invoice ID
-            ReportData = reportItems
+            ReportData = [.. reportItems
                 .OrderBy(x => x.CustomerName, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(x => x.InvoiceId)
-                .ToList();
+                .ThenBy(x => x.InvoiceId)];
         }
 
         public async Task OnGetAsync()

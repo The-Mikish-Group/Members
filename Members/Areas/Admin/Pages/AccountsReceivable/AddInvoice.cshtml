@@ -5,44 +5,43 @@
     Layout = "/Views/Shared/_Layout.cshtml"; 
 }
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="my-4">
+
+    <div class="card m-1 p-2 shadow">
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
             
-            <form method="post">
+                <form method="post">               
 
-                <div class="card mb-2 shadow">
-
-                    <div class="card-header">
-                        <h4 class="text-black text-center mb-0">
-                            @ViewData["Title"]
-                        </h4>
+                    <div class="card-header rounded-top shadow">
+                        <h4 class="text-black text-center mb-0">@ViewData["Title"]</h4>
                     </div>
 
-                    <div class="card-body rounded-2">
-
-                        @if (TempData["StatusMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
+                    <div class="card-body p-2">                        
 
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                         @if (Model.IsUserPreselected)
+                            @if (Model.IsUserPreselected)
                         {
                             <input type="hidden" asp-for="Input.SelectedUserID" />
                             <div class="mb-3">
-                                <label class="fw-bold">Member</label>
+                                <label class="form-label fw-bold">Member</label>
                                 <p class="form-control shadow">@Model.TargetUserName</p>
                             </div>
                         }
-                        else
+                        else // User not preselected, show dropdown (fallback)
                         {
                             <div class="mb-3">
                                 <label asp-for="Input.SelectedUserID" class="fw-bold"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select">
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select shadow">
                                     <option value="">-- Select User --</option>
                                 </select>
                                 <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
@@ -53,17 +52,24 @@
                         {
                             <input type="hidden" asp-for="ReturnUrl" />
                         }
-                        <div class="row mb-3">
+
+                        <!-- Invoice Date and Due Date fields -->
+                        <div class="row gy-3 mb-3">
+
+                            <!-- Invoice Date -->
                             <div class="col-sm-6">
                                 <label asp-for="Input.InvoiceDate" class="fw-bold"></label>
                                 <input asp-for="Input.InvoiceDate" class="form-control shadow" />
                                 <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                             </div>
+
+                            <!-- Due Date -->
                             <div class="col-sm-6">
                                 <label asp-for="Input.DueDate" class="fw-bold"></label>
                                 <input asp-for="Input.DueDate" class="form-control shadow" />
                                 <span asp-validation-for="Input.DueDate" class="text-danger"></span>
                             </div>
+
                         </div>
 
                         <div class="mb-3">
@@ -72,7 +78,7 @@
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </div>
                         
-                        <div class="row mb-3">
+                        <div class="row gy-3 mb-3">
                             <div class="col-sm-6">
                                 <label asp-for="Input.AmountDue" class="fw-bold"></label>
                                 <input asp-for="Input.AmountDue" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
@@ -88,33 +94,32 @@
                         
                     </div>
 
-                    <div class="card-footer d-grid py-4 gap-2">
+                    <div class="card-footer rounded-bottom d-grid py-4 gap-2">
 
-                        <div class="row justify-content-center">
+                            <div class="row justify-content-center">
 
-                            <div class="col-6 text-center">
-                                @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
-                                {
-                                    <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-2 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
-                                }
-                                else
-                                {
-                                    <a href="~/Info/" class="btn btn-sm btn-back rounded-2 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
-                                }
+                                <div class="col-6 text-center">
+                                    @if (Model.IsUserPreselected && !string.IsNullOrEmpty(Model.ReturnUrl))
+                                    {
+                                        <a href="@Model.ReturnUrl" class="btn btn-sm btn-back rounded-2 mt-0 shadow"><i class="bi bi-arrow-left"> </i> Billing History</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Info/" class="btn btn-sm btn-back rounded-2 mt-0 shadow"> <i class="bi bi-arrow-left"></i> Cancel</a>
+                                    }
+                                </div>
+
+                                <div class="col-6 text-center">
+                                    <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
+                                </div>
                             </div>
 
-                            <div class="col-6 text-center">
-                                <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
-                            </div>
-                        </div>
+                        </div>                
 
-                    </div>
-
-                </div>
-
-            </form>
+                </form>
                
-        </div> 
+            </div> 
+        </div>
     </div>
 </div> 
 
