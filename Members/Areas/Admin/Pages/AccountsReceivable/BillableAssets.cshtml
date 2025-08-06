@@ -5,8 +5,10 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Title -->
 <h2 class="text-black my-4 text-center"><i class="bi bi-house"></i> @ViewData["Title"]</h2>
 
+<!-- Error Status Messages --> 
 @if (TempData["StatusMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -23,12 +25,14 @@
     </div>
 }
 
+
+<!-- Add A New Billable Asset Button -->
 <div class="text-center">
-    <button type="button" class="btn btn-sm btn-success rounded-2 mb-4 ms-2" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-square"></i> Add A New Billable Asset</button>
+    <button type="button" class="btn btn-sm btn-success rounded-2 mb-4 ms-2 shadow" data-bs-toggle="modal" data-bs-target="#addAssetModal"><i class="bi bi-plus-square"></i> Add A New Billable Asset</button>
 </div>
 
-<div class="mb-4"> 
-    
+<!-- Filter Assets Card -->
+<div class="mb-4">
     <div class="card m-1 p-2 shadow">
 
         <h5 class="text-black my-2 ms-2"><i class="bi bi-filter"></i> Filter Assets</h5>
@@ -54,8 +58,10 @@
     </div>
 </div>
 
+<!-- Export and Table Card -->
 <div class="card mx-1 mb-4 mt-1 p-1 shadow">
 
+    <!-- Export Button -->
     <div class="d-flex justify-content-between align-items-center mb-0 ms-2">
         <h5 class="text-black my-2"><i class="bi bi-list"></i> Existing Assets</h5>
         <button type="button" class="btn btn-sm btn-success rounded-2 my-2 me-2 shadow" id="exportBillableAssetsTriggerButton"
@@ -64,6 +70,7 @@
         </button>
     </div>
 
+    <!-- Table -->
     <div class="table-responsive">
         <table class="w-100 mb-0" id="mainAssetsTable">
             <thead>
@@ -154,13 +161,13 @@
                     </th>
 
                     <!-- Billing -->
-                    <th class="text-nowrap py-2 pe-2 text-center">Billing</th>
+                    <th class="text-nowrap pe-2 text-center">Billing</th>
 
                     <!-- Edit -->
-                    <th class="text-nowrap py-2 pe-2 text-center">Edit</th>
+                    <th class="text-nowrap pe-2 text-center">Edit</th>
                     
                     <!-- Delete -->
-                    <th class="text-nowrap py-2 pe-2 text-center">Delete</th>
+                    <th class="text-nowrap pe-2 text-center">Delete</th>
 
                 </tr>
             </thead>
@@ -230,6 +237,8 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Paginator -->
     <div id="assetsPaginationPlaceholder" class="mt-3 px-1">
         @if (Model.TotalPages > 1)
         {
@@ -253,9 +262,13 @@
             </nav>
         }
     </div>
+
+    <!-- Ajax Response Container -->
     <div id="assetsTableAjaxResponseContainer" style="display:none;"></div>
+
 </div>
 
+<!-- Add Asset Modal -->
 <div class="modal fade" id="addAssetModal" tabindex="-1" aria-labelledby="addAssetModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -302,6 +315,7 @@
     </div>
 </div> <!-- End of addAssetModal -->
 
+<!-- Edit Asset Modal -->
 <div class="modal fade" id="editAssetModal" tabindex="-1" aria-labelledby="editAssetModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -362,8 +376,8 @@
                 Download the CSV export for all Billable Assets?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
-                <button type="button" class="btn btn-sm btn-success" id="confirmBillableAssetsExportButton"><i class="bi bi-save"></i> Yes, Export</button>
+                <button type="button" class="btn btn-sm btn-secondary shadow" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
+                <button type="button" class="btn btn-sm btn-success shadow" id="confirmBillableAssetsExportButton"><i class="bi bi-save"></i> Yes, Export</button>
             </div>
         </div>
     </div>

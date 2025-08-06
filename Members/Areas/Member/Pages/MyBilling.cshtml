@@ -112,15 +112,15 @@
 					</h3>
 					@if (Model.CurrentBalance > 0)
 					{
-						<p class="text-muted">This account has an outstanding balance.</p>
+						<p class="text-muted">Account has an outstanding balance.</p>
 					}
 					else if (Model.CurrentBalance == 0)
 					{
-						<p class="text-muted">This account is settled. Thank you!</p>
+						<p class="text-muted">Account is settled. Thank you!</p>
 					}
 					else
 					{
-						<p class="text-muted">This account has a credit balance.</p>
+						<p class="text-muted">Account has a credit balance.</p>
 					}
 
 				</div>
@@ -362,7 +362,7 @@
 														<input type="hidden" name="ViewedUserId" value="@Model.ViewedUserId" />
 														<input type="hidden" name="BackToEditUserUrl" value="@Model.BackToEditUserUrl" />
 
-														<button type="submit" class="btn btn-sm btn-danger ms-1" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
+														<button type="submit" class="btn btn-sm btn-danger ms-1 shadow" title="Void Payment @trans.PaymentID.Value (Ref: @trans.Description)">
 															<i class="bi bi-eraser"></i>
 														</button>
 

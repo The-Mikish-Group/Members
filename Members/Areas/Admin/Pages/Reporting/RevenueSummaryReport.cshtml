@@ -8,50 +8,47 @@
 <!-- Top Button placed here -->
 <button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
-<div class="container mt-4">
+<div class="mt-4 px-1">
 
     <!-- Title -->
-    <div class="row">
-        <div class="col">
-            <h2 class="text-black text-center">@ViewData["Title"]</h2>            
-        </div>
+    <div class="text-center">
+        <h2 class="text-black">@ViewData["Title"]</h2>
     </div>
 
+    <!-- Buttons Form -->
     <form method="get" class="mb-3">
-        <div class="row align-items-end gy-2">
+        <div class="row align-items-end gx-2 gy-3 mx-0 p-0">
 
             <!-- Start Date -->
-            <div class="col-md-3">
-                <label for="StartDate" class="ms-2 mb-0 fw-bold">Start Date:</label>
+            <div class="col-md-3 px-0 me-2">
+                <label for="StartDate" class="ms-2 mb-0 form-label">Start Date:</label>
                 <input asp-for="StartDate" type="date" class="form-control shadow" id="StartDate" name="StartDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
             </div>
 
             <!-- End Date -->
-            <div class="col-md-3">
-                <label for="EndDate" class="ms-2 mb-0 fw-bold">End Date:</label>
+            <div class="col-md-3 px-0 me-2">
+                <label for="EndDate" class="ms-2 mb-0 form-label">End Date:</label>
                 <input asp-for="EndDate" type="date" class="form-control shadow" id="EndDate" name="EndDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
             </div>
 
             <!-- Run Report Button -->
-            <div class="col-md-auto">
-                <button type="submit" class="btn btn-success rounded-2 mx-2 shadow">
-                    <i class="bi bi-funnel-fill"></i> Run Report
-                </button>
+            <div class="col-md-auto px-0">
+                <button type="submit" class="btn btn-success rounded-2 ms-2 px-2 shadow"><i class="bi bi-funnel-fill"></i> Run Report</button>
             </div>
 
             @if (Model.SummaryData != null) // Check if data has been generated
             {
                 <!-- Export to CSV Buttonn (Only show if there is report data) -->
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-success rounded-2 mx-2 shadow"
+                <div class="col-md-auto px-0">
+                    <button type="button" class="btn btn-success rounded-2 ms-2 px-2 shadow"
                             data-bs-toggle="modal" data-bs-target="#exportRevenueSummaryConfirmModal">
                         <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
                     </button>
                 </div>
 
                 <!-- Print Button (Only show if there is report data) -->
-                <div class="col-md-auto">
-                    <button type="button" class="btn btn-success rounded-2 mx-2 shadow" id="printReportButton">
+                <div class="col-md-auto px-0">
+                    <button type="button" class="btn btn-success rounded-2 ms-2 px-2 shadow" id="printReportButton">
                         <i class="bi bi-printer-fill"></i> Print
                     </button>
                 </div>

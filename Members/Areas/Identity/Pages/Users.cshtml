@@ -12,41 +12,30 @@
     string siteName = Environment.GetEnvironmentVariable("SITE_NAME")!;
 }
 
-<!-- Title -->
-<head>
-    <title>@ViewData["Title"]</title>   
-</head>
-
 <!-- Must be an Admin or Manager -->
 @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
 {
-    <div class="container my-4">
-        <div class="row mx-1 p-0">
-
-            <div class="col-12 mx-auto my-0 p-0">
-
-                <!-- Page Header with Title -->
-                <div class="row align-items-center mb-2">
-                    
-                    <!-- Page Title -->
-                    <div class="d-flex align-items-center col-auto mx-auto">
-                        <h1 class="text-black text-center"><i class="bi bi-people-fill"></i> Manage Members</h1>
-                    </div>
-
-                </div>
+    <div class="my-4">
+        <div class="row justify-content-center m-0 p-0">
+            <div class="col-12 p-1">
+               
+                <!-- Title -->
+                <div class="mb-3 text-center">
+                    <h1 class="text-black text-center"><i class="bi bi-people-fill"></i> @ViewData["Title"]</h1>
+                </div>                
 
                 <!-- Export to CSV Button -->
-                <div class="row mb-3">
-                    <div class="col-12 text-center">
-                        <button type="button" class="btn btn-sm btn-success rounded-2" data-bs-toggle="modal" data-bs-target="#exportConfirmModal" id="exportCsvTriggerButton">
-                            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
-                        </button>
-                    </div>
+                <div class="mb-3 text-center">                    
+                    <button type="button" class="btn btn-sm btn-success rounded-2 shadow" data-bs-toggle="modal" data-bs-target="#exportConfirmModal" id="exportCsvTriggerButton">
+                        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export to CSV
+                    </button>                    
                 </div>
 
                 <!-- Shadow Card for Search Term and User Count -->
-                <div class="card m-sm-0 rounded p-1 shadow">
+                <div class="card rounded m-0 p-1 shadow">
 
+                    <h5 class="text-black my-2 ms-2"><i class="bi bi-filter"></i> Filter Members</h5>
+                    
                     <!-- Searchterm input field and button -->
                     <div class="mb-3">
 
@@ -94,30 +83,29 @@
                 </div>
 
             </div>
-
         </div>
 
-        <div class="row mx-1 p-0">
-            <div class="col-12 mt-2 p-0">            
+        <div class="row justify-content-center m-0 p-0">
+            <div class="col-12 p-1">
 
                 <!-- Shadow Card for Manage Members Table -->
                 <div class="card m-sm-0 rounded p-1 shadow"> 
 
-                        <!-- Table Container for displaying users -->
-                        <div class="table-responsive mb-3" id="usersTableContainer">
+                    <!-- Table Container for displaying users -->
+                    <div class="table-responsive mb-3" id="usersTableContainer">
 
-                            <!-- Row for Header: Manage Members -->
-                            <div class="row align-items-center mb-2">
+                        <!-- Row for Header: Manage Members -->
+                        <div class="row align-items-center mb-2">
                     
-                                <!-- Header: Manage Members -->
-                                <div class="d-flex align-items-start col-auto">
-                                    <h2 class="text-black text-start"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
-                                </div>
-
+                            <!-- Header: Manage Members -->
+                            <div class="d-flex align-items-start col-auto">
+                                <h2 class="text-black text-start"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
                             </div>
 
+                        </div>
 
-                            <!-- Table for displaying users -->
+                        <!-- Table for displaying users -->
+                        <div class="table-responsive rounded shadow">
                             <table class="w-100 table-striped shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
                 
                                 <!-- Table Column Headings -->
@@ -477,102 +465,102 @@
                                 </tbody>
 
                             </table>
-
                         </div>
 
-                        <!-- Pagination Navigation -->
-                        @{
-                            var totalPages = Model.TotalPages;
-                            var currentPage = Model.PageNumber;
+                    </div>
 
-                            <!-- Set the number of pages to display in the pagination -->
-                            var pageDisplayLimit = 5;
+                    <!-- Pagination Navigation -->
+                    @{
+                        var totalPages = Model.TotalPages;
+                        var currentPage = Model.PageNumber;
 
-                            <!-- Calculate the start and end pages to display -->
-                            var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
-                            var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
+                        <!-- Set the number of pages to display in the pagination -->
+                        var pageDisplayLimit = 5;
 
-                            <!-- Adjust startPage if endPage was capped by totalPages -->
-                            if (endPage - startPage + 1 < pageDisplayLimit)
-                            {
-                                startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
-                            }
+                        <!-- Calculate the start and end pages to display -->
+                        var startPage = Math.Max(1, currentPage - (int)Math.Floor((double)pageDisplayLimit / 2));
+                        var endPage = Math.Min(totalPages, startPage + pageDisplayLimit - 1);
+
+                        <!-- Adjust startPage if endPage was capped by totalPages -->
+                        if (endPage - startPage + 1 < pageDisplayLimit)
+                        {
+                            startPage = Math.Max(1, endPage - pageDisplayLimit + 1);
                         }
+                    }
 
-                        <!-- Pagination Controls -->
-                        <nav navigation" id="paginationNav">
-                            <ul class="pagination justify-content-center">
+                    <!-- Pagination Controls -->
+                    <nav navigation" id="paginationNav">
+                        <ul class="pagination justify-content-center">
 
-                                <!-- Previous Page Button -->
-                                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                            <!-- Previous Page Button -->
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage - 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage - 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()">
+                                    &laquo;
+                                </a>
+                            </li>
+
+                            <!-- Page Number Links -->
+                
+                            @for (var ii = startPage; ii <= endPage; ii++)
+                            {
+                                <li class="page-item @(ii == currentPage ? "active" : "")">
                                     <a class="page-link" asp-page="./Users"
-                                        asp-route-PageNumber="@(currentPage - 1)"
+                                        asp-route-PageNumber="@ii"
                                         asp-route-PageSize="@Model.PageSize"
                                         asp-route-SortColumn="@Model.SortColumn"
                                         asp-route-SortOrder="@Model.SortOrder"
                                         asp-route-SearchTerm="@Model.SearchTerm"
                                         asp-route-showextrafields="@Model.ShowExtraFields"
-                                        data-page-number="@(currentPage - 1)"
+                                        data-page-number="@ii"
                                         data-page-size="@Model.PageSize"
                                         data-sort-column="@Model.SortColumn"
                                         data-sort-order="@Model.SortOrder"
                                         data-search-term="@Model.SearchTerm"
                                         data-show-extra-fields="@Model.ShowExtraFields.ToString()">
-                                        &laquo;
+                                        @ii
                                     </a>
                                 </li>
-
-                                <!-- Page Number Links -->
-                
-                                @for (var ii = startPage; ii <= endPage; ii++)
-                                {
-                                    <li class="page-item @(ii == currentPage ? "active" : "")">
-                                        <a class="page-link" asp-page="./Users"
-                                            asp-route-PageNumber="@ii"
-                                            asp-route-PageSize="@Model.PageSize"
-                                            asp-route-SortColumn="@Model.SortColumn"
-                                            asp-route-SortOrder="@Model.SortOrder"
-                                            asp-route-SearchTerm="@Model.SearchTerm"
-                                            asp-route-showextrafields="@Model.ShowExtraFields"
-                                            data-page-number="@ii"
-                                            data-page-size="@Model.PageSize"
-                                            data-sort-column="@Model.SortColumn"
-                                            data-sort-order="@Model.SortOrder"
-                                            data-search-term="@Model.SearchTerm"
-                                            data-show-extra-fields="@Model.ShowExtraFields.ToString()">
-                                            @ii
-                                        </a>
-                                    </li>
-                                }
+                            }
 
 
-                                <!-- Next Page Button -->
-                                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                                    <a class="page-link" asp-page="./Users"
-                                        asp-route-PageNumber="@(currentPage + 1)"
-                                        asp-route-PageSize="@Model.PageSize"
-                                        asp-route-SortColumn="@Model.SortColumn"
-                                        asp-route-SortOrder="@Model.SortOrder"
-                                        asp-route-SearchTerm="@Model.SearchTerm"
-                                        asp-route-showextrafields="@Model.ShowExtraFields"
-                                        data-page-number="@(currentPage + 1)"
-                                        data-page-size="@Model.PageSize"
-                                        data-sort-column="@Model.SortColumn"
-                                        data-sort-order="@Model.SortOrder"
-                                        data-search-term="@Model.SearchTerm"
-                                        data-show-extra-fields="@Model.ShowExtraFields.ToString()"
-                                        aria-label="Next">
-                                        &raquo;
-                                    </a>
-                                </li>
+                            <!-- Next Page Button -->
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="./Users"
+                                    asp-route-PageNumber="@(currentPage + 1)"
+                                    asp-route-PageSize="@Model.PageSize"
+                                    asp-route-SortColumn="@Model.SortColumn"
+                                    asp-route-SortOrder="@Model.SortOrder"
+                                    asp-route-SearchTerm="@Model.SearchTerm"
+                                    asp-route-showextrafields="@Model.ShowExtraFields"
+                                    data-page-number="@(currentPage + 1)"
+                                    data-page-size="@Model.PageSize"
+                                    data-sort-column="@Model.SortColumn"
+                                    data-sort-order="@Model.SortOrder"
+                                    data-search-term="@Model.SearchTerm"
+                                    data-show-extra-fields="@Model.ShowExtraFields.ToString()"
+                                    aria-label="Next">
+                                    &raquo;
+                                </a>
+                            </li>
 
-                            </ul>
-                        </nav>
+                        </ul>
+                    </nav>
                
                 </div>
 
             </div>
-
         </div>
     </div>
 
@@ -588,8 +576,8 @@
                     Download the CSV Members export?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary rounded-2" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
-                    <button type="button" class="btn btn-sm btn-success rounded-2" id="confirmExportButton"><i class="bi bi-save"></i> Yes, Export</button>
+                    <button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal"><i class="bi bi-arrow-left"></i> Cancel</button>
+                    <button type="button" class="btn btn-sm btn-success rounded-2 shadow" id="confirmExportButton"><i class="bi bi-save"></i> Yes, Export</button>
                 </div>
             </div>
         </div>
