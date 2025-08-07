@@ -288,7 +288,7 @@
 												@($"INV-{trans.InvoiceID:D5}-Pmt")
 											}
 										</td>
-										<td class="text-black text-nowrap py-1" style="max-width: 430px;">@Html.DisplayFor(modelItem => trans.Description)</td>
+										<td class="text-black text-wrap py-1" style="min-width: 430px;">@Html.DisplayFor(modelItem => trans.Description)</td>
 										<td class="text-black text-nowrap py-1 text-end">@trans.ChargeAmount?.ToString("C")</td>
 										<td class="text-black text-nowrap py-1 pe-1 text-end">@trans.PaymentAmount?.ToString("C")</td>
 
