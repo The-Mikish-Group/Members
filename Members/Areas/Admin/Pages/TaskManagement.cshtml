@@ -1,0 +1,294 @@
+﻿@page
+@model Members.Areas.Admin.Pages.TasksModel
+@{
+    ViewData["Title"] = "Administrative Tasks";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Top Button -->
+<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+
+<div class="my-4">
+
+    <!-- Title -->
+    <h2 class="text-black my-4 text-center"><i class="bi bi-list-task"></i> @ViewData["Title"]</h2>
+
+    <!-- Status Messages -->
+    @if (TempData["StatusMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Html.Raw(TempData["WarningMessage"]?.ToString()?.Replace("\n", "<br />"))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Task Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Overdue</h5>
+                    <h3>@Model.TasksSummary.OverdueCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="bi bi-clock-fill"></i> Due Now</h5>
+                    <h3>@Model.TasksSummary.DueNowCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="bi bi-check-circle-fill"></i> Completed</h5>
+                    <h3>@Model.TasksSummary.CompletedCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="bi bi-list-ul"></i> Total</h5>
+                    <h3>@Model.TasksSummary.TotalCount</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasks Table -->
+    <div class="card m-1 p-2 shadow">
+        <div class="card-header">
+            <h5 class="text-black mb-0">
+                <i class="bi bi-calendar-month"></i> Tasks for @DateTime.Now.ToString("MMMM yyyy")
+            </h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Priority</th>
+                        <th>Due Period</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Completed</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Tasks.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="bi bi-info-circle"></i> No tasks found for this month.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var task in Model.Tasks)
+                        {
+                            <tr class="@(task.ComputedStatus == "Overdue" ? "table-danger" : task.ComputedStatus == "Due Now" ? "table-warning" : task.ComputedStatus == "Completed" ? "table-success" : "")">
+                                <td>
+                                    <strong>@task.TaskName</strong>
+                                    @if (!string.IsNullOrEmpty(task.Description))
+                                    {
+                                        <br />
+                                        <small class="text-muted">@task.Description</small>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="@task.PriorityBadgeClass">@task.Priority</span>
+                                </td>
+                                <td class="text-nowrap">@task.DueDateRange</td>
+                                <td>
+                                    <span class="@task.StatusBadgeClass">@task.ComputedStatus</span>
+                                    @if (task.IsAutomatedCompletion)
+                                    {
+                                        <br />
+                                        <small class="text-muted"><i class="bi bi-robot"></i> Auto-completed</small>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(task.AssignedToUserId))
+                                    {
+                                        var assignedUser = Model.UserSelectList?.FirstOrDefault(u => u.Value == task.AssignedToUserId);
+                                        <span class="badge bg-info">@(assignedUser?.Text ?? "Unknown User")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Unassigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (task.CompletedDate.HasValue)
+                                    {
+                                        <span class="text-nowrap">@task.CompletedDate.Value.ToString("MMM dd, yyyy")</span>
+                                        @if (!string.IsNullOrEmpty(task.CompletedByUserId))
+                                        {
+                                            var completedUser = Model.UserSelectList?.FirstOrDefault(u => u.Value == task.CompletedByUserId);
+                                            <br />
+                                            <small class="text-muted">by @(completedUser?.Text ?? "Unknown")</small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not completed</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (task.ComputedStatus != "Completed")
+                                    {
+                                        <!-- Complete Task Button -->
+                                        <form method="post" asp-page-handler="CompleteTask" style="display: inline;">
+                                            <input type="hidden" name="taskId" value="@task.TaskID" />
+                                            <button type="submit" class="btn btn-sm btn-success me-1" title="Mark as Complete">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Assign Task Button -->
+                                        <button type="button" class="btn btn-sm btn-primary me-1"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#assignTaskModal"
+                                                data-task-id="@task.TaskID"
+                                                data-task-name="@task.TaskName"
+                                                title="Assign Task">
+                                            <i class="bi bi-person-plus"></i>
+                                        </button>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(task.PageUrl))
+                                    {
+                                        <!-- Go to Page Button -->
+                                        <a href="@task.PageUrl" class="btn btn-sm btn-info" title="Go to Task Page">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                            @if (!string.IsNullOrEmpty(task.Notes))
+                            {
+                                <tr>
+                                    <td colspan="7" class="border-0 pt-0">
+                                        <small class="text-muted">
+                                            <i class="bi bi-note-text"></i> <strong>Notes:</strong> @task.Notes
+                                        </small>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Task Modal -->
+<div class="modal fade" id="assignTaskModal" tabindex="-1" aria-labelledby="assignTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AssignTask">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignTaskModalLabel">
+                        <i class="bi bi-person-plus"></i> Assign Task
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="assignTaskId" name="taskId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Task:</label>
+                        <p id="assignTaskName" class="form-control-plaintext"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="assignToUserId" class="form-label">Assign To:</label>
+                        <select name="assignToUserId" id="assignToUserId" class="form-select shadow">
+                            <option value="">-- Select User --</option>
+                            @if (Model.UserSelectList != null)
+                            {
+                                foreach (var user in Model.UserSelectList)
+                                {
+                                    <option value="@user.Value">@user.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check"></i> Assign Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle assign task modal
+            var assignTaskModal = document.getElementById('assignTaskModal');
+            if (assignTaskModal) {
+                assignTaskModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var taskId = button.getAttribute('data-task-id');
+                    var taskName = button.getAttribute('data-task-name');
+
+                    var modalTaskId = assignTaskModal.querySelector('#assignTaskId');
+                    var modalTaskName = assignTaskModal.querySelector('#assignTaskName');
+
+                    modalTaskId.value = taskId;
+                    modalTaskName.textContent = taskName;
+                });
+            }
+        });
+
+        // Top Button Script
+        var mybutton = document.getElementById("top-button");
+
+        window.onscroll = function () { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+}

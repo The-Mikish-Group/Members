@@ -1,128 +1,157 @@
-﻿@page
-@model Members.Areas.Admin.Pages.AccountsReceivable.CreateBatchInvoicesModel
-@{
-    ViewData["Title"] = "Create Draft Batch Invoices";
-    Layout = "/Views/Shared/_Layout.cshtml"; // Or your preferred admin layout
-}
+﻿using Members.Data;
+using Members.Models;
+using Members.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
-<div class="my-4">
-    <div class="row justify-content-center m-0 p-0">
-        <div class="col-md-8 col-lg-7 p-1">
+namespace Members.Areas.Admin.Pages.AccountsReceivable
+{
+    [Authorize(Roles = "Admin,Manager")]
+    public class CreateBatchInvoicesModel : PageModel
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser>
+    _userManager;
+    private readonly ILogger<CreateBatchInvoicesModel>
+        _logger;
+        private readonly ITaskManagementService _taskService;
 
-            <form method="post">
+        public CreateBatchInvoicesModel(
+        ApplicationDbContext context,
+        UserManager<IdentityUser>
+            userManager,
+            ILogger<CreateBatchInvoicesModel>
+                logger,
+                ITaskManagementService taskService)
+                {
+                _context = context;
+                _userManager = userManager;
+                _logger = logger;
+                _taskService = taskService;
+                }
 
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                [BindProperty]
+                public InputModel Input { get; set; } = new InputModel();
+                public int ActionableBillableAssetsCount { get; set; }
 
-                <div class="card rounded shadow">
+                public class InputModel
+                {
+                [Required]
+                [StringLength(150, MinimumLength = 5)]
+                [Display(Name = "Batch Description:")]
+                public string Description { get; set; } = string.Empty;
 
-                    <div class="card-header">
+                [Required]
+                [DataType(DataType.Date)]
+                [Display(Name = "Invoice Date:")]
+                public DateTime InvoiceDate { get; set; } = DateTime.Today;
 
-                        <!-- Title -->
-                        <div class="mb-3 text-center">
-                            <h3 class="text-black mb-0"><i class="bi bi-plus-square"></i> @ViewData["Title"]</h3>
-                        </div>
+                [Required]
+                [DataType(DataType.Date)]
+                [Display(Name = "Due Date:")]
+                public DateTime DueDate { get; set; } = DateTime.Today.AddDays(30);
+                }
 
-                    </div>
+                public async Task OnGetAsync()
+                {
+                _logger.LogInformation("CreateBatchInvoices.OnGetAsync called.");
+                ActionableBillableAssetsCount = await _context.BillableAssets
+                .CountAsync(ba => ba.UserID != null && ba.UserID != "");
+                _logger.LogInformation("Found {Count} actionable billable assets (with assigned users).", ActionableBillableAssetsCount);
 
-                    <div class="card-body rounded-2 rounded-2">
-                        <p class="card-text mb-2">
-                            Use this form to generate a batch of draft assessment invoices (e.g., for monthly assessments)
-                            for all <strong>billable assets</strong> that have an assigned billing contact. 
-                            One invoice will be created per asset.
-                        </p>
+                // Default to creating assessments for the first of next month
+                DateTime firstOfNextMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(1);
+                Input.Description = $"Monthly Assessment {firstOfNextMonth:MMMM yyyy}";
+                Input.InvoiceDate = firstOfNextMonth;
+                Input.DueDate = firstOfNextMonth; // Payable on the 1st, in advance
+                }
 
-                        @if (Model.ActionableBillableAssetsCount > 0)
-                        {
-                            <p class="bg-info-subtle mb-2 rounded p-2">
-                                Currently, there are <strong>@Model.ActionableBillableAssetsCount</strong> billable asset(s) with assigned contacts that will be processed. The specific 'Assessment Fee' set for each individual asset will be used to determine the amount for each invoice.
-                            </p>
-                        }
-                        else
-                        {
-                            <p class="alert alert-warning">
-                                There are currently no billable assets with assigned billing contacts. No invoices will be generated by this batch.
-                                Please <a asp-page="./BillableAssets">assign contacts to assets</a> first.
-                            </p>
-                        }
+                public async Task<IActionResult>
+                    OnPostAsync()
+                    {
+                    if (!ModelState.IsValid)
+                    {
+                    await OnGetAsync(); // Repopulate counts for display
+                    return Page();
+                    }
 
-                        <p class="card-text">
-                            These invoices will be created with a 'Draft' status and can be reviewed and finalized 
-                            via the 'Review Draft Batches' page before they become active.
-                        </p>
+                    _logger.LogInformation("Attempting to create batch invoices for description: {Description}", Input.Description);
 
-                        <hr />
+                    var billableAssetsToInvoice = await _context.BillableAssets
+                    .Where(ba => ba.UserID != null && ba.UserID != "")
+                    .ToListAsync();
 
-                        @if (TempData["StatusMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
-                                <button type="button" class="btn-close shadow" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
-                        @if (TempData["ErrorMessage"] != null)
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
-                                <button type="button" class="btn-close shadow" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
+                    if (billableAssetsToInvoice.Count == 0)
+                    {
+                    ModelState.AddModelError(string.Empty, "No billable assets found with assigned billing contacts. Cannot create batch.");
+                    _logger.LogWarning("CreateBatchInvoices: No billable assets with assigned users found.");
+                    await OnGetAsync(); // Repopulate counts
+                    return Page();
+                    }
 
-                        <!-- Description -->
-                        <div class="mb-3">
-                            <label asp-for="Input.Description" class="form-label ms-2"></label>
-                            <input asp-for="Input.Description" class="form-control shadow" />
-                            <span asp-validation-for="Input.Description" class="text-danger"></span>
-                        </div>
+                    string newBatchId = $"BATCH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString()[..4]}";
+                    int invoicesCreatedCount = 0;
+                    decimal batchTotalAmount = 0;
 
-                        <div class="row">
+                    foreach (var asset in billableAssetsToInvoice)
+                    {
+                    var invoice = new Invoice
+                    {
+                    UserID = asset.UserID!,
+                    InvoiceDate = Input.InvoiceDate,
+                    DueDate = Input.DueDate,
+                    Description = $"{Input.Description} - Plot: {asset.PlotID}",
+                    AmountDue = asset.AssessmentFee,
+                    AmountPaid = 0,
+                    Status = InvoiceStatus.Draft,
+                    Type = InvoiceType.Dues,
+                    BatchID = newBatchId,
+                    DateCreated = DateTime.UtcNow,
+                    LastUpdated = DateTime.UtcNow
+                    };
+                    _context.Invoices.Add(invoice);
+                    invoicesCreatedCount++;
+                    batchTotalAmount += asset.AssessmentFee;
+                    }
 
-                            <!-- Invoice Date -->
-                            <div class="col-6">
-                                <label asp-for="Input.InvoiceDate" class="form-label ms-2"></label>
-                                <input asp-for="Input.InvoiceDate" class="form-control shadow" type="date" />
-                                <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
-                            </div>
+                    _logger.LogInformation("Generated BatchID: {BatchID} for {BillableAssetsCount} billable assets, total amount {BatchTotalAmountC}.",
+                    newBatchId, billableAssetsToInvoice.Count, batchTotalAmount.ToString("C"));
 
-                            <!-- Due Date -->
-                            <div class="col-6">
-                                <label asp-for="Input.DueDate" class="form-label ms-2"></label>
-                                <input asp-for="Input.DueDate" class="form-control shadow" type="date" />
-                                <span asp-validation-for="Input.DueDate" class="text-danger"></span>
-                            </div>
+                    try
+                    {
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Successfully created {InvoicesCreatedCount} draft invoices (totaling {BatchTotalAmountC}) for BatchID: {BatchID}.",
+                    invoicesCreatedCount, batchTotalAmount.ToString("C"), newBatchId);
 
-                        </div>
-                   
-                    </div>
+                    // Mark task as completed
+                    try
+                    {
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("CreateBatchInvoices",
+                    $"Created draft batch '{newBatchId}' with {invoicesCreatedCount} invoices totaling {batchTotalAmount:C}");
+                    }
+                    catch (Exception ex)
+                    {
+                    _logger.LogError(ex, "Failed to mark CreateBatchInvoices task as completed");
+                    }
 
-                    <!-- Card-Footer -->
-                    <div class="card-footer">
-
-                        <div class="row">
-
-                            <!-- Back to Manage Batch Invoices Button -->
-                            <div class="col-6 my-3 text-center">
-                                <a class="btn btn-sm btn-back rounded-2 shadow" href=".\reviewbatchinvoices"><i class="bi bi-arrow-left"></i> Back to Review batch Invoices</a>
-                            </div>
-
-                            <!-- Create a Batch Invoice Btton -->
-                            <div class="col-6 my-3 text-center">
-                                <button type="submit" class="btn btn-sm btn-success rounded-2 shadow">
-                                    <i class="bi bi-files"></i> Create a Draft Invoice Batch
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-                
-            </form>
-
-        </div>
-    </div>
-
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+                    TempData["StatusMessage"] = $"Draft batch '{newBatchId}' created with {invoicesCreatedCount} invoices (for '{Input.Description}') totaling {batchTotalAmount:C}. One invoice per assigned billable asset. Please review and finalize.";
+                    return RedirectToPage("./ReviewBatchInvoices", new { batchId = newBatchId });
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                    _logger.LogError(ex, "Error saving batch invoices to database for BatchID {BatchId}", newBatchId);
+                    ModelState.AddModelError(string.Empty, "An error occurred while saving the batch invoices. Please check logs.");
+                    await OnGetAsync(); // Repopulate counts
+                    return Page();
+                    }
+                    }
+                    }
+                    }

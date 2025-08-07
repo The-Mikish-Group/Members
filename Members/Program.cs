@@ -1,3 +1,4 @@
+using TaskStatus = Members.Models.TaskStatus;
 using Members.Data;
 using Members.Filters;
 using Members.Models; // Add this to access UserProfile
@@ -64,6 +65,9 @@ builder.Services.AddTransient<EmailService>();
 // Register Color filters
 builder.Services.AddScoped<LoadDynamicColorsFilter>();
 builder.Services.AddScoped<RazorPageLoadColorsFilter>();
+
+// Register the Task Management Service
+builder.Services.AddScoped<ITaskManagementService, TaskManagementService>();
 
 // Apply filters globally to both MVC and Razor Pages
 builder.Services.Configure<MvcOptions>(options =>

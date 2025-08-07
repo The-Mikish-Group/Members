@@ -1,6 +1,7 @@
 ﻿using Members.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 namespace Members.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
@@ -13,9 +14,14 @@ namespace Members.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<UserCredit> UserCredits { get; set; }
         public DbSet<BillableAsset> BillableAssets { get; set; }
-        public DbSet<CreditApplication> CreditApplications { get; set; } // Added DbSet for CreditApplications
+        public DbSet<CreditApplication> CreditApplications { get; set; }
         public DbSet<ColorVar> ColorVars { get; set; }
-        // ... other DbSets
+
+        // Task System DbSets
+        public DbSet<AdminTask> AdminTasks { get; set; }
+        public DbSet<AdminTaskInstance> AdminTaskInstances { get; set; }
+        public DbSet<TaskStatusMessage> TaskStatusMessages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -23,26 +29,57 @@ namespace Members.Data
             builder.Entity<BillableAsset>()
                 .HasIndex(ba => ba.PlotID)
                 .IsUnique();
-            
+
             builder.Entity<BillableAsset>()
                 .HasOne(ba => ba.User)
-                .WithMany() // Assuming IdentityUser doesn't have a direct navigation collection for BillableAssets
+                .WithMany()
                 .HasForeignKey(ba => ba.UserID)
-                .IsRequired(false) // Makes the relationship optional (UserID can be null)
-                .OnDelete(DeleteBehavior.SetNull); // If a User is deleted, set BillableAsset.UserID to null
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Configure CreditApplication relationships
             builder.Entity<CreditApplication>(entity =>
             {
                 entity.HasOne(ca => ca.UserCredit)
-                    .WithMany() // Assuming UserCredit does not have a direct navigation collection for CreditApplications explicitly
+                    .WithMany()
                     .HasForeignKey(ca => ca.UserCreditID)
-                    .OnDelete(DeleteBehavior.Restrict); // Prevent deletion of UserCredit if applications exist
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ca => ca.Invoice)
-                    .WithMany() // Assuming Invoice does not have a direct navigation collection for CreditApplications explicitly
+                    .WithMany()
                     .HasForeignKey(ca => ca.InvoiceID)
-                    .OnDelete(DeleteBehavior.Restrict); // Prevent deletion of Invoice if credit applications exist
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure Task System relationships
+            builder.Entity<AdminTaskInstance>(entity =>
+            {
+                entity.HasOne(ati => ati.AdminTask)
+                    .WithMany(at => at.TaskInstances)
+                    .HasForeignKey(ati => ati.TaskID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ati => ati.AssignedToUser)
+                    .WithMany()
+                    .HasForeignKey(ati => ati.AssignedToUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(ati => ati.CompletedByUser)
+                    .WithMany()
+                    .HasForeignKey(ati => ati.CompletedByUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                // Ensure unique constraint for Task + Year + Month
+                entity.HasIndex(ati => new { ati.TaskID, ati.Year, ati.Month })
+                    .IsUnique();
+            });
+
+            builder.Entity<TaskStatusMessage>(entity =>
+            {
+                entity.HasOne(tsm => tsm.User)
+                    .WithMany()
+                    .HasForeignKey(tsm => tsm.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

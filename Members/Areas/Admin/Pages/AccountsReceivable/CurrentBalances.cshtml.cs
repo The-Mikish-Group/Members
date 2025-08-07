@@ -1,5 +1,6 @@
 using Members.Data;
 using Members.Models; // Assuming UserProfile, Invoice, Payment are here
+using Members.Services; // Add this using statement
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +16,14 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
         ILogger<CurrentBalancesModel> logger,
-        Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender) : PageModel
+        Microsoft.AspNetCore.Identity.UI.Services.IEmailSender emailSender,
+        ITaskManagementService taskService) : PageModel // Add task service parameter
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<CurrentBalancesModel> _logger = logger;
         private readonly Microsoft.AspNetCore.Identity.UI.Services.IEmailSender _emailSender = emailSender;
+        private readonly ITaskManagementService _taskService = taskService; // Add this field
         private const int RecentFeeDaysThreshold = 7;
 
         // Inner class for results
@@ -151,7 +154,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) already has a recent late fee. Skipped.", userNameForDisplay, userId);
                 return LateFeeApplicationResult.SkippedRecentFeeExists(userNameForDisplay, userId);
             }
-            
+
             if (latestOverdueInvoice == null)
             {
                 _logger.LogInformation("ApplyLateFeeToUserAsync: User {UserName} (ID: {UserId}) has an outstanding balance but no overdue invoices. No late fee applied.", userNameForDisplay, userId);
@@ -308,7 +311,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             var memberRoleName = "Member";
             var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
 
-            if (usersInMemberRole == null || usersInMemberRole.Count == 0) 
+            if (usersInMemberRole == null || usersInMemberRole.Count == 0)
             {
                 _logger.LogWarning("No users found in 'Member' role.");
                 MemberBalances = []; // Ensure MemberBalances is initialized even if empty
@@ -545,7 +548,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             int successCount = 0;
             int skippedNoOutstandingBalance = 0;
             int skippedRecentFeeExists = 0;
-            int skippedNoOverdueDues = 0; 
+            int skippedNoOverdueDues = 0;
             int errorCount = 0;
             var detailedErrorMessages = new List<string>();
             var successMessages = new List<string>();
@@ -590,7 +593,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 // Apply late fee to each billing contact
                 LateFeeApplicationResult result;
                 try
-                {                    
+                {
                     result = await ApplyLateFeeToUserAsync(user.Id, user.UserName);
                 }
                 catch (Exception ex)
@@ -663,6 +666,21 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 TempData["WarningMessage"] = "Bulk late fee process ran, but no fees were applied or applicable to the targeted billing contacts.";
             }
+
+            // Mark task as completed if any late fees were successfully applied
+            if (successCount > 0)
+            {
+                try
+                {
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("BulkApplyLateFees",
+                        $"Applied {successCount} late fees automatically");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to mark BulkApplyLateFees task as completed");
+                }
+            }
+
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
 
@@ -836,6 +854,20 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 TempData["StatusMessage"] = statusMessage.ToString();
             }
 
+            // Mark task as completed if any emails were sent
+            if (emailsSentCount > 0)
+            {
+                try
+                {
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("EmailBalanceNotifications",
+                        $"Sent {emailsSentCount} balance notification emails automatically");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to mark EmailBalanceNotifications task as completed");
+                }
+            }
+
             _logger.LogInformation("OnPostEmailBalanceNotificationsAsync COMPLETE. Emails Sent: {EmailsSentCount}, Errors: {EmailErrorsCount}", emailsSentCount, emailErrors.Count);
             return RedirectToPage(new { sortOrder = CurrentSort, showOnlyOutstanding = ShowOnlyOutstanding });
         }
@@ -993,6 +1025,20 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             else
             {
                 TempData["StatusMessage"] = statusMessage.ToString();
+            }
+
+            // Mark task as completed if any emails were sent
+            if (emailsSentCount > 0)
+            {
+                try
+                {
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("EmailLateFeeWarnings",
+                        $"Sent {emailsSentCount} late fee warning emails automatically");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to mark EmailLateFeeWarnings task as completed");
+                }
             }
 
             _logger.LogInformation("OnPostEmailLateFeeWarningsAsync COMPLETE. Emails Sent: {EmailsSentCount}, Errors: {EmailErrorsCount}", emailsSentCount, emailErrors.Count);
