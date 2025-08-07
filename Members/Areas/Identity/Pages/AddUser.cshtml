@@ -9,9 +9,9 @@
     <title>@ViewData["Title"]</title>
 </head>
 
-<div class="container my-4">
-     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
+<div class="my-4">
+     <div class="row justify-content-center m-0 p-0">
+        <div class="col-lg-8 col-md-10 p-1">
             <div class="card rounded p-2 shadow">
                 <form method="post">
                     <h1 class="text-black mb-4 text-center">
@@ -146,17 +146,21 @@
                     </div>
 
                     <!-- Buttons -->
-                    <div class="d-flex justify-content-center mt-3">
+                    <div class="row justify-content-center">
 
                         <!-- Cancel Button -->
-                        <button type="button" onclick="window.location.href='/Identity/Users'" class="btn btn-sm btn-back rounded-2 me-2 shadow">
-                            <i class="bi bi-box-arrow-left"></i> Cancel
-                        </button>
+                        <div class="col-6 text-center">
+                            <button type="button" onclick="window.location.href='/Identity/Users'" class="btn btn-sm btn-back rounded-2 text-start shadow">
+                                <i class="bi bi-box-arrow-left"></i> Cancel
+                            </button>
+                        </div>
 
                         <!-- Save -->
-                        <button type="submit" class="btn btn-sm btn-success rounded-2 me-2 shadow">
-                            <i class="bi bi-save"></i> Save
-                        </button>
+                        <div class="col-6 text-center">
+                            <button type="submit" class="btn btn-sm btn-success rounded-2 text-end shadow">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                        </div>
 
                     </div>
                 </form>

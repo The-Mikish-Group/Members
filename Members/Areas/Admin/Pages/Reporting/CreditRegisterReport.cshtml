@@ -118,8 +118,8 @@
                             <td>UC-@item.CreditId.ToString("D5")</td>
                             <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
                             <td>@item.CreditDate.ToString("yyyy-MM-dd")</td>
-                            <td style="max-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.Reason)</td>
-                            <td style="max-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.SourceInfo)</td>
+                            <td style="min-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.Reason)</td>
+                            <td style="min-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => item.SourceInfo)</td>
                             <td class="text-end">@item.OriginalAmount.ToString("C")</td>
                             <td class="text-end">@item.RemainingAmount.ToString("C")</td>
                             <td>@Html.DisplayFor(modelItem => item.Status)</td>
@@ -132,7 +132,7 @@
                             {
                                 // For the first application, display it in the main row's allocated cells
                                 var firstApp = item.AppliedApplications.First();
-                                <td class="ps-3" style="max-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceDescription)</small></td>
+                                <td class="ps-3" style="min-width: 275px; word-wrap: break-word; white-space: normal;">@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceId) <br /><small>@Html.DisplayFor(modelItem => firstApp.AppliedToInvoiceDescription)</small></td>
                                 <td class="text-end">@firstApp.AmountApplied.ToString("C")</td>
                                 <td>@firstApp.ApplicationDate.ToString("yyyy-MM-dd")</td>
                             }

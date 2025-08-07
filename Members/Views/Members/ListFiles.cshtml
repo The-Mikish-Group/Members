@@ -24,33 +24,35 @@
 </div>
 
 <!-- Card Container -->
-<div class="row justify-content-center container mx-auto p-1 mb-3">
-    <div class="col-lg-6 col-md-10 m-1 p-1">
+<div class="my-4 m-0 p-0">
+    <div class="row justify-content-center m-1 p-0">
+        <div class="col-md-6 col-lg-4 m-0 p-0">
 
-        <!-- Card -->
-        <div class="card rounded border p-0 shadow">           
+            <!-- Card -->
+            <div class="card rounded border p-0 shadow">           
 
-            <!-- Create the List of File Names -->
-            @if (Model != null && Model.Any())
-            {
-                <ul class="list-group list-group-flush"> <!-- flush blends the list bg with card bg -->
-                    @foreach (var file in Model)
-                    {
-                        <li class="list-group-item bg-transparent nav-link" style="cursor: pointer; border: none;">
-                            <a href="/identity/ViewPdf?fileName=@file.FileName" class="nav-link d-block">
-                                <i class="bi bi-eye text-eye-view me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
-                            </a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="text-black text-center">No files found in this category.</p>
-            }
+                <!-- Create the List of File Names -->
+                @if (Model != null && Model.Any())
+                {
+                    <ul class="list-group list-group-flush"> <!-- flush blends the list bg with card bg -->
+                        @foreach (var file in Model)
+                        {
+                            <li class="list-group-item bg-transparent nav-link" style="cursor: pointer; border: none;">
+                                <a href="/identity/ViewPdf?fileName=@file.FileName" class="nav-link d-block">
+                                    <i class="bi bi-eye text-eye-view me-2"></i> @System.IO.Path.GetFileNameWithoutExtension(file.FileName) <!-- Display name without extension -->
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-black text-center">No files found in this category.</p>
+                }
+
+            </div>
 
         </div>
-
     </div>
 </div>
 

@@ -89,22 +89,17 @@
             <div class="col-12 p-1">
 
                 <!-- Shadow Card for Manage Members Table -->
-                <div class="card m-sm-0 rounded p-1 shadow"> 
+                <div class="card rounded m-0 p-1 shadow">
 
                     <!-- Table Container for displaying users -->
                     <div class="table-responsive mb-3" id="usersTableContainer">
 
-                        <!-- Row for Header: Manage Members -->
-                        <div class="row align-items-center mb-2">
-                    
-                            <!-- Header: Manage Members -->
-                            <div class="d-flex align-items-start col-auto">
-                                <h2 class="text-black text-start"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
-                            </div>
-
+                        <!-- Header: Manage Members -->
+                        <div class="text-startr">
+                            <h2 class="text-black"><i class="bi bi-person-fill ms-2"></i> Select a Member</h2>
                         </div>
 
-                        <!-- Table for displaying users -->
+                        <!-- Table for displaying Members -->
                         <div class="table-responsive rounded shadow">
                             <table class="w-100 table-striped shadow @(Model.ShowExtraFields ? "" : "hide-extra-fields")" data-search-term="@Model.SearchTerm" id="userTable">
                 
@@ -113,7 +108,7 @@
                                     <tr>                       
                                         <th>
                                             <!-- Sort by Full Name -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="fullname"
                                                 data-sort-column="fullname"
@@ -127,7 +122,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Email -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="email"
                                                 data-sort-column="email"
@@ -141,7 +136,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Email Confirmed -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="emailconfirmed"
                                                 data-sort-column="emailconfirmed"
@@ -155,7 +150,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Cell Phone -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="phonenumber"
                                                 data-sort-column="phonenumber"
@@ -169,7 +164,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Cell Phone Confirmed -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="phonenumberconfirmed"
                                                 data-sort-column="phonenumberconfirmed"
@@ -183,7 +178,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Is Billing Contact -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="isbillingcontact"
                                                 data-sort-column="isbillingcontact"
@@ -197,7 +192,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Roles -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="roles"
                                                 data-sort-column="roles"
@@ -211,7 +206,7 @@
                                         </th>
                                         <th>
                                             <!-- Sort by Last Login -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="lastlogin"
                                                 data-sort-column="lastlogin"
@@ -225,7 +220,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by First Name -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="firstname"
                                                 data-sort-column="firstname"
@@ -239,7 +234,7 @@
                                         </th>
                                         <th class="extra-field">
                                             <!-- Sort by Middle Name -->
-                                        <a class="text-decoration-none text-nowrap"
+                                            <a class="text-decoration-none text-nowrap"
                                                 asp-page="./Users"
                                                 asp-route-sortcolumn="middlename"
                                                 data-sort-column="middlename"

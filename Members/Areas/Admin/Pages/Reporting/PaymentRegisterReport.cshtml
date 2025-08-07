@@ -103,8 +103,8 @@
                             <td class="text-nowrap text-end">@item.PaymentAmount.ToString("C")</td>
                             <td class="text-nowrap">@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
                             <td class="text-nowrap">@Html.DisplayFor(modelItem => item.ReferenceNumber)</td>
-                            <td class="text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
-                            <td class="text-wrap" style="width: 300px;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
+                            <td class="text-wrap" style="min-width: 300px;">@Html.DisplayFor(modelItem => item.PrimaryInvoiceInfo)</td>
+                            <td class="text-wrap" style="min-width: 300px;">@Html.DisplayFor(modelItem => item.PaymentNotes)</td>
                         </tr>
                     }
                 </tbody>

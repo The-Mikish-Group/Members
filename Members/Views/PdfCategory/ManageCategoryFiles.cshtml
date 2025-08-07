@@ -14,132 +14,177 @@
         ViewData["Title"] = $"Manage Files: {selectedCategory.CategoryName}";
     }
 }
-<div class="container my-4">
 
-    <div class="text-center">
+<div class="my-4 m-0 p-0">
+    <div class="row justify-content-center m-1 p-0">
+        <div class="col-md-8 col-lg-6 m-0 p-0">
 
-        <!-- Title -->
-        <h3 class="text-black mb-3">
-            <i class="bi bi-shield-lock-fill"></i>
-            @if (selectedCategory != null) {
-                <span>@ViewData["Title"]</span>
-            } else {
-                <span>Manage PDF Documents</span>
-            }
-        </h3>
+            <div class="text-center">
 
-        <!-- Back Button -->
-        <a asp-controller="PdfCategory" asp-action="MembersCategories" class="btn btn-sm btn-back rounded-2 mb-3 shadow">
-            <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
-        </a>
+                <!-- Title -->
+                <h3 class="text-black mb-3">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    @if (selectedCategory != null)
+                    {
+                        <span>@ViewData["Title"]</span>
+                    }
+                    else
+                    {
+                        <span>Manage PDF Documents</span>
+                    }
+                </h3>
 
-    </div>
+                <!-- Back Button -->
+                <a asp-controller="PdfCategory" asp-action="MembersCategories" class="btn btn-sm btn-back rounded-2 mb-3 shadow">
+                    <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
+                </a>
 
-    <div class="card mb-3 rounded p-2 shadow">
-
-        <!-- Category Selection Dropdown -->
-        <form method="get" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" class="mb-4">
-
-            <label for="categoryIdSelection" class="fw-bold">Select Category to Manage Files:</label>
-            <select name="categoryId" id="categoryIdSelection" class="form-select" asp-items="@(new SelectList(allMembersCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
-                <option value="">-- Select a Category --</option>
-            </select>
-
-        </form>
-
-    </div>
-
-    @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div> }
-    @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div> }
-       
-    @if (selectedCategoryId.HasValue && selectedCategory != null)
-    {
-        <!-- Upload Form -->
-        <div class="card mb-4 rounded shadow">
-            <div class="card-header fw-bold ">
-                <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
-            <div class="card-body rounded-2 px-1">
-                <form method="post" enctype="multipart/form-data" asp-controller="PdfCategory" asp-action="UploadFileToCategory">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
-                    <div class="row gx-0 gy-2 align-items-center">
 
-                        <div class="col-8">
-                            <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
-                            <input type="file" name="file" id="fileUpload" class="form-control no-right-radius mt-2" required accept=".pdf">
-                        </div>
+            <div class="card mb-3 rounded p-2 shadow">
 
-                        <div class="col-2">
-                            <label for="sortOrder" class="fw-bold">Sort:</label>
-                            <input type="number" name="sortOrder" id="sortOrder" class="form-control no-left-radius no-right-radius mt-2" value="1" min="1" required>
-                        </div>
+                <!-- Category Selection Dropdown -->
+                <form method="get" asp-controller="PdfCategory" asp-action="ManageCategoryFiles" class="mb-4">
 
-                        <div class="col-2 align-self-end">
-                            <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i></button>
-                        </div>
-                    </div>
+                    <label for="categoryIdSelection" class="fw-bold">Select Category to Manage Files:</label>
+                    <select name="categoryId" id="categoryIdSelection" class="form-select" asp-items="@(new SelectList(allMembersCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
+                        <option value="">-- Select a Category --</option>
+                    </select>
+
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- Existing Files Table -->
-        <h5 class="text-black mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
-        @if (Model == null || !Model.Any())
-        {
-            <div class="alert alert-primary mt-2">No files in this category.</div>
-        }
-        else
-        {
-            <div class="table-responsive rounded shadow">
-                <table class="table-striped w-100 shadow">
-                    <thead>
-                        <tr>
-                            <th class="header-text text-center">Edit</th>
-                            <th class="header-text text-center">View</th>
-                            <th class="header-text text-start">File Name (Click to Edit)</th>
-                            <th class="header-text text-center">Sort Order</th>
-                            <th class="header-text text-end">Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var file in Model.OrderBy(f => f.SortOrder).ThenBy(f => f.FileName))
-                        {
-                            <tr id="display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
-                                <td class="p-0 text-center align-middle">
-                                    <button type="button" class="btn btn-sm" title="Edit name/sort order"
-                                            onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
-                                        <i class="bi bi-pencil-square text-green"></i>
-                                    </button>
-                                </td>
-                                <td class="p-0 text-center align-middle">
-                                    <a class="btn btn-sm px-2 py-1" href="/identity/ViewPdf?fileName=@file.FileName" title="View PDF">
-                                        <i class="bi bi-eye text-eye-view"></i>
-                                    </a>
-                                </td>
-                                <td class="nav  py-2 filename-cell align-middle" style="cursor:pointer;" title="Edit name/sort order"
-                                    onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
-                                    @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
-                                </td>
-                                <td class="text-center align-middle">@file.SortOrder</td>
-                                <td class="p-0 text-end align-middle">
-                                    <form method="post" asp-controller="PdfCategory" asp-action="DeleteFileFromCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
-                                                onclick="return confirm('Are you sure you want to delete the file @file.FileName from this category?');">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
     }
-    else if (allMembersCategories.Any()) { <div class="alert alert-info mt-3 shadow">Select a category to manage its files.</div> }
-    else { <div class="alert alert-warning mt-3 shadow">No Members categories exist. <a asp-controller="PdfCategory" asp-action="Categories" class="alert-link">Create one</a>.</div> }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+    }
+
+    @if (selectedCategoryId.HasValue && selectedCategory != null)
+    {
+        <!-- Upload Form -->
+        <div class="my-4 mx-0 p-0">
+            <div class="row justify-content-center m-1 p-0">
+                <div class="col-md-8 col-lg-6 m-0 p-0">
+
+                    <div class="card rounded shadow">
+                        <div class="card-header fw-bold ">
+                            <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
+                        </div>
+                        <div class="card-body rounded-2 px-1">
+                            <form method="post" enctype="multipart/form-data" asp-controller="PdfCategory" asp-action="UploadFileToCategory">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
+                                <div class="row gx-0 gy-2 align-items-center">
+
+                                    <div class="col-8">
+                                        <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
+                                        <input type="file" name="file" id="fileUpload" class="form-control no-right-radius mt-2" required accept=".pdf">
+                                    </div>
+
+                                    <div class="col-2">
+                                        <label for="sortOrder" class="fw-bold">Sort:</label>
+                                        <input type="number" name="sortOrder" id="sortOrder" class="form-control no-left-radius no-right-radius mt-2" value="1" min="1" required>
+                                    </div>
+
+                                    <div class="col-2 align-self-end">
+                                        <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Existing Files Card-Header -->
+                    <div class="card-header fw-bold mt-2 p-2 rounded-top">
+                        <h5 class="text-black"><i class="bi bi-list-task"></i> Existing Files in:</h5>
+                        <h5 class="text-black fw-bold mb-2 ms-4">@selectedCategory.CategoryName</h5>
+                    </div>                    
+
+                    @if (Model == null || !Model.Any())
+                    {
+                        <div class="alert alert-primary mt-2">No files in this category.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive rounded-bottom shadow">
+                            <table class="table-striped w-100 shadow">
+                                <thead>
+                                    <tr>
+                                        <th class="header-text text-center">Edit</th>
+                                        <th class="header-text text-center">View</th>
+                                        <th class="header-text text-start text-nowrap">File Name (Click to Edit)</th>
+                                        <th class="header-text text-center text-nowrap">Sort</th>
+                                        <th class="header-text text-end">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var file in Model.OrderBy(f => f.SortOrder).ThenBy(f => f.FileName))
+                                    {
+                                        <tr id="display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
+                                            <td class="p-0 text-center align-middle">
+                                                <button type="button" class="btn btn-sm" title="Edit name/sort order"
+                                                        onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
+                                                    <i class="bi bi-pencil-square text-green"></i>
+                                                </button>
+                                            </td>
+                                            <td class="p-0 text-center align-middle">
+                                                <a class="btn btn-sm px-2 py-1" href="/identity/ViewPdf?fileName=@file.FileName" title="View PDF">
+                                                    <i class="bi bi-eye text-eye-view"></i>
+                                                </a>
+                                            </td>
+                                            <td class="nav py-2 filename-cell align-middle text-nowrap" style="cursor:pointer;" title="Edit name/sort order"
+                                                onclick="showRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
+                                                @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
+                                            </td>
+                                            <td class="text-center align-middle">@file.SortOrder</td>
+                                            <td class="p-0 text-end align-middle">
+                                                <form method="post" asp-controller="PdfCategory" asp-action="DeleteFileFromCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
+                                                            onclick="return confirm('Are you sure you want to delete the file @file.FileName from this category?');">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    }
+
+                </div>
+            </div>
+        </div>
+    }
+    else if (allMembersCategories.Any())
+    {
+        <div class="row justify-content-center m-1 p-0">
+            <div class="col-md-8 col-lg-6 m-0 p-0">
+                <div class="alert alert-info mt-3 shadow">
+                    Select a category to manage its files.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center m-1 p-0">
+            <div class="col-md-8 col-lg-6 m-0 p-0">
+                <div class="alert alert-warning mt-3 shadow">
+                    No Members categories exist. <a asp-controller="PdfCategory" asp-action="Categories" class="alert-link">Create one</a>.
+                </div>
+            </div>
+        </div>
+    }
+
 </div>
 
 <!-- Rename/Sort Modal for Manager Files -->
@@ -147,7 +192,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-            <div class="modal-header card-header">
+            <div class="modal-header card-header rounded-top">
                 <h5 class="modal-title" id="RenameModalLabel">Edit File Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -174,72 +219,72 @@
 
 @section Styles {
     <style>
-    
+
         .table th, .table td {
             vertical-align: middle;
         }
 
     </style>
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
 @section Scripts {
-<script>
-    function showRenameModal(fileId, fileName, sortOrder, categoryId) {
-        document.getElementById('RenameFileId').value = fileId;
-        document.getElementById('OldFileName').value = fileName;
-        document.getElementById('NewFileName').value = fileName.substring(0, fileName.lastIndexOf('.'));
-        document.getElementById('NewSortOrder').value = sortOrder;
-        document.getElementById('FileCategoryId').value = categoryId;
-        new bootstrap.Modal(document.getElementById('RenameModal')).show();
-    }
-
-    function submitRenameForm() {
-        var fileId = document.getElementById('RenameFileId').value;
-        var oldFileName = document.getElementById('OldFileName').value;
-        var newFileNameNoExt = document.getElementById('NewFileName').value;
-        var newSortOrder = document.getElementById('NewSortOrder').value;
-        var categoryId = document.getElementById('FileCategoryId').value;
-
-        if (!newFileNameNoExt.trim()) { alert('File name cannot be empty.'); return; }
-        if (parseInt(newSortOrder) < 1) { alert('Sort order must be >= 1.'); return; }
-        var newFileNameWithExt = newFileNameNoExt + '.pdf';
-
-        var formData = new FormData();
-        formData.append("renameFileId", fileId);
-        formData.append("categoryId", categoryId);
-        formData.append("oldFileName", oldFileName);
-        formData.append("newFileName", newFileNameWithExt);
-        formData.append("newSortOrder", newSortOrder);
-
-        var token = $('form[asp-controller="PdfCategory"][asp-action="UploadFileToMembersCategory"] input[name="__RequestVerificationToken"]').first().val();
-        if (!token) { token = $('input[name="__RequestVerificationToken"]').first().val(); }
-        if (!token) { alert("Security token missing."); return; }
-
-        fetch('@Url.Action("RenameFileInCategory", "PdfCategory")', {
-            method: 'POST', body: formData, headers: { 'RequestVerificationToken': token }
-        })
-        .then(response => {
-            if (!response.ok) { return response.text().then(text => { throw new Error(text || 'Server error.') }); }
-            window.location.href = '@Url.Action("ManageCategoryFiles", "PdfCategory")?categoryId=' + categoryId;
-        })
-        .catch(error => { alert('Error updating file: ' + error.message); });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var categorySelect = document.getElementById('categoryIdSelection');
-        var currentSelectedCategoryId = "@selectedCategoryId";
-        if (categorySelect && currentSelectedCategoryId) {
-             fetchNextSortOrderFor(currentSelectedCategoryId, 'sortOrder');
+    <script>
+        function showRenameModal(fileId, fileName, sortOrder, categoryId) {
+            document.getElementById('RenameFileId').value = fileId;
+            document.getElementById('OldFileName').value = fileName;
+            document.getElementById('NewFileName').value = fileName.substring(0, fileName.lastIndexOf('.'));
+            document.getElementById('NewSortOrder').value = sortOrder;
+            document.getElementById('FileCategoryId').value = categoryId;
+            new bootstrap.Modal(document.getElementById('RenameModal')).show();
         }
-    });
 
-    function fetchNextSortOrderFor(categoryId, targetInputId) {
-        if (categoryId) {
-            fetch(`@Url.Action("GetNextSortOrder", "PdfCategory")?categoryId=${categoryId}`)
-                .then(response => response.ok ? response.json() : Promise.reject('Failed to fetch sort order'))
-                .then(data => { document.getElementById(targetInputId).value = data; })
-                .catch(error => { console.error(error); document.getElementById(targetInputId).value = 1; });
+        function submitRenameForm() {
+            var fileId = document.getElementById('RenameFileId').value;
+            var oldFileName = document.getElementById('OldFileName').value;
+            var newFileNameNoExt = document.getElementById('NewFileName').value;
+            var newSortOrder = document.getElementById('NewSortOrder').value;
+            var categoryId = document.getElementById('FileCategoryId').value;
+
+            if (!newFileNameNoExt.trim()) { alert('File name cannot be empty.'); return; }
+            if (parseInt(newSortOrder) < 1) { alert('Sort order must be >= 1.'); return; }
+            var newFileNameWithExt = newFileNameNoExt + '.pdf';
+
+            var formData = new FormData();
+            formData.append("renameFileId", fileId);
+            formData.append("categoryId", categoryId);
+            formData.append("oldFileName", oldFileName);
+            formData.append("newFileName", newFileNameWithExt);
+            formData.append("newSortOrder", newSortOrder);
+
+            var token = $('form[asp-controller="PdfCategory"][asp-action="UploadFileToMembersCategory"] input[name="__RequestVerificationToken"]').first().val();
+            if (!token) { token = $('input[name="__RequestVerificationToken"]').first().val(); }
+            if (!token) { alert("Security token missing."); return; }
+
+            fetch('@Url.Action("RenameFileInCategory", "PdfCategory")', {
+                method: 'POST', body: formData, headers: { 'RequestVerificationToken': token }
+            })
+            .then(response => {
+                if (!response.ok) { return response.text().then(text => { throw new Error(text || 'Server error.') }); }
+                window.location.href = '@Url.Action("ManageCategoryFiles", "PdfCategory")?categoryId=' + categoryId;
+            })
+            .catch(error => { alert('Error updating file: ' + error.message); });
         }
-    }
-</script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var categorySelect = document.getElementById('categoryIdSelection');
+            var currentSelectedCategoryId = "@selectedCategoryId";
+            if (categorySelect && currentSelectedCategoryId) {
+                 fetchNextSortOrderFor(currentSelectedCategoryId, 'sortOrder');
+            }
+        });
+
+        function fetchNextSortOrderFor(categoryId, targetInputId) {
+            if (categoryId) {
+                fetch(`@Url.Action("GetNextSortOrder", "PdfCategory")?categoryId=${categoryId}`)
+                    .then(response => response.ok ? response.json() : Promise.reject('Failed to fetch sort order'))
+                    .then(data => { document.getElementById(targetInputId).value = data; })
+                    .catch(error => { console.error(error); document.getElementById(targetInputId).value = 1; });
+            }
+        }
+    </script>
 }

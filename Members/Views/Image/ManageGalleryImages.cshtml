@@ -6,8 +6,8 @@
     var currentGalleryName = ViewBag.GalleryName as string; // Get the gallery name once
 }
 
-<div class="row gx-1 gy-0 m-2">
-    <div class="col-md-8 col-lg-10 mx-auto">
+<div class="row justify-content-center m-0 p-0">
+    <div class="col-lg-8 col-md-10 p-1">
 
         <!-- Heading: Manage Images fir 'Gallery' -->
         <h1 class="text-black mb-2 mt-4 text-center">Manage Images for:<br />@ViewBag.GalleryName</h1>
@@ -34,7 +34,7 @@
         }
        
         <!-- Shadow Card (Upload a New Image) -->
-        <div class="card rounded p-2 shadow">
+        <div class="card rounded p-1 shadow">
             
             <!-- Heading: Upload a New Image -->
             <h2 class="text-black mb-2 mt-4 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Shadow Card (Existing Images) -->
-        <div class="card mt-4 rounded p-2 shadow">
+        <div class="card mt-4 mb-3 rounded p-1 shadow">
 
             @if (Model != null && Model.Any())
                 {
@@ -70,24 +70,24 @@
                 </h2>
 
                 <!-- Setup Row and loop through Images creating Columns -->
-                <div class="row gx-1 gy-0 m-1">
+                <div class="row justify-content-center m-0 p-0">
                     @foreach (var image in Model)
                     {
-                        <div class="col-md-6 col-lg-3 col-xl-2 mb-2">
+                        <div class="col-md-6 col-lg-3 col-xl-2 mb-2 p-0">
 
                             <!-- Shadow Card for each Image -->
                             <div class="card h-100 rounded p-2 shadow">
 
                                 <!-- Image Thumbnail with Link to View Image -->
                                 <a asp-controller="Image" asp-action="ImageView" asp-route-galleryName="@image.GalleryName" asp-route-fileName="@image.FileName">
-                                    <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 200px; object-fit: cover;">
+                                    <img src="@image.ThumbnailUrl" class="card-img-top img-fluid" alt="@image.FileName" style="width: 100%; height: 100%; object-fit: cover;">
                                 </a>
 
                                 <!-- Image Name and Action Buttons -->
                                 <div class="card-body rounded-2 p-0 text-center">
 
                                     <!-- Image Name -->
-                                    <p class="card-text mt-1">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
+                                    <p class="card-text mt-1 mb-0">@System.IO.Path.GetFileNameWithoutExtension(image.FileName)</p>
                                     
                                     <!-- Image Actions -->
                                     <div class="btn-group mt-0" role="group" aria-label="Image Actions">

@@ -15,183 +15,187 @@
     }
 }
 
-<div class="container my-4">
+<div class="my-4 m-0 p-0">
+    <div class="row justify-content-center m-1 p-0">
+        <div class="col-md-8 col-lg-6 m-0 p-0">
 
-    <div class="text-center">
+            <div class="text-center">
 
-        <!-- Title -->
-        <h3 class="text-black mb-3">
-            <i class="bi bi-shield-lock-fill"></i>
-            @if (selectedCategory != null)
-            {
-                <span>@ViewData["Title"] <span class="badge bg-danger ms-1">Confidential</span></span>
-            }
-            else
-            {
-                <span>Manage Confidential Documents</span>
-            }
-        </h3>
+                <!-- Title -->
+                <h3 class="text-black mb-3">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    @if (selectedCategory != null)
+                    {
+                        <span>@ViewData["Title"] <span class="badge bg-danger ms-1">Confidential</span></span>
+                    }
+                    else
+                    {
+                        <span>Manage Confidential Documents</span>
+                    }
+                </h3>
 
-        <!-- Back Button -->
-        <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" class="btn btn-sm btn-back rounded-2 mb-3 shadow">
-            <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
-        </a>
+                <!-- Back Button -->
+                <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" class="btn btn-sm btn-back rounded-2 mb-3 shadow">
+                    <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
+                </a>
 
-    </div>
-
-    <div class="card mb-3 rounded p-2 shadow">
-
-        <!-- Category Selection Dropdown -->
-        <form method="get" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" class="mb-4">
-
-            <label for="categoryIdSelection" class="fw-bold">Select Confidential Category to Manage:</label>
-            <select name="categoryId" id="categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allConfidentialCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
-                <option value="">-- Select a Category --</option>
-            </select>
-
-        </form>
-
-    </div>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-    }
-
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-    }
-
-
-    @if (selectedCategoryId.HasValue && selectedCategory != null)
-    {
-        <!-- Upload Form -->
-        <div class="card mb-4 rounded shadow">
-
-            <div class="card-header fw-bold">
-                <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
             </div>
 
-            <!-- Upload PDF Document -->
-            <div class="px-1">
-                <form method="post" enctype="multipart/form-data" asp-controller="ManagerPdfCategory" asp-action="UploadFileToManagerCategory">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
-                    <div class="row gx-0 gy-2 mx-0 mb-3 align-items-center">
+            <div class="card mb-3 rounded p-2 shadow">
 
-                        <div class="col-8">
-                            <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
-                            <input type="file" name="file" id="fileUpload" class="form-control no-right-radius" required accept=".pdf">
-                        </div>
+                <!-- Category Selection Dropdown -->
+                <form method="get" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" class="mb-4">
 
-                        <div class="col-2">
-                            <label for="sortOrder" class="fw-bold">Sort:</label>
-                            <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
-                        </div>
+                    <label for="categoryIdSelection" class="fw-bold">Select Confidential Category to Manage:</label>
+                    <select name="categoryId" id="categoryIdSelection" class="form-select shadow" asp-items="@(new SelectList(allConfidentialCategories, "CategoryID", "CategoryName", selectedCategoryId))" onchange="this.form.submit()">
+                        <option value="">-- Select a Category --</option>
+                    </select>
 
-                        <div class="col-2 align-self-end">
-                            <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i></button>
-                        </div>
-
-                    </div>
                 </form>
+
             </div>
 
-        </div>
-
-        <!-- Existing Files -->
-        <div class="card mb-4 rounded shadow">
-
-            <!-- Existing Files Card-Header -->
-            <div class="card-header fw-bold">                
-                <h5 class="text-black mb-2 mt-4"><i class="bi bi-list-task"></i> Existing Files in '@selectedCategory.CategoryName'</h5>
-            </div>
-
-            @if (Model == null || !Model.Any())
+            @if (TempData["SuccessMessage"] != null)
             {
-                <div class="mx-2 alert alert-info mt-2">No files in this category.</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
             }
-            else
+
+
+            @if (TempData["ErrorMessage"] != null)
             {
-                <!-- Existing Files Table -->
-                <div class="table-responsive rounded shadow">
-                    <table class="table-striped w-100 shadow">
-
-                        <!-- Table Head -->
-                        <thead>
-                            <tr>                            
-                                <th class="header-text text-center">Edit</th>
-                                <th class="header-text text-center">View</th>
-                                <th class="header-text text-start">File Name (Click to Edit)</th>
-                                <th class="header-text text-center">Sort Order</th>
-                                <th class="header-text text-end">Delete</th>
-                            </tr>
-                        </thead>
-
-                        <!-- Table Body -->
-                        <tbody>
-                            @foreach (var file in Model.OrderBy(f => f.SortOrder).ThenBy(f => f.FileName))
-                            {
-                                <tr id="mmcf-display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
-                                    <td class="p-0 text-center align-middle">
-                                        <button type="button" class="btn btn-sm btn-link shadow" title="Edit name/sort order"
-                                                onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                    </td>
-                                    <td class="p-0 text-center align-middle">
-                                        <a class="btn btn-sm px-2 py-1" href="/identity/ViewPdf?fileName=@file.FileName" title="View PDF">
-                                            <i class="bi bi-eye text-eye-view"></i>
-                                        </a>
-                                    </td>
-                                    <td class="filename-cell align-middle" style="cursor:pointer;" title="Edit name/sort order"
-                                        onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
-                                        @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
-                                    </td>
-                                    <td class="text-center align-middle">@file.SortOrder</td>
-                                    <td class="p-0 text-end align-middle">
-                                        <form method="post" asp-controller="ManagerPdfCategory" asp-action="DeleteFileFromManagerCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
-                                                    onclick="return confirm('Are you sure you want to delete the file @file.FileName from this confidential category?');">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
             }
-        </div>
 
-        <!-- Rename/Sort Modal for Manager Files -->
-        <div class="modal fade" id="mmcfRenameModal" tabindex="-1" aria-labelledby="mmcfRenameModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title" id="mmcfRenameModalLabel">Edit File Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body pb-0">
-                        <input type="hidden" id="mmcfRenameFileId" /><input type="hidden" id="mmcfOldFileName" /><input type="hidden" id="mmcfFileCategoryId" />
-                        <div class="row align-items-center mb-2">
-                            <div class="col-sm-3"><label for="mmcfNewFileName" class="col-fw-bold">File Name:</label></div>
-                            <div class="col-sm-9"><input type="text" class="form-control" id="mmcfNewFileName"></div>
-                        </div>
-                        <div class="row align-items-center mb-3">
-                            <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-fw-bold">Sort Order:</label></div>
-                            <div class="col-sm-9"><input type="number" class="form-control" id="mmcfNewSortOrder" min="1"></div>
-                        </div>
-                        <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
+
+            @if (selectedCategoryId.HasValue && selectedCategory != null)
+            {
+                <!-- Upload Form -->
+                <div class="card mb-4 rounded shadow">
+
+                    <div class="card-header fw-bold">
+                        <i class="bi bi-cloud-upload-fill"></i> Upload New PDF to '@selectedCategory.CategoryName'
                     </div>
-                    <div class="modal-footer border-top-0"><button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-sm btn-primary" onclick="submitMmcfRenameForm()">Save</button></div>
+
+                    <!-- Upload PDF Document -->
+                    <div class="px-1">
+                        <form method="post" enctype="multipart/form-data" asp-controller="ManagerPdfCategory" asp-action="UploadFileToManagerCategory">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="categoryId" value="@selectedCategoryId.Value" />
+                            <div class="row gx-0 gy-2 mx-0 mb-3 align-items-center">
+
+                                <div class="col-8">
+                                    <label for="fileUpload" class="fw-bold ms-2">PDF Document:</label>
+                                    <input type="file" name="file" id="fileUpload" class="form-control no-right-radius" required accept=".pdf">
+                                </div>
+
+                                <div class="col-2">
+                                    <label for="sortOrder" class="fw-bold">Sort:</label>
+                                    <input type="number" name="sortOrder" id="sortOrder" class="no-left-radius no-right-radius form-control" value="1" min="1" required>
+                                </div>
+
+                                <div class="col-2 align-self-end">
+                                    <button type="submit" class="no-left-radius btn btn-success w-100"><i class="bi bi-upload"></i></button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
-            </div>
+
+                <!-- Existing Files -->
+                <div class="card mb-4 rounded shadow">
+
+                    <!-- Existing Files Card-Header -->
+                    <div class="card-header fw-bold">                
+                        <h5 class="text-black mt-4"><i class="bi bi-list-task"></i> Existing Files in:</h5>
+                        <h5 class="text-black fw-bold mb-2 ms-4">@selectedCategory.CategoryName</h5>
+                    </div>
+
+                    @if (Model == null || !Model.Any())
+                    {
+                        <div class="mx-2 alert alert-info mt-2">No files in this category.</div>
+                    }
+                    else
+                    {
+                        <!-- Existing Files Table -->
+                        <div class="table-responsive rounded-bottom shadow">
+                            <table class="table-striped w-100 shadow">
+
+                                <!-- Table Head -->
+                                <thead>
+                                    <tr>                            
+                                        <th class="header-text text-center">Edit</th>
+                                        <th class="header-text text-center">View</th>
+                                        <th class="header-text text-start text-nowrap">File Name (Click to Edit)</th>
+                                        <th class="header-text text-center">Sort Order</th>
+                                        <th class="header-text text-end">Delete</th>
+                                    </tr>
+                                </thead>
+
+                                <!-- Table Body -->
+                                <tbody>
+                                    @foreach (var file in Model.OrderBy(f => f.SortOrder).ThenBy(f => f.FileName))
+                                    {
+                                        <tr id="mmcf-display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
+                                            <td class="p-0 text-center align-middle">
+                                                <button type="button" class="btn btn-sm btn-link shadow" title="Edit name/sort order"
+                                                        onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                            </td>
+                                            <td class="p-0 text-center align-middle">
+                                                <a class="btn btn-sm px-2 py-1" href="/identity/ViewPdf?fileName=@file.FileName" title="View PDF">
+                                                    <i class="bi bi-eye text-eye-view"></i>
+                                                </a>
+                                            </td>
+                                            <td class="filename-cell align-middle text-nowrap" style="cursor:pointer;" title="Edit name/sort order"
+                                                onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
+                                                @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
+                                            </td>
+                                            <td class="text-center align-middle">@file.SortOrder</td>
+                                            <td class="p-0 text-end align-middle">
+                                                <form method="post" asp-controller="ManagerPdfCategory" asp-action="DeleteFileFromManagerCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
+                                                            onclick="return confirm('Are you sure you want to delete the file @file.FileName from this confidential category?');">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- Rename/Sort Modal for Manager Files -->
+                <div class="modal fade" id="mmcfRenameModal" tabindex="-1" aria-labelledby="mmcfRenameModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header"><h5 class="modal-title" id="mmcfRenameModalLabel">Edit File Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                            <div class="modal-body pb-0">
+                                <input type="hidden" id="mmcfRenameFileId" /><input type="hidden" id="mmcfOldFileName" /><input type="hidden" id="mmcfFileCategoryId" />
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-sm-3"><label for="mmcfNewFileName" class="col-fw-bold">File Name:</label></div>
+                                    <div class="col-sm-9"><input type="text" class="form-control" id="mmcfNewFileName"></div>
+                                </div>
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-sm-3"><label for="mmcfNewSortOrder" class="col-fw-bold">Sort Order:</label></div>
+                                    <div class="col-sm-9"><input type="number" class="form-control" id="mmcfNewSortOrder" min="1"></div>
+                                </div>
+                                <div class="alert alert-info small p-2">Do not include '.pdf' extension. Physical file will be renamed if name changes.</div>
+                            </div>
+                            <div class="modal-footer border-top-0"><button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-sm btn-primary" onclick="submitMmcfRenameForm()">Save</button></div>
+                        </div>
+                    </div>
+                </div>
+
+            }
         </div>
-
-    }
-
+    </div>
 
 </div>
 

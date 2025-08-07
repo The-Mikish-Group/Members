@@ -2,13 +2,16 @@
 @using Members.Models
 
 @{
-    ViewData["Title"] = "Manage Image Galleries";
+    ViewData["Title"] = "Manage Galleries";
 }
 
-<div class="row justify-content-center container mx-auto p-1">
-    <div class="col-lg-8 col-md-10 m-1 p-1">
-
-        <h1 class="text-black mb-2 mt-4 text-center"><i class="bi bi-images"></i> Manage Galleries</h1>
+<div class="mt-4 mb-3">
+    <div class="text-center">
+        <h1 class="text-black mb-2 mt-4 text-center"><i class="bi bi-images"></i> @ViewData["Title"]</h1>
+    </div>
+    
+    <div class="row justify-content-center m-0 p-0">
+    <div class="col-lg-8 col-md-10 p-1">        
 
         <div class="mb-3 text-center">
             <a asp-controller="Image" asp-action="GalleryList" class="btn btn-sm btn-back rounded-2 shadow"><i class="bi bi-box-arrow-left"></i> Back to Galleries</a>
@@ -27,93 +30,95 @@
             </div>
         }
 
-        <div class="card rounded border mb-4 p-2 shadow">            
+        <!-- Create a new Gallery Card -->
+        <div class="card rounded border mb-3 p-1 shadow">            
 
             <h2 class="text-black my-2 ps-2 text-start"><i class="bi bi-folder-plus"></i> Create a New Gallery</h2>
 
             <form asp-controller="Image" asp-action="CreateGallery" method="post" class="mb-4">
 
-                    <div class="input-group">
+                <div class="input-group">
 
-                        <input type="text" name="GalleryName" class="form-control shadow" placeholder="New Gallery Name" required>
+                    <input type="text" name="GalleryName" class="form-control shadow" placeholder="New Gallery Name" required>
             
-                        <button type="submit" class="btn btn-success no-left-radius">
-                                <i class="bi bi-save"></i>
-                            </button>
+                    <button type="submit" class="btn btn-success no-left-radius">
+                        <i class="bi bi-save"></i>
+                    </button>
 
-                    </div>
+                </div>
 
-                    <span class="text-danger">@Html.ValidationMessage("GalleryName")</span>
+                <span class="text-danger">@Html.ValidationMessage("GalleryName")</span>
 
-                </form>
+            </form>
             
         </div>
 
-        <div class="card rounded border mb-4 p-2 shadow">            
+        <!-- Galleries Card -->
+        <div class="card rounded border p-1 shadow">            
 
             @if (Model != null && Model.Any())
                 {
                     <h2 class="text-black my-2 ps-2 text-start"><i class="bi bi-images"></i> Existing Galleries</h2>
                     
-                    <table class="table-striped w-100 shadow">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <div class="row align-items-center">
-                                        <div class="col-6 d-flex justify-content-start">Manage Images</div>
-
-                                        <div class="col-4 d-flex justify-content-center">Rename</div>
-                                        
-                                        <div class="col-2 d-flex justify-content-end">Delete</div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var gallery in Model)
-                            {
+                        <table class="table-striped table-hover w-100 shadow">
+                            <thead>
                                 <tr>
-
-                                    <td class="text-black py-0">
+                                    <th>
                                         <div class="row align-items-center">
+                                            <div class="col-6 d-flex justify-content-start">Manage Images</div>
 
-                                            <div class="col-6 d-flex justify-content-start">
-                                                <a asp-controller="Image" asp-action="ManageGalleryImages" asp-route-galleryName="@gallery.Name"
-                                               class="nav-link d-block"><i class="bi bi-images"></i> @gallery.Name (@gallery.ImageCount)</a>
-                                            </div>
-
-                                            <div class="col-4 d-flex justify-content-center">
-                                                <button type="button" 
-                                                    class="btn btn-sm btn-rename px-2 py-2"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#renameGalleryModal_@gallery.Name.Replace(" ", "-")"
-                                                    title="Rename Gallery">
-                                                        <i class="bi bi-pencil-square px-0"></i>
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="col-2 d-flex justify-content-end">
-                                                <form asp-controller="Image" 
-                                                    asp-action="DeleteGallery"
-                                                    method="post" 
-                                                    style="display:inline;" 
-                                                    onsubmit="return confirm('Are you sure you want to delete the gallery \'@gallery.Name\' and all its images?');">
-
-                                                    <input type="hidden" name="galleryName" value="@gallery.Name" />
-
-                                                    <button type="submit" class="btn btn-delete delete-button px-2 py-2" title="Delete Gallery @gallery.Name">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>                                        
-
-                                                </form>
-                                            </div>
-                                        </div>                            
-                                    </td>                            
+                                            <div class="col-4 d-flex justify-content-center">Rename</div>
+                                        
+                                            <div class="col-2 d-flex justify-content-end">Delete</div>
+                                        </div>
+                                    </th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody class="m-0 p-0">
+                                @foreach (var gallery in Model)
+                                {
+                                    <tr>
+
+                                        <td class="text-black py-0">
+                                            <div class="row align-items-center">
+
+                                                <div class="col-6 d-flex justify-content-start">
+                                                    <a asp-controller="Image" asp-action="ManageGalleryImages" asp-route-galleryName="@gallery.Name"
+                                                   class="nav-link d-block text-nowrap"><i class="bi bi-images"></i> @gallery.Name (@gallery.ImageCount)</a>
+                                                </div>
+
+                                                <div class="col-4 d-flex justify-content-center">
+                                                    <button type="button" 
+                                                        class="btn btn-sm btn-rename px-2 py-2"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#renameGalleryModal_@gallery.Name.Replace(" ", "-")"
+                                                        title="Rename Gallery">
+                                                            <i class="bi bi-pencil-square px-0"></i>
+                                                    </button>
+                                                </div>
+                                            
+                                                <div class="col-2 d-flex justify-content-end">
+                                                    <form asp-controller="Image" 
+                                                        asp-action="DeleteGallery"
+                                                        method="post" 
+                                                        style="display:inline;" 
+                                                        onsubmit="return confirm('Are you sure you want to delete the gallery \'@gallery.Name\' and all its images?');">
+
+                                                        <input type="hidden" name="galleryName" value="@gallery.Name" />
+
+                                                        <button type="submit" class="btn btn-delete delete-button px-2 py-2" title="Delete Gallery @gallery.Name">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>                                        
+
+                                                    </form>
+                                                </div>
+                                            </div>                            
+                                        </td>                            
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
 
                     @foreach (var gallery in Model)
                     {
@@ -170,6 +175,8 @@
         </div>
 
     </div>
+</div>
+
 </div>
 
 @section Scripts {

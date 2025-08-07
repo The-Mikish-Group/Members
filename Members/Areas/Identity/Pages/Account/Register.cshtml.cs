@@ -51,10 +51,9 @@ namespace Members.Areas.Identity.Pages.Account
                 LastName = string.Empty,
                 AddressLine1 = string.Empty,
                 AddressLine2 = string.Empty,
-                City = string.Empty,
-                State = string.Empty,
-                ZipCode = string.Empty,
-                //Plot = string.Empty,
+                City = "Avon Park",
+                State = "FL",
+                ZipCode = "33825",               
                 Birthday = null,
                 Anniversary = null
             };
