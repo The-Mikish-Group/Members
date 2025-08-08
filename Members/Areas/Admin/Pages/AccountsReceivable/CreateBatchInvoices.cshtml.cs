@@ -1,5 +1,6 @@
 using Members.Data;
 using Members.Models;
+using Members.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,16 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
 {
     [Authorize(Roles = "Admin,Manager")]
     public class CreateBatchInvoicesModel(
-        ApplicationDbContext context,
-        UserManager<IdentityUser> userManager,
-        ILogger<CreateBatchInvoicesModel> logger) : PageModel
+    ApplicationDbContext context,
+    UserManager<IdentityUser> userManager,
+    ILogger<CreateBatchInvoicesModel> logger,
+    ITaskManagementService taskService) : PageModel // Add this parameter
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ILogger<CreateBatchInvoicesModel> _logger = logger;
+        private readonly ITaskManagementService _taskService = taskService;
+
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
         public int ActionableBillableAssetsCount { get; set; }
@@ -100,6 +104,20 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully created {InvoicesCreatedCount} draft invoices (totaling {BatchTotalAmountC}) for BatchID: {BatchID}.", invoicesCreatedCount, batchTotalAmount.ToString("C"), newBatchId);
+
+                // ADD THIS TASK COMPLETION LOGIC HERE:
+                try
+                {
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("CreateBatchInvoices",
+                        $"Created {invoicesCreatedCount} draft batch invoices (BatchID: {newBatchId}) totaling {batchTotalAmount:C}");
+                    _logger.LogInformation("Marked CreateBatchInvoices task as completed after creating batch {BatchId}", newBatchId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to mark CreateBatchInvoices task as completed for batch {BatchId}", newBatchId);
+                    // Don't fail the whole operation if task completion fails
+                }
+
                 TempData["StatusMessage"] = $"Draft batch '{newBatchId}' created with {invoicesCreatedCount} invoices (for '{Input.Description}') totaling {batchTotalAmount:C}. One invoice per assigned billable asset. Please review and finalize.";
                 return RedirectToPage("./ReviewBatchInvoices", new { batchId = newBatchId });
             }

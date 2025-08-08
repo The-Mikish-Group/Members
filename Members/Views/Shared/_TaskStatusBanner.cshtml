@@ -27,7 +27,7 @@
 
 @if (shouldShowBanner && (overdueCount > 0 || dueNowCount > 0))
 {
-    <div class="alert alert-warning alert-dismissible fade show mb-0 border-0 rounded-0" role="alert" id="taskReminderBanner">
+    <div class="alert bg-warning alert-dismissible fade show mt-4 mb-0 border-0 rounded-0" role="alert" id="taskReminderBanner">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-auto">
@@ -56,29 +56,45 @@
                 </div>
             </div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="dismissTaskReminder()"></button>
+        <button type="button" class="btn-close" aria-label="Close" onclick="dismissTaskReminder()"></button>
     </div>
 
     <script>
-        function dismissTaskReminder() {
-            // Create a form and submit it
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/Admin/Tasks?handler=DismissReminder';
+        async function dismissTaskReminder() {
+            try {
+                // Get anti-forgery token
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
-            // Add anti-forgery token if available
-            const token = document.querySelector('input[name="__RequestVerificationToken"]');
-            if (token) {
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = '__RequestVerificationToken';
-                tokenInput.value = token.value;
-                form.appendChild(tokenInput);
+                // Make AJAX call to dismiss the reminder
+                const response = await fetch('/Admin/TaskManagement?handler=DismissReminder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+                });
+
+                if (response.ok) {
+                    // Hide the banner with animation
+                    const banner = document.getElementById('taskReminderBanner');
+                    if (banner) {
+                        banner.classList.remove('show');
+                        setTimeout(() => {
+                            banner.style.display = 'none';
+                        }, 150);
+                    }
+                } else {
+                    console.error('Failed to dismiss task reminder');
+                }
+            } catch (error) {
+                console.error('Error dismissing task reminder:', error);
+                // Fallback: still hide the banner locally
+                const banner = document.getElementById('taskReminderBanner');
+                if (banner) {
+                    banner.style.display = 'none';
+                }
             }
-
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
         }
     </script>
 }

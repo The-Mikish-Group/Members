@@ -12,18 +12,22 @@ using System.ComponentModel.DataAnnotations; // Not strictly needed for this Pag
 using System.Linq;
 using System.Text; // Added for StringBuilder
 using System.Threading.Tasks;
+using Members.Services;
 
 namespace Members.Areas.Admin.Pages.AccountsReceivable
-{
+{   
     [Authorize(Roles = "Admin,Manager")]
     public class ReviewBatchInvoicesModel(
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
-        ILogger<ReviewBatchInvoicesModel> logger) : PageModel
+        ILogger<ReviewBatchInvoicesModel> logger,
+        ITaskManagementService taskService) : PageModel // Add taskService parameter
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly ILogger<ReviewBatchInvoicesModel> _logger = logger;
         private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly ILogger<ReviewBatchInvoicesModel> _logger = logger;
+        private readonly ITaskManagementService _taskService = taskService;           
+       
         public string? AmountDueSort { get; set; }
         public List<BatchSelectItem> AvailableDraftBatches { get; set; } = [];
         public string? BatchDescription { get; set; }
@@ -532,6 +536,17 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 _logger.LogError(ex, "Error finalizing batch {BatchId}.", BatchId);
                 TempData["ErrorMessage"] = $"Error finalizing batch '{BatchId}'. See logs.";
             }
+            try
+            {
+                await _taskService.MarkTaskCompletedAutomaticallyAsync("FinalizeBatchInvoices",
+                    $"Finalized {finalizedCount} invoices in batch '{BatchId}'");
+                _logger.LogInformation("Marked FinalizeBatchInvoices task as completed after finalizing batch {BatchId}", BatchId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to mark FinalizeBatchInvoices task as completed for batch {BatchId}", BatchId);
+            }
+
             return RedirectToPage("./CurrentBalances");
         }
 

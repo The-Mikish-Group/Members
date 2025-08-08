@@ -672,8 +672,10 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 try
                 {
-                    await _taskService.MarkTaskCompletedAutomaticallyAsync("BulkApplyLateFees",
-                        $"Applied {successCount} late fees automatically");
+
+                    // In OnPostBulkApplyLateFeesAsync method, change this line:
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("ApplyLateFees",
+                        $"Applied {successCount} late fees automatically");                    
                 }
                 catch (Exception ex)
                 {
@@ -858,9 +860,9 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             if (emailsSentCount > 0)
             {
                 try
-                {
-                    await _taskService.MarkTaskCompletedAutomaticallyAsync("EmailBalanceNotifications",
-                        $"Sent {emailsSentCount} balance notification emails automatically");
+                {                    
+                    await _taskService.MarkTaskCompletedAutomaticallyAsync("EmailLateFeeWarnings",
+                        $"Sent {emailsSentCount} late fee warning emails automatically");
                 }
                 catch (Exception ex)
                 {
@@ -1032,6 +1034,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 try
                 {
+
                     await _taskService.MarkTaskCompletedAutomaticallyAsync("EmailLateFeeWarnings",
                         $"Sent {emailsSentCount} late fee warning emails automatically");
                 }

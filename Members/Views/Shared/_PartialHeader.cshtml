@@ -94,7 +94,13 @@
 
                                 <!-- Invoice Draft Batches -->
                                 <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" aria-labelledby="invoiceDraftBatchesDropdown" style="margin-top: 0; width: 225px;" aria-expanded="false" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 190px;" asp-area="Admin" asp-page="/AccountsReceivable/CreateBatchInvoices" title="Create Draft Batches"><i class="bi bi-plus-square"></i> Create Draft Batches</a></li>
+                                    <li>
+                                        <a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 190px;"
+                                           href="/Admin/AccountsReceivable/CreateBatchInvoices"
+                                           title="Create Draft Batches">
+                                           <i class="bi bi-plus-square"></i> Create Draft Batches
+                                        </a>
+                                    </li>
                                     <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 195px;" asp-area="Admin" asp-page="/AccountsReceivable/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
                                 </ul>
 
@@ -160,7 +166,7 @@
 
                             <!-- Tasks -->
                             <li>
-                                <a class="nav-link rounded-2 text-dark ps-2 mb-1" style="width:175px;" asp-area="Admin" asp-page="/Tasks">
+                                <a class="nav-link rounded-2 text-dark ps-2 mb-1" style="width:175px;" asp-area="Admin" asp-page="/TaskManagement">
                                     <i class="bi bi-list-task"></i> Tasks
                                 </a>
                             </li>
@@ -250,47 +256,7 @@
                                 <a class="rounded-2 nav-link footer-fs text-nowrap ps-2" style="width:180px;" asp-area="" asp-controller="Members" asp-action="ListCategories">
                                     <i class="bi bi-file-earmark-pdf-fill me-2"></i> PDF Documents
                                 </a>
-                            </li>
-
-                            <!-- Members PDF Documents Display Dropdown -->  
-                            @* <li class="nav-item dropdown"> 
-                                
-                                <!-- Members PDF Documents Display Toggle -->
-                                <a class="dropdown-toggle text-dark nav-link rounded-2 mb-1 ps-2" style="width: 180px;" href="#" id="membersPdfDocumentsDisplayDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i> PDF Documents  
-                                </a>  
-
-                                <!-- Members PDF Documents -->
-                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 200px;" aria-labelledby="membersPdfDocumentsDisplayDropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                    @{
-                                        // Fetch the non-empty categories directly in the layout
-                                        var dynamicCategories = DbContext.PDFCategories
-                                        .Where(c => c.IsAdminOnly != true)
-                                        .OrderBy(c => c.SortOrder)
-                                        .ThenBy(c => c.CategoryName)
-                                        .ToList();
-
-                                        // Check if any categories were found
-                                        if (dynamicCategories != null && dynamicCategories.Any())
-                                        {
-                                            // Loop through the categories and create a link for each
-                                            foreach (var category in dynamicCategories)
-                                            {
-                                                <li>
-                                                    <a class="nav-link text-dark rounded-2 mb-1 ps-2" style="width: 180px;" asp-controller="Members" asp-action="ListFiles" asp-route-categoryId="@category.CategoryID">
-                                                        <i class="bi bi-list-ul"></i> @category.CategoryName  
-                                                    </a>  
-                                                </li>  
-                                            }  
-                                        }  
-                                        else  
-                                        {  
-                                            // Optional: Display a placeholder if no categories are found  
-                                            <li><span class="dropdown-item-text">No PDF categories available</span></li>  
-                                        }  
-                                    }                                      
-                                </ul>  
-                            </li> *@
+                            </li>                           
 
                             <!-- Profile -->
                             @if (SignInManager.IsSignedIn(User))

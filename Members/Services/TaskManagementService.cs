@@ -46,6 +46,9 @@ namespace Members.Services
             // Ensure task instances exist for current month
             await InitializeTaskInstancesAsync();
 
+            // Auto-complete tasks that don't have dependencies
+            await AutoCompleteTasksWithoutDependenciesAsync();
+
             var tasks = await _context.AdminTasks
                 .Where(t => t.IsActive)
                 .Include(t => t.TaskInstances.Where(ti => ti.Year == currentYear && ti.Month == currentMonth))
@@ -58,7 +61,7 @@ namespace Members.Services
             foreach (var task in tasks)
             {
                 var instance = task.TaskInstances.FirstOrDefault();
-                var computedStatus = ComputeTaskStatus(task, instance, currentDay);
+                var computedStatus = await ComputeTaskStatusAsync(task, instance, currentDay);
                 var sortPriority = ComputeSortPriority(computedStatus, task, currentDay);
 
                 result.Add(new TaskStatusViewModel
@@ -73,7 +76,7 @@ namespace Members.Services
                     CanAutomate = task.CanAutomate,
                     IsAutomated = task.IsAutomated,
                     TaskInstanceID = instance?.TaskInstanceID,
-                    Status = instance?.Status ??  TaskStatus.Pending,
+                    Status = instance?.Status ?? TaskStatus.Pending,
                     AssignedToUserId = instance?.AssignedToUserId,
                     CompletedDate = instance?.CompletedDate,
                     CompletedByUserId = instance?.CompletedByUserId,
@@ -90,6 +93,107 @@ namespace Members.Services
                         .ThenBy(t => (int)t.Priority)
                         .ThenBy(t => t.DayOfMonthStart)
                         .ToList();
+        }
+
+        private async Task<bool> HasMemberBalancesAsync()
+        {
+            // Get all users in Member role who are billing contacts
+            var memberRoleName = "Member";
+            var usersInMemberRole = await _userManager.GetUsersInRoleAsync(memberRoleName);
+
+            if (usersInMemberRole == null || !usersInMemberRole.Any())
+            {
+                return false; // No members found
+            }
+
+            // Check each billing contact for outstanding balances
+            foreach (var user in usersInMemberRole)
+            {
+                var userProfile = await _context.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
+                if (userProfile != null && userProfile.IsBillingContact)
+                {
+                    // Calculate balance using the same logic as your CurrentBalances page
+                    decimal totalChargesFromInvoices = await _context.Invoices
+                        .Where(i => i.UserID == user.Id &&
+                                   i.Status != InvoiceStatus.Cancelled &&
+                                   i.Status != InvoiceStatus.Draft)
+                        .SumAsync(i => i.AmountDue);
+
+                    decimal totalAmountPaidOnInvoices = await _context.Invoices
+                        .Where(i => i.UserID == user.Id &&
+                                   i.Status != InvoiceStatus.Cancelled &&
+                                   i.Status != InvoiceStatus.Draft)
+                        .SumAsync(i => i.AmountPaid);
+
+                    decimal currentBalance = totalChargesFromInvoices - totalAmountPaidOnInvoices;
+
+                    // If any member has an outstanding balance, return true
+                    if (currentBalance > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false; // No members have outstanding balances
+        }
+
+        private async Task AutoCompleteTasksWithoutDependenciesAsync()
+        {
+            var currentYear = DateTime.Now.Year;
+            var currentMonth = DateTime.Now.Month;
+
+            // Check if late fees task should be auto-completed
+            var lateFeesTasks = await _context.AdminTasks
+                .Where(t => t.IsActive &&
+                           (t.ActionHandler == "ApplyLateFees" ||
+                            t.TaskName.ToLower().Contains("apply late fee")))
+                .ToListAsync();
+
+            foreach (var task in lateFeesTasks)
+            {
+                var instance = await _context.AdminTaskInstances
+                    .FirstOrDefaultAsync(ti => ti.TaskID == task.TaskID &&
+                                              ti.Year == currentYear &&
+                                              ti.Month == currentMonth);
+
+                // If task is not completed and there are no member balances, auto-complete it
+                if ((instance == null || instance.Status != TaskStatus.Completed) &&
+                    !await HasMemberBalancesAsync())
+                {
+                    await MarkTaskCompletedAutomaticallyAsync(
+                        task.ActionHandler ?? task.TaskName,
+                        "Automatically completed - No member balances requiring late fees");
+
+                    _logger.LogInformation("Auto-completed late fees task '{TaskName}' - no member balances found", task.TaskName);
+                }
+            }
+        }
+
+        private async Task<string> ComputeTaskStatusAsync(AdminTask task, AdminTaskInstance? instance, int currentDay)
+        {
+            if (instance?.Status == TaskStatus.Completed) return "Completed";
+
+            // Special handling for late fees tasks
+            if (task.ActionHandler == "ApplyLateFees" ||
+                task.TaskName.ToLower().Contains("apply late fee"))
+            {
+                if (!await HasMemberBalancesAsync())
+                {
+                    return "Completed"; // Show as completed if no balances exist
+                }
+            }
+
+            var currentYear = DateTime.Now.Year;
+            var currentMonth = DateTime.Now.Month;
+
+            if (currentDay >= task.DayOfMonthStart && currentDay <= task.DayOfMonthEnd)
+                return "Due Now";
+
+            if (currentDay > task.DayOfMonthEnd)
+                return "Overdue";
+
+            return "Pending";
         }
 
         public async Task<bool> CompleteTaskAsync(int taskId, string userId, string? notes = null, bool isAutomated = false)
@@ -179,9 +283,9 @@ namespace Members.Services
 
             if (!hasUrgentTasks) return false;
 
-            // Check if user has dismissed reminder recently (within last 4 hours)
+            // Check if user has dismissed reminder recently (within last 1 hour)
             var recentDismissal = await _context.TaskStatusMessages
-                .Where(tsm => tsm.UserId == userId && tsm.DismissedAt > DateTime.UtcNow.AddHours(-4))
+                .Where(tsm => tsm.UserId == userId && tsm.DismissedAt > DateTime.UtcNow.AddHours(-1))
                 .OrderByDescending(tsm => tsm.DismissedAt)
                 .FirstOrDefaultAsync();
 
@@ -216,18 +320,34 @@ namespace Members.Services
         {
             var currentYear = DateTime.Now.Year;
             var currentMonth = DateTime.Now.Month;
-            var today = DateTime.Now.Date;
-            var endOfCurrentMonth = new DateTime(currentYear, currentMonth, DateTime.DaysInMonth(currentYear, currentMonth));
+            var currentDay = DateTime.Now.Day;
 
             var overdueTasks = await _context.AdminTasks
                 .Where(t => t.IsActive)
                 .Include(t => t.TaskInstances.Where(ti => ti.Year == currentYear && ti.Month == currentMonth))
                 .Where(t => t.TaskInstances.Any(ti => ti.Status != TaskStatus.Completed) || !t.TaskInstances.Any())
-                .Where(t => today > endOfCurrentMonth ||
-                           (DateTime.Now.Day > t.DayOfMonthEnd && t.DayOfMonthEnd < DateTime.DaysInMonth(currentYear, currentMonth)))
-                .AnyAsync();
+                .Where(t => currentDay > t.DayOfMonthEnd)
+                .ToListAsync();
 
-            return overdueTasks;
+            // Filter out late fees tasks if no balances exist
+            var validOverdueTasks = new List<AdminTask>();
+            foreach (var task in overdueTasks)
+            {
+                if (task.ActionHandler == "ApplyLateFees" ||
+                    task.TaskName.ToLower().Contains("apply late fee"))
+                {
+                    if (await HasMemberBalancesAsync())
+                    {
+                        validOverdueTasks.Add(task);
+                    }
+                }
+                else
+                {
+                    validOverdueTasks.Add(task);
+                }
+            }
+
+            return validOverdueTasks.Any();
         }
 
         public async Task<bool> HasTasksDueNowAsync()
@@ -241,9 +361,27 @@ namespace Members.Services
                 .Include(t => t.TaskInstances.Where(ti => ti.Year == currentYear && ti.Month == currentMonth))
                 .Where(t => t.TaskInstances.Any(ti => ti.Status != TaskStatus.Completed) || !t.TaskInstances.Any())
                 .Where(t => currentDay >= t.DayOfMonthStart && currentDay <= t.DayOfMonthEnd)
-                .AnyAsync();
+                .ToListAsync();
 
-            return dueNowTasks;
+            // Filter out late fees tasks if no balances exist
+            var validDueNowTasks = new List<AdminTask>();
+            foreach (var task in dueNowTasks)
+            {
+                if (task.ActionHandler == "ApplyLateFees" ||
+                    task.TaskName.ToLower().Contains("apply late fee"))
+                {
+                    if (await HasMemberBalancesAsync())
+                    {
+                        validDueNowTasks.Add(task);
+                    }
+                }
+                else
+                {
+                    validDueNowTasks.Add(task);
+                }
+            }
+
+            return validDueNowTasks.Any();
         }
 
         public async Task InitializeTaskInstancesAsync()
@@ -350,22 +488,6 @@ namespace Members.Services
                 _logger.LogError(ex, "Error automatically completing task with handler: {ActionHandler}", actionHandler);
                 return false;
             }
-        }
-
-        private static string ComputeTaskStatus(AdminTask task, AdminTaskInstance? instance, int currentDay)
-        {
-            if (instance?.Status == TaskStatus.Completed) return "Completed";
-
-            var currentYear = DateTime.Now.Year;
-            var currentMonth = DateTime.Now.Month;
-            var endOfMonth = DateTime.DaysInMonth(currentYear, currentMonth);
-            var today = DateTime.Now.Date;
-            var endOfCurrentMonth = new DateTime(currentYear, currentMonth, endOfMonth);
-
-            if (currentDay >= task.DayOfMonthStart && currentDay <= task.DayOfMonthEnd)
-                return "Due Now";
-
-            return "Pending";
         }
 
         private static int ComputeSortPriority(string computedStatus, AdminTask task, int currentDay)

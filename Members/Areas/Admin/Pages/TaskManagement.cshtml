@@ -1,5 +1,5 @@
 ﻿@page
-@model Members.Areas.Admin.Pages.TasksModel
+@model Members.Areas.Admin.Pages.TasksManagementModel
 @{
     ViewData["Title"] = "Administrative Tasks";
     Layout = "/Views/Shared/_Layout.cshtml";
@@ -39,34 +39,34 @@
     }
 
     <!-- Task Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-danger text-white shadow">
-                <div class="card-body text-center">
+    <div class="row gy-2 mb-4 mx-1">
+        <div class="col-md-3 rounded-2">
+            <div class="card bg-danger text-white rounded-2 shadow">
+                <div class="card-body text-center rounded-2">
                     <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Overdue</h5>
                     <h3>@Model.TasksSummary.OverdueCount</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark shadow">
-                <div class="card-body text-center">
+        <div class="col-md-3 rounded-2">
+            <div class="card bg-warning text-dark rounded-2 shadow">
+                <div class="card-body text-center rounded-2">
                     <h5 class="card-title"><i class="bi bi-clock-fill"></i> Due Now</h5>
                     <h3>@Model.TasksSummary.DueNowCount</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white shadow">
-                <div class="card-body text-center">
+        <div class="col-md-3 rounded-2">
+            <div class="card bg-success text-white rounded-2 shadow">
+                <div class="card-body text-center rounded-2">
                     <h5 class="card-title"><i class="bi bi-check-circle-fill"></i> Completed</h5>
                     <h3>@Model.TasksSummary.CompletedCount</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-white shadow">
-                <div class="card-body text-center">
+        <div class="col-md-3 rounded-2">
+            <div class="card bg-secondary text-white rounded-2 shadow">
+                <div class="card-body text-center rounded-2">
                     <h5 class="card-title"><i class="bi bi-list-ul"></i> Total</h5>
                     <h3>@Model.TasksSummary.TotalCount</h3>
                 </div>
@@ -109,7 +109,7 @@
                         @foreach (var task in Model.Tasks)
                         {
                             <tr class="@(task.ComputedStatus == "Overdue" ? "table-danger" : task.ComputedStatus == "Due Now" ? "table-warning" : task.ComputedStatus == "Completed" ? "table-success" : "")">
-                                <td>
+                                <td style="text-wrap: wrap; width: 400px;">
                                     <strong>@task.TaskName</strong>
                                     @if (!string.IsNullOrEmpty(task.Description))
                                     {
@@ -159,8 +159,10 @@
                                 <td class="text-center">
                                     @if (task.ComputedStatus != "Completed")
                                     {
+
                                         <!-- Complete Task Button -->
-                                        <form method="post" asp-page-handler="CompleteTask" style="display: inline;">
+                                        <form method="post" action="/Admin/TaskManagement?handler=CompleteTask" style="display: inline;">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="taskId" value="@task.TaskID" />
                                             <button type="submit" class="btn btn-sm btn-success me-1" title="Mark as Complete">
                                                 <i class="bi bi-check"></i>
@@ -209,7 +211,8 @@
 <div class="modal fade" id="assignTaskModal" tabindex="-1" aria-labelledby="assignTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="AssignTask">
+            <form method="post" action="/Admin/TaskManagement?handler=AssignTask">
+                @Html.AntiForgeryToken()
                 <div class="modal-header">
                     <h5 class="modal-title" id="assignTaskModalLabel">
                         <i class="bi bi-person-plus"></i> Assign Task
@@ -237,8 +240,6 @@
                             }
                         </select>
                     </div>
-                </div>
-                <div class="modal-footer">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
