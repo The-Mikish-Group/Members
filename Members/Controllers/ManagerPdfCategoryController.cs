@@ -157,7 +157,7 @@ namespace Members.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> DeleteManagerCategoryConfirmed(int id)
         {
             var category = await _context.PDFCategories.Include(c => c.CategoryFiles).FirstOrDefaultAsync(c => c.CategoryID == id && c.IsAdminOnly == true);

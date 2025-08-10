@@ -96,7 +96,7 @@ namespace Members.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMemberCategory(string categoryName, int sortOrder) 
+        public async Task<IActionResult> CreateCategory(string categoryName, int sortOrder) 
         {
             if (string.IsNullOrWhiteSpace(categoryName))
             {
