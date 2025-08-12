@@ -18,10 +18,10 @@ namespace Members.Services
         {
             _logger = logger;
 
-            _smtpHost = Environment.GetEnvironmentVariable("SMTP_SERVER")!;
+            _smtpHost = Environment.GetEnvironmentVariable("SMTP_SERVER_OAKS_VILLAGE")!;
             string portString = Environment.GetEnvironmentVariable("SMTP_PORT")!;
-            _smtpUser = Environment.GetEnvironmentVariable("SMTP_USERNAME")!;
-            _smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD")!;
+            _smtpUser = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE")!;
+            _smtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD_OAKS_VILLAGE")!;
             string sslString = Environment.GetEnvironmentVariable("SMTP_SSL")!;
 
             if (string.IsNullOrEmpty(_smtpHost) || string.IsNullOrEmpty(portString) || string.IsNullOrEmpty(_smtpUser) || string.IsNullOrEmpty(_smtpPassword) || string.IsNullOrEmpty(sslString))

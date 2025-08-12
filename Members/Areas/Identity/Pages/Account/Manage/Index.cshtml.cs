@@ -121,15 +121,15 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             // Apply default values from environment variables if the loaded data is empty
             if (string.IsNullOrEmpty(Input.City))
             {
-                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.State))
             {
-                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.ZipCode))
             {
-                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_OAKS_VILLAGE") ?? string.Empty;
             }
 
             return Page();

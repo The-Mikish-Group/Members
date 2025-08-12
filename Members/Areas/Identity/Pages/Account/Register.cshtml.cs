@@ -156,15 +156,15 @@ namespace Members.Areas.Identity.Pages.Account
             // Apply default values from environment variables if the Input properties are empty
             if (string.IsNullOrEmpty(Input.City))
             {
-                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY") ?? string.Empty;
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.State))
             {
-                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE") ?? string.Empty;
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.ZipCode))
             {
-                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE") ?? string.Empty;
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_OAKS_VILLAGE") ?? string.Empty;
             }
         }
 
@@ -251,12 +251,12 @@ namespace Members.Areas.Identity.Pages.Account
                     // Send Notification Email to OaksVillage@Oaks-village.com
                     string emailSubject = "Oaks-Village HOA - New Member Registration";
                     string emailBody;
-                    string? adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME");
+                    string? adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE");
 
                     if (string.IsNullOrEmpty(adminEmail))
                     {
                         // Replace the line causing the CS0126 error with a proper IActionResult return statement
-                        _logger.LogError("SMTP_USERNAME environment variable is not set. Cannot send admin notification for new registration.");
+                        _logger.LogError("SMTP_USERNAME_OAKS_VILLAGE environment variable is not set. Cannot send admin notification for new registration.");
                         return Page(); // Or handle this error as appropriate for your application
                     }
 

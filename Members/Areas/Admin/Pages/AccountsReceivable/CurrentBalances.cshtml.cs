@@ -759,7 +759,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
 
             int emailsSentCount = 0;
             var emailErrors = new List<string>();
-            var siteName = Environment.GetEnvironmentVariable("SITE_NAME") ?? "Our Community";
+            var siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Our Community";
             var today = DateTime.Today;
             var dueDate = new DateTime(today.Year, today.Month, 1).AddMonths(1);
 
@@ -959,7 +959,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
 
             int emailsSentCount = 0;
             var emailErrors = new List<string>();
-            var siteName = Environment.GetEnvironmentVariable("SITE_NAME") ?? "Our Community";
+            var siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Our Community";
             var fifthOfMonth = new DateTime(today.Year, today.Month, 5);
 
             foreach (var member in usersToEmail)

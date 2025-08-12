@@ -1,13 +1,13 @@
 using TaskStatus = Members.Models.TaskStatus;
 using Members.Data;
 using Members.Filters;
-using Members.Models; // Add this to access UserProfile
+using Members.Models;
 using Members.Services;
-using Microsoft.AspNetCore.DataProtection; // Added for Data Protection
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure; // For IActionContextAccessor and ActionContextAccessor
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +17,10 @@ string SYNCFUSION_KEY = Environment.GetEnvironmentVariable("SYNCFUSION_KEY")!;
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(SYNCFUSION_KEY);
 
 // Retrieve connection string from environment variables
-string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER")!;
-string DB_USER = Environment.GetEnvironmentVariable("DB_USER")!;
-string DB_PASSWORD = Environment.GetEnvironmentVariable("DB_PASSWORD")!;
-string DB_NAME = Environment.GetEnvironmentVariable("DB_NAME")!;
+string DB_SERVER = Environment.GetEnvironmentVariable("DB_SERVER_OAKS_VILLAGE")!;
+string DB_USER = Environment.GetEnvironmentVariable("DB_USER_OAKS_VILLAGE")!;
+string DB_PASSWORD = Environment.GetEnvironmentVariable("DB_PASSWORD_OAKS_VILLAGE")!;
+string DB_NAME = Environment.GetEnvironmentVariable("DB_NAME_OAKS_VILLAGE")!;
 if (string.IsNullOrEmpty(DB_SERVER) || string.IsNullOrEmpty(DB_USER) || string.IsNullOrEmpty(DB_PASSWORD) || string.IsNullOrEmpty(DB_NAME))
 {
     // Handle the error: Log, throw an exception, or provide a default value
@@ -51,7 +51,17 @@ builder.Services.AddDbContext<DataProtectionKeyDbContext>(options =>
 // Configure Data Protection to use Entity Framework Core store
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<DataProtectionKeyDbContext>()
-    .SetApplicationName("MembersApplication"); // Unique name for the application   
+    .SetApplicationName("MembersApplication") // Unique name for the application
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90)); // Keys expire after 90 days
+
+// Configure Antiforgery with custom options to handle key issues gracefully
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = ".AspNetCore.Antiforgery.Members";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -128,11 +138,11 @@ using (var scope = app.Services.CreateScope())
 {
     var UserManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Get the ApplicationDbContext
-    string ADMIN_EMAIL = Environment.GetEnvironmentVariable("ADMIN_EMAIL")!;
-    string ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
+    string ADMIN_EMAIL = Environment.GetEnvironmentVariable("ADMIN_EMAIL_OAKS_VILLAGE")!;
+    string ADMIN_PASSWORD = Environment.GetEnvironmentVariable("ADMIN_PASSWORD_OAKS_VILLAGE")!;
     if (string.IsNullOrEmpty(ADMIN_EMAIL) || string.IsNullOrEmpty(ADMIN_PASSWORD))
     {
-        throw new InvalidOperationException("ADMIN_EMAIL or ADMIN_PASSWORD environment variables are not set.");
+        throw new InvalidOperationException("ADMIN_EMAIL_OAKS_VILLAGE or ADMIN_PASSWORD_OAKS_VILLAGE environment variables are not set.");
     }
     var adminUser = await UserManager.FindByEmailAsync(ADMIN_EMAIL);
     if (adminUser == null)
@@ -148,13 +158,12 @@ using (var scope = app.Services.CreateScope())
         if (createResult.Succeeded)
         {
             await UserManager.AddToRoleAsync(adminUser, "Admin");
-            // Update PhoneNumber if it's not already set
-            if (string.IsNullOrEmpty(adminUser.PhoneNumber))
-            {
-                adminUser.PhoneNumber = "(217) 371-8041";
-                await UserManager.UpdateAsync(adminUser);
-            }
             // Update UserProfile
+            string default_City = Environment.GetEnvironmentVariable("DEFAULT_CITY_OAKS_VILLAGE")!;
+            string default_State = Environment.GetEnvironmentVariable("DEFAULT_STATE_OAKS_VILLAGE")!;
+            string default_Zipcode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_OAKS_VILLAGE")!;
+            string default_Name = Environment.GetEnvironmentVariable("DEFAULT_NAME_OAKS_VILLAGE")!;
+
             var adminProfile = await dbContext.UserProfile.FirstOrDefaultAsync(up => up.UserId == adminUser.Id);
             if (adminProfile == null)
             {
@@ -163,11 +172,10 @@ using (var scope = app.Services.CreateScope())
                     UserId = adminUser.Id,
                     FirstName = "An",
                     LastName = "Administrator",
-                    AddressLine1 = "1042 N Brainerd",
-                    City = "Avon Park",
-                    State = "FL",
-                    ZipCode = "33825",
-                    HomePhoneNumber = "(123) 456-7890",
+                    AddressLine1 = default_Name,
+                    City = default_City,
+                    State = default_State,
+                    ZipCode = default_Zipcode,
                     User = adminUser
                 };
                 dbContext.UserProfile.Add(adminProfile);
@@ -176,11 +184,10 @@ using (var scope = app.Services.CreateScope())
             {
                 adminProfile.FirstName = "An";
                 adminProfile.LastName = "Administrator";
-                adminProfile.AddressLine1 = "1042 N Brainerd";
-                adminProfile.City = "Avon Park";
-                adminProfile.State = "FL";
-                adminProfile.ZipCode = "33825";
-                // You can choose to update HomePhoneNumber here if needed
+                adminProfile.AddressLine1 = default_Name;
+                adminProfile.City = default_City;
+                adminProfile.State = default_State;
+                adminProfile.ZipCode = default_Zipcode;
             }
             await dbContext.SaveChangesAsync();
         }
@@ -194,12 +201,9 @@ using (var scope = app.Services.CreateScope())
             throw new Exception("Failed to create admin user.");
         }
     }
-    else
-    {
-        // Do Nothing!
-    }
 }
 
+// Seed color variables
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

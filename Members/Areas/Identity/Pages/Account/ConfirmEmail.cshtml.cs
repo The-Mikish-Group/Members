@@ -108,12 +108,12 @@ namespace Members.Areas.Identity.Pages.Account
                 {
                     string emailSubjectAdmin = "Oaks-Village HOA - Email Confirmation Notification";
                     string emailBodyAdmin;
-                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME");
+                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE");
 
                     if (string.IsNullOrEmpty(adminEmail))
                     {
                         // Handle the case where the environment variable is not set
-                        _logger.LogError("SMTP_USERNAME environment variable is not set. Cannot send admin notification.");
+                        _logger.LogError("SMTP_USERNAME_OAKS_VILLAGE environment variable is not set. Cannot send admin notification.");
                         return Page(); // Or handle this error as appropriate for your application
                     }
 

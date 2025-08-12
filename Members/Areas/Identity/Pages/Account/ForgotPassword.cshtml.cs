@@ -49,7 +49,7 @@ namespace Members.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    Environment.GetEnvironmentVariable("SITE_NAME") + " - Reset Your Password",
+                    Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") + " - Reset Your Password",
                     $"<!DOCTYPE html>" +
                     "<html lang=\"en\">" +
                     "<head>" +
