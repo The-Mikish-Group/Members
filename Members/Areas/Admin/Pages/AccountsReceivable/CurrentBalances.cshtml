@@ -6,7 +6,7 @@
 }
 
 <!-- Top Button placed here -->
-<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+<button class="btn btn-sm px-1 py-0" onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
 <!-- Title -->
 <h2 class="text-black my-4 text-center"><i class="bi bi-calculator"></i> @ViewData["Title"]</h2>
@@ -68,25 +68,25 @@
                 <div class="col-md-9 text-md-end">
 
                     <!-- Email Late Fee Warnings -->
-                    <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-subtle-danger rounded-2 shadow"
-                                onclick="return confirm('Are you sure you want to send late fee warning emails to all members with an outstanding balance? This should typically be done between the 1st and 5th of the month.');">
+                    <form method="post" asp-page-handler="EmailLateFeeWarnings" style="display: inline-block;" class="my-2 ms-1" id="emailLateFeeWarningsForm">
+                        <button type="button" class="btn btn-sm btn-subtle-danger rounded-2 shadow"
+                                onclick="showConfirmModal('Are you sure you want to send late fee warning emails to all members with an outstanding balance?<br/><br/>This should typically be done between the 1st and 5th of the month.', function() { document.getElementById('emailLateFeeWarningsForm').submit(); }, { title: 'Send Late Fee Warnings', confirmText: 'Send Emails', dangerous: false });">
                             <i class="bi bi-exclamation-triangle"></i> Email Late Fee Warnings
                         </button>
                     </form>
 
                     <!-- Apply Late Fee -->
-                    <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-danger rounded-2 shadow"
-                                onclick="return confirm('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances? This may take a moment.');">
+                    <form method="post" asp-page-handler="BulkApplyLateFees" style="display: inline-block;" class="my-2 ms-1" id="bulkApplyLateFeesForm">
+                        <button type="button" class="btn btn-sm btn-danger rounded-2 shadow"
+                                onclick="showConfirmModal('Are you sure you want to attempt to apply late fees to all eligible members with outstanding balances?<br/><br/>This may take a moment.', function() { document.getElementById('bulkApplyLateFeesForm').submit(); }, { title: 'Apply Late Fees', confirmText: 'Apply Fees' });">
                             <i class="bi bi-alarm"></i> Apply Late Fees to All Eligible
                         </button>
                     </form>
 
                     <!-- Email Balance Notifications -->
-                    <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block;" class="my-2 ms-1">
-                        <button type="submit" class="btn btn-sm btn-search-fill rounded-2 shadow"
-                                onclick="return confirm('Are you sure you want to send balance notification emails to all members with a balance?');">
+                    <form method="post" asp-page-handler="EmailBalanceNotifications" style="display: inline-block;" class="my-2 ms-1" id="emailBalanceNotificationsForm">
+                        <button type="button" class="btn btn-sm btn-search-fill rounded-2 shadow"
+                                onclick="showConfirmModal('Are you sure you want to send balance notification emails to all members with a balance?', function() { document.getElementById('emailBalanceNotificationsForm').submit(); }, { title: 'Send Balance Notifications', confirmText: 'Send Emails', dangerous: false });">
                             <i class="bi bi-envelope"></i> Email Balance Notifications
                         </button>
                     </form>
@@ -181,14 +181,14 @@
                                 <td class="text-nowrap py-1 pe-2 text-center">
                                     @if (member.CurrentBalance > 0 || member.CreditBalance > 0) // Also consider CreditBalance for enabling actions
                                     {
-                                        <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;">
+                                        <form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@member.UserId" style="display:inline;" id="lateFeeForm_@member.UserId">
 
                                             @* We might need to pass sourceInvoiceId if we refine the logic later *@
                                             @* <input type="hidden" name="sourceInvoiceId" value="THE_ID_OF_OVERDUE_DUES_INVOICE" /> *@
 
-                                            <button type="submit" class="btn btn-sm btn-delete @(member.CurrentBalance <= 0 ? "disabled" : "")"
+                                            <button type="button" class="btn btn-sm btn-delete @(member.CurrentBalance <= 0 ? "disabled" : "")"
                                                     title="Apply Late Fee if Dues are Overdue"
-                                                    onclick="return confirm('Are you sure you want to apply a late fee for @member.FullName? This will check for their latest overdue invoice to calculate the fee, or apply a standard $25 if none is found overdue.');">
+                                                    onclick="showConfirmModal('Are you sure you want to apply a late fee for <strong>@Html.Raw(Html.Encode(member.FullName))</strong>?<br/><br/>This will check for their latest overdue invoice to calculate the fee, or apply a standard $25 if none is found overdue.', function() { document.getElementById('lateFeeForm_@member.UserId').submit(); }, { title: 'Apply Late Fee', confirmText: 'Apply Fee' });">
                                                 <i class="bi bi-alarm"></i>
                                             </button>
                                         </form>

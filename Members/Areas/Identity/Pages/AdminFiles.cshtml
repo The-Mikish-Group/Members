@@ -150,13 +150,17 @@
             $('.delete-button').on('click', function (event) {
                 event.preventDefault(); // Prevent the default form submission of this button
                 var fileName = $(this).data('filename');
-                if (confirm('Are you sure you want to delete the file "' + fileName + '"?')) {
-                    // If the user confirms, submit the form to the DeleteSingle handler
-                    var form = document.getElementById('AdminFiles');
-                    form.action = '?handler=DeleteSingle&fileName=' + encodeURIComponent(fileName);
-                    form.method = 'post';
-                    form.submit();
-                }
+                showConfirmModal(
+                    'Are you sure you want to delete the file <strong>"' + fileName + '"</strong>?<br/><br/>This action cannot be undone.',
+                    function() {
+                        // If the user confirms, submit the form to the DeleteSingle handler
+                        var form = document.getElementById('AdminFiles');
+                        form.action = '?handler=DeleteSingle&fileName=' + encodeURIComponent(fileName);
+                        form.method = 'post';
+                        form.submit();
+                    },
+                    { title: 'Delete File', confirmText: 'Delete' }
+                );
             });
         });
     </script>

@@ -132,16 +132,15 @@ else
                 $.get(checkUrl, { fileName: fileName, categoryId: categoryId }, function(data) {
                     if (data.exists) {
                         // File exists, show confirmation dialog
-                        var confirmOverwrite = confirm('A file named "' + fileName + '.pdf" already exists in this category. Do you want to overwrite it?');
-
-                        if (confirmOverwrite) {
-                            // User confirmed overwrite, allow the form to submit
-                            // Temporarily unbind the submit handler to avoid infinite loop, then submit
-                            pdfForm.off('submit').submit();
-                        } else {
-                            // User cancelled, do nothing (form submission is already prevented)
-                            console.log("Overwrite cancelled by user.");
-                        }
+                        showConfirmModal(
+                            'A file named <strong>"' + fileName + '.pdf"</strong> already exists in this category.<br/><br/>Do you want to overwrite it?',
+                            function() {
+                                // User confirmed overwrite, allow the form to submit
+                                // Temporarily unbind the submit handler to avoid infinite loop, then submit
+                                pdfForm.off('submit').submit();
+                            },
+                            { title: 'File Already Exists', confirmText: 'Overwrite', dangerous: false }
+                        );
                     } else {
                         // File does not exist, proceed with form submission
                         // Temporarily unbind the submit handler and submit the form
@@ -156,13 +155,14 @@ else
 
             // Find the new export button by its ID
             $('#exportCsvButton').on('click', function() {
-                var confirmExport = confirm('Are you sure you want to download the complete user data export? This may take a moment.');
-
-                if (confirmExport) {
-                    var exportUrl = '@Url.Action("ExportUserData", "PdfGeneration")';
-                    window.location.href = exportUrl; } else {
-                    console.log("Export cancelled by user.");
-                }
+                showConfirmModal(
+                    'Are you sure you want to download the complete user data export?<br/><br/>This may take a moment.',
+                    function() {
+                        var exportUrl = '@Url.Action("ExportUserData", "PdfGeneration")';
+                        window.location.href = exportUrl;
+                    },
+                    { title: 'Export User Data', confirmText: 'Export', dangerous: false }
+                );
             });
 
         });

@@ -46,6 +46,15 @@ namespace Members.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
+                // Get the site name from environment variable
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD");
+
+                if (string.IsNullOrEmpty(siteName))
+                {
+                    _logger.LogError("SITE_NAME_HOA_CLOUD environment variable is not set. Using default value.");
+                    siteName = "Oaks-Village"; // Fallback to default if environment variable is not set
+                }
+
                 string emailSubjectUser;
                 string emailBodyUser;
 
@@ -54,24 +63,24 @@ namespace Members.Areas.Identity.Pages.Account
 
                 if (isMember)
                 {
-                    emailSubjectUser = "Welcome to Oaks-Village HOA - Your Account is Confirmed";
+                    emailSubjectUser = $"Welcome to {siteName} HOA - Your Account is Confirmed";
                     emailBodyUser = $"<!DOCTYPE html>" +
                       "<html lang=\"en\">" +
                       "<head>" +
                       "    <meta charset=\"UTF-8\">" +
                       "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                      "    <title>Welcome to Oaks-Village HOA</title>" +
+                      $"    <title>Welcome to {siteName} HOA</title>" +
                       "</head>" +
                       "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
                       "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
-                      "    <p style=\"margin-bottom: 1em;\">Welcome to the Oaks-Village Homeowners Association!</p>" +
+                      $"   <p style=\"margin-bottom: 1em;\">Welcome to the {siteName} Homeowners Association!</p>" +
                       "    <p style=\"margin-bottom: 1em;\">Thank you for confirming your email address. Your account is now <strong style=\"font-weight: bold;\">Active</strong>.</p>" +
-                      "    <p style=\"margin-bottom: 1em;\">You can log in to the community portal at <a href=\"https://Oaks-Village.com\" style=\"color: #007bff; text-decoration: none;\">https://Oaks-Village.com</a>.</p>" +
+                      $"   <p style=\"margin-bottom: 1em;\">You can log in to the community portal at <a href=\"https://{siteName}.com\" style=\"color: #007bff; text-decoration: none;\">https://{siteName}.com</a>.</p>" +
                       "    <p style=\"margin-bottom: 0;\">Thank you for being a part of our community.</p>" +
                       "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                      "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                      $"   <p style=\"margin-top: 0;\">The {siteName} HOA Team <img src=\"https://{siteName}.com/Images/LinkImages/SmallLogo.png\" alt=\"{siteName} HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 35px;\"></p>" +
                       "</body>" +
-                      "</html>"; ;
+                      "</html>";
                 }
                 else
                 {
@@ -81,7 +90,7 @@ namespace Members.Areas.Identity.Pages.Account
                         "<head>" +
                         "    <meta charset=\"UTF-8\">" +
                         "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                        "    <title>Email Address Confirmed - Oaks-Village HOA</title>" +
+                        $"    <title>Email Address Confirmed - {siteName} HOA</title>" +
                         "</head>" +
                         "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
                         "    <p style=\"margin-bottom: 1em;\">Dear Member,</p>" +
@@ -90,7 +99,7 @@ namespace Members.Areas.Identity.Pages.Account
                         "    <p style=\"margin-bottom: 1em;\">Once your account has been authorized, you will receive a separate <strong style=\"font-weight: bold;\">Welcome Email</strong> with login instructions. Please be patient as we are a small team of volunteers.</p>" +
                         "    <p style=\"margin-bottom: 0;\">Thank you for your understanding.</p>" +
                         "    <p style=\"margin-top: 0;\">Sincerely,</p>" +
-                        "    <p style=\"margin-top: 0;\">The Oaks-Village HOA Team<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                        $"    <p style=\"margin-top: 0;\">The {siteName} HOA Team <img src=\"https://{siteName}.com/Images/LinkImages/SmallLogo.png\" alt=\"{siteName} HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 35px;\"></p>" +
                         "</body>" +
                         "</html>";
                 }
@@ -102,18 +111,18 @@ namespace Members.Areas.Identity.Pages.Account
                     emailBodyUser
                 );
 
-                // Send notification email to OaksVillage@Oaks-village.com
+                // Send notification email to admin
                 var userProfile = await _dbContext.UserProfile.FirstOrDefaultAsync(up => up.UserId == user.Id);
                 if (userProfile != null)
                 {
-                    string emailSubjectAdmin = "Oaks-Village HOA - Email Confirmation Notification";
+                    string emailSubjectAdmin = $"{siteName} HOA - Email Confirmation Notification";
                     string emailBodyAdmin;
-                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE");
+                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_HOA_CLOUD");
 
                     if (string.IsNullOrEmpty(adminEmail))
                     {
                         // Handle the case where the environment variable is not set
-                        _logger.LogError("SMTP_USERNAME_OAKS_VILLAGE environment variable is not set. Cannot send admin notification.");
+                        _logger.LogError("SMTP_USERNAME_HOA_CLOUD environment variable is not set. Cannot send admin notification.");
                         return Page(); // Or handle this error as appropriate for your application
                     }
 
@@ -127,7 +136,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    <title>Email Confirmation Notification</title>" +
                                          "</head>" +
                                          "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
-                                         "    <p style=\"margin-bottom: 1em;\">Dear Oaks-Village HOA Administrator,</p>" +
+                                         $"    <p style=\"margin-bottom: 1em;\">Dear {siteName} HOA Administrator,</p>" +
                                          "    <p style=\"margin-bottom: 1em;\">This is a notification that a user has confirmed their email address.</p>" +
                                          "    <p style=\"margin-bottom: 1em;\"><strong>Member Account Activated:</strong></p>" +
                                          "    <ul style=\"margin-left: 20px; margin-bottom: 1em;\">" +
@@ -136,7 +145,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    </ul>" +
                                          "    <p style=\"margin-bottom: 1em;\">The user's email address has been verified, and their account is now live with Member access.</p>" +
                                          "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                         $"    <p style=\"margin-top: 0;\">{siteName} HOA System<img src=\"https://{siteName}.com/Images/LinkImages/SmallLogo.png\" alt=\"{siteName} HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                          "</body>" +
                                          "</html>";
                     }
@@ -150,7 +159,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    <title>Email Confirmation Notification - Action Required</title>" +
                                          "</head>" +
                                          "<body style=\"font-family: sans-serif; line-height: 1.6; margin: 20px;\">" +
-                                         "    <p style=\"margin-bottom: 1em;\">Dear Oaks-Village HOA Administrator,</p>" +
+                                         $"    <p style=\"margin-bottom: 1em;\">Dear {siteName} HOA Administrator,</p>" +
                                          "    <p style=\"margin-bottom: 1em;\">This is a notification that a user has confirmed their email address.</p>" +
                                          "    <p style=\"margin-bottom: 1em;\"><strong>Account Requires Member Role Assignment:</strong></p>" +
                                          "    <ul style=\"margin-left: 20px; margin-bottom: 1em;\">" +
@@ -159,7 +168,7 @@ namespace Members.Areas.Identity.Pages.Account
                                          "    </ul>" +
                                          "    <p style=\"margin-bottom: 1em;\">The user with the email address above has confirmed their email. Please review their account and assign the 'Member' role as appropriate.</p>" +
                                          "    <p style=\"margin-bottom: 0;\">Sincerely,</p>" +
-                                         "    <p style=\"margin-top: 0;\">Oaks-Village HOA System<img src=\"https://Oaks-Village.com/Images/LinkImages/SmallLogo.png\" alt=\"Oaks-Village HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
+                                         $"    <p style=\"margin-top: 0;\">{siteName} HOA System<img src=\"https://{siteName}.com/Images/LinkImages/SmallLogo.png\" alt=\"{siteName} HOA Logo\" style=\"vertical-align: middle; margin-left: 3px; height: 40px;\"></p>" +
                                          "</body>" +
                                          "</html>";
                     }

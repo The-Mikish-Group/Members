@@ -103,11 +103,13 @@
                                                         asp-action="DeleteGallery"
                                                         method="post" 
                                                         style="display:inline;" 
-                                                        onsubmit="return confirm('Are you sure you want to delete the gallery \'@gallery.Name\' and all its images?');">
+                                                        id="deleteGalleryForm_@gallery.Name.Replace(" ", "_")">
 
                                                         <input type="hidden" name="galleryName" value="@gallery.Name" />
 
-                                                        <button type="submit" class="btn btn-delete delete-button px-2 py-2" title="Delete Gallery @gallery.Name">
+                                                        <button type="button" class="btn btn-delete delete-button px-2 py-2" title="Delete Gallery @gallery.Name"
+                                                                data-gallery-name="@gallery.Name" data-form-id="deleteGalleryForm_@gallery.Name.Replace(" ", "_")"
+                                                                onclick="confirmDeleteGallery(this)">
                                                             <i class="bi bi-trash-fill"></i>
                                                         </button>                                        
 
@@ -183,6 +185,19 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        // Function to confirm gallery deletion
+        function confirmDeleteGallery(button) {
+            const galleryName = button.getAttribute('data-gallery-name');
+            const formId = button.getAttribute('data-form-id');
+            showConfirmModal(
+                'Are you sure you want to delete the gallery <strong>' + galleryName + '</strong> and all its images?<br/><br/>This action cannot be undone.',
+                function() {
+                    document.getElementById(formId).submit();
+                },
+                { title: 'Delete Gallery', confirmText: 'Delete' }
+            );
+        }
+
         // JavaScript to handle the auto-hide alert messages
         document.addEventListener('DOMContentLoaded', function () {            
             var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');

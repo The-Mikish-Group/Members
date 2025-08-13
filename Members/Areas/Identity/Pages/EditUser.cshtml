@@ -433,14 +433,24 @@
                 // If the clicked button is the delete confirmation button
                 if (clickedButton && clickedButton.id === 'confirmDeleteButton') {
                      // Show confirmation dialog
-                    const confirmation = confirm("Are you sure you want to delete this user? This action cannot be undone.");
-
-                    // If user cancels the confirmation, prevent form submission
-                    if (!confirmation) {
-                        event.preventDefault();
-                        return; // Stop further execution in this handler
-                    }
-                    // If user confirms, allow submission - the OnPostDeleteAsync handler will be called
+                    showConfirmModal(
+                        'Are you sure you want to delete this user?<br/><br/>This action cannot be undone.',
+                        function() {
+                            // Set flag to bypass confirmation on re-submission
+                            const deleteForm = document.getElementById('editUserForm');
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'ConfirmDelete';
+                            hiddenInput.value = 'true';
+                            deleteForm.appendChild(hiddenInput);
+                            deleteForm.submit();
+                        },
+                        { title: 'Delete User', confirmText: 'Delete User' }
+                    );
+                    
+                    // Always prevent default submission to show modal first
+                    event.preventDefault();
+                    return false;
                 }
 
                 // For any submit button (including Save if it wasn't the delete button),

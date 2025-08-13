@@ -39,7 +39,7 @@
                 <button type="button" class="btn btn-sm me-1 btn-rename edit-asset-button" data-asset-id="@asset.BillableAssetID" data-plot-id="@asset.PlotID" title="Edit Asset @asset.PlotID"><i class="bi bi-pencil-square"></i></button>
             </td>
             <td class="text-nowrap text-center pe-2 py-2">
-                <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i></button></form>
+                <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;" id="deletePartialAssetForm_@asset.BillableAssetID"><button type="button" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="showConfirmModal('Are you sure you want to delete Billable Asset <strong>@Html.Raw(Html.Encode(asset.PlotID))</strong> (ID: @asset.BillableAssetID)?<br/><br/>This action cannot be undone.', function() { document.getElementById('deletePartialAssetForm_@asset.BillableAssetID').submit(); }, { title: 'Delete Billable Asset', confirmText: 'Delete' });"><i class="bi bi-trash"></i></button></form>
             </td>
         </tr>
         i++;

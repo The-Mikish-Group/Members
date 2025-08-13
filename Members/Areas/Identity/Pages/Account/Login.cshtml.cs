@@ -7,50 +7,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Members.Areas.Identity.Pages.Account
 {
-    public class LoginModel : PageModel
+    public class LoginModel(
+        SignInManager<IdentityUser> signInManager,
+        ILogger<LoginModel> logger,
+        UserManager<IdentityUser> userManager, // Inject UserManager
+        ApplicationDbContext dbContext) : PageModel // Inject ApplicationDbContext
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly ApplicationDbContext _dbContext;
-
-        public LoginModel(
-            SignInManager<IdentityUser> signInManager,
-            ILogger<LoginModel> logger,
-            UserManager<IdentityUser> userManager,
-            ApplicationDbContext dbContext)
-        {
-            _signInManager = signInManager;
-            _logger = logger;
-            _userManager = userManager;
-            _dbContext = dbContext;
-
-            // Initialize required properties
-            Input = new InputModel();
-            ExternalLogins = new List<AuthenticationScheme>();
-            ReturnUrl = string.Empty;
-            ErrorMessage = string.Empty;
-        }
+        private readonly SignInManager<IdentityUser> _signInManager = signInManager;
+        private readonly ILogger<LoginModel> _logger = logger;
+        private readonly UserManager<IdentityUser> _userManager = userManager; // Inject UserManager
+        private readonly ApplicationDbContext _dbContext = dbContext; // Inject ApplicationDbContext
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public required InputModel Input { get; set; }
 
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
+        public required IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public required string ReturnUrl { get; set; }
 
         [TempData]
-        public string ErrorMessage { get; set; }
+        public required string ErrorMessage { get; set; }
 
         public class InputModel
         {
             [Required]
             [EmailAddress]
-            public string Email { get; set; } = string.Empty;
+            public required string Email { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
-            public string Password { get; set; } = string.Empty;
+            public required string Password { get; set; }
 
             [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
@@ -67,7 +53,7 @@ namespace Members.Areas.Identity.Pages.Account
 
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync())];
 
             ReturnUrl = returnUrl;
         }
@@ -116,7 +102,7 @@ namespace Members.Areas.Identity.Pages.Account
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {

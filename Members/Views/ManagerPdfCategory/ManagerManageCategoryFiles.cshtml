@@ -155,10 +155,11 @@
                                             </td>
                                             <td class="text-center align-middle">@file.SortOrder</td>
                                             <td class="p-0 text-end align-middle">
-                                                <form method="post" asp-controller="ManagerPdfCategory" asp-action="DeleteFileFromManagerCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline">
+                                                <form method="post" asp-controller="ManagerPdfCategory" asp-action="DeleteFileFromManagerCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline" id="deleteManagerFileForm_@file.FileID">
                                                     @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
-                                                            onclick="return confirm('Are you sure you want to delete the file @file.FileName from this confidential category?');">
+                                                    <button type="button" class="btn btn-sm btn-delete px-2 py-1" title="Delete File"
+                                                            data-file-name="@file.FileName" data-form-id="deleteManagerFileForm_@file.FileID"
+                                                            onclick="confirmDeleteManagerFile(this)">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </form>
@@ -209,6 +210,19 @@
 
 @section Scripts {
     <script>
+        // Function to confirm manager file deletion
+        function confirmDeleteManagerFile(button) {
+            const fileName = button.getAttribute('data-file-name');
+            const formId = button.getAttribute('data-form-id');
+            showConfirmModal(
+                'Are you sure you want to delete the file <strong>' + fileName + '</strong> from this confidential category?<br/><br/>This action cannot be undone.',
+                function() {
+                    document.getElementById(formId).submit();
+                },
+                { title: 'Delete File', confirmText: 'Delete' }
+            );
+        }
+
         function showMmcfRenameModal(fileId, fileName, sortOrder, categoryId) {
             document.getElementById('mmcfRenameFileId').value = fileId;
             document.getElementById('mmcfOldFileName').value = fileName;

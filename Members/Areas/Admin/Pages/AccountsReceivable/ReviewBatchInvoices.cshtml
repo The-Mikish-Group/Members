@@ -6,7 +6,7 @@
 }
 
 <!-- Top Button placed here -->
-<button onclick="topFunction()" id="top-button" title="Go to top">Top</button>
+<button class="btn btn-sm px-1 py-0" onclick="topFunction()" id="top-button" title="Go to top">Top</button>
 
 <div class="container p-1">
 
@@ -99,9 +99,9 @@
 
                         <!-- Cancel and Delete Batch -->
                         <div class="col-auto">
-                            <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
-                                  onsubmit="return confirm('Are you sure you want to cancel and delete all draft invoices in this batch? This action cannot be undone.');">
-                                <button type="submit" class="btn btn-sm btn-danger rounded-2 shadow">
+                            <form method="post" asp-page-handler="CancelBatch" asp-route-batchId="@Model.BatchId" style="display:inline;" id="cancelBatchForm">
+                                <button type="button" class="btn btn-sm btn-danger rounded-2 shadow"
+                                        onclick="showConfirmModal('Are you sure you want to cancel and delete all draft invoices in this batch?<br/><br/>This action cannot be undone.', function() { document.getElementById('cancelBatchForm').submit(); }, { title: 'Cancel & Delete Batch', confirmText: 'Cancel & Delete' });">
                                     <i class="bi bi-x-circle"></i> Cancel & Delete Batch
                                 </button>
                             </form>
@@ -109,9 +109,9 @@
 
                         <!-- Finalize the Batch -->
                         <div class="col-auto">
-                            <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;"
-                                  onsubmit="return confirm('Are you sure you want to finalize this batch? This will make all draft invoices active and Due (or Paid if credits applied).');">
-                                <button type="submit" class="btn btn-sm btn-success rounded-2 shadow">
+                            <form method="post" asp-page-handler="FinalizeBatch" asp-route-batchId="@Model.BatchId" style="display:inline;" id="finalizeBatchForm">
+                                <button type="button" class="btn btn-sm btn-success rounded-2 shadow"
+                                        onclick="showConfirmModal('Are you sure you want to finalize this batch?<br/><br/>This will make all draft invoices active and Due (or Paid if credits applied).', function() { document.getElementById('finalizeBatchForm').submit(); }, { title: 'Finalize Batch', confirmText: 'Finalize', dangerous: false });">
                                     <i class="bi bi-check-circle"></i> Finalize Batch
                                 </button>
                             </form>

@@ -45,9 +45,15 @@
 
             if (deleteButton) {
                 deleteButton.addEventListener('click', function (event) {
-                    if (!confirm("Are you sure you want to delete your personal data? This action cannot be undone.")) {
-                        event.preventDefault(); // Prevent the link from navigating
-                    }
+                    event.preventDefault(); // Always prevent default to show modal first
+                    showConfirmModal(
+                        'Are you sure you want to delete your personal data?<br/><br/>This action cannot be undone.',
+                        function() {
+                            // Navigate to the delete URL
+                            window.location.href = deleteButton.href;
+                        },
+                        { title: 'Delete Personal Data', confirmText: 'Delete Data' }
+                    );
                 });
             }
         });

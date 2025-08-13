@@ -239,7 +239,7 @@ public class PdfGenerationController : Controller
 
                 // --- Draw Heading and Logo on the FIRST Page ---
                 // Restored to original first page heading logic
-                string firstPageHeadingText = "Oaks Village Homeowners Association Directory";
+                string firstPageHeadingText = "Homeowners Association Directory";
                 SizeF firstPageHeadingSize = boldHeadingFont.MeasureString(firstPageHeadingText);
 
                 // Calculate the total width of the logo + spacing + text for centering

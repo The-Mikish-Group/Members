@@ -11,7 +11,7 @@ namespace Members.Controllers
 
         public IActionResult Index()
         {
-            string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Site";
+            string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
 
             // Set the default view name and message
             ViewBag.Message = "Home";
@@ -36,7 +36,7 @@ namespace Members.Controllers
             }
             try
             {
-                string siteEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE") ?? string.Empty;
+                string siteEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_HOA_CLOUD") ?? string.Empty;
 
                 // Use EmailService to send the email
                 await _emailService.SendEmailAsync(

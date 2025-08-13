@@ -13,86 +13,86 @@
     </div>
 }
 
-<div class="my-4">
+<div class="my-4 p-0">   
 
-    <div class="card m-1 p-2 shadow">
+        <div class="row justify-content-center m-0 p-0">
+            <div class="col-md-8 col-lg-7 p-0">
+                
+                <div class="card m-1 p-2 shadow">
+                    
+                    <form method="post">               
 
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-7">
-            
-                <form method="post">               
+                        <div class="card-header rounded-top shadow">
+                            <h4 class="text-black text-center mb-0">@ViewData["Title"]</h4>
+                        </div>
 
-                    <div class="card-header rounded-top shadow">
-                        <h4 class="text-black text-center mb-0">@ViewData["Title"]</h4>
-                    </div>
+                        <div class="card-body p-2">                        
 
-                    <div class="card-body p-2">                        
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                                @if (Model.IsUserPreselected)
+                            {
+                                <input type="hidden" asp-for="Input.SelectedUserID" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Member</label>
+                                    <p class="form-control shadow">@Model.TargetUserName</p>
+                                </div>
+                            }
+                            else // User not preselected, show dropdown (fallback)
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="Input.SelectedUserID" class="fw-bold"></label>
+                                    <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select shadow">
+                                        <option value="">-- Select User --</option>
+                                    </select>
+                                    <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
+                                </div>
+                            }
+                        
+                            @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                            {
+                                <input type="hidden" asp-for="ReturnUrl" />
+                            }
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                            @if (Model.IsUserPreselected)
-                        {
-                            <input type="hidden" asp-for="Input.SelectedUserID" />
+                            <!-- Invoice Date and Due Date fields -->
+                            <div class="row gy-3 mb-3">
+
+                                <!-- Invoice Date -->
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.InvoiceDate" class="fw-bold"></label>
+                                    <input asp-for="Input.InvoiceDate" class="form-control shadow" />
+                                    <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
+                                </div>
+
+                                <!-- Due Date -->
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.DueDate" class="fw-bold"></label>
+                                    <input asp-for="Input.DueDate" class="form-control shadow" />
+                                    <span asp-validation-for="Input.DueDate" class="text-danger"></span>
+                                </div>
+
+                            </div>
+
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Member</label>
-                                <p class="form-control shadow">@Model.TargetUserName</p>
+                                <label asp-for="Input.Description" class="fw-bold"></label>
+                                <input asp-for="Input.Description" class="form-control shadow" />
+                                <span asp-validation-for="Input.Description" class="text-danger"></span>
                             </div>
-                        }
-                        else // User not preselected, show dropdown (fallback)
-                        {
-                            <div class="mb-3">
-                                <label asp-for="Input.SelectedUserID" class="fw-bold"></label>
-                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select shadow">
-                                    <option value="">-- Select User --</option>
-                                </select>
-                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
-                            </div>
-                        }
                         
-                        @if (!string.IsNullOrEmpty(Model.ReturnUrl))
-                        {
-                            <input type="hidden" asp-for="ReturnUrl" />
-                        }
-
-                        <!-- Invoice Date and Due Date fields -->
-                        <div class="row gy-3 mb-3">
-
-                            <!-- Invoice Date -->
-                            <div class="col-sm-6">
-                                <label asp-for="Input.InvoiceDate" class="fw-bold"></label>
-                                <input asp-for="Input.InvoiceDate" class="form-control shadow" />
-                                <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
+                            <div class="row gy-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.AmountDue" class="fw-bold"></label>
+                                    <input asp-for="Input.AmountDue" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
+                                    <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.Type" class="fw-bold"></label>
+                                    <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select">
+                                    </select>
+                                    <span asp-validation-for="Input.Type" class="text-danger"></span>
+                                </div>
                             </div>
-
-                            <!-- Due Date -->
-                            <div class="col-sm-6">
-                                <label asp-for="Input.DueDate" class="fw-bold"></label>
-                                <input asp-for="Input.DueDate" class="form-control shadow" />
-                                <span asp-validation-for="Input.DueDate" class="text-danger"></span>
-                            </div>
-
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Input.Description" class="fw-bold"></label>
-                            <input asp-for="Input.Description" class="form-control shadow" />
-                            <span asp-validation-for="Input.Description" class="text-danger"></span>
-                        </div>
                         
-                        <div class="row gy-3 mb-3">
-                            <div class="col-sm-6">
-                                <label asp-for="Input.AmountDue" class="fw-bold"></label>
-                                <input asp-for="Input.AmountDue" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
-                                <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-6">
-                                <label asp-for="Input.Type" class="fw-bold"></label>
-                                <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select">
-                                </select>
-                                <span asp-validation-for="Input.Type" class="text-danger"></span>
-                            </div>
                         </div>
-                        
-                    </div>
 
                     <div class="card-footer rounded-bottom d-grid py-4 gap-2">
 

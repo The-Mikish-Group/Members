@@ -158,10 +158,19 @@ namespace Members.Areas.Identity.Pages.Account.Manage
 
         private string GenerateQrCodeUri(string email, string unformattedKey)
         {
+            // Get the site domain from environment variable
+            string siteDomain = Environment.GetEnvironmentVariable("SITE_DOMAIN_HOA_CLOUD");
+
+            if (string.IsNullOrEmpty(siteDomain))
+            {
+                _logger.LogError("SITE_DOMAIN_HOA_CLOUD environment variable is not set. Using default value.");
+                siteDomain = "Oaks-Village.com"; // Fallback to default if environment variable is not set
+            }
+
             return string.Format(
                 CultureInfo.InvariantCulture,
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode("Oaks-Village.com"),
+                _urlEncoder.Encode(siteDomain),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

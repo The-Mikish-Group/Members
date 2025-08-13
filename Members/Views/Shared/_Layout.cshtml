@@ -14,8 +14,8 @@
 
 @{
     // This Site
-    string siteURL = Environment.GetEnvironmentVariable("SITE_URL_OAKS_VILLAGE")!;
-    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL_HOA_CLOUD")!;
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD")!;
     string siteOrg = Environment.GetEnvironmentVariable("SITE_ORG")!;
 
     // Set Site Name and Description (Change as needed)
@@ -180,6 +180,165 @@
 
         // Export for external use
         window.adjustFooterPosition = adjustFooterPositionFlexible;
+    </script>
+
+    <!-- Global Confirmation Modal -->
+    <div class="modal fade" id="globalConfirmModal" tabindex="-1" aria-labelledby="globalConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="globalConfirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="globalConfirmModalBody">
+                    Are you sure you want to perform this action?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger rounded-2 shadow" id="globalConfirmButton">
+                        <i class="bi bi-check-circle"></i> Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Void Modal (with reason input) -->
+    <div class="modal fade" id="globalVoidModal" tabindex="-1" aria-labelledby="globalVoidModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="globalVoidModalLabel">Confirm Void</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="globalVoidModalBody" class="mb-3">
+                        Are you sure you want to void this item?
+                    </div>
+                    <div class="mb-3">
+                        <label for="globalVoidReasonInput" class="form-label fw-bold" id="globalVoidReasonLabel">Reason:</label>
+                        <textarea class="form-control" id="globalVoidReasonInput" rows="3" placeholder="Enter reason for voiding..."></textarea>
+                        <div class="text-danger small mt-1" id="globalVoidReasonError" style="display: none;">A reason is required.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary rounded-2 shadow" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger rounded-2 shadow" id="globalVoidButton">
+                        <i class="bi bi-check-circle"></i> Void
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global confirmation modal functionality
+        window.showConfirmModal = function(message, onConfirm, options = {}) {
+            const modal = document.getElementById('globalConfirmModal');
+            const modalBody = document.getElementById('globalConfirmModalBody');
+            const modalTitle = document.getElementById('globalConfirmModalLabel');
+            const confirmButton = document.getElementById('globalConfirmButton');
+            
+            // Set message and title
+            modalBody.innerHTML = message;
+            modalTitle.textContent = options.title || 'Confirm Action';
+            
+            // Set confirm button text and style
+            const buttonText = options.confirmText || 'Confirm';
+            const buttonClass = options.dangerous !== false ? 'btn-danger' : 'btn-success';
+            confirmButton.className = `btn btn-sm ${buttonClass} rounded-2 shadow`;
+            confirmButton.innerHTML = `<i class="bi bi-check-circle"></i> ${buttonText}`;
+            
+            // Remove any existing event listeners
+            const newConfirmButton = confirmButton.cloneNode(true);
+            confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+            
+            // Add new event listener
+            newConfirmButton.addEventListener('click', function() {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                }
+                if (typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+            
+            // Show the modal
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+            
+            return false; // Prevent default form submission
+        };
+
+        // Enhanced confirm function that replaces browser's confirm()
+        window.confirmAction = function(message, onConfirm, options = {}) {
+            return showConfirmModal(message, onConfirm, options);
+        };
+
+        // Global void modal functionality with reason input
+        window.showVoidModal = function(message, reasonLabel, onConfirm, options = {}) {
+            const modal = document.getElementById('globalVoidModal');
+            const modalBody = document.getElementById('globalVoidModalBody');
+            const modalTitle = document.getElementById('globalVoidModalLabel');
+            const reasonLabelElement = document.getElementById('globalVoidReasonLabel');
+            const reasonInput = document.getElementById('globalVoidReasonInput');
+            const reasonError = document.getElementById('globalVoidReasonError');
+            const voidButton = document.getElementById('globalVoidButton');
+            
+            // Set message, title, and reason label
+            modalBody.innerHTML = message;
+            modalTitle.textContent = options.title || 'Confirm Void';
+            reasonLabelElement.textContent = reasonLabel || 'Reason:';
+            
+            // Set void button text
+            const buttonText = options.confirmText || 'Void';
+            voidButton.innerHTML = `<i class="bi bi-check-circle"></i> ${buttonText}`;
+            
+            // Clear previous input and errors
+            reasonInput.value = '';
+            reasonError.style.display = 'none';
+            reasonInput.classList.remove('is-invalid');
+            
+            // Remove any existing event listeners
+            const newVoidButton = voidButton.cloneNode(true);
+            voidButton.parentNode.replaceChild(newVoidButton, voidButton);
+            
+            // Add new event listener
+            newVoidButton.addEventListener('click', function() {
+                const reason = reasonInput.value.trim();
+                if (!reason) {
+                    reasonError.style.display = 'block';
+                    reasonInput.classList.add('is-invalid');
+                    reasonInput.focus();
+                    return;
+                }
+                
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) {
+                    bootstrapModal.hide();
+                }
+                
+                if (typeof onConfirm === 'function') {
+                    onConfirm(reason);
+                }
+            });
+            
+            // Show the modal and focus the reason input
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+            
+            // Focus the reason input after modal is shown
+            modal.addEventListener('shown.bs.modal', function() {
+                reasonInput.focus();
+            }, { once: true });
+            
+            return false; // Prevent default form submission
+        };
     </script>
     
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>    

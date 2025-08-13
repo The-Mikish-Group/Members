@@ -15,14 +15,15 @@
     <div class="row justify-content-center m-1 p-0">
         <div class="col-md-8 col-lg-6 m-0 p-0">
 
-            <!-- Status Messsage -->
+            <!-- Error Status Messages -->
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert-success alert-dismissible fade show my-2" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
             }
+
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert-danger alert-dismissible fade show my-2" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
             }
 
             <!-- Card with Shadow -->
@@ -139,11 +140,13 @@
                                                   asp-controller="PdfCategory"
                                                   asp-action="DeleteMemberCategoryConfirmed"
                                                   asp-route-id="@item.CategoryID"
-                                                  class="d-inline d-flex justify-content-end w-100">
+                                                  class="d-inline d-flex justify-content-end w-100"
+                                                  id="deleteForm_@item.CategoryID">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit"
+                                                <button type="button"
                                                         class="btn btn-sm btn-delete delete-button px-2 py-2"
-                                                        onclick="return confirm('Are you sure you want to delete the category: @item.CategoryName?');">
+                                                        data-category-name="@item.CategoryName" data-form-id="deleteForm_@item.CategoryID"
+                                                        onclick="confirmDeleteCategory(this)">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -269,6 +272,19 @@
         // --- Standalone Helper Functions (Global Scope) ---
         // These functions are called directly from HTML onclick attributes,
         // so they MUST be in the global scope.
+
+        // Function to confirm category deletion
+        function confirmDeleteCategory(button) {
+            const categoryName = button.getAttribute('data-category-name');
+            const formId = button.getAttribute('data-form-id');
+            showConfirmModal(
+                'Are you sure you want to delete the category: <strong>' + categoryName + '</strong>?<br/><br/>This action cannot be undone.',
+                function() {
+                    document.getElementById(formId).submit();
+                },
+                { title: 'Delete Category', confirmText: 'Delete' }
+            );
+        }
 
         // Function to populate and show the rename category modal
         function showRenameCategoryModal(categoryId, categoryName, sortOrder) {

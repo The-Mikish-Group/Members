@@ -78,86 +78,99 @@
 
                     <!-- Contact -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="contact" data-sort-value="contact">Assigned Billing Contact</a>
-                        @if (Model.CurrentSort == "contact_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "contact_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="contact" data-sort-value="contact">
+                                Assigned Billing Contact</a>
+                            @if (Model.CurrentSort == "contact_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "contact_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
 
                     <!-- Plot ID-->
                     <th class="text-nowrap text-start">
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="plotid" data-sort-value="Asset Identifier">Asset Identifier</a>
-                        @if (Model.CurrentSort == "plotid_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "plotid_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="plotid" data-sort-value="Asset Identifier">Asset Identifier</a>
+                            @if (Model.CurrentSort == "plotid_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "plotid_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
 
                     <!-- Assessment Fee -->
                     <th class="text-nowrap text-end">
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
-                        @if (Model.CurrentSort == "fee_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "fee_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="fee" data-sort-value="fee">Assessment Fee</a>
+                            @if (Model.CurrentSort == "fee_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "fee_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
                     
                     <!-- Description -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
-                        @if (Model.CurrentSort == "desc_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "desc_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="desc" data-sort-value="desc">Description</a>
+                            @if (Model.CurrentSort == "desc_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "desc_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
 
                     <!-- Created -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
-                        @if (Model.CurrentSort == "created_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "created_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="created" data-sort-value="created">Date Created</a>
+                            @if (Model.CurrentSort == "created_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "created_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
 
                     <!-- Last Updated -->
                     <th>
-                        <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
-                        @if (Model.CurrentSort == "updated_asc")
-                        {
-                            <i class="bi bi-arrow-down ms-1"></i>
-                        }
-                        else if (Model.CurrentSort == "updated_desc")
-                        {
+                        <span class="text-nowrap">
+                            <a class="asset-sort-link text-decoration-none text-nowrap" href="#" data-column-key="updated" data-sort-value="updated">Last Updated</a>
+                            @if (Model.CurrentSort == "updated_asc")
+                            {
+                                <i class="bi bi-arrow-down ms-1"></i>
+                            }
+                            else if (Model.CurrentSort == "updated_desc")
+                            {
 
-                            <i class="bi bi-arrow-up ms-1"></i>
-                        }
+                                <i class="bi bi-arrow-up ms-1"></i>
+                            }
+                        </span>
                     </th>
 
                     <!-- Billing -->
@@ -228,7 +241,7 @@
 
                         <!-- Delete Asset -->
                         <td class="text-nowrap py-2 pe-2 text-center">
-                            <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;"><button type="submit" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="return confirm('Are you sure you want to delete Billable Asset \'@asset.PlotID.Replace("'", "\'")\' (ID: @asset.BillableAssetID)? This action cannot be undone.');"><i class="bi bi-trash"></i></button></form>
+                            <form method="post" asp-page-handler="DeleteAsset" asp-route-assetId="@asset.BillableAssetID" style="display: inline;" id="deleteAssetForm_@asset.BillableAssetID"><button type="button" class="btn btn-sm btn-delete" title="Delete Asset: @asset.PlotID" onclick="showConfirmModal('Are you sure you want to delete Billable Asset <strong>@Html.Raw(Html.Encode(asset.PlotID))</strong> (ID: @asset.BillableAssetID)?<br/><br/>This action cannot be undone.', function() { document.getElementById('deleteAssetForm_@asset.BillableAssetID').submit(); }, { title: 'Delete Billable Asset', confirmText: 'Delete' });"><i class="bi bi-trash"></i></button></form>
                         </td>
 
                     </tr>

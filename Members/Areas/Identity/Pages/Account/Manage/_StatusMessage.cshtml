@@ -3,28 +3,8 @@
 @if (!String.IsNullOrEmpty(Model))
 {
     var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
-    var cardColor = Model.StartsWith("Error") ? "bg-danger text-white" : "bg-success text-white"; // Set card color    
-    var cardSize = Model.Length > 50 ? "col-12" : "col-12"; // Adjust card size based on message length
-
-    <div class="row justify-content-center">
-        <div class="@cardSize">
-            <div class="card @cardColor shadow rounded mx-2 p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span>@Model</span>
-                    <button type="button" class="btn-close btn-close-white no-left-radius" data-bs-dismiss="card" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
+    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        @Model
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const closeButtons = document.querySelectorAll('.btn-close[data-bs-dismiss="card"]');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    this.closest('.card').parentElement.remove(); // Remove the parent row
-                });
-            });
-        });
-    </script>
 }

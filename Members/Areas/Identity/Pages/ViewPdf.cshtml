@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "View PDF";    
 
-    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")!;
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD")!;
 
 }
 
@@ -80,12 +80,16 @@
                 renderPage(1);
 
                 downloadButton.addEventListener('click', function() {
-                    if (confirm("Are you sure you want to download this PDF?")) {
-                        var link = document.createElement('a');
-                        link.href = '/File/DownloadPdf?fileName=' + fileName;
-                        link.download = fileName;
-                        link.click();
-                    }
+                    showConfirmModal(
+                        'Are you sure you want to download this PDF?',
+                        function() {
+                            var link = document.createElement('a');
+                            link.href = '/File/DownloadPdf?fileName=' + fileName;
+                            link.download = fileName;
+                            link.click();
+                        },
+                        { title: 'Download PDF', confirmText: 'Download', dangerous: false }
+                    );
                 });
             });
         });

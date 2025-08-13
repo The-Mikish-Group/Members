@@ -32,10 +32,10 @@ html > body header {
 
 .navbar-overhang {
     position: absolute;
-    top: 22px;
+    top: 14px;
     transform: translateY(-10%);
 }
-
+   
 .siteNameBig, .siteNameSmall > a {
     padding-left: 120px;
 }
@@ -48,12 +48,32 @@ svg, #container {
 
 /* Svg Nav Bar Small Logo */
 .logo {
-    height: 60px;
+    height: 72px;
 }
 
 /* SVG Nav Bar 'Name' Logo */
 .nbLogo {
     height: 18px;
+}
+
+/* cloudlg */
+.cloudlg {
+    height:140px;
+}
+
+/* cloudbannersm */
+.cloudbannersm {
+    height: 30px;
+}
+
+/* cloudiconsm */
+.cloudiconsm {
+    height: 14px;
+}
+
+/* cloudsm */
+.cloudsm {
+    height: 30px;
 }
 
 /* Svg Footer Logo */

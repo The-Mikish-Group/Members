@@ -291,6 +291,19 @@ table th a .bi,
 
 /* #region Nav-Link and Pills */
 
+.footer-nav-link {
+    color: var(--footer-nav-link-text, #424143) !important;
+}
+
+    .footer-nav-link:active,
+    .footer-nav-link:hover,
+    .footer-nav-link:focus {
+        text-decoration: none;
+        font-weight: 500;
+        color: var(--nav-link-hover-text, #424143) !important;
+    }
+
+
 .my-nav-link,
 .nav-link {
     color: var(--nav-link-text, #424143) !important;    
@@ -302,25 +315,30 @@ table th a .bi,
     .nav-link:active,
     .nav-link:hover,
     .nav-link:focus {
+        text-decoration: none;
         font-weight: 500;
         color: var(--nav-link-hover-text, #424143) !important;
     }
 
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-    background-color: var(--nav-pills-active-bg, #28a745);
-    color: var(--nav-pills-active-text, #FFFFFF);
+.nav-pill-link {
+    text-decoration: none;
+    background-color: var(--nav-pill-link-bg, #28a745);
+    color: var(--nav-pill-link-text, #FFFFFF);
 }
 
-.nav-pills .nav-link {
-    color: var(--nav-pills-text, #28a745);
-}
-
-    .nav-pills .nav-link:hover {
-        background-color: var(--nav-pills-hover-bg, #90EE90);
-        color: var(--nav-pills-hover-text, #FFFFFF);
+    .nav-pill-link:active {
+        text-decoration: none;
+        font-weight: 500;
+        background-color: var(--nav-pill-link-active-bg, #28a745);
+        color: var(--nav-pill-link-active-text, #FFFFFF);
     }
 
+    .nav-pill-link:hover {
+        text-decoration: none;
+        font-weight: 500;
+        background-color: var(--nav-pill-link-hover-bg, #90EE90);
+        color: var(--nav-pills-hover-text, #FFFFFF);
+    }
 
 /* #endregion Nav-links and Pills */
 

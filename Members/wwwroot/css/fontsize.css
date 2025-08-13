@@ -1,6 +1,19 @@
 
 
 /* #region Font Sizes (-fs) */
+/* cloudbannersm */
+
+.cloudbannersm {
+    height: 30px;
+}
+
+.fs-banner {
+    font-size: 28px !important;
+}
+
+.fs-banner-body {
+    font-size: 16px !important;
+}
 
 .about-text-fs {
     font-size: 14px;
@@ -23,6 +36,14 @@
 /* #region (BS -sm- ) (min-width: 575px) and (max-width: 768px) Smaller tablets */
 @media (min-width: 575px) {
 
+    .fs-banner {
+        font-size: 44px !important;
+    }
+
+    .fs-banner-body {
+        font-size: 16px !important;
+    }
+
     .about-text-fs {
         font-size: 16px;
     }
@@ -36,6 +57,19 @@
 
 /* #region (BS -md- ) (min-width: 768.01px) and (max-width: 991px) Large tablet styles */
 @media (min-width: 768.01px) {
+
+    /* cloudbannersm */
+    .cloudbannersm {
+        height: 30px;
+    }
+
+    .fs-banner {
+        font-size: 60px !important;
+    }
+
+    .fs-banner-body {
+        font-size: 20px !important;
+    }
 
     .about-text-fs {
         font-size: 18px;
@@ -51,6 +85,19 @@
 /* #region (BS -lx- ) (min-width: 1200px) Medium Desktop*/
 @media (min-width: 1200px) {
 
+    /* cloudbannersm */
+    .cloudbannersm {
+        height: 40px;
+    }
+
+    .fs-banner {
+        font-size: 72px !important;
+    }
+
+    .fs-banner-body {
+        font-size: 20px !important;
+    }
+
     .about-text-fs {
         font-size: 20px;
     }
@@ -64,6 +111,14 @@
 
 /* #region (BS - xlg- ) (min-width: 1399.98px) Large Desktop */
 @media (min-width: 1399.98px) {
+
+    .fs-banner {
+        font-size: 72px !important;
+    }
+
+    .fs-banner-body {
+        font-size: 24px !important;
+    }
 
     .about-text-fs {
         font-size: 22px;
