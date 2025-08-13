@@ -34,6 +34,7 @@
     <Compile Remove="wwwroot\Galleries\2025 Memorial Day\**" />
     <Compile Remove="wwwroot\Galleries\Chapel\**" />
     <Compile Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <Compile Remove="wwwroot\Galleries\Sunsets\**" />
     <Compile Remove="wwwroot\Galleries\Traveling\**" />
     <Compile Remove="wwwroot\js\ej2\**" />
     <Content Remove="Areas\Admin\Pages\Accounting\**" />
@@ -45,6 +46,7 @@
     <Content Remove="wwwroot\Galleries\2025 Memorial Day\**" />
     <Content Remove="wwwroot\Galleries\Chapel\**" />
     <Content Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <Content Remove="wwwroot\Galleries\Sunsets\**" />
     <Content Remove="wwwroot\Galleries\Traveling\**" />
     <Content Remove="wwwroot\js\ej2\**" />
     <EmbeddedResource Remove="Areas\Admin\Pages\Accounting\**" />
@@ -56,6 +58,7 @@
     <EmbeddedResource Remove="wwwroot\Galleries\2025 Memorial Day\**" />
     <EmbeddedResource Remove="wwwroot\Galleries\Chapel\**" />
     <EmbeddedResource Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <EmbeddedResource Remove="wwwroot\Galleries\Sunsets\**" />
     <EmbeddedResource Remove="wwwroot\Galleries\Traveling\**" />
     <EmbeddedResource Remove="wwwroot\js\ej2\**" />
     <None Remove="Areas\Admin\Pages\Accounting\**" />
@@ -67,6 +70,7 @@
     <None Remove="wwwroot\Galleries\2025 Memorial Day\**" />
     <None Remove="wwwroot\Galleries\Chapel\**" />
     <None Remove="wwwroot\Galleries\Oaks-Village\**" />
+    <None Remove="wwwroot\Galleries\Sunsets\**" />
     <None Remove="wwwroot\Galleries\Traveling\**" />
     <None Remove="wwwroot\js\ej2\**" />
   </ItemGroup>
@@ -108,6 +112,9 @@
     <Content Remove="Views\Home\Financials.cshtml" />
     <Content Remove="Views\Home\Minutes.cshtml" />
     <Content Remove="Views\Home\Privacy.cshtml" />
+    <Content Remove="Views\Info\About.cshtml" />
+    <Content Remove="Views\Info\Facilities.cshtml" />
+    <Content Remove="Views\Info\MoreLinks.cshtml" />
     <Content Remove="Views\PdfCategory\CategoriesMenu.cshtml" />
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
     <Content Remove="Views\Shared\Galleries.cshtml" />
