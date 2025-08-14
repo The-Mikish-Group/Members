@@ -152,15 +152,15 @@ namespace Members.Areas.Identity.Pages.Account
             // Apply default values from environment variables if the Input properties are empty
             if (string.IsNullOrEmpty(Input.City))
             {
-                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY_HOA_CLOUD") ?? string.Empty;
+                Input.City = Environment.GetEnvironmentVariable("DEFAULT_CITY_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.State))
             {
-                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE_HOA_CLOUD") ?? string.Empty;
+                Input.State = Environment.GetEnvironmentVariable("DEFAULT_STATE_OAKS_VILLAGE") ?? string.Empty;
             }
             if (string.IsNullOrEmpty(Input.ZipCode))
             {
-                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_HOA_CLOUD") ?? string.Empty;
+                Input.ZipCode = Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_OAKS_VILLAGE") ?? string.Empty;
             }
         }
 
@@ -279,8 +279,8 @@ namespace Members.Areas.Identity.Pages.Account
             try
             {
                 // Get environment variables for dynamic content
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
-                string siteUrl = Environment.GetEnvironmentVariable("SITE_URL_HOA_CLOUD") ?? string.Empty;
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Oaks-Village";
+                string siteUrl = Environment.GetEnvironmentVariable("SITE_URL_OAKS_VILLAGE") ?? string.Empty;
 
                 await _emailSender.SendEmailAsync(
                     email,
@@ -332,7 +332,7 @@ namespace Members.Areas.Identity.Pages.Account
                 }
 
                 // Get environment variables for dynamic content
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Oaks-Village";
 
                 string emailSubject = $"{siteName} - New Member Registration";
                 string emailBody = $"<!DOCTYPE html>" +

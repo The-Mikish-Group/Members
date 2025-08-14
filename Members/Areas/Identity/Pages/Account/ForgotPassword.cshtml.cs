@@ -41,11 +41,11 @@ namespace Members.Areas.Identity.Pages.Account
                 }
 
                 // Get the site name from environment variable
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD");
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE");
 
                 if (string.IsNullOrEmpty(siteName))
                 {
-                    _logger.LogError("SITE_NAME_HOA_CLOUD environment variable is not set. Using default value.");
+                    _logger.LogError("SITE_NAME_OAKS_VILLAGE environment variable is not set. Using default value.");
                     siteName = "Oaks-Village"; // Fallback to default if environment variable is not set
                 }
 

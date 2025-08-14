@@ -28,15 +28,15 @@ namespace Members.Controllers
             try
             {
                 // Get environment variables (matching EmailService variable names)
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Oaks-Village";
 
                 // Log environment variables (matching your EmailService)
                 _logger.LogInformation("Testing email with the following configuration:");
-                _logger.LogInformation("SMTP_SERVER_HOA_CLOUD: {Server}", Environment.GetEnvironmentVariable("SMTP_SERVER_HOA_CLOUD"));
+                _logger.LogInformation("SMTP_SERVER_OAKS_VILLAGE: {Server}", Environment.GetEnvironmentVariable("SMTP_SERVER_OAKS_VILLAGE"));
                 _logger.LogInformation("SMTP_PORT: {Port}", Environment.GetEnvironmentVariable("SMTP_PORT"));
-                _logger.LogInformation("SMTP_USERNAME_HOA_CLOUD: {Username}", Environment.GetEnvironmentVariable("SMTP_USERNAME_HOA_CLOUD"));
+                _logger.LogInformation("SMTP_USERNAME_OAKS_VILLAGE: {Username}", Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE"));
                 _logger.LogInformation("SMTP_SSL: {SSL}", Environment.GetEnvironmentVariable("SMTP_SSL"));
-                _logger.LogInformation("SITE_NAME_HOA_CLOUD: {SiteName}", siteName);
+                _logger.LogInformation("SITE_NAME_OAKS_VILLAGE: {SiteName}", siteName);
 
                 await _emailService.SendEmailAsync(
                     testEmail,

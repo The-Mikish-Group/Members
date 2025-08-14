@@ -80,11 +80,11 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             if (Input?.NewEmail != null && Input.NewEmail != email)
             {
                 // Get the site name from environment variable
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Oaks-Village";
 
-                if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD")))
+                if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")))
                 {
-                    _logger.LogError("SITE_NAME_HOA_CLOUD environment variable is not set. Using default value.");
+                    _logger.LogError("SITE_NAME_OAKS_VILLAGE environment variable is not set. Using default value.");
                 }
 
                 var userId = await _userManager.GetUserIdAsync(user);
@@ -154,11 +154,11 @@ namespace Members.Areas.Identity.Pages.Account.Manage
             }
 
             // Get the site name from environment variable
-            string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD") ?? "Oaks-Village";
+            string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE") ?? "Oaks-Village";
 
             if (string.IsNullOrEmpty(siteName))
             {
-                _logger.LogError("SITE_NAME_HOA_CLOUD environment variable is not set. Using default value.");
+                _logger.LogError("SITE_NAME_OAKS_VILLAGE environment variable is not set. Using default value.");
                 siteName = "Oaks-Village"; // Fallback to default if environment variable is not set
             }
 

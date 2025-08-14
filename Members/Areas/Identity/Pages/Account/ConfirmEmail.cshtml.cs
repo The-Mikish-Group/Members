@@ -47,11 +47,11 @@ namespace Members.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 // Get the site name from environment variable
-                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD");
+                string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE");
 
                 if (string.IsNullOrEmpty(siteName))
                 {
-                    _logger.LogError("SITE_NAME_HOA_CLOUD environment variable is not set. Using default value.");
+                    _logger.LogError("SITE_NAME_OAKS_VILLAGE environment variable is not set. Using default value.");
                     siteName = "Oaks-Village"; // Fallback to default if environment variable is not set
                 }
 
@@ -117,12 +117,12 @@ namespace Members.Areas.Identity.Pages.Account
                 {
                     string emailSubjectAdmin = $"{siteName} HOA - Email Confirmation Notification";
                     string emailBodyAdmin;
-                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_HOA_CLOUD");
+                    string adminEmail = Environment.GetEnvironmentVariable("SMTP_USERNAME_OAKS_VILLAGE");
 
                     if (string.IsNullOrEmpty(adminEmail))
                     {
                         // Handle the case where the environment variable is not set
-                        _logger.LogError("SMTP_USERNAME_HOA_CLOUD environment variable is not set. Cannot send admin notification.");
+                        _logger.LogError("SMTP_USERNAME_OAKS_VILLAGE environment variable is not set. Cannot send admin notification.");
                         return Page(); // Or handle this error as appropriate for your application
                     }
 

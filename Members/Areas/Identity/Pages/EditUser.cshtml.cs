@@ -169,9 +169,9 @@ namespace Members.Areas.Identity.Pages
                 return RedirectToPage("./Users");
             }
             await LoadUserAsync(user);
-            Input.City ??= Environment.GetEnvironmentVariable("DEFAULT_CITY_HOA_CLOUD");
-            Input.State ??= Environment.GetEnvironmentVariable("DEFAULT_STATE_HOA_CLOUD");
-            Input.ZipCode ??= Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_HOA_CLOUD");
+            Input.City ??= Environment.GetEnvironmentVariable("DEFAULT_CITY_OAKS_VILLAGE");
+            Input.State ??= Environment.GetEnvironmentVariable("DEFAULT_STATE_OAKS_VILLAGE");
+            Input.ZipCode ??= Environment.GetEnvironmentVariable("DEFAULT_ZIPCODE_OAKS_VILLAGE");
             return Page();
         }
         public async Task<IActionResult> OnPostAsync()

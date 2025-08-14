@@ -1,6 +1,6 @@
 ﻿@{
-    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD")!;
-    string siteURL = Environment.GetEnvironmentVariable("SITE_URL_HOA_CLOUD")!;
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL_OAKS_VILLAGE")!;
    
     ViewData["Title"] = "Contact Us";
     ViewData["Canonical"] = siteURL + "/Info/Contact";
@@ -17,7 +17,7 @@
 </head>
 
 <!-- Logo Image -->
-
+<partial name="_PartialBannerLogo" />
 
 <div class="my-4 m-0 p-0">
     <div class="row justify-content-center m-1 p-0">
@@ -52,7 +52,7 @@
                         <div class="invalid-feedback">Please enter your full name.</div>
                     </div>
 
-                    <!-- Email -->
+                    <!-- Emasil -->
                     <div class="form-floating mb-3">
                         <input type="email" class="form-control" id="email" name="Email" required>
                         <label for="email" class="fw-bold">Your Email</label>
@@ -108,27 +108,30 @@
 
                 <!-- Contact Card -->
                 <div class="text-black my-4">
-                    <div class="card rounded-2 mx-auto rounded p-3 shadow" style="max-width: 350px;">
+                    <div class="card-body rounded-2 mx-auto rounded p-3 shadow" style="max-width: 350px;">
                         <div class="d-flex flex-column">
 
-                            <div class="mb-2 text-center">
-                                <strong>The Mikish Group</strong><br>
+                            <div class="mb-2 ps-3">
+                                <strong>Chad Pritchett, HOA President</strong><br>
                             </div>
 
-                            <div class="mb-3 fs-2 text-center">
-                                <img class="cloudsm" src="~/images/svg/logos/Cloudleft.png" /><strong> HOA-Cloud </strong><img class="cloudsm" src="~/images/svg/logos/CloudRight.svg" />
+                            <div class="mb-3 ps-5">
+                                1515 Isis Lake Dr<br>
+                                Avon Park FL 33825
                             </div>
 
-                            <div class="mb-1 text-center">
+                            <div class="mb-1 ps-3">
                                 <strong>
-                                    Message us today!
+                                    To visit Oaks Village, enter the clubhouse address in your GPS:
                                 </strong>
                             </div>
-                            @*
-                            <div class="pb-2 ps-5">                                
+
+                            <div class="pb-2 ps-5">
+                                1042 N Brainerd<br>
+                                Avon Park FL 33825
                             </div>
 
-                             <div class="ps-4 text-center">
+                            <div class="ps-4 text-center">
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Open Google Maps">
                                     <button style="color: #3C599B; border: none; background-color: transparent; width: 200px; border-radius: 8px; padding-left: 20px; text-align: left;"
                                             onclick="window.open('https://maps.app.goo.gl/hGys3ThSijPrvDUB6', '_blank');">
@@ -136,16 +139,17 @@
                                         <b>Google Maps</b>
                                     </button>
                                 </span>
-                            </div> *@
+                            </div>
                         </div>
                     </div>
                 </div>
 
- 
+               
             </div>
         </div>
     </div>
 </div>
+
 
 <script>
     (function () {

@@ -112,9 +112,6 @@
     <Content Remove="Views\Home\Financials.cshtml" />
     <Content Remove="Views\Home\Minutes.cshtml" />
     <Content Remove="Views\Home\Privacy.cshtml" />
-    <Content Remove="Views\Info\About.cshtml" />
-    <Content Remove="Views\Info\Facilities.cshtml" />
-    <Content Remove="Views\Info\MoreLinks.cshtml" />
     <Content Remove="Views\PdfCategory\CategoriesMenu.cshtml" />
     <Content Remove="Views\PdfGeneration\MemberDirectoryPdf.cshtml" />
     <Content Remove="Views\Shared\Galleries.cshtml" />
