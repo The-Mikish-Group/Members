@@ -84,8 +84,7 @@ hr {
 
 /* #region Tables */
 thead th,
-thead th a,
-thead th a i {
+thead th a {
     background-color: var(--table-header-bg, #FFFFFF);
     color: var(--table-header-text, #4d4b3b);
 }
@@ -162,31 +161,6 @@ table th a .bi,
 }
 
 /* #endregion Pagination */
-
-/* #region Top Button */
-#top-button {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 30px;
-    z-index: 99;
-    font-size: 18px;
-    border: none;
-    outline: none;
-    background-color: #C72D27; /* bg-red-dark*/
-    color: white;
-    cursor: pointer;
-    padding: 8px 24px;
-    border-radius: 4px;
-}
-
-    #top-button:hover {
-        background-color: #4A4B4C; /* bg-gray-dark */
-    }
-
-    #top-button:active {
-        background-color: #C72D27; /* bg-red-dark*/
-    }
 
 .siteNameBig, .siteNameSmall, nav-link, .nav-text > a {
     padding-left: 120px;

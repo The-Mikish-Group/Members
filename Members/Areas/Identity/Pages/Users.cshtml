@@ -9,7 +9,7 @@
     ViewData["Title"] = "Manage Members";
 
     <!-- Site Name -->
-    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")!;
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_HOA_CLOUD")!;
 }
 
 <!-- Must be an Admin or Manager -->
@@ -1026,12 +1026,12 @@ else
                  showExtraFieldsCheckbox.checked = showExtraFieldsHidden.value === "True";
              }
 
-            // Handle Live Search Input (uses AJAX)
+            // Handle Live Search Input (uses AJAX with debounce)
             // Ensure necessary elements exist
             if (searchInput && searchForm && pageNumberInput && searchTermInput && clearSearch) {
-                 // Use debounce to delay the AJAX request
+                 
+                 // Debounced AJAX update function for keystroke-by-keystroke search
                  const debouncedAjaxUpdate = debounce(function() {
-
                      // Reset to the first page on search input change
                      if (pageNumberInput) pageNumberInput.value = '1';
 
@@ -1039,20 +1039,18 @@ else
                      updateAllHiddenFields();
                      saveScrollPosition();
                      updateTableAjax(); // Call the AJAX update function
-                 }, 100); // Adjust delay (milliseconds) as needed for live search responsiveness
+                 }, 400); // Longer delay for slow connections but still responsive
 
                  searchInput.addEventListener('input', function() {
                      clearSearch.style.display = this.value ? 'block' : 'none';
-                     debouncedAjaxUpdate(); // Call the debounced AJAX update function
+                     debouncedAjaxUpdate(); // Trigger keystroke-by-keystroke search
                  });
 
                  // Handle Enter key press on search input
                  searchInput.addEventListener('keydown', function(event) {
                      if (event.key === 'Enter') {
+                         event.preventDefault(); // Prevent default form submission
                          
-                         // Prevent default form submission
-                         event.preventDefault(); 
-
                          // Reset to the first page on Enter
                          if (pageNumberInput) pageNumberInput.value = '1';
                          
@@ -1085,7 +1083,7 @@ else
                     // updateAllHiddenFields will sync the cleared searchInput to searchTermInput
                     updateAllHiddenFields();
                     saveScrollPosition();
-                    updateTableAjax();
+                    updateTableAjax(); // Use AJAX for instant clearing
 
                 });
 
@@ -1104,7 +1102,7 @@ else
                     // and also ensure searchTerm is synced.
                     updateAllHiddenFields();
                     saveScrollPosition(); 
-                    updateTableAjax();    // Call the AJAX update function
+                    updateTableAjax(); // Use AJAX for responsive toggling
                     
                 });
             }

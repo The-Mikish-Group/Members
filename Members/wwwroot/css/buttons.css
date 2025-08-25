@@ -203,24 +203,40 @@
     display: none;
     position: fixed;
     bottom: 20px;
-    right: 30px;
+    right: 20px;
     z-index: 99;
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
     border: none;
     outline: none;
-    background-color: #C72D27; /* bg-red-dark*/
+    background-color: #5a9d6b;
     color: white;
     cursor: pointer;
-    padding: 8px 24px;
-    border-radius: 4px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
     #top-button:hover {
-        background-color: #4A4B4C; /* bg-gray-dark */
+        background-color: #265039;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     }
 
     #top-button:active {
-        background-color: #C72D27; /* bg-red-dark*/
+        background-color: #40996d;  Original green 
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* For when display is set to block by JavaScript */
+    #top-button[style*="block"] {
+        display: flex !important;
     }
 
 /* Responsive Nav colors */

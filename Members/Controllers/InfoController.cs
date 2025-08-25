@@ -83,12 +83,13 @@ namespace Members.Controllers
             return View();
         }
 
-        public IActionResult MoreLinks()
-        {
-            ViewBag.Message = "More Links";
-            ViewData["ViewName"] = ViewBag.Message;
-            return View();
-        }
+        // OBSOLETE: Replaced with dynamic Links/MoreLinks system
+        // public IActionResult MoreLinks()
+        // {
+        //     ViewBag.Message = "More Links";
+        //     ViewData["ViewName"] = ViewBag.Message;
+        //     return View();
+        // }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

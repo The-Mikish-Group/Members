@@ -16,6 +16,10 @@ namespace Members.Data
         public DbSet<BillableAsset> BillableAssets { get; set; }
         public DbSet<CreditApplication> CreditApplications { get; set; }
         public DbSet<ColorVar> ColorVars { get; set; }
+        
+        // More Links System DbSets
+        public DbSet<LinkCategory> LinkCategories { get; set; }
+        public DbSet<CategoryLink> CategoryLinks { get; set; }
 
         // Task System DbSets
         public DbSet<AdminTask> AdminTasks { get; set; }

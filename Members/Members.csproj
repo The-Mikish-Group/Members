@@ -26,6 +26,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Areas\Admin\Pages\Accounting\**" />
+    <Compile Remove="Areas\Identity\Pages\Old files\**" />
     <Compile Remove="Data\Migrations\**" />
     <Compile Remove="Pdf\**" />
     <Compile Remove="ProtectedFiles\**" />
@@ -38,6 +39,7 @@
     <Compile Remove="wwwroot\Galleries\Traveling\**" />
     <Compile Remove="wwwroot\js\ej2\**" />
     <Content Remove="Areas\Admin\Pages\Accounting\**" />
+    <Content Remove="Areas\Identity\Pages\Old files\**" />
     <Content Remove="Data\Migrations\**" />
     <Content Remove="Pdf\**" />
     <Content Remove="ProtectedFiles\**" />
@@ -50,6 +52,7 @@
     <Content Remove="wwwroot\Galleries\Traveling\**" />
     <Content Remove="wwwroot\js\ej2\**" />
     <EmbeddedResource Remove="Areas\Admin\Pages\Accounting\**" />
+    <EmbeddedResource Remove="Areas\Identity\Pages\Old files\**" />
     <EmbeddedResource Remove="Data\Migrations\**" />
     <EmbeddedResource Remove="Pdf\**" />
     <EmbeddedResource Remove="ProtectedFiles\**" />
@@ -62,6 +65,7 @@
     <EmbeddedResource Remove="wwwroot\Galleries\Traveling\**" />
     <EmbeddedResource Remove="wwwroot\js\ej2\**" />
     <None Remove="Areas\Admin\Pages\Accounting\**" />
+    <None Remove="Areas\Identity\Pages\Old files\**" />
     <None Remove="Data\Migrations\**" />
     <None Remove="Pdf\**" />
     <None Remove="ProtectedFiles\**" />
@@ -76,11 +80,14 @@
   </ItemGroup>
   <ItemGroup>       
     <Compile Remove="Areas\Admin\Pages\AccountsReceivable\AccountsReceivable.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\EditUser-current.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MembersGrid.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\MigrateFullName.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\Users - Copy.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\Users-current.cshtml.cs" />       
     <Compile Remove="Areas\Identity\Pages\UsersGrid.cshtml.cs" />       
+    <Compile Remove="Areas\Identity\Pages\_UsersTablePartial-current.cshtml.cs" />       
     <Compile Remove="Controllers\AdminController.cs" />       
     <Compile Remove="Controllers\PdfCategoryControllerBackup.cs" />       
     <Compile Remove="Controllers\PdfGenerationControllerBackup.cs" />       
@@ -101,12 +108,17 @@
   <ItemGroup>
     <Content Remove="Areas\Admin\Pages\AccountsReceivable\AccountsReceivable.cshtml" />
     <Content Remove="Areas\Identity\Pages\body.cshtml" />
+    <Content Remove="Areas\Identity\Pages\EditUser-current.cshtml" />
+    <Content Remove="Areas\Identity\Pages\EditUser-good.cshtml" />
     <Content Remove="Areas\Identity\Pages\MembersGrid.cshtml" />
     <Content Remove="Areas\Identity\Pages\MigrateFullName.cshtml" />
     <Content Remove="Areas\Identity\Pages\scripts.cshtml" />
     <Content Remove="Areas\Identity\Pages\Users - Copy %282%29.cshtml" />
     <Content Remove="Areas\Identity\Pages\Users - Copy.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users-current.cshtml" />
+    <Content Remove="Areas\Identity\Pages\Users-good.cshtml" />
     <Content Remove="Areas\Identity\Pages\UsersGrid.cshtml" />
+    <Content Remove="Areas\Identity\Pages\_UsersTablePartial-current.cshtml" />
     <Content Remove="Views\Home\Directory.cshtml" />
     <Content Remove="Views\Home\Documents.cshtml" />
     <Content Remove="Views\Home\Financials.cshtml" />

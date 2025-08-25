@@ -157,6 +157,96 @@ img {
     transition: border 0.3s ease-in-out;
 }
 
+/* #region More Links System CSS */
+
+/* Link styling */
+.link-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    color: #495057 !important;
+    border: 1px solid transparent;
+}
+
+.link-item:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #0d6efd !important;
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.link-item:hover .bi-eye {
+    color: #0d6efd !important;
+}
+
+/* Fish-Smart Card styling */
+.fish-smart-card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--card-bg, #DCEDFF) !important;
+}
+
+.fish-smart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.fish-smart-card-header {
+    background-color: var(--card-header-bg, #A3CBF6) !important;
+    border-bottom: none;
+    font-weight: 500;
+    color: #424143 !important; /* Use dark gray/black for good contrast against light blue background */
+}
+
+.fish-smart-card-body {
+    background-color: var(--card-body-bg, #F8F9FA) !important;
+    color: #424143 !important; /* Use dark gray/black for good contrast against light background */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .link-item {
+        padding: 10px 8px;
+        font-size: 0.95em;
+    }
+    
+    .card-header h5 {
+        font-size: 1.1em;
+    }
+}
+
+/* Ensure equal height columns */
+.card.h-100 {
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    flex: 1;
+}
+
+/* Admin buttons responsive spacing */
+.admin-buttons-container {
+    gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .admin-buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .admin-buttons-container .btn {
+        width: auto;
+        min-width: 150px;
+    }
+}
+
+/* #endregion More Links System CSS */
+
 /* #endregion General Site CSS Stuff */
 
 

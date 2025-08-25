@@ -1,0 +1,150 @@
+@model List<Members.Models.LinkCategory>
+@{
+    string siteName = Environment.GetEnvironmentVariable("SITE_NAME_OAKS_VILLAGE")!;
+    string siteURL = Environment.GetEnvironmentVariable("SITE_URL_OAKS_VILLAGE")!;
+
+    ViewData["Title"] = "More Links";
+    ViewData["Canonical"] = siteURL + "/Links/MoreLinks";
+    ViewData["OGDescription"] = "Useful links organized by category for our community.";
+    ViewData["Description"] = ViewData["Title"] + " " + siteName;
+    ViewData["OGTitle"] = ViewData["Title"];
+    ViewData["OGURL"] = ViewData["Canonical"];
+}
+
+<!-- View -->
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+
+<!-- Banner Logo -->
+<partial name="_PartialBannerLogo" />
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Page Header -->
+            <div class="mb-4 text-center">
+                <!-- Title Row -->
+                <h2>🔗 More Links</h2>
+                
+                <!-- Description Row -->
+                <p>Useful links organized by category</p>
+                
+                <!-- Admin/Manager Button Row -->
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <div class="mt-3 d-flex flex-wrap justify-content-center admin-buttons-container">
+                        <a href="@Url.Action("ManageCategories", "Links")" class="btn btn-primary btn-sm">
+                            <i class="bi bi-gear"></i> Manage Categories
+                        </a>
+                        <a href="@Url.Action("ManageLinks", "Links")" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-link-45deg"></i> Manage Links
+                        </a>
+                    </div>
+                }
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (ViewBag.DatabaseError != null)
+            {
+                <div class="alert alert-warning">
+                    <h4><i class="bi bi-exclamation-triangle"></i> Database Setup Required</h4>
+                    <p><strong>@ViewBag.DatabaseError</strong></p>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <p>Please run one of these database scripts:</p>
+                        <ul>
+                            <li><code>Scripts/CreateMoreLinkstables_Dev.sql</code> - For development database</li>
+                            <li><code>Scripts/CreateMoreLinkstables_Live.sql</code> - For production database</li>
+                        </ul>
+                    }
+                    <details>
+                        <summary>Technical Details</summary>
+                        <pre>@ViewBag.ErrorDetails</pre>
+                    </details>
+                </div>
+            }
+
+            @if (Model.Any())
+            {
+                <!-- Links Display in Columns -->
+                <div class="row">
+                    @foreach (var category in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <div class="card h-100 fish-smart-card">
+                                <div class="card-header fish-smart-card-header">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-folder2"></i> @category.CategoryName
+                                        @if (category.IsAdminOnly)
+                                        {
+                                            <small class="badge bg-warning text-dark ms-2">Admin Only</small>
+                                        }
+                                    </h5>
+                                </div>
+                                <div class="card-body fish-smart-card-body">
+                                    @if (category.CategoryLinks.Any())
+                                    {
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach (var link in category.CategoryLinks)
+                                            {
+                                                <li>
+                                                    <a href="@link.LinkUrl" 
+                                                       target="_blank" 
+                                                       rel="noopener noreferrer" 
+                                                       class="link-item d-flex align-items-center text-decoration-none">
+                                                        <i class="bi bi-eye text-primary me-2"></i>
+                                                        <span>@link.LinkName</span>
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <p class="mb-0">
+                                            <i class="bi bi-info-circle"></i> No links in this category yet.
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h4><i class="bi bi-info-circle"></i> No Link Categories Found</h4>
+                    <p class="mb-0">
+                        No link categories have been created yet.
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <text>Use the "Manage Categories" button above to create your first category.</text>
+                        }
+                        else
+                        {
+                            <text>Please contact an administrator to set up link categories.</text>
+                        }
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

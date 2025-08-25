@@ -66,8 +66,8 @@
                         <!-- Admin Protection on Delete Button -->
                         @if (User.IsInRole("Admin"))
                         {
-                            <!-- Delete -->
-                            <button type="submit" asp-page-handler="Delete" class="btn btn-sm btn-danger rounded-2 me-2 shadow" id="confirmDeleteButton">
+                            <!-- Delete Button - Triggers Modal -->
+                            <button type="button" class="btn btn-sm btn-danger rounded-2 me-2 shadow" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
                                 <i class="bi bi-x-circle"></i> Delete
                             </button>
                         }
@@ -88,9 +88,7 @@
                         }
 
                     </div>
-                    
-                    <hr />
-                    
+
                     <!-- Hidden Fields -->
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="ReturnUrl" />
@@ -113,7 +111,7 @@
 
                     <!-- Email Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox custom-checkbox-green shadow" id="emailConfirmedCheckbox" />
+                        <input asp-for="Input.EmailConfirmed" type="checkbox" class="form-check-input email-confirmed-checkbox shadow" id="emailConfirmedCheckbox" />
                         <label class="form-check-label" for="emailConfirmedCheckbox">Email Confirmed</label>
                     </div>
 
@@ -129,7 +127,7 @@
 
                     <!-- Phone Number Confirmed -->
                     <div class="form-check mb-3">
-                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox custom-checkbox-green shadow" id="PhoneNumberConfirmedCheckbox" />
+                        <input asp-for="Input.PhoneNumberConfirmed" type="checkbox" class="form-check-input phoneNumber-confirmed-checkbox shadow" id="PhoneNumberConfirmedCheckbox" />
                         <label class="form-check-label" for="PhoneNumberConfirmedCheckbox">Cell Phone Confirmed</label>
                     </div>
 
@@ -225,7 +223,7 @@
                         <!-- Is Billing Contact -->
                         <div class="col-6 mb-4">
                             <div class="form-check ms-2">
-                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox custom-checkbox-green shadow" id="IsBillingContactCheckbox" />
+                                <input asp-for="Input.IsBillingContact" type="checkbox" class="form-check-input isBillingContact-checkbox shadow" id="IsBillingContactCheckbox" />
                                 <label asp-for="Input.IsBillingContact" class="form-check-label"></label>
                             </div>
                             <span asp-validation-for="Input.IsBillingContact" class="text-danger"></span>
@@ -234,7 +232,7 @@
                         <!-- Two Factor Enabled -->
                         <div class="col-6 mb-4">
                             <div class="form-check mb-3">
-                                <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox custom-checkbox-green shadow" id="twoFactorEnabledCheckbox" />
+                                <input asp-for="Input.TwoFactorEnabled" type="checkbox" class="form-check-input twoFactorEnabled-checkbox shadow" id="twoFactorEnabledCheckbox" />
                                 <label class="form-check-label" asp-for="Input.TwoFactorEnabled"></label>
                                 <span asp-validation-for="Input.TwoFactorEnabled" class="text-danger"></span>
                             </div>
@@ -265,7 +263,46 @@
             transform: translateY(-50%);
         }
 
+        .form-check-input[type=checkbox].twoFactorEnabled-checkbox,
+        .form-check-input[type=checkbox].isBillingContact-checkbox,
+        .form-check-input[type=checkbox].email-confirmed-checkbox,
+        .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox,
+        .form-check-input[type=checkbox].role-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.2em;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
 
+            .form-check-input[type=checkbox].twoFactorEnabled-checkbox:checked,
+            .form-check-input[type=checkbox].isBillingContact-checkbox:checked,
+            .form-check-input[type=checkbox].email-confirmed-checkbox:checked,
+            .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked,
+            .form-check-input[type=checkbox].role-checkbox:checked {
+                background-color: #fff; /* White background when checked */
+                border-color: #28a745; /* Green border when checked */
+            }
+
+                .form-check-input[type=checkbox].twoFactorEnabled-checkbox:checked::before,
+                .form-check-input[type=checkbox].isBillingContact-checkbox:checked::before,
+                .form-check-input[type=checkbox].email-confirmed-checkbox:checked::before,
+                .form-check-input[type=checkbox].phoneNumber-confirmed-checkbox:checked::before,
+                .form-check-input[type=checkbox].role-checkbox:checked::before {
+                    content: '\2713'; /* Unicode checkmark character */
+                    display: block;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 1em;
+                    color: #28a745; /* Green checkmark */
+                }
     </style>
 }
 
@@ -427,31 +464,7 @@
 
             // Event listener for form submission to update hidden email field
             editForm.addEventListener('submit', function (event) {
-                 // Check which button was clicked using event.submitter
-                const clickedButton = event.submitter;
-
-                // If the clicked button is the delete confirmation button
-                if (clickedButton && clickedButton.id === 'confirmDeleteButton') {
-                     // Show confirmation dialog
-                    showConfirmModal(
-                        'Are you sure you want to delete this user?<br/><br/>This action cannot be undone.',
-                        function() {
-                            // Set flag to bypass confirmation on re-submission
-                            const deleteForm = document.getElementById('editUserForm');
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'ConfirmDelete';
-                            hiddenInput.value = 'true';
-                            deleteForm.appendChild(hiddenInput);
-                            deleteForm.submit();
-                        },
-                        { title: 'Delete User', confirmText: 'Delete User' }
-                    );
-                    
-                    // Always prevent default submission to show modal first
-                    event.preventDefault();
-                    return false;
-                }
+                 // Note: Delete confirmation now handled by Bootstrap modal
 
                 // For any submit button (including Save if it wasn't the delete button),
                 // update the hidden email field value from the span before submitting.
@@ -503,3 +516,62 @@
         });
     </script>
 }
+
+<!-- Fancy Bootstrap Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Delete Member
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-x-fill text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <h6 class="mb-3">Are you absolutely sure you want to delete this member?</h6>
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All member data will be permanently removed.
+                </div>
+                <p class="text-muted mb-0">
+                    Member: <strong>@(Model.Input.FirstName + " " + Model.Input.LastName)</strong><br>
+                    Email: <strong>@Model.Input.Email</strong>
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash-fill me-1"></i>Yes, Delete Member
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const editForm = document.getElementById('editForm');
+    
+    if (confirmDeleteBtn && editForm) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            // Hide the modal first
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            modal.hide();
+            
+            // Change the form action to submit to the Delete handler
+            const currentAction = editForm.action || window.location.pathname;
+            const separator = currentAction.includes('?') ? '&' : '?';
+            editForm.action = currentAction + separator + 'handler=Delete';
+            
+            // Submit the form to delete the user
+            editForm.submit();
+        });
+    }
+});
+</script>
