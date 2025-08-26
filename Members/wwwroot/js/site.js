@@ -63,33 +63,3 @@ function formatCurrencyInputOnBlur(inputElement) { // Renamed for clarity
     }
 }
 
-// Back to Top Button Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the button
-    var mybutton = document.getElementById("top-button");
-    
-    if (mybutton) {
-        // When the user scrolls down 320px from the top of the document, show the button
-        window.onscroll = function() { scrollFunction() };
-        
-        function scrollFunction() {
-            if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
-                mybutton.style.display = "block";
-            } else {
-                mybutton.style.display = "none";
-            }
-        }
-        
-        // When the user clicks on the button, scroll to the top of the document with smooth animation
-        mybutton.addEventListener('click', function() {
-            document.body.scrollTop = 0; // For Safari
-            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-            
-            // Smooth scroll for modern browsers
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-});

@@ -6,7 +6,9 @@
 }
 
 <!-- Top Button placed here -->
-<button style="display:none;" class="btn btn-sm px-1 py-0" onclick="topFunction()" id="top-button" title="Go to top"><i class="bi bi-chevron-double-up"></i></button>
+<button class="btn" id="top-button" title="Go to top" style="display:none">
+    <i class="bi bi-chevron-double-up"></i>
+</button>
 
 <!-- Container -->
 <div class="my-4 px-1">
@@ -269,7 +271,7 @@
 
         function scrollFunction() {
             if (document.body.scrollTop > 320 || document.documentElement.scrollTop > 320) {
-                mybutton.style.display = "block";
+                mybutton.style.display = "flex";
             } else {
                 mybutton.style.display = "none";
             }
@@ -277,8 +279,19 @@
 
         // When the user clicks on the button, scroll to the top of the document
         function topFunction() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            // Fallback for older browsers
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
+        }
+
+        // Add click event listener
+        if (mybutton) {
+            mybutton.addEventListener('click', topFunction);
         }
 
     </script>
