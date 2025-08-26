@@ -357,7 +357,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully added new billable asset: PlotID = {PlotID}, UserID = {UserID}, AssetID = {AssetID}", newAsset.PlotID, newAsset.UserID, newAsset.BillableAssetID);
-                TempData["StatusMessage"] = $"Billable Asset '{newAsset.PlotID}' added successfully and assigned to the selected contact.";
+                TempData["AssetStatusMessage"] = $"Billable Asset '{newAsset.PlotID}' added successfully and assigned to the selected contact.";
             }
             catch (DbUpdateException ex)
             {
@@ -498,7 +498,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             {
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully updated billable asset: PlotID = {PlotID}, AssetID = {AssetID}", assetToUpdate.PlotID, assetToUpdate.BillableAssetID); // assetToUpdate.PlotID is the original, unchanged PlotID
-                TempData["StatusMessage"] = $"Billable Asset '{assetToUpdate.PlotID}' updated successfully.";
+                TempData["AssetStatusMessage"] = $"Billable Asset '{assetToUpdate.PlotID}' updated successfully.";
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -539,7 +539,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 _context.BillableAssets.Remove(assetToDelete);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully deleted billable asset: PlotID = {PlotID}, AssetID = {AssetID}", assetToDelete.PlotID, assetToDelete.BillableAssetID);
-                TempData["StatusMessage"] = $"Billable Asset '{assetToDelete.PlotID}' (ID: {assetToDelete.BillableAssetID}) has been deleted.";
+                TempData["AssetStatusMessage"] = $"Billable Asset '{assetToDelete.PlotID}' (ID: {assetToDelete.BillableAssetID}) has been deleted.";
             }
             catch (DbUpdateException ex)
             {

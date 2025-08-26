@@ -8,11 +8,19 @@
 <!-- Title -->
 <h2 class="text-black my-4 text-center"><i class="bi bi-house"></i> @ViewData["Title"]</h2>
 
-<!-- Error Status Messages --> 
-@if (TempData["StatusMessage"] != null)
+<!-- Asset Status Messages --> 
+@if (TempData["AssetStatusMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["StatusMessage"]?.ToString())
+        @Html.Raw(TempData["AssetStatusMessage"]?.ToString())
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["SuccessMessage"]?.ToString())
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }

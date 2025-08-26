@@ -222,8 +222,8 @@
                     <div class="col-9">
                         <input type="text" 
                             class="form-control" 
-                            id="newCategoryName"
-                            name="newCategoryName" />
+                            id="editCategoryName"
+                            name="editCategoryName" />
                     </div>
 
                 </div>
@@ -234,7 +234,7 @@
                         <label for="newSortOrder" class="col-form-label fw-bold">Sort Order:</label>
                     </div>
                     <div class="col-9">
-                        <input type="number" class="form-control" id="newSortOrderInput" name="newSortOrder" min="0">
+                        <input type="number" class="form-control" id="editSortOrderInput" name="editSortOrder" min="0">
                     </div>
                 </div>
 
@@ -289,11 +289,11 @@
 
             // Populate modal inputs with data from the clicked category row
             document.getElementById('renameCategoryId').value = categoryId;
-            document.getElementById('newCategoryName').value = categoryName;
-            document.getElementById('newSortOrderInput').value = sortOrder;
+            document.getElementById('editCategoryName').value = categoryName;
+            document.getElementById('editSortOrderInput').value = sortOrder;
 
             // Ensure the sort order input allows 0 or more (or 1 if you prefer)
-            document.getElementById('newSortOrderInput').setAttribute('min', '0');
+            document.getElementById('editSortOrderInput').setAttribute('min', '0');
 
 
             // Initialize and show the Bootstrap modal
@@ -309,8 +309,8 @@
 
             // Get values from modal inputs
             var categoryId = document.getElementById('renameCategoryId').value;
-            var newCategoryName = document.getElementById('newCategoryName').value;
-            var newSortOrder = document.getElementById('newSortOrderInput').value;
+            var newCategoryName = document.getElementById('editCategoryName').value;
+            var newSortOrder = document.getElementById('editSortOrderInput').value;
 
             var url = '@Url.Action("EditManagerCategory", "ManagerPdfCategory")';
 
