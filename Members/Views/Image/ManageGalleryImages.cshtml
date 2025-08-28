@@ -40,20 +40,41 @@
             <h2 class="text-black mb-2 mt-4 ps-2"><i class="bi bi-cloud-arrow-up"></i> Upload a New Image</h2>
 
             <!-- Upload a New Image Form -->
-            <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data">
+            <form asp-controller="Image" asp-action="UploadImage" method="post" enctype="multipart/form-data" class="p-3">
                 <input type="hidden" name="galleryName" value="@currentGalleryName" />
 
-                <div class="input-group">
-                    
-                    <!-- Multiple File Input -->
-                    <input type="file" name="ImageFiles" class="form-control" accept="image/*" required multiple>
-
-                        <!-- Upload Button -->
-                    <button type="submit" class="btn btn-success rounded-2 no-left-radius">
-                            <i class="bi bi-cloud-arrow-up"></i>
+                <!-- Drag and Drop Zone -->
+                <div id="dropZone" class="drag-drop-zone mb-3">
+                    <div class="drag-drop-content">
+                        <i class="bi bi-cloud-arrow-up drag-drop-icon"></i>
+                        <h5 class="drag-drop-title">Drag & Drop Images Here</h5>
+                        <p class="drag-drop-subtitle">or click to browse files</p>
+                        <button type="button" class="btn btn-outline-primary" id="browseButton">
+                            <i class="bi bi-folder2-open"></i> Browse Files
                         </button>
-
+                    </div>
+                    <div class="drag-drop-overlay" id="dragOverlay">
+                        <div class="drag-drop-overlay-content">
+                            <i class="bi bi-download text-white"></i>
+                            <h4 class="text-white">Drop images to upload</h4>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Traditional File Input (Hidden) -->
+                <input type="file" name="ImageFiles" class="d-none" accept="image/*" multiple id="fileInput">
+
+                <!-- Upload Controls -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                        <span id="selectedFilesText" class="text-muted">No files selected</span>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="uploadButton" disabled>
+                        <span id="uploadButtonIcon"><i class="bi bi-cloud-arrow-up"></i></span>
+                        <span id="uploadButtonText">Upload</span>
+                    </button>
+                </div>
+
                 @Html.AntiForgeryToken()
             </form>
         </div>
@@ -208,7 +229,62 @@
         /* Remove the top border of the modal footer to get rid of the line above the buttons */
         .modal-footer {
             border-top: none;
-        }        
+        }
+
+        /* Drag and Drop Styles */
+        .drag-drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+
+        .drag-drop-zone:hover, .drag-drop-zone.drag-over {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+        }
+
+        .drag-drop-icon {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .drag-drop-title {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .drag-drop-subtitle {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .drag-drop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 123, 255, 0.9);
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .drag-drop-overlay.show {
+            display: flex;
+        }
+
+        .drag-drop-overlay-content {
+            text-align: center;
+        }
                
     </style>
 }
@@ -230,7 +306,102 @@
             );
         }
 
+        // Elements for drag and drop
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const dropZone = document.getElementById('dropZone');
+        const dragOverlay = document.getElementById('dragOverlay');
+        const browseButton = document.getElementById('browseButton');
+        const selectedFilesText = document.getElementById('selectedFilesText');
+
+        // File input change handler
+        fileInput.addEventListener('change', function() {
+            updateSelectedFilesText();
+            toggleUploadButton();
+        });
+
+        function updateSelectedFilesText() {
+            const fileCount = fileInput.files.length;
+            if (fileCount === 0) {
+                selectedFilesText.textContent = 'No files selected';
+            } else if (fileCount === 1) {
+                selectedFilesText.textContent = '1 file selected';
+            } else {
+                selectedFilesText.textContent = fileCount + ' files selected';
+            }
+        }
+
+        function toggleUploadButton() {
+            uploadButton.disabled = fileInput.files.length === 0;
+        }
+
+        // Drag and Drop Event Handlers
+        function setupDragAndDrop() {
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                document.addEventListener(eventName, preventDefaults, false);
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+            
+            // Click to browse
+            dropZone.addEventListener('click', () => fileInput.click());
+            browseButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            dropZone.classList.add('drag-over');
+            dragOverlay.classList.add('show');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('drag-over');
+            dragOverlay.classList.remove('show');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            // Convert FileList to Array and filter for images
+            const imageFiles = Array.from(files).filter(file => {
+                return file.type.startsWith('image/');
+            });
+
+            if (imageFiles.length > 0) {
+                // Create a new FileList with only image files
+                const dataTransfer = new DataTransfer();
+                imageFiles.forEach(file => dataTransfer.items.add(file));
+                fileInput.files = dataTransfer.files;
+                
+                updateSelectedFilesText();
+                toggleUploadButton();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize drag and drop
+            setupDragAndDrop();
+
             // Select all alerts that we want to auto-hide
             var alertsToAutoHide = document.querySelectorAll('.auto-hide-alert');
 

@@ -42,6 +42,22 @@ namespace Members.Controllers
             return Path.Combine(GetGalleryPath(galleryName), thumbnailFileName);
         }
 
+        // Helper method to get image dimensions
+        private (int Width, int Height) GetImageDimensions(string imagePath)
+        {
+            try
+            {
+                using var image = Image.Load(imagePath);
+                return (image.Width, image.Height);
+            }
+            catch (Exception)
+            {
+                // If we can't read the image dimensions, return default values
+                // This will put problematic images at the top (height = 0)
+                return (0, 0);
+            }
+        }
+
         // Helper method to generate a thumbnail for an image
         private static async Task GenerateThumbnail(string imagePath, string thumbnailPath)
         {
@@ -155,8 +171,8 @@ namespace Members.Controllers
 
             var imageFiles = new List<ImageViewModel>();
 
-            // Get all image files (excluding thumbnails) in the gallery directory
-            var filesInGallery = Directory.GetFiles(galleryPath)
+            // Get all image files (excluding thumbnails) in the gallery directory with their dimensions
+            var filesWithDimensions = Directory.GetFiles(galleryPath)
                                             .Where(f => !f.Contains("_thumb", StringComparison.OrdinalIgnoreCase) &&
                                                         (f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                                                          f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
@@ -164,8 +180,17 @@ namespace Members.Controllers
                                                          f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
                                                          f.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
                                                          f.EndsWith(".webp", StringComparison.OrdinalIgnoreCase)))
-                                            .OrderBy(f => Path.GetFileName(f))
+                                            .Select(f => new
+                                            {
+                                                FilePath = f,
+                                                FileName = Path.GetFileName(f),
+                                                Dimensions = GetImageDimensions(f)
+                                            })
+                                            .OrderBy(f => f.Dimensions.Height)  // Sort by height first
+                                            .ThenBy(f => f.FileName)            // Then by filename
                                             .ToList();
+
+            var filesInGallery = filesWithDimensions.Select(f => f.FilePath).ToList();
 
             // --- Thumbnail Recreation Check ---
             foreach (var filePath in filesInGallery)
