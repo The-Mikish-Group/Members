@@ -82,12 +82,12 @@
 
             @if (Model.Any())
             {
-                <!-- Links Display in Columns -->
-                <div class="row">
+                <!-- Links Display in Masonry Layout -->
+                <div class="masonry-container">
                     @foreach (var category in Model)
                     {
-                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                            <div class="card h-100 fish-smart-card">
+                        <div class="masonry-item">
+                            <div class="card fish-smart-card">
                                 <div class="card-header fish-smart-card-header">
                                     <h5 class="mb-0">
                                         <i class="bi bi-folder2"></i> @category.CategoryName

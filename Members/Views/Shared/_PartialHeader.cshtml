@@ -25,12 +25,17 @@
     }  
 }  
 
+@{
+    // Cache-busting parameter to match _Layout.cshtml
+    string cacheBuster = "?v=" + DateTime.Now.ToString("yyyyMMddHH");
+}
+
 <header>
+    <!-- Hidden image for Facebook - MUST be the very first image on page -->
+    <img src="/Images/LinkImages/OaksvillageShare.jpg@(cacheBuster)" alt="Oaks Village - Homeowners Association" style="visibility: hidden; position: absolute; top: 0; left: 0; width: 1200px; height: 630px; z-index: -1000;" />
     
     <!-- Navbar -->  
     <nav class="navbar navbar-expand-lg navbar-header-bg position-relative px-0">
-        <!-- Hidden image for Facebook - must be first image on page -->
-        <img src="/Images/LinkImages/OaksvillageShare.jpg" alt="Oaks Village - Homeowners Association" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
         <div class="d-flex flex-grow-1 ps-2">  
             
             <!-- Set to show on lg -->  

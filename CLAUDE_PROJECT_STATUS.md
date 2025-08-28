@@ -135,7 +135,36 @@ Framework: ASP.NET Core 9.0
 - Consider additional UI/UX enhancements based on user feedback
 - Monitor for any regression issues in updated functionality
 
-## Recent Session Updates (2025-08-28)
+## Recent Session Updates (2025-08-28 Evening)
+
+### ✅ **Facebook Open Graph Image Fix - RESOLVED**
+**Problem**: Facebook Sharing Debugger was ignoring og:image meta tags and selecting wrong images
+**Solution Applied**:
+- Repositioned hidden image as very first HTML element in `_PartialHeader.cshtml`
+- Updated image dimensions from 1000x1000 to 1200x630 (Facebook optimal ratio)
+- Changed styling from `position: absolute; left: -9999px` to `visibility: hidden`
+- Added cache-busting parameters to force Facebook re-scraping
+- Updated meta tag dimensions to match actual image size
+
+**Result**: Facebook Sharing Debugger now consistently detects the correct OaksvillageShare.jpg image
+
+**Files Modified**:
+- `Views/Shared/_PartialHeader.cshtml` - Hidden image positioning and dimensions
+- `Views/Shared/_Layout.cshtml` - Meta tag dimensions and cache busting
+
+### ✅ **More Links Layout Analysis - DOCUMENTED**
+**Current Implementation**: Uses CSS Masonry Layout (column-count) instead of Bootstrap grid
+**Behavior**: 
+- Creates 3 columns on desktop (2 on tablet, 1 on mobile)
+- Fills columns by height balance, not item count
+- Categories distributed based on content height, not sequence
+- Third column may appear empty if content balances well with 2 columns
+
+**Trade-off Confirmed**: Variable card heights (desired) vs predictable column placement
+
+---
+
+## Previous Session Updates (2025-08-28 Morning)
 
 ### ✅ **Major Accomplishments This Session:**
 
