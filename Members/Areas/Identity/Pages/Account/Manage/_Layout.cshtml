@@ -36,58 +36,76 @@
     }
 }
 
-<div class="container my-4 mx-2 ps-0 text-center">
-    <div class="row gx-0 gy-0 justify-content-center">
-        <div class="col-md-4 pe-0">
-            <div class="row gx-0 gy-0 text-start">
-                <div class="col-12 my-3">
-                    <a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a>
+<!-- Modern Tab-Based Profile Navigation -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            
+            <!-- Page Title -->
+            <div class="text-center mb-4">
+                <h1 class="text-black">
+                    <i class="bi bi-person-gear"></i> Account Management
+                </h1>
+                <p class="text-muted">Manage your profile, security, and privacy settings</p>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="card mb-4">
+                <div class="card-header bg-transparent pb-0 border-bottom-0">
+                    <ul class="nav nav-tabs" role="tablist">
+                        
+                        <!-- Profile Tab -->
+                        <li class="nav-item">
+                            <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" 
+                               asp-page="./Index" role="tab">
+                                <i class="bi bi-person-fill me-2"></i>Profile
+                            </a>
+                        </li>
+                        
+                        <!-- Email Tab -->
+                        <li class="nav-item">
+                            <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" 
+                               asp-page="./Email" role="tab">
+                                <i class="bi bi-envelope-fill me-2"></i>Email
+                            </a>
+                        </li>
+                        
+                        <!-- Password Tab -->
+                        <li class="nav-item">
+                            <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" 
+                               asp-page="./ChangePassword" role="tab">
+                                <i class="bi bi-lock-fill me-2"></i>Password
+                            </a>
+                        </li>
+                        
+                        <!-- Two-Factor Tab -->
+                        <li class="nav-item">
+                            <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" 
+                               asp-page="./TwoFactorAuthentication" role="tab">
+                                <i class="bi bi-shield-check me-2"></i>Security
+                            </a>
+                        </li>
+
+                        <!-- Billing Tab (if applicable) -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Member"))
+                        {
+                            @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member")))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="Member" asp-page="/MyBilling" role="tab">
+                                        <i class="bi bi-card-list me-2"></i>Billing
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
                 </div>
                 
-                <div class="col-12 my-3">
-                    <a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a>
+                <!-- Tab Content -->
+                <div class="card-body">
+                    @RenderBody()
                 </div>
-           
-                <div class="col-12 my-3">
-                    <a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a>
-                </div>
-            
-                <div class="col-12 my-3">
-                    <a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi bi-shield-fill-check"></i> Two-factor authentication</a>
-                </div>           
-
-                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Member"))
-                    {
-                    @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member")))
-                    {
-                        <div class="col-12 my-3">
-                                <a class="p-2 nav-pill-link text-decoration-none rounded-2" asp-area="Member" asp-page="/MyBilling" id="MyBilling" title="My Billing"><i class="bi bi-card-list"></i> My Billing</a>
-                            </div>                        
-                        }
-                    }
-                </div>
-
-            @* <ul class="nav nav-pills flex-column mb-2 me-0 ms-3 text-start"> *@
-               @*  <li class="nav-item mb-2"><a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index"><i class="bi bi-person-fill"></i> Profile</a></li>
-                <li class="nav-item my-2"><a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email"><i class="bi bi-envelope-fill"></i> Email</a></li>
-                <li class="nav-item my-2"><a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword"><i class="bi bi-lock-fill"></i> Password</a></li>
-                <li class="nav-item my-2"><a class="p-2 text-decoration-none rounded-2 nav-pill-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication"><i class="bi bi bi-shield-fill-check"></i> Two-factor authentication</a></li>
-                *@
-
-                @* Take the following line out with the leading bracket (and ending bracket below) for Members to see *@
-                @* @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Member")) *@
-                @* { *@
-                    @* @if (userProfile != null && userProfile.IsBillingContact && (User.IsInRole("Member"))) *@
-                    @* { *@
-                        @* <li class="nav-item my-2">
-                            <a class="p-2 nav-pill-link text-decoration-none rounded-2" asp-area="Member" asp-page="/MyBilling" id="MyBilling" title="My Billing"><i class="bi bi-card-list"></i> My Billing</a>
-                        </li> *@
-                    @* }
-                }
-            </ul> *@
-        </div>
-        <div class="col-md-8 container pe-0">
-            @RenderBody()
+            </div>
         </div>
     </div>
 </div>

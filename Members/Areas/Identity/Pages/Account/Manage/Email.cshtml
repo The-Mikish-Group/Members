@@ -5,18 +5,12 @@
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<!-- Email Edit -->
-<div class="row gx-0 gy-0">
-
-    <div class="col-lg-8">
-
-        <h1 class="text-black pb-2 text-center">Manage your account</h1>
-
-        <div class="card mx-0 mb-2 rounded p-2 shadow">
-            <h2 class="text-black mb-4 text-center">
-                <i class="bi bi-envelope-fill"></i> @ViewData["Title"]
-            </h2>
-            <form id="email-form" method="post">
+<!-- Email Form -->
+<div class="row justify-content-center">
+    <div class="col-12 m-1">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form id="email-form" method="post">
                 @if (Model.IsEmailConfirmed)
                 {
                             <div class="form-floating input-group mb-3">
@@ -41,17 +35,20 @@
                     <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
                 </div>
 
-                <!-- Cancel -->
-                <a href="~/" class="btn btn-sm btn-back rounded-2 me-2 shadow">
-                    <i class="bi bi-box-arrow-left"></i> Cancel
-                </a>
+                <div class="text-end">
+                    <!-- Cancel -->
+                    <a href="~/" class="btn btn-sm btn-back rounded-2 me-2 shadow">
+                        <i class="bi bi-box-arrow-left"></i> Cancel
+                    </a>
 
-                <!-- Change Email -->
-                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary rounded-2 me-2 shadow">
-                    <i class="bi bi-envelope-arrow-right"></i> Change email
-                </button>
+                    <!-- Change Email -->
+                    <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-sm btn-primary rounded-2 me-2 shadow">
+                        <i class="bi bi-envelope-arrow-right"></i> Change email
+                    </button>
+                </div>
                 
             </form>
+            </div>
         </div>
         <partial name="_StatusMessage" for="StatusMessage" />
     </div>    
