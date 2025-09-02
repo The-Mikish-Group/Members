@@ -33,16 +33,23 @@
                             {
                                 <input type="hidden" asp-for="Input.SelectedUserID" />
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Member</label>
-                                    <p class="form-control shadow">@Model.TargetUserName</p>
+                                    <label class="form-label fw-bold text-warning fs-5">
+                                        <i class="bi bi-person-circle text-warning"></i> Member
+                                    </label>
+                                    <p class="form-control shadow border-warning border-2 fs-5 fw-semibold text-center" 
+                                       style="background-color: #fffbf0; padding: 12px;">@Model.TargetUserName</p>
                                 </div>
                             }
                             else // User not preselected, show dropdown (fallback)
                             {
                                 <div class="mb-3">
-                                    <label asp-for="Input.SelectedUserID" class="fw-bold"></label>
-                                    <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select shadow">
-                                        <option value="">-- Select User --</option>
+                                    <label asp-for="Input.SelectedUserID" class="form-label fw-bold text-warning fs-5">
+                                        <i class="bi bi-person-circle text-warning"></i> @Html.DisplayNameFor(m => m.Input.SelectedUserID)
+                                    </label>
+                                    <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" 
+                                            class="form-select shadow border-warning border-2 fs-5" 
+                                            style="background-color: #fffbf0;">
+                                        <option value="">-- Select Member --</option>
                                     </select>
                                     <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
                                 </div>
@@ -53,42 +60,65 @@
                                 <input type="hidden" asp-for="ReturnUrl" />
                             }
 
+                            <!-- Amount Due and Invoice Type - Most Important Fields First -->
+                            <div class="row gy-3 mb-3">
+                                <!-- Amount Due - Primary Field -->
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.AmountDue" class="form-label fw-bold text-success fs-5">
+                                        <i class="bi bi-currency-dollar text-success"></i> @Html.DisplayNameFor(m => m.Input.AmountDue)
+                                    </label>
+                                    <input asp-for="Input.AmountDue" type="text" 
+                                           class="form-control shadow border-success border-2 fs-4 text-center fw-bold" 
+                                           style="background-color: #f0f9ff;" 
+                                           placeholder="0.00"
+                                           oninput="cleanCurrencyInputOnTheFly(this)" 
+                                           onblur="formatCurrencyInputOnBlur(this)" />
+                                    <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
+                                </div>
+                                <!-- Invoice Type -->
+                                <div class="col-sm-6">
+                                    <label asp-for="Input.Type" class="form-label fw-bold text-info fs-6">
+                                        <i class="bi bi-tags text-info"></i> @Html.DisplayNameFor(m => m.Input.Type)
+                                    </label>
+                                    <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" 
+                                            class="shadow form-select border-info border-2 fs-5" 
+                                            style="background-color: #f0feff;">
+                                    </select>
+                                    <span asp-validation-for="Input.Type" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label asp-for="Input.Description" class="form-label fw-bold text-primary fs-6">
+                                    <i class="bi bi-card-text text-primary"></i> @Html.DisplayNameFor(m => m.Input.Description)
+                                </label>
+                                <input asp-for="Input.Description" class="form-control shadow border-primary border-2 fs-5" 
+                                       style="background-color: #f8f9ff;" 
+                                       placeholder="Enter invoice description..." />
+                                <span asp-validation-for="Input.Description" class="text-danger"></span>
+                            </div>
+
                             <!-- Invoice Date and Due Date fields -->
                             <div class="row gy-3 mb-3">
-
                                 <!-- Invoice Date -->
                                 <div class="col-sm-6">
-                                    <label asp-for="Input.InvoiceDate" class="fw-bold"></label>
-                                    <input asp-for="Input.InvoiceDate" class="form-control shadow" />
+                                    <label asp-for="Input.InvoiceDate" class="form-label fw-bold text-secondary fs-6">
+                                        <i class="bi bi-calendar-plus text-secondary"></i> @Html.DisplayNameFor(m => m.Input.InvoiceDate)
+                                    </label>
+                                    <input asp-for="Input.InvoiceDate" class="form-control shadow border-secondary border-2 fs-5" 
+                                           style="background-color: #fafafa;" />
                                     <span asp-validation-for="Input.InvoiceDate" class="text-danger"></span>
                                 </div>
 
                                 <!-- Due Date -->
                                 <div class="col-sm-6">
-                                    <label asp-for="Input.DueDate" class="fw-bold"></label>
-                                    <input asp-for="Input.DueDate" class="form-control shadow" />
+                                    <label asp-for="Input.DueDate" class="form-label fw-bold text-danger fs-6">
+                                        <i class="bi bi-calendar-x text-danger"></i> @Html.DisplayNameFor(m => m.Input.DueDate)
+                                    </label>
+                                    <input asp-for="Input.DueDate" class="form-control shadow border-danger border-2 fs-5" 
+                                           style="background-color: #fff5f5;" />
                                     <span asp-validation-for="Input.DueDate" class="text-danger"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Input.Description" class="fw-bold"></label>
-                                <input asp-for="Input.Description" class="form-control shadow" />
-                                <span asp-validation-for="Input.Description" class="text-danger"></span>
-                            </div>
-                        
-                            <div class="row gy-3 mb-3">
-                                <div class="col-sm-6">
-                                    <label asp-for="Input.AmountDue" class="fw-bold"></label>
-                                    <input asp-for="Input.AmountDue" type="text" class="form-control shadow" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
-                                    <span asp-validation-for="Input.AmountDue" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-6">
-                                    <label asp-for="Input.Type" class="fw-bold"></label>
-                                    <select asp-for="Input.Type" asp-items="Html.GetEnumSelectList<Members.Models.InvoiceType>()" class="shadow form-select">
-                                    </select>
-                                    <span asp-validation-for="Input.Type" class="text-danger"></span>
                                 </div>
                             </div>
                         
@@ -110,7 +140,9 @@
                                 </div>
 
                                 <div class="col-6 text-center">
-                                    <button type="submit" class="btn btn-sm btn-success rounded-2 shadow"><i class="bi bi-plus-square"></i> Create Invoice</button>
+                                    <button type="submit" class="px-3 btn btn-lg btn-success rounded-3 shadow-lg fs-4 fw-bold">
+                                        <i class="bi bi-plus-square me-2"></i> Create Invoice
+                                    </button>
                                 </div>
                             </div>
 

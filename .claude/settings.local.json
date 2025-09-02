@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run lint)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Views\\Links/**)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Views\\Links/**)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Controllers/**)",
+      "Read(D:\\Projects\\Repos\\Hoa-Cloud\\Members\\Views\\Links/**)",
+      "Read(D:\\Projects\\Repos\\Hoa-Cloud\\Members\\Controllers/**)",
+      "Read(D:\\Projects\\Repos\\Hoa-Cloud\\Members\\Controllers/**)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Controllers/**)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Views\\Links/**)",
+      "Read(D:\\Projects\\Repos\\Fish-Smart\\Members\\Views\\Links/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

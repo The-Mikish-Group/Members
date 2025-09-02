@@ -75,7 +75,7 @@
                     </ul>  
                 </li>
                 
-                @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DataEntry")))
                 {
 
                     <!-- Accounts Receivable Dropdown -->
@@ -90,53 +90,61 @@
                         <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-2" style="margin-top: 0; width: 235px;" aria-labelledby="accountsReceivableDropdown" data-bs-auto-close="outside">
 
                             <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:150px;" asp-area="Admin" asp-page="/AccountsReceivable/BillableAssets" title="Manage Billable Assets"><i class="bi bi-house"></i> Billable Assets</a></li>
-                            <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:165px;" asp-area="Admin" asp-page="/AccountsReceivable/CurrentBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
+                            @if (!User.IsInRole("DataEntry"))
+                            {
+                                <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width:165px;" asp-area="Admin" asp-page="/AccountsReceivable/CurrentBalances" title="Current Balances"><i class="bi bi-calculator"></i> Current Balances</a></li>
+                            }
 
-                            <!-- Invoice Draft Batches Dropdown -->
-                            <li class="nav-item dropdown">
+                            @if (!User.IsInRole("DataEntry"))
+                            {
+                                <!-- Invoice Draft Batches Dropdown -->
+                                <li class="nav-item dropdown">
 
-                                <!-- Invoice Draft Batches Toggle -->
-                                <a class="ms-2 nav-link rounded-2 dropdown-toggle text-dark ps-2 mb-2" style="width: 210px;" href="#" id="invoiceDraftBatchesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                    <i class="bi bi-files"></i> Invoice Draft Batches
-                                </a>
+                                    <!-- Invoice Draft Batches Toggle -->
+                                    <a class="ms-2 nav-link rounded-2 dropdown-toggle text-dark ps-2 mb-2" style="width: 210px;" href="#" id="invoiceDraftBatchesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <i class="bi bi-files"></i> Invoice Draft Batches
+                                    </a>
 
-                                <!-- Invoice Draft Batches -->
-                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" aria-labelledby="invoiceDraftBatchesDropdown" style="margin-top: 0; width: 225px;" aria-expanded="false" data-bs-auto-close="outside">
-                                    <li>
-                                        <a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 190px;"
-                                           href="/Admin/AccountsReceivable/CreateBatchInvoices"
-                                           title="Create Draft Batches">
-                                           <i class="bi bi-plus-square"></i> Create Draft Batches
-                                        </a>
-                                    </li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 195px;" asp-area="Admin" asp-page="/AccountsReceivable/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
-                                </ul>
+                                    <!-- Invoice Draft Batches -->
+                                    <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" aria-labelledby="invoiceDraftBatchesDropdown" style="margin-top: 0; width: 225px;" aria-expanded="false" data-bs-auto-close="outside">
+                                        <li>
+                                            <a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 190px;"
+                                               href="/Admin/AccountsReceivable/CreateBatchInvoices"
+                                               title="Create Draft Batches">
+                                               <i class="bi bi-plus-square"></i> Create Draft Batches
+                                            </a>
+                                        </li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 195px;" asp-area="Admin" asp-page="/AccountsReceivable/ReviewBatchInvoices" title="Review Batch Invoices"><i class="bi bi-list-check"></i> Review Draft Batches</a></li>
+                                    </ul>
 
-                            </li>
+                                </li>
 
-                            <!-- Reporting Dropdown -->
-                            <li class="nav-item dropdown">
+                                <!-- Reporting Dropdown -->
+                                <li class="nav-item dropdown">
 
-                                <!-- Reporting Toggle -->
-                                <a class="ms-2 nav-link rounded-2 dropdown-toggle text-dark ps-2" style="width:130px;" href="#" id="reportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                    <i class="bi bi-bar-chart-line-fill"></i> Reporting
-                                </a>
+                                    <!-- Reporting Toggle -->
+                                    <a class="ms-2 nav-link rounded-2 dropdown-toggle text-dark ps-2" style="width:130px;" href="#" id="reportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <i class="bi bi-bar-chart-line-fill"></i> Reporting
+                                    </a>
 
-                                <!-- Reporting -->
-                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 280px;" aria-labelledby="reportingDropdown" aria-expanded="false" data-bs-auto-close="outside">
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 180px;" asp-area="Admin" asp-page="/Reporting/ArAgingReport" title="A/R Aging Report"><i class="bi bi-calendar-range"></i> A/R Aging Report</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 160px;" asp-area="Admin" asp-page="/Reporting/InvoiceRegisterReport" title="Invoice Register Report"><i class="bi bi-list-ul"></i> Invoice Register</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 170px;" asp-area="Admin" asp-page="/Reporting/PaymentRegisterReport" title="Payment Register Report"><i class="bi bi-cash-coin"></i> Payment Register</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 155px;" asp-area="Admin" asp-page="/Reporting/CreditRegisterReport" title="Credit Register Report"><i class="bi bi-gift-fill"></i> Credit Register</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 165px;" asp-area="Admin" asp-page="/Reporting/LateFeeRegisterReport" title="Late Fee Register Report"><i class="bi bi-alarm-fill"></i> Late Fee Register</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 180px;" asp-area="Admin" asp-page="/Reporting/RevenueSummaryReport" title="Revenue Summary Report"><i class="bi bi-file-earmark-bar-graph-fill"></i> Revenue Summary</a></li>
-                                    <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 250px;" asp-area="Admin" asp-page="/Reporting/UserAccountStatementReport" title="Member Account Statement"><i class="bi bi-person-lines-fill"></i> Member Account Statement</a></li>
-                                </ul>
+                                    <!-- Reporting -->
+                                    <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ms-2 ps-2" style="margin-top: 0; width: 280px;" aria-labelledby="reportingDropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 180px;" asp-area="Admin" asp-page="/Reporting/ArAgingReport" title="A/R Aging Report"><i class="bi bi-calendar-range"></i> A/R Aging Report</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 160px;" asp-area="Admin" asp-page="/Reporting/InvoiceRegisterReport" title="Invoice Register Report"><i class="bi bi-list-ul"></i> Invoice Register</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 170px;" asp-area="Admin" asp-page="/Reporting/PaymentRegisterReport" title="Payment Register Report"><i class="bi bi-cash-coin"></i> Payment Register</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 155px;" asp-area="Admin" asp-page="/Reporting/CreditRegisterReport" title="Credit Register Report"><i class="bi bi-gift-fill"></i> Credit Register</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 165px;" asp-area="Admin" asp-page="/Reporting/LateFeeRegisterReport" title="Late Fee Register Report"><i class="bi bi-alarm-fill"></i> Late Fee Register</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 180px;" asp-area="Admin" asp-page="/Reporting/RevenueSummaryReport" title="Revenue Summary Report"><i class="bi bi-file-earmark-bar-graph-fill"></i> Revenue Summary</a></li>
+                                        <li><a class="nav-link text-dark rounded-2 ms-2 mb-1 ps-2" style="width: 250px;" asp-area="Admin" asp-page="/Reporting/UserAccountStatementReport" title="Member Account Statement"><i class="bi bi-person-lines-fill"></i> Member Account Statement</a></li>
+                                    </ul>
 
-                            </li>
+                                </li>
+                            }
                         </ul>
                     </li>
 
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
                     <!-- Management Dropdown -->
                     <li class="nav-item dropdown pt-0 me-1">
 
@@ -238,7 +246,8 @@
 
                         </ul>
                     </li>
-                    
+                }
+                
                 }
                  
                 @if (SignInManager.IsSignedIn(User))  

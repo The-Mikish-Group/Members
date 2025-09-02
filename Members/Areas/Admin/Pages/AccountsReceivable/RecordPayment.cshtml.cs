@@ -21,7 +21,7 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
         public string Reason { get; set; } = string.Empty;
         public DateTime CreditDate { get; set; }
     }
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,DataEntry")]
     public class RecordPaymentModel(
         ApplicationDbContext context,
         UserManager<IdentityUser> userManager,
@@ -700,6 +700,96 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                 return Redirect(ReturnUrl);
             }
             return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+        }
+
+        // Simplified payment method for DataEntry role - auto-applies to oldest invoice
+        public async Task<IActionResult> OnPostSimplePaymentAsync()
+        {
+            _logger.LogInformation("OnPostSimplePaymentAsync called. UserID: {SelectedUserID}, Amount: {Amount}", Input.SelectedUserID, Input.Amount);
+            
+            // Basic validation
+            if (!Input.PaymentDate.HasValue)
+            {
+                ModelState.AddModelError("Input.PaymentDate", "Payment Date is required.");
+            }
+            if (!Input.Amount.HasValue || Input.Amount.Value <= 0)
+            {
+                ModelState.AddModelError("Input.Amount", "Payment Amount is required and must be greater than 0.");
+            }
+            if (!Input.Method.HasValue)
+            {
+                ModelState.AddModelError("Input.Method", "Payment Method is required.");
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            var user = await _userManager.FindByIdAsync(Input.SelectedUserID);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "User not found.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            // Get the oldest unpaid invoice automatically (ordered by InvoiceDate, then by InvoiceID for tie-breaking)
+            var oldestInvoice = await _context.Invoices
+                .Where(i => i.UserID == Input.SelectedUserID &&
+                           i.Status != InvoiceStatus.Cancelled &&
+                           i.Status != InvoiceStatus.Draft &&
+                           i.AmountPaid < i.AmountDue)
+                .OrderBy(i => i.InvoiceDate)
+                .ThenBy(i => i.InvoiceID)
+                .FirstOrDefaultAsync();
+
+            if (oldestInvoice == null)
+            {
+                TempData["StatusMessage"] = "No open invoices found for this member. Payment could not be processed.";
+                return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+            }
+
+            // Auto-assign the oldest invoice
+            Input.SelectedInvoiceID = oldestInvoice.InvoiceID;
+
+            // Calculate amounts
+            decimal paymentAmount = Input.Amount!.Value;
+            decimal amountRemaining = oldestInvoice.AmountDue - oldestInvoice.AmountPaid;
+            decimal totalOutstanding = await _context.Invoices
+                .Where(i => i.UserID == Input.SelectedUserID &&
+                           i.Status != InvoiceStatus.Cancelled &&
+                           i.Status != InvoiceStatus.Draft &&
+                           i.AmountPaid < i.AmountDue)
+                .SumAsync(i => i.AmountDue - i.AmountPaid);
+
+            // Create notification messages
+            string notificationMessage = "";
+            if (paymentAmount < amountRemaining)
+            {
+                notificationMessage = $"Payment of {paymentAmount:C} applied to invoice INV-{oldestInvoice.InvoiceID:D5}. " +
+                                    $"This invoice still has {(amountRemaining - paymentAmount):C} remaining. " +
+                                    $"Total outstanding balance: {(totalOutstanding - paymentAmount):C}.";
+            }
+            else if (paymentAmount > totalOutstanding)
+            {
+                notificationMessage = $"Payment of {paymentAmount:C} exceeds total outstanding balance of {totalOutstanding:C}. " +
+                                    $"Payment will be applied to all open invoices starting with the oldest, " +
+                                    $"and any remaining amount will be credited to the account.";
+            }
+            else if (paymentAmount > amountRemaining)
+            {
+                decimal remainingAfterFirst = paymentAmount - amountRemaining;
+                notificationMessage = $"Payment of {paymentAmount:C} exceeds the oldest invoice amount of {amountRemaining:C}. " +
+                                    $"The remaining {remainingAfterFirst:C} will be automatically applied to other open invoices.";
+            }
+
+            // Store notification for display after processing
+            TempData["PaymentNotification"] = notificationMessage;
+
+            // Call the existing payment processing method
+            return await OnPostRecordNewPaymentAsync();
         }
     }
 }

@@ -82,7 +82,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table id="categoriesTable" class="table table-hover">
                                 <thead class="table-dark">
                                     <tr>
                                         <th width="5%">Order</th>
@@ -96,9 +96,14 @@
                                     @for (int i = 0; i < Model.Count; i++)
                                     {
                                         var category = Model[i];
-                                        <tr>
+                                        <tr data-category-id="@category.CategoryID">
                                             <td class="text-center">
-                                                <span class="badge bg-secondary">@category.SortOrder</span>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <span class="drag-handle me-2" title="Drag to reorder">
+                                                        <i class="bi bi-grip-vertical"></i>
+                                                    </span>
+                                                    <span class="badge bg-secondary">@category.SortOrder</span>
+                                                </div>
                                             </td>
                                             <td>
                                                 <strong>@category.CategoryName</strong>
@@ -120,47 +125,10 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <!-- Sort Order Controls -->
-                                                @if (i > 0)
-                                                {
-                                                    <form asp-action="UpdateCategorySortOrder" method="post" class="d-inline me-1">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="categoryId" value="@category.CategoryID">
-                                                        <input type="hidden" name="direction" value="up">
-                                                        <button type="submit" class="btn btn-sm btn-rename" title="Move Up">
-                                                            <i class="bi bi-arrow-up"></i>
-                                                        </button>
-                                                    </form>
-                                                }
-                                                else
-                                                {
-                                                    <button class="btn btn-sm btn-secondary me-1" disabled title="Already at top">
-                                                        <i class="bi bi-arrow-up"></i>
-                                                    </button>
-                                                }
-
-                                                @if (i < Model.Count - 1)
-                                                {
-                                                    <form asp-action="UpdateCategorySortOrder" method="post" class="d-inline me-1">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="categoryId" value="@category.CategoryID">
-                                                        <input type="hidden" name="direction" value="down">
-                                                        <button type="submit" class="btn btn-sm btn-rename" title="Move Down">
-                                                            <i class="bi bi-arrow-down"></i>
-                                                        </button>
-                                                    </form>
-                                                }
-                                                else
-                                                {
-                                                    <button class="btn btn-sm btn-secondary me-1" disabled title="Already at bottom">
-                                                        <i class="bi bi-arrow-down"></i>
-                                                    </button>
-                                                }
-
                                                 <!-- Manage Links Button -->
                                                 <a href="@Url.Action("ManageLinks", new { categoryId = category.CategoryID })" 
                                                    class="btn btn-sm btn-billing me-1" title="Manage Links for @category.CategoryName">
-                                                    <i class="bi bi-link-45deg"></i>
+                                                    <i class="bi bi-link-45deg"></i> Links
                                                 </a>
 
                                                 <!-- Delete Button -->
@@ -271,4 +239,108 @@ function confirmDelete(categoryId, categoryName, linkCount) {
 .badge.text-decoration-none:hover {
     opacity: 0.8;
 }
+
+/* Drag and drop styling */
+.sortable-ghost {
+    opacity: 0.4;
+}
+.sortable-chosen {
+    background-color: #e3f2fd !important;
+}
+.drag-handle {
+    cursor: grab;
+    padding: 0.25rem;
+}
+.drag-handle:active {
+    cursor: grabbing;
+}
+tbody tr:hover .drag-handle {
+    color: #0d6efd !important;
+}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize drag and drop for category table
+    const tbody = document.querySelector('#categoriesTable tbody');
+    if (tbody) {
+        const sortable = Sortable.create(tbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function (evt) {
+                updateCategorySortOrder();
+            }
+        });
+    }
+
+    function updateCategorySortOrder() {
+        const rows = document.querySelectorAll('#categoriesTable tbody tr');
+        const updates = [];
+        
+        rows.forEach((row, index) => {
+            const categoryId = row.getAttribute('data-category-id');
+            if (categoryId) {
+                updates.push({
+                    categoryId: parseInt(categoryId),
+                    newSortOrder: index + 1
+                });
+                
+                // Update the sort order badge
+                const badge = row.querySelector('.badge.bg-secondary');
+                if (badge) {
+                    badge.textContent = index + 1;
+                }
+            }
+        });
+
+        // Send updates to server
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value || '');
+        updates.forEach(update => {
+            formData.append('categoryIds', update.categoryId);
+            formData.append('sortOrders', update.newSortOrder);
+        });
+
+        fetch('@Url.Action("UpdateCategoriesSortOrder", "Links")', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showMessage('Categories reordered successfully!', 'success');
+            } else {
+                throw new Error(data.message || 'Failed to update sort order');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error updating sort order. Please refresh and try again.', 'error');
+        });
+    }
+
+    function showMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+});
+</script>

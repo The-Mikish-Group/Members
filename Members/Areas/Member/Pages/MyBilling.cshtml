@@ -51,7 +51,7 @@
 			}
 
 
-			@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+			@if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DataEntry"))
 			{
 				var accountingActionsDisplayStyle = Model.TargetUserIsBillingContact ? "block" : "none";
 				var myBillingReturnUrl = Url.Page("/MyBilling",
@@ -65,14 +65,17 @@
 				<div id="accountingActionsSectionOnMyBilling" style="@(string.IsNullOrEmpty(accountingActionsDisplayStyle) ? "display:none;" : $"display:{accountingActionsDisplayStyle};")" class="mb-0 mt-2">
 					<div class="row gx-2 gy-2 justify-content-center mb-3 mt-3">
 
-						<div class="col-auto">
-							<a asp-area="Admin" asp-page="/AccountsReceivable/AddInvoice"
-							   asp-route-userId="@Model.ViewedUserId"
-							   asp-route-returnUrl="@myBillingReturnUrl"
-							   class="btn btn-sm btn-success rounded-2 shadow">
-								<i class="bi bi-file-earmark-plus"></i> Invoice
-							</a>
-						</div>
+						@if (!User.IsInRole("DataEntry"))
+						{
+							<div class="col-auto">
+								<a asp-area="Admin" asp-page="/AccountsReceivable/AddInvoice"
+								   asp-route-userId="@Model.ViewedUserId"
+								   asp-route-returnUrl="@myBillingReturnUrl"
+								   class="btn btn-sm btn-success rounded-2 shadow">
+									<i class="bi bi-file-earmark-plus"></i> Invoice
+								</a>
+							</div>
+						}
 
 						<div class="col-auto">
 							<a asp-area="Admin" asp-page="/AccountsReceivable/RecordPayment"
@@ -83,16 +86,19 @@
 							</a>
 						</div>
 
-						<div class="col-auto">
-							<form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@Model.ViewedUserId" style="display:inline;" id="applyLateFeeForm">
-								<button type="button" class="btn btn-sm btn-danger rounded-2 shadow"
-										title="Apply Late Fee if Dues/Assessments are overdue"
-										onclick="showConfirmModal('Are you sure you want to attempt to apply a late fee for <strong>@Html.Raw(Html.Encode(Model.DisplayName.Replace("\'s", "")))</strong>?<br/><br/>This will check for overdue Dues/Assessments and apply a fee if appropriate.', function() { document.getElementById('applyLateFeeForm').submit(); }, { title: 'Apply Late Fee', confirmText: 'Apply Fee' });"
-										@(Model.TargetUserIsBillingContact ? "" : "disabled")>
-									<i class="bi bi-alarm"></i> Apply Late Fee
-								</button>
-							</form>
-						</div>
+						@if (!User.IsInRole("DataEntry"))
+						{
+							<div class="col-auto">
+								<form method="post" asp-page-handler="ApplyLateFee" asp-route-userId="@Model.ViewedUserId" style="display:inline;" id="applyLateFeeForm">
+									<button type="button" class="btn btn-sm btn-danger rounded-2 shadow"
+											title="Apply Late Fee if Dues/Assessments are overdue"
+											onclick="showConfirmModal('Are you sure you want to attempt to apply a late fee for <strong>@Html.Raw(Html.Encode(Model.DisplayName.Replace("\'s", "")))</strong>?<br/><br/>This will check for overdue Dues/Assessments and apply a fee if appropriate.', function() { document.getElementById('applyLateFeeForm').submit(); }, { title: 'Apply Late Fee', confirmText: 'Apply Fee' });"
+											@(Model.TargetUserIsBillingContact ? "" : "disabled")>
+										<i class="bi bi-alarm"></i> Apply Late Fee
+									</button>
+								</form>
+							</div>
+						}
 
 					</div>
 

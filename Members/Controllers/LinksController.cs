@@ -302,5 +302,67 @@ namespace Members.Controllers
             return RedirectToAction(nameof(ManageLinks), new { categoryId });
         }
 
+        // POST: /Links/UpdateCategoriesSortOrder - Batch update for drag-and-drop
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCategoriesSortOrder(int[] categoryIds, int[] sortOrders)
+        {
+            try
+            {
+                if (categoryIds == null || sortOrders == null || categoryIds.Length != sortOrders.Length)
+                {
+                    return Json(new { success = false, message = "Invalid data provided" });
+                }
+
+                for (int i = 0; i < categoryIds.Length; i++)
+                {
+                    var category = await _context.LinkCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryIds[i]);
+                    if (category != null)
+                    {
+                        category.SortOrder = sortOrders[i];
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Categories reordered successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error updating sort order: " + ex.Message });
+            }
+        }
+
+        // POST: /Links/UpdateLinksSortOrder - Batch update for drag-and-drop  
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateLinksSortOrder(int[] linkIds, int[] sortOrders)
+        {
+            try
+            {
+                if (linkIds == null || sortOrders == null || linkIds.Length != sortOrders.Length)
+                {
+                    return Json(new { success = false, message = "Invalid data provided" });
+                }
+
+                for (int i = 0; i < linkIds.Length; i++)
+                {
+                    var link = await _context.CategoryLinks.FirstOrDefaultAsync(l => l.LinkID == linkIds[i]);
+                    if (link != null)
+                    {
+                        link.SortOrder = sortOrders[i];
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Links reordered successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error updating sort order: " + ex.Message });
+            }
+        }
+
     }
 }

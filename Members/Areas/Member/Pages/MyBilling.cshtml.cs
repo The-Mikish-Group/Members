@@ -77,7 +77,7 @@ namespace Members.Areas.Member.Pages
                 return Challenge(); 
             }
             _logger.LogInformation("MyBilling.OnGetAsync: LoggedInUser: {LoggedInUserName} (ID: {LoggedInUserId})", loggedInUser.UserName, loggedInUser.Id);
-            if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+            if (!string.IsNullOrEmpty(userId) && (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DataEntry")))
             {
                 _logger.LogInformation("MyBilling.OnGetAsync: Admin/Manager viewing specific user. Attempting to find UserID: {UserIdToFind}", userId);
                 determinedTargetUser = await _userManager.FindByIdAsync(userId);

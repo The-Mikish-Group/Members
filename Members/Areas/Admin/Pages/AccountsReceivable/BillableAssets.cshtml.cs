@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Members.Areas.Admin.Pages.AccountsReceivable
 {
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager,DataEntry")]
     public class BillableAssetsModel(ApplicationDbContext context, UserManager<IdentityUser> userManager, ILogger<BillableAssetsModel> logger) : PageModel
     {
         private readonly ApplicationDbContext _context = context;
