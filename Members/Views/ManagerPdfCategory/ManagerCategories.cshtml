@@ -4,9 +4,17 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Title -->
-<div class="text-black mb-2 mt-4 text-center">
-    <h3><i class="bi bi-shield-lock-fill ms-2"></i> @ViewData["Title"]</h3>       
+<!-- Page Header -->
+<div class="mb-4">
+    <!-- 1. Page Title - Centered -->
+    <div class="text-center">
+        <h2><i class="bi bi-shield-lock-fill"></i> @ViewData["Title"]</h2>
+    </div>
+    
+    <!-- 2. Description - Centered -->
+    <div class="text-center">
+        <p>Create and organize confidential PDF categories for administrators</p>
+    </div>
 </div>
 
 <!-- Row and Column -->
@@ -92,11 +100,10 @@
                             <!-- Table Head -->
                             <thead>
                                 <tr>
-                                    <th class="header-text ps-2">Rename</th>
-                                    <th class="header-text">Category</th>
-                                    <th class="header-text text-center">Sort</th>
-                                    @* <th class="header-text text-center text-white">Visibility</th> *@
-                                    <th class="header-text text-end pe-2">Delete</th>
+                                    <th class="header-text ps-2" width="5%">Order</th>
+                                    <th class="header-text ps-2" width="5%">Rename</th>
+                                    <th class="header-text" width="65%">Category</th>
+                                    <th class="header-text text-end pe-2" width="25%">Delete</th>
                                 </tr>
                             </thead>
 
@@ -110,24 +117,29 @@
                                     data-sort-order="@item.SortOrder"
                                     id="display-row-@item.CategoryID">
 
+                                        <!-- Drag Handle and Sort Order -->
+                                        <td class="text-center py-0">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="drag-handle me-2" title="Drag to reorder">
+                                                    <i class="bi bi-grip-vertical"></i>
+                                                </span>
+                                                <span class="badge bg-secondary">@item.SortOrder</span>
+                                            </div>
+                                        </td>
+
                                         <!-- Edit Button -->
                                         <td class="edit-cell py-0">
                                             <button type="button" class="btn btn-sm btn-link btn-rename mt-1"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#renameModal"
-                                                    onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                                    data-bs-target="#renameModal">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
                                         </td>
 
                                         <!-- Category Name -->
-                                        <td class="category-name-cell text-nowrap" style="cursor:pointer;"
-                                            onclick="showRenameCategoryModal('@item.CategoryID', '@item.CategoryName', '@item.SortOrder')">
+                                        <td class="category-name-cell text-nowrap" style="cursor:pointer;">
                                             @item.CategoryName
                                         </td>
-
-                                        <!-- Sort Order -->
-                                        <td class="text-black text-center">@item.SortOrder</td>
 
                                         <!-- Delete Button -->                                        
                                         <td class="delete-cell py-0 text-end">
@@ -426,7 +438,124 @@
              // Remove the header text hiding logic as inline editing is removed
              // $('#EditHeader .header-text, #DeleteHeader .header-text').hide(); // Removed
 
+            // Add event listener for the rename button click to open the modal
+            $('#manageConfidentialCategoriesTableBody').on('click', '.btn-rename', function() {
+                 var row = $(this).closest('tr'); // Find the parent table row
+                 // Retrieve category data stored in data attributes on the table row
+                 var categoryId = row.data('category-id');
+                 var categoryName = row.data('category-name');
+                 var sortOrder = row.data('sort-order');
+
+                 // Call the global function to show the modal, passing the retrieved data
+                 showRenameCategoryModal(categoryId, categoryName, sortOrder);
+            });
+
+            // Initialize drag and drop for confidential categories table
+            const tbody = document.querySelector('#manageConfidentialCategoriesTableBody');
+            if (tbody) {
+                const sortable = Sortable.create(tbody, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    onEnd: function (evt) {
+                        updateManagerCategorySortOrder();
+                    }
+                });
+            }
+
         });
 
+        function updateManagerCategorySortOrder() {
+            const rows = document.querySelectorAll('#manageConfidentialCategoriesTableBody tr');
+            const updates = [];
+            
+            rows.forEach((row, index) => {
+                const categoryId = row.getAttribute('data-category-id');
+                if (categoryId) {
+                    updates.push({
+                        categoryId: parseInt(categoryId),
+                        newSortOrder: index + 1
+                    });
+                    
+                    // Update the sort order badge
+                    const badge = row.querySelector('.badge.bg-secondary');
+                    if (badge) {
+                        badge.textContent = index + 1;
+                    }
+                    
+                    // Update data attribute for consistency
+                    row.setAttribute('data-sort-order', index + 1);
+                }
+            });
+
+            // Send updates to server
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value || '');
+            updates.forEach(update => {
+                formData.append('categoryIds', update.categoryId);
+                formData.append('sortOrders', update.newSortOrder);
+            });
+
+            fetch('@Url.Action("UpdateManagerCategoriesSortOrder", "ManagerPdfCategory")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Confidential categories reordered successfully!', 'success');
+                    applyRowColors(); // Reapply row colors after reordering
+                } else {
+                    throw new Error(data.message || 'Failed to update sort order');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error updating sort order. Please refresh and try again.', 'error');
+            });
+        }
+
+        function showMessage(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
     </script>
+
+    <style>
+    /* Drag and drop styling */
+    .sortable-ghost {
+        opacity: 0.4;
+    }
+    .sortable-chosen {
+        background-color: #e3f2fd !important;
+    }
+    .drag-handle {
+        cursor: grab;
+        padding: 0.25rem;
+    }
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+    tbody tr:hover .drag-handle {
+        color: #0d6efd !important;
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 }

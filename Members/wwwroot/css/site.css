@@ -247,51 +247,112 @@ img {
 
 /* #endregion More Links System CSS */
 
-/* #region More Links Masonry Layout */
+/* #region More Links Responsive Layout */
 
-/* Masonry Layout CSS */
-.masonry-container {
-    column-count: 3;
-    column-gap: 1.5rem;
-    column-fill: balance;
+/* Desktop/Tablet: Column-based layout */
+.masonry-columns-desktop {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.masonry-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Mobile: Linear layout (hidden on desktop/tablet) */
+.masonry-mobile-linear {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .masonry-item {
-    display: inline-block;
     width: 100%;
-    margin-bottom: 1.5rem;
-    break-inside: avoid;
+    margin-bottom: 0;
 }
 
 .masonry-item .card {
-    break-inside: avoid;
+    height: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Responsive column adjustments */
+.masonry-item .card-body {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Tablet: 2 columns */
 @media (max-width: 1200px) {
-    .masonry-container {
-        column-count: 2;
-    }
-}
-
-@media (max-width: 768px) {
-    .masonry-container {
-        column-count: 1;
-        column-gap: 0;
+    .masonry-columns-desktop {
+        grid-template-columns: 1fr 1fr;
     }
     
-    .masonry-item {
-        margin-bottom: 1rem;
+    .masonry-column {
+        gap: 1.25rem;
+    }
+    
+    .masonry-item .card-body {
+        max-height: 350px;
     }
 }
 
-/* Ensure cards don't get cut off between columns */
-.fish-smart-card {
-    page-break-inside: avoid;
-    break-inside: avoid;
+/* Mobile: Switch to linear layout maintaining sort order */
+@media (max-width: 768px) {
+    .masonry-columns-desktop {
+        display: none;
+    }
+    
+    .masonry-mobile-linear {
+        display: flex;
+    }
+    
+    .masonry-item .card-body {
+        max-height: 300px;
+    }
 }
 
-/* #endregion More Links Masonry Layout */
+@media (max-width: 576px) {
+    .masonry-mobile-linear {
+        gap: 0.75rem;
+    }
+    
+    .masonry-item .card-body {
+        max-height: 250px;
+    }
+}
+
+/* Custom scrollbar styling for better UX */
+.masonry-item .card-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.masonry-item .card-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.masonry-item .card-body::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.masonry-item .card-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox scrollbar styling */
+.masonry-item .card-body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+/* #endregion More Links Responsive Layout */
 
 /* #endregion General Site CSS Stuff */
 

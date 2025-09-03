@@ -194,6 +194,29 @@
                                 </a>
                             </li>
 
+                            <!-- Admin Tools Dropdown -->
+                            <li class="nav-item dropdown">
+
+                                <!-- Admin Tools Toggle -->
+                                <a class="nav-link dropdown-toggle rounded-2 text-dark ps-2 mb-1" style="width:175px;" href="#" id="adminToolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                    <i class="bi bi-tools"></i> Admin Tools <span class="caret"></span>
+                                </a>
+
+                                <!-- Admin Tools -->
+                                <ul class="dropdown-menu navbar-header-dropdown-bg navbar-header-dropdown-border ps-2" style="margin-left: 155px; width: 230px;" aria-labelledby="adminToolsDropdown" data-bs-auto-close="outside">
+                                    <li>
+                                        <a class="nav-link text-dark rounded-2 mb-1 ps-2" style="width:200px;" asp-area="Admin" asp-page="/AccountsReceivable/ApplyCredits">
+                                            <i class="bi bi-arrow-repeat"></i> Apply Credits Utility
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark rounded-2 mb-1 ps-2" style="width:200px;" asp-area="Identity" asp-page="/AdminFiles">
+                                            <i class="bi bi-lock-fill"></i> Delete Protected Files
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
                             <!-- Manage PDF Documents Dropdown -->
                             <li class="nav-item dropdown">
 
@@ -235,7 +258,6 @@
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:260px;" asp-area="" asp-controller="Manager" asp-action="ManagerListCategories" title="Confidential PDF Documents"><i class="bi bi-file-earmark-plus"></i> Confidential PDF Documents</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:280px;" asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" title="Manage Confidential PDF Categories"><i class="bi bi-file-earmark-pdf-fill"></i> Manage Confidential Categories</a></li>
                                             <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:285px;" asp-controller="ManagerPdfCategory" asp-action="ManagerManageCategoryFiles" title="Manage Confidential PDF Documents"><i class="bi bi-file-earmark-richtext-fill"></i> Manage Confidential Documents</a></li>
-                                            <li><a class="ms-2 nav-link rounded-2 text-dark ps-2 mb-1" style="width:200px;" asp-area="Identity" asp-page="/AdminFiles" title="Delete Protected Files"><i class="bi bi-lock-fill me-0"></i> Delete Protected Files</a></li>
                                         </ul>
 
                                     </li>                                    

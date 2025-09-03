@@ -33,6 +33,8 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
         public List<UserCreditViewModel> AvailableUserCredits { get; set; } = [];
         [DataType(DataType.Currency)]
         public decimal TotalAvailableUserCreditAmount { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal TotalDue { get; set; }
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
         public List<OpenInvoiceViewModel> OpenInvoicesForUser { get; set; } = [];
@@ -48,17 +50,19 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             [Display(Name = "User")]
             public string SelectedUserID { get; set; } = string.Empty;
             [Display(Name = "Apply to Invoice")]
-            [Required(ErrorMessage = "You must select an invoice to apply this payment or credit to.")]
             public int? SelectedInvoiceID { get; set; }
-            // --- MODIFIED: Make these nullable ---
+            // --- Payment fields - now required for processing ---
+            [Required]
             [DataType(DataType.Date)]
-            [Display(Name = "Payment Date (if new payment)")]
+            [Display(Name = "Payment Date")]
             public DateTime? PaymentDate { get; set; } = DateTime.Today;
-            [Range(0.01, 1000000.00, ErrorMessage = "Amount must be greater than 0 if entered.")]
+            [Required]
+            [Range(0.01, 1000000.00, ErrorMessage = "Amount must be greater than 0.")]
             [DataType(DataType.Currency)]
-            [Display(Name = "Payment Amount (if new payment)")]
+            [Display(Name = "Payment Amount")]
             public decimal? Amount { get; set; }
-            [Display(Name = "Payment Method (if new payment)")]
+            [Required]
+            [Display(Name = "Payment Method")]
             public PaymentMethod? Method { get; set; } = PaymentMethod.Check;
             // --- END MODIFIED ---
             // ... (Your existing ReferenceNumber and Notes properties) ...
@@ -121,8 +125,12 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
                         })
                         .OrderBy(i => i.InvoiceDate)
                         .ToListAsync();
-                    const string openInvoicesLogTemplate = "Found {OpenInvoicesCount} open invoices for user {UserId}.";
-                    _logger.LogInformation(openInvoicesLogTemplate, OpenInvoicesForUser.Count, userId);
+                    
+                    // Calculate total due
+                    TotalDue = OpenInvoicesForUser.Sum(i => i.AmountRemaining);
+                    
+                    const string openInvoicesLogTemplate = "Found {OpenInvoicesCount} open invoices for user {UserId}. Total due: {TotalDue}";
+                    _logger.LogInformation(openInvoicesLogTemplate, OpenInvoicesForUser.Count, userId, TotalDue);
                 }
                 else
                 {
@@ -702,6 +710,64 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
             return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
         }
 
+        // Unified payment method for all roles - auto-applies to oldest invoice with full overpayment distribution
+        public async Task<IActionResult> OnPostAsync()
+        {
+            _logger.LogInformation("OnPostAsync called. UserID: {SelectedUserID}, Amount: {Amount}", Input.SelectedUserID, Input.Amount);
+            
+            // Basic validation
+            if (!Input.PaymentDate.HasValue)
+            {
+                ModelState.AddModelError("Input.PaymentDate", "Payment Date is required.");
+            }
+            if (!Input.Amount.HasValue || Input.Amount.Value <= 0)
+            {
+                ModelState.AddModelError("Input.Amount", "Payment Amount is required and must be greater than 0.");
+            }
+            if (!Input.Method.HasValue)
+            {
+                ModelState.AddModelError("Input.Method", "Payment Method is required.");
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            var user = await _userManager.FindByIdAsync(Input.SelectedUserID);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "User not found.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            // Get the oldest unpaid invoice automatically (ordered by InvoiceDate, then by InvoiceID for tie-breaking)
+            var oldestInvoice = await _context.Invoices
+                .Where(i => i.UserID == Input.SelectedUserID &&
+                           i.Status != InvoiceStatus.Cancelled &&
+                           i.Status != InvoiceStatus.Draft &&
+                           i.AmountPaid < i.AmountDue)
+                .OrderBy(i => i.InvoiceDate)
+                .ThenBy(i => i.InvoiceID)
+                .FirstOrDefaultAsync();
+
+            if (oldestInvoice == null)
+            {
+                TempData["StatusMessage"] = "No open invoices found for this member. Payment could not be processed.";
+                return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+            }
+
+            // Auto-assign the oldest invoice
+            Input.SelectedInvoiceID = oldestInvoice.InvoiceID;
+
+            // Auto-assign the oldest invoice and process payment
+
+            // Use the existing comprehensive payment processing logic
+            return await ProcessPaymentWithOverpaymentDistribution();
+        }
+
         // Simplified payment method for DataEntry role - auto-applies to oldest invoice
         public async Task<IActionResult> OnPostSimplePaymentAsync()
         {
@@ -790,6 +856,380 @@ namespace Members.Areas.Admin.Pages.AccountsReceivable
 
             // Call the existing payment processing method
             return await OnPostRecordNewPaymentAsync();
+        }
+
+        // Shared payment processing logic with full overpayment distribution
+        private async Task<IActionResult> ProcessPaymentWithOverpaymentDistribution()
+        {
+            var invoiceToPay = await _context.Invoices.FirstOrDefaultAsync(i => i.InvoiceID == Input.SelectedInvoiceID.GetValueOrDefault() && i.UserID == Input.SelectedUserID);
+            if (invoiceToPay == null)
+            {
+                _logger.LogWarning("Selected invoice ID {SelectedInvoiceID} not found for user {SelectedUserID}.", Input.SelectedInvoiceID, Input.SelectedUserID);
+                ModelState.AddModelError("Input.SelectedInvoiceID", "The selected invoice was not found or does not belong to this user.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            if (invoiceToPay.Status == InvoiceStatus.Draft)
+            {
+                ModelState.AddModelError("Input.SelectedInvoiceID", $"Payments cannot be recorded for Draft invoices (INV-{invoiceToPay.InvoiceID}). Please finalize the invoice first.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            if (invoiceToPay.Status == InvoiceStatus.Cancelled || invoiceToPay.Status == InvoiceStatus.Paid)
+            {
+                ModelState.AddModelError("Input.SelectedInvoiceID", $"Invoice {invoiceToPay.InvoiceID} is already {invoiceToPay.Status} and cannot receive further payments.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            decimal amountToApplyToInvoice = Input.Amount!.Value;
+            decimal overpaymentAmount = 0;
+            decimal amountRemainingOnInvoice = invoiceToPay.AmountDue - invoiceToPay.AmountPaid;
+            
+            if (Input.Amount!.Value > amountRemainingOnInvoice)
+            {
+                amountToApplyToInvoice = amountRemainingOnInvoice;
+                overpaymentAmount = Input.Amount.Value - amountRemainingOnInvoice;
+                _logger.LogInformation("Overpayment detected. Payment: {PaymentAmount}, Remaining on Invoice {InvoiceID}: {RemainingAmount}. Overpayment: {OverpaymentAmount}",
+                    Input.Amount, invoiceToPay.InvoiceID, amountRemainingOnInvoice, overpaymentAmount);
+            }
+
+            // Create the Payment record for the full amount received
+            var payment = new Payment
+            {
+                UserID = Input.SelectedUserID,
+                InvoiceID = invoiceToPay.InvoiceID,
+                PaymentDate = Input.PaymentDate!.Value,
+                Amount = Input.Amount!.Value,
+                Method = Input.Method!.Value,
+                ReferenceNumber = string.IsNullOrEmpty(Input.ReferenceNumber) ? null : Input.ReferenceNumber.Length > 100 ? Input.ReferenceNumber[..100] : Input.ReferenceNumber,
+                Notes = string.IsNullOrEmpty(Input.Notes) ? null : Input.Notes.Length > 1000 ? Input.Notes[..1000] : Input.Notes,
+                DateRecorded = DateTime.UtcNow
+            };
+            _context.Payments.Add(payment);
+
+            // Update the selected invoice
+            invoiceToPay.AmountPaid += amountToApplyToInvoice;
+            invoiceToPay.LastUpdated = DateTime.UtcNow;
+            if (invoiceToPay.AmountPaid >= invoiceToPay.AmountDue)
+            {
+                invoiceToPay.Status = InvoiceStatus.Paid;
+                invoiceToPay.AmountPaid = invoiceToPay.AmountDue;
+            }
+            else if (invoiceToPay.DueDate < DateTime.Today.AddDays(-1) && invoiceToPay.Status == InvoiceStatus.Due)
+            {
+                invoiceToPay.Status = InvoiceStatus.Overdue;
+            }
+
+            UserCredit? overpaymentEventCredit = null;
+            List<CreditApplication> newCreditApplications = [];
+
+            _context.Invoices.Update(invoiceToPay);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Payment {PaymentId} and primary Invoice {InvoiceId} saved. Overpayment amount: {OverpaymentAmount}",
+                    payment.PaymentID, invoiceToPay.InvoiceID, overpaymentAmount);
+
+                if (overpaymentAmount > 0)
+                {
+                    _logger.LogInformation("Overpayment of {OverpaymentAmount} occurred for User {UserId} from Payment {PaymentId}. Will create a UserCredit and attempt to apply to other due invoices.",
+                        overpaymentAmount, Input.SelectedUserID, payment.PaymentID);
+
+                    overpaymentEventCredit = new UserCredit
+                    {
+                        UserID = Input.SelectedUserID,
+                        CreditDate = Input.PaymentDate!.Value,
+                        Amount = overpaymentAmount,
+                        SourcePaymentID = payment.PaymentID,
+                        Reason = $"Overpayment from Payment P{payment.PaymentID} on Invoice INV-{invoiceToPay.InvoiceID:D5}.",
+                        IsApplied = false,
+                        DateCreated = DateTime.UtcNow,
+                        LastUpdated = DateTime.UtcNow
+                    };
+                    _context.UserCredits.Add(overpaymentEventCredit);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Created UserCredit {UserCreditId} for overpayment amount {OverpaymentAmount}.",
+                        overpaymentEventCredit.UserCreditID, overpaymentAmount);
+
+                    var otherDueInvoices = await _context.Invoices
+                        .Where(i => i.UserID == Input.SelectedUserID &&
+                                    i.InvoiceID != invoiceToPay.InvoiceID &&
+                                    (i.Status == InvoiceStatus.Due || i.Status == InvoiceStatus.Overdue) &&
+                                    i.AmountPaid < i.AmountDue)
+                        .OrderBy(i => i.DueDate)
+                        .ToListAsync();
+
+                    if (otherDueInvoices.Count != 0)
+                    {
+                        _logger.LogInformation("Found {OtherInvoiceCount} other due/overdue invoices for User {UserId} to apply overpayment from UserCredit {UserCreditId}.",
+                            otherDueInvoices.Count, Input.SelectedUserID, overpaymentEventCredit.UserCreditID);
+
+                        foreach (var otherInvoice in otherDueInvoices)
+                        {
+                            if (overpaymentEventCredit.Amount <= 0) break;
+
+                            decimal amountNeededForOtherInvoice = otherInvoice.AmountDue - otherInvoice.AmountPaid;
+                            decimal amountToApplyToOtherInvoice = Math.Min(overpaymentEventCredit.Amount, amountNeededForOtherInvoice);
+
+                            if (amountToApplyToOtherInvoice > 0)
+                            {
+                                otherInvoice.AmountPaid += amountToApplyToOtherInvoice;
+                                otherInvoice.LastUpdated = DateTime.UtcNow;
+                                if (otherInvoice.AmountPaid >= otherInvoice.AmountDue)
+                                {
+                                    otherInvoice.Status = InvoiceStatus.Paid;
+                                    otherInvoice.AmountPaid = otherInvoice.AmountDue;
+                                }
+                                else if (otherInvoice.DueDate < DateTime.Today.AddDays(-1) && otherInvoice.Status == InvoiceStatus.Due)
+                                {
+                                    otherInvoice.Status = InvoiceStatus.Overdue;
+                                }
+                                _context.Invoices.Update(otherInvoice);
+
+                                var creditApplication = new CreditApplication
+                                {
+                                    UserCreditID = overpaymentEventCredit.UserCreditID,
+                                    InvoiceID = otherInvoice.InvoiceID,
+                                    AmountApplied = amountToApplyToOtherInvoice,
+                                    ApplicationDate = DateTime.UtcNow,
+                                    Notes = $"Applied from overpayment (Payment P{payment.PaymentID}, UserCredit UC{overpaymentEventCredit.UserCreditID})"
+                                };
+                                newCreditApplications.Add(creditApplication);
+                                _context.CreditApplications.Add(creditApplication);
+
+                                overpaymentEventCredit.Amount -= amountToApplyToOtherInvoice;
+                                payment.Notes = (payment.Notes ?? "") + $" Applied ${amountToApplyToOtherInvoice:F2} from UC{overpaymentEventCredit.UserCreditID} to INV-{otherInvoice.InvoiceID:D5}.";
+                                _logger.LogInformation("Recorded CreditApplication: {AmountApplied} from UserCredit {UserCreditId} to Invoice {OtherInvoiceId}. UserCredit remaining: {UserCreditRemaining}",
+                                    amountToApplyToOtherInvoice, overpaymentEventCredit.UserCreditID, otherInvoice.InvoiceID, overpaymentEventCredit.Amount);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("No other due/overdue invoices found for User {UserId} to apply overpayment from UserCredit {UserCreditId}.",
+                            Input.SelectedUserID, overpaymentEventCredit.UserCreditID);
+                    }
+
+                    // Update the overpaymentEventCredit state after applications
+                    if (overpaymentEventCredit.Amount <= 0)
+                    {
+                        overpaymentEventCredit.IsApplied = true;
+                        overpaymentEventCredit.Amount = 0;
+                        overpaymentEventCredit.AppliedDate = DateTime.UtcNow;
+                        _logger.LogInformation("UserCredit {UserCreditId} fully consumed by applying to other invoices.", overpaymentEventCredit.UserCreditID);
+                    }
+                    overpaymentEventCredit.LastUpdated = DateTime.UtcNow;
+                    _context.UserCredits.Update(overpaymentEventCredit);
+                }
+
+                // Final truncation safeguard for payment notes
+                const int dbColumnMaxLength = 1000;
+                if (payment.Notes != null && payment.Notes.Length > dbColumnMaxLength)
+                {
+                    _logger.LogWarning("Payment.Notes for UserID {UserId} (PaymentID {PaymentId}) was truncated from {OriginalLength} to {MaxLength} characters.",
+                        payment.UserID, payment.PaymentID, payment.Notes.Length, dbColumnMaxLength);
+                    payment.Notes = payment.Notes[..dbColumnMaxLength];
+                }
+                _context.Payments.Update(payment);
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Successfully saved credit applications and updated overpayment UserCredit {UserCreditId}.", overpaymentEventCredit?.UserCreditID);
+
+                // Build Status Message
+                var statusMessageBuilder = new System.Text.StringBuilder();
+                statusMessageBuilder.Append($"Payment of {Input.Amount!.Value:C} (P{payment.PaymentID}) processed for Invoice INV-{invoiceToPay.InvoiceID:D5} (Status: {invoiceToPay.Status}).");
+
+                if (overpaymentEventCredit != null)
+                {
+                    decimal totalAppliedToOthersFromOverpayment = overpaymentAmount - overpaymentEventCredit.Amount;
+                    if (totalAppliedToOthersFromOverpayment > 0)
+                    {
+                        statusMessageBuilder.Append($" {totalAppliedToOthersFromOverpayment:C} of the overpayment (from UC{overpaymentEventCredit.UserCreditID}) was automatically applied to other due invoices.");
+                    }
+
+                    if (overpaymentEventCredit.Amount > 0)
+                    {
+                        statusMessageBuilder.Append($" Remaining overpayment of ${overpaymentEventCredit.Amount:C} credited to account (UC{overpaymentEventCredit.UserCreditID}).");
+                    }
+                    else if (overpaymentAmount > 0 && overpaymentEventCredit.Amount <= 0)
+                    {
+                        if (totalAppliedToOthersFromOverpayment == 0 && overpaymentAmount > 0)
+                        {
+                            statusMessageBuilder.Append($" The overpayment (UC{overpaymentEventCredit.UserCreditID}) was fully utilized.");
+                        }
+                    }
+                }
+                TempData["StatusMessage"] = statusMessageBuilder.ToString();
+                _logger.LogInformation("Successfully processed payment ID {PaymentID}. Final status message: {StatusMessage}",
+                    payment.PaymentID, TempData["StatusMessage"]);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "DbUpdateException saving payment data. User: {UserId}, Invoice: {InvoiceId}, Amount: {Amount}, PaymentDate: {PaymentDate}, Method: {Method}. Inner Exception: {InnerException}", 
+                    Input.SelectedUserID, Input.SelectedInvoiceID, Input.Amount, Input.PaymentDate, Input.Method, ex.InnerException?.Message);
+                ModelState.AddModelError(string.Empty, $"Database error occurred while saving payment data: {ex.InnerException?.Message ?? ex.Message}");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error saving payment data. User: {UserId}, Invoice: {InvoiceId}, Amount: {Amount}", 
+                    Input.SelectedUserID, Input.SelectedInvoiceID, Input.Amount);
+                ModelState.AddModelError(string.Empty, $"An unexpected error occurred: {ex.Message}");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            {
+                return Redirect(ReturnUrl);
+            }
+            return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+        }
+
+        // Utility method to apply all available credits to open invoices for a user
+        public async Task<IActionResult> OnPostApplyAllCreditsAsync()
+        {
+            _logger.LogInformation("OnPostApplyAllCreditsAsync called for User: {SelectedUserID}", Input.SelectedUserID);
+
+            if (string.IsNullOrEmpty(Input.SelectedUserID))
+            {
+                ModelState.AddModelError(string.Empty, "User ID is required.");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            // Get all available credits for the user
+            var availableCredits = await _context.UserCredits
+                .Where(uc => uc.UserID == Input.SelectedUserID && !uc.IsApplied && !uc.IsVoided && uc.Amount > 0)
+                .OrderBy(uc => uc.CreditDate)
+                .ToListAsync();
+
+            if (!availableCredits.Any())
+            {
+                TempData["StatusMessage"] = "No available credits found for this user.";
+                return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+            }
+
+            // Get all open invoices for the user
+            var openInvoices = await _context.Invoices
+                .Where(i => i.UserID == Input.SelectedUserID &&
+                           i.Status != InvoiceStatus.Cancelled &&
+                           i.Status != InvoiceStatus.Draft &&
+                           i.Status != InvoiceStatus.Paid &&
+                           i.AmountPaid < i.AmountDue)
+                .OrderBy(i => i.InvoiceDate)
+                .ThenBy(i => i.InvoiceID)
+                .ToListAsync();
+
+            if (!openInvoices.Any())
+            {
+                TempData["StatusMessage"] = $"No open invoices found. User has {availableCredits.Sum(c => c.Amount):C} in unused credits.";
+                return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
+            }
+
+            decimal totalCreditsApplied = 0;
+            int invoicesPaid = 0;
+            var statusMessages = new List<string>();
+
+            try
+            {
+                foreach (var credit in availableCredits)
+                {
+                    if (credit.Amount <= 0) continue;
+
+                    foreach (var invoice in openInvoices.Where(i => i.AmountPaid < i.AmountDue))
+                    {
+                        if (credit.Amount <= 0) break;
+
+                        decimal amountNeeded = invoice.AmountDue - invoice.AmountPaid;
+                        decimal amountToApply = Math.Min(credit.Amount, amountNeeded);
+
+                        if (amountToApply > 0)
+                        {
+                            // Update invoice
+                            invoice.AmountPaid += amountToApply;
+                            invoice.LastUpdated = DateTime.UtcNow;
+                            
+                            if (invoice.AmountPaid >= invoice.AmountDue)
+                            {
+                                invoice.Status = InvoiceStatus.Paid;
+                                invoice.AmountPaid = invoice.AmountDue;
+                                invoicesPaid++;
+                            }
+                            else if (invoice.DueDate < DateTime.Today.AddDays(-1) && invoice.Status == InvoiceStatus.Due)
+                            {
+                                invoice.Status = InvoiceStatus.Overdue;
+                            }
+
+                            // Create credit application record
+                            var creditApplication = new CreditApplication
+                            {
+                                UserCreditID = credit.UserCreditID,
+                                InvoiceID = invoice.InvoiceID,
+                                AmountApplied = amountToApply,
+                                ApplicationDate = DateTime.UtcNow,
+                                Notes = $"Applied via Apply All Credits utility. Original credit reason: {credit.Reason}"
+                            };
+                            _context.CreditApplications.Add(creditApplication);
+
+                            // Update credit
+                            credit.Amount -= amountToApply;
+                            credit.LastUpdated = DateTime.UtcNow;
+                            totalCreditsApplied += amountToApply;
+
+                            statusMessages.Add($"Applied {amountToApply:C} from Credit UC{credit.UserCreditID} to Invoice INV-{invoice.InvoiceID:D5}");
+                            _logger.LogInformation("Applied {Amount} from UserCredit {CreditId} to Invoice {InvoiceId}", 
+                                amountToApply, credit.UserCreditID, invoice.InvoiceID);
+                        }
+                    }
+
+                    // Mark credit as applied if fully used
+                    if (credit.Amount <= 0)
+                    {
+                        credit.IsApplied = true;
+                        credit.Amount = 0;
+                        credit.AppliedDate = DateTime.UtcNow;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Build comprehensive status message
+                var finalStatus = $"Successfully applied {totalCreditsApplied:C} in credits. ";
+                if (invoicesPaid > 0)
+                {
+                    finalStatus += $"{invoicesPaid} invoice(s) fully paid. ";
+                }
+                
+                var remainingCredit = availableCredits.Where(c => c.Amount > 0).Sum(c => c.Amount);
+                if (remainingCredit > 0)
+                {
+                    finalStatus += $"{remainingCredit:C} in credits remaining. ";
+                }
+
+                var remainingDue = openInvoices.Sum(i => i.AmountDue - i.AmountPaid);
+                if (remainingDue > 0)
+                {
+                    finalStatus += $"{remainingDue:C} still due on open invoices.";
+                }
+
+                TempData["StatusMessage"] = finalStatus;
+                _logger.LogInformation("Apply All Credits completed. {StatusMessage}", finalStatus);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error applying credits for user {UserId}", Input.SelectedUserID);
+                ModelState.AddModelError(string.Empty, $"Error applying credits: {ex.Message}");
+                await OnGetAsync(Input.SelectedUserID, ReturnUrl);
+                return Page();
+            }
+
+            return RedirectToPage(new { userId = Input.SelectedUserID, returnUrl = ReturnUrl });
         }
     }
 }

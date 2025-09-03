@@ -211,33 +211,47 @@ namespace Members.Areas.Member.Pages
         }
         public async Task<IActionResult> OnPostVoidInvoiceAsync(int invoiceId, string voidReason)
         {
-            _logger.LogInformation("OnPostVoidInvoiceAsync called for InvoiceID: {invoiceId} by User: {User.Identity?.Name}. Reason: {voidReason}", invoiceId, User.Identity?.Name, voidReason);
+            _logger.LogInformation("OnPostVoidInvoiceAsync called for InvoiceID: {invoiceId} by User: {User.Identity?.Name}. ViewedUserId: {ViewedUserId}. Reason: {voidReason}", 
+                invoiceId, User.Identity?.Name, ViewedUserId, voidReason);
+            
             // Ensure the current user is authorized to perform this action
             if (!User.IsInRole("Admin") && !User.IsInRole("Manager"))
             {
                 _logger.LogWarning("User {User.Identity?.Name} attempted to void invoice {invoiceId} without authorization.", User.Identity?.Name, invoiceId);
                 TempData["ErrorMessage"] = "You are not authorized to perform this action.";
-                // Redirect to the current page for the ViewedUserId if available, else to a safe default
-                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+                // Redirect to the current page for the ViewedUserId if available
+                return RedirectToPage(new { userId = ViewedUserId ?? "", returnUrl = BackToEditUserUrl });
             }
             if (string.IsNullOrWhiteSpace(voidReason))
             {
                 // Although the JavaScript prompt should require a reason, add server-side validation too.
                 TempData["WarningMessage"] = "A reason is required to void an invoice.";
-                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+                return RedirectToPage(new { userId = ViewedUserId ?? "", returnUrl = BackToEditUserUrl });
             }
-            // ViewedUserId should be populated in OnGetAsync if an admin is viewing specific user's billing
+            
+            // First, find the invoice by ID only to get the actual UserID
             var invoiceToVoid = await _context.Invoices
-                .FirstOrDefaultAsync(i => i.InvoiceID == invoiceId && i.UserID == ViewedUserId);
+                .FirstOrDefaultAsync(i => i.InvoiceID == invoiceId);
+            
             if (invoiceToVoid == null)
             {
-                // ... (handle not found) ...
-                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+                _logger.LogWarning("Invoice {InvoiceId} not found.", invoiceId);
+                TempData["ErrorMessage"] = $"Invoice INV-{invoiceId:D5} not found.";
+                return RedirectToPage(new { userId = ViewedUserId ?? "", returnUrl = BackToEditUserUrl });
             }
+            
+            // Log for debugging
+            _logger.LogInformation("Found invoice {InvoiceId} for UserID: {InvoiceUserId}. ViewedUserId from form: {ViewedUserId}", 
+                invoiceId, invoiceToVoid.UserID, ViewedUserId);
+            
+            // For Admin/Manager, use the invoice's actual UserID if ViewedUserId is not provided
+            var targetUserId = !string.IsNullOrEmpty(ViewedUserId) ? ViewedUserId : invoiceToVoid.UserID;
+            
             if (invoiceToVoid.Status == InvoiceStatus.Cancelled)
             {
-                // ... (handle already cancelled) ...
-                return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+                _logger.LogWarning("Invoice {InvoiceId} is already cancelled.", invoiceId);
+                TempData["WarningMessage"] = $"Invoice INV-{invoiceId:D5} is already cancelled.";
+                return RedirectToPage(new { userId = targetUserId, returnUrl = BackToEditUserUrl });
             }
             decimal originalAmountPaidOnInvoice = invoiceToVoid.AmountPaid; // Capture before any changes
             string successMessage = $"Invoice INV-{invoiceToVoid.InvoiceID:D5} ('{invoiceToVoid.Description}') has been cancelled.";
@@ -336,7 +350,7 @@ namespace Members.Areas.Member.Pages
                 _logger.LogError(ex, "Error cancelling InvoiceID {InvoiceId}.", invoiceToVoid.InvoiceID);
                 TempData["ErrorMessage"] = "Error cancelling invoice. Please check logs.";
             }
-            return RedirectToPage(new { userId = ViewedUserId, returnUrl = BackToEditUserUrl });
+            return RedirectToPage(new { userId = targetUserId, returnUrl = BackToEditUserUrl });
         }
         public async Task<IActionResult> OnPostApplyLateFeeAsync(string userId)
         {

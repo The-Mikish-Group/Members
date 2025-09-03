@@ -1,0 +1,214 @@
+@page "{userId?}"
+@model Members.Areas.Admin.Pages.AccountsReceivable.ApplyCreditsModel
+@{
+    ViewData["Title"] = "Apply Credits Utility";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["StatusMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("\n", "<br />"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="my-4 p-0">
+    <div class="row justify-content-center m-0 p-0">
+        <div class="col-md-10 col-lg-8 p-0">
+            <div class="card p-2 shadow">
+                <form method="post">
+                    <div class="card-header rounded-top shadow">
+                        <h4 class="text-center text-black mb-0">@ViewData["Title"]</h4>
+                        <p class="text-center text-muted mb-0">Admin Utility - Apply Available Credits to Open Invoices</p>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @if (!Model.IsUserPreselected)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Input.SelectedUserID" class="form-label fw-bold">Select Member</label>
+                                <select asp-for="Input.SelectedUserID" asp-items="Model.UserSelectList" class="form-select shadow">
+                                    <option value="">-- Select a Member --</option>
+                                </select>
+                                <span asp-validation-for="Input.SelectedUserID" class="text-danger"></span>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <button type="submit" asp-page-handler="LoadUserData" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Load User Data
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="Input.SelectedUserID" />
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-warning fs-5">
+                                    <i class="bi bi-person-circle text-warning"></i> Member
+                                </label>
+                                <p class="form-control shadow border-warning border-2 fs-5 fw-semibold text-center"
+                                   style="background-color: #fffbf0; padding: 12px;">@Model.TargetUserName</p>
+                            </div>
+
+                            <!-- Current Balance Summary -->
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Current Account Summary</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 text-center">
+                                            <div class="fs-2 fw-bold text-success">@Model.TotalAvailableCredit.ToString("C")</div>
+                                            <div class="text-muted">Available Credits</div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <div class="fs-2 fw-bold text-danger">@Model.TotalAmountDue.ToString("C")</div>
+                                            <div class="text-muted">Total Amount Due</div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            @{
+                                                var netBalance = Model.TotalAmountDue - Model.TotalAvailableCredit;
+                                            }
+                                            <div class="fs-2 fw-bold @(netBalance > 0 ? "text-danger" : netBalance < 0 ? "text-success" : "text-primary")">
+                                                @Math.Abs(netBalance).ToString("C")
+                                            </div>
+                                            <div class="text-muted">
+                                                @if (netBalance > 0) { <text>Net Amount Due</text> }
+                                                else if (netBalance < 0) { <text>Net Credit Balance</text> }
+                                                else { <text>Balanced</text> }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card bg-success-subtle mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-success">Available Credits</h5>
+                                            @if (Model.AvailableCredits.Any())
+                                            {
+                                                <ul class="list-group list-group-flush">
+                                                    @foreach (var credit in Model.AvailableCredits)
+                                                    {
+                                                        <li class="list-group-item">
+                                                            UC@(credit.UserCreditID): @credit.Amount.ToString("C")
+                                                            <small class="d-block text-muted">@credit.Reason</small>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                                <div class="mt-2 fw-bold">Total: @Model.TotalAvailableCredit.ToString("C")</div>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted">No available credits</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card bg-danger-subtle mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-danger">Open Invoices</h5>
+                                            @if (Model.OpenInvoices.Any())
+                                            {
+                                                <ul class="list-group list-group-flush">
+                                                    @foreach (var invoice in Model.OpenInvoices.Take(5))
+                                                    {
+                                                        <li class="list-group-item">
+                                                            INV-@invoice.InvoiceID.ToString("D5"): @invoice.AmountRemaining.ToString("C")
+                                                            <small class="d-block text-muted">@invoice.Description</small>
+                                                        </li>
+                                                    }
+                                                    @if (Model.OpenInvoices.Count() > 5)
+                                                    {
+                                                        <li class="list-group-item text-muted">
+                                                            ... and @(Model.OpenInvoices.Count() - 5) more
+                                                        </li>
+                                                    }
+                                                </ul>
+                                                <div class="mt-2 fw-bold">Total Due: @Model.TotalAmountDue.ToString("C")</div>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-success">No open invoices</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (Model.AvailableCredits.Any() && Model.OpenInvoices.Any())
+                            {
+                                <div class="alert alert-info">
+                                    <h5>Credit Application Preview</h5>
+                                    <p>This utility will automatically apply all available credits to open invoices, starting with the oldest invoice first.</p>
+                                    <ul>
+                                        <li>Credits to Apply: <strong>@Model.TotalAvailableCredit.ToString("C")</strong></li>
+                                        <li>Total Amount Due: <strong>@Model.TotalAmountDue.ToString("C")</strong></li>
+                                        <li>Result: 
+                                            @if (Model.TotalAvailableCredit >= Model.TotalAmountDue)
+                                            {
+                                                <span class="text-success">All invoices will be paid, with @((Model.TotalAvailableCredit - Model.TotalAmountDue).ToString("C")) remaining in credit</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-warning">Credits will reduce balance by @Model.TotalAvailableCredit.ToString("C"), leaving @((Model.TotalAmountDue - Model.TotalAvailableCredit).ToString("C")) due</span>
+                                            }
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="card-footer rounded-bottom d-grid py-4 gap-2">
+                        <div class="row gy-2 justify-content-center">
+                            <div class="col-6 text-center">
+                                <a href="~/Admin/AccountsReceivable/" class="btn btn-sm btn-back shadow">
+                                    <i class="bi bi-arrow-left"></i> Back to A/R
+                                </a>
+                            </div>
+
+                            @if (Model.IsUserPreselected)
+                            {
+                                @if (Model.AvailableCredits.Any() && Model.OpenInvoices.Any())
+                                {
+                                    <div class="col-6 text-center">
+                                        <button type="submit" asp-page-handler="ApplyAllCredits" class="btn btn-lg btn-success shadow-lg">
+                                            <i class="bi bi-check-circle-fill"></i> Apply All Credits
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-6 text-center">
+                                        <button type="button" class="btn btn-lg btn-secondary" disabled>
+                                            <i class="bi bi-x-circle"></i> No Credits to Apply
+                                        </button>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

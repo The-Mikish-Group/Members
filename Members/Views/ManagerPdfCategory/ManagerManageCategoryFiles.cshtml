@@ -15,31 +15,38 @@
     }
 }
 
+<!-- Page Header -->
+<div class="mb-4">
+    <!-- 1. Page Title - Centered -->
+    <div class="text-center">
+        <h2><i class="bi bi-shield-lock-fill"></i> 
+        @if (selectedCategory != null)
+        {
+            <span>Manage Files: @selectedCategory.CategoryName <span class="badge bg-danger ms-1">Confidential</span></span>
+        }
+        else
+        {
+            <span>Manage Confidential PDF Files</span>
+        }
+        </h2>
+    </div>
+    
+    <!-- 2. Description - Centered -->
+    <div class="text-center">
+        <p>Upload, organize, and manage confidential PDF files within categories</p>
+    </div>
+    
+    <!-- 3. Navigation Buttons - Centered on Mobile -->
+    <div class="text-center">
+        <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" class="btn btn-sm btn-back rounded-2 shadow">
+            <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
+        </a>
+    </div>
+</div>
+
 <div class="my-4 m-0 p-0">
     <div class="row justify-content-center m-1 p-0">
         <div class="col-md-8 col-lg-6 m-0 p-0">
-
-            <div class="text-center">
-
-                <!-- Title -->
-                <h3 class="text-black mb-3">
-                    <i class="bi bi-shield-lock-fill"></i>
-                    @if (selectedCategory != null)
-                    {
-                        <span>@ViewData["Title"] <span class="badge bg-danger ms-1">Confidential</span></span>
-                    }
-                    else
-                    {
-                        <span>Manage Confidential Documents</span>
-                    }
-                </h3>
-
-                <!-- Back Button -->
-                <a asp-controller="ManagerPdfCategory" asp-action="ManagerCategories" class="btn btn-sm btn-back rounded-2 mb-3 shadow">
-                    <i class="bi bi-arrow-left-square"></i> Back to Manage Categories
-                </a>
-
-            </div>
 
             <div class="card mb-4 rounded p-2 shadow">
 
@@ -124,12 +131,12 @@
 
                                 <!-- Table Head -->
                                 <thead>
-                                    <tr>                            
-                                        <th class="header-text text-center">Edit</th>
-                                        <th class="header-text text-center">View</th>
-                                        <th class="header-text text-start text-nowrap">File Name (Click to Edit)</th>
-                                        <th class="header-text text-center">Sort Order</th>
-                                        <th class="header-text text-end">Delete</th>
+                                    <tr>
+                                        <th class="header-text ps-2" width="5%">Order</th>
+                                        <th class="header-text text-center" width="8%">Edit</th>
+                                        <th class="header-text text-center" width="8%">View</th>
+                                        <th class="header-text text-start" width="54%">File Name (Click to Edit)</th>
+                                        <th class="header-text text-end pe-2" width="25%">Delete</th>
                                     </tr>
                                 </thead>
 
@@ -138,6 +145,17 @@
                                     @foreach (var file in Model.OrderBy(f => f.SortOrder).ThenBy(f => f.FileName))
                                     {
                                         <tr id="mmcf-display-row-@file.FileID" data-file-id="@file.FileID" data-file-name="@file.FileName" data-sort-order="@file.SortOrder" data-category-id="@selectedCategoryId.Value">
+                                            
+                                            <!-- Drag Handle and Sort Order -->
+                                            <td class="text-center py-0">
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <span class="drag-handle me-2" title="Drag to reorder">
+                                                        <i class="bi bi-grip-vertical"></i>
+                                                    </span>
+                                                    <span class="badge bg-secondary">@file.SortOrder</span>
+                                                </div>
+                                            </td>
+                                            
                                             <td class="p-0 text-center align-middle">
                                                 <button type="button" class="btn btn-sm btn-link shadow" title="Edit name/sort order"
                                                         onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
@@ -153,7 +171,6 @@
                                                 onclick="showMmcfRenameModal('@file.FileID', '@file.FileName', '@file.SortOrder', '@selectedCategoryId.Value')">
                                                 @System.IO.Path.GetFileNameWithoutExtension(file.FileName)
                                             </td>
-                                            <td class="text-center align-middle">@file.SortOrder</td>
                                             <td class="p-0 text-end align-middle">
                                                 <form method="post" asp-controller="ManagerPdfCategory" asp-action="DeleteFileFromManagerCategory" asp-route-id="@file.FileID" asp-route-categoryId="@selectedCategoryId.Value" class="d-inline" id="deleteManagerFileForm_@file.FileID">
                                                     @Html.AntiForgeryToken()
@@ -281,5 +298,111 @@
             }
         }
 
+        // Initialize drag and drop functionality for confidential files
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.querySelector('table tbody');
+            if (tbody && tbody.children.length > 0) {
+                const sortable = Sortable.create(tbody, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    onEnd: function (evt) {
+                        updateManagerFilesSortOrder();
+                    }
+                });
+            }
+        });
+
+        function updateManagerFilesSortOrder() {
+            const rows = document.querySelectorAll('table tbody tr');
+            const updates = [];
+            
+            rows.forEach((row, index) => {
+                const fileId = row.getAttribute('data-file-id');
+                if (fileId) {
+                    updates.push({
+                        fileId: parseInt(fileId),
+                        newSortOrder: index + 1
+                    });
+                    
+                    // Update the sort order badge
+                    const badge = row.querySelector('.badge.bg-secondary');
+                    if (badge) {
+                        badge.textContent = index + 1;
+                    }
+                    
+                    // Update data attribute for consistency
+                    row.setAttribute('data-sort-order', index + 1);
+                }
+            });
+
+            // Send updates to server
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value || '');
+            updates.forEach(update => {
+                formData.append('fileIds', update.fileId);
+                formData.append('sortOrders', update.newSortOrder);
+            });
+
+            fetch('@Url.Action("UpdateManagerFilesSortOrder", "ManagerPdfCategory")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Confidential files reordered successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to update sort order');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error updating sort order. Please refresh and try again.', 'error');
+            });
+        }
+
+        function showMessage(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
     </script>
+
+    <style>
+    /* Drag and drop styling */
+    .sortable-ghost {
+        opacity: 0.4;
+    }
+    .sortable-chosen {
+        background-color: #e3f2fd !important;
+    }
+    .drag-handle {
+        cursor: grab;
+        padding: 0.25rem;
+    }
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+    tbody tr:hover .drag-handle {
+        color: #0d6efd !important;
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 }

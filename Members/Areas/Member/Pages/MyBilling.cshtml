@@ -345,6 +345,7 @@
 												@if (trans.Type == "Invoice" && trans.InvoiceID.HasValue && trans.StatusOrMethod != InvoiceStatus.Cancelled.ToString())
 												{
 													<form method="post" asp-page-handler="VoidInvoice" style="display:inline;"
+														  id="voidInvoiceForm_@trans.InvoiceID.Value.ToString()"
 														  onsubmit="return handleVoidInvoice('@trans.InvoiceID.Value.ToString()');">
 
 														<input type="hidden" name="invoiceId" value="@trans.InvoiceID.Value" />
@@ -363,6 +364,7 @@
 												{
 
 													<form method="post" asp-page-handler="VoidPayment" style="display:inline;"
+														  id="voidPaymentForm_@trans.PaymentID.Value.ToString()"
 														  onsubmit="return handleVoidPayment('@trans.PaymentID.Value.ToString()', '@trans.Description');">
 														<!-- Ensure all your hidden inputs for paymentId, voidReason, ViewedUserId, BackToEditUserUrl are here -->
 														<input type="hidden" name="paymentId" value="@trans.PaymentID.Value" />

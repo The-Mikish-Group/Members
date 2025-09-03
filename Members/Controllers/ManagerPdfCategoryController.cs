@@ -309,5 +309,70 @@ namespace Members.Controllers
                  _logger.LogInformation("Physical file NOT deleted (still linked elsewhere): {FileName}", fileName);
             }
         }
+
+        // POST: Batch update for drag-and-drop category reordering (Confidential Categories)
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateManagerCategoriesSortOrder(int[] categoryIds, int[] sortOrders)
+        {
+            try
+            {
+                if (categoryIds == null || sortOrders == null || categoryIds.Length != sortOrders.Length)
+                {
+                    return Json(new { success = false, message = "Invalid data provided" });
+                }
+
+                for (int i = 0; i < categoryIds.Length; i++)
+                {
+                    var category = await _context.PDFCategories.FirstOrDefaultAsync(c => c.CategoryID == categoryIds[i] && c.IsAdminOnly == true);
+                    if (category != null)
+                    {
+                        category.SortOrder = sortOrders[i];
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Confidential categories reordered successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating confidential category sort order");
+                return Json(new { success = false, message = "Error updating sort order: " + ex.Message });
+            }
+        }
+
+        // POST: Batch update for drag-and-drop file reordering (Confidential Files)
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateManagerFilesSortOrder(int[] fileIds, int[] sortOrders)
+        {
+            try
+            {
+                if (fileIds == null || sortOrders == null || fileIds.Length != sortOrders.Length)
+                {
+                    return Json(new { success = false, message = "Invalid data provided" });
+                }
+
+                for (int i = 0; i < fileIds.Length; i++)
+                {
+                    var file = await _context.CategoryFiles.Include(f => f.PDFCategory)
+                        .FirstOrDefaultAsync(f => f.FileID == fileIds[i] && f.PDFCategory.IsAdminOnly == true);
+                    if (file != null)
+                    {
+                        file.SortOrder = sortOrders[i];
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Confidential files reordered successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating confidential file sort order");
+                return Json(new { success = false, message = "Error updating sort order: " + ex.Message });
+            }
+        }
     }
 }

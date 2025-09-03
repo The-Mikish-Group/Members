@@ -49,76 +49,50 @@
                                    style="background-color: #fffbf0; padding: 12px;">@Model.TargetUserName</p>
                             </div>
 
-                            @* Invoice Selection - Hidden for DataEntry users *@
-                            @if (!User.IsInRole("DataEntry"))
-                            {
-                                @* Display Open Invoices for Selection *@
-                                <div class="mb-3">
-                                    <label asp-for="Input.SelectedInvoiceID" class="form-label"></label>
-                                    @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
-                                    {
-                                        <div class="card list-group shadow" style="max-height: 300px; overflow-y: auto; border: 1px solid #ced4da; border-radius: 0.25rem;">
-                                            @foreach (var invoice in Model.OpenInvoicesForUser)
-                                            {
-                                                <label class="list-group-item list-group-item-action">
-                                                    <input type="radio" asp-for="Input.SelectedInvoiceID" value="@invoice.InvoiceID" class="form-check-input me-1" />
-                                                    INV-@invoice.InvoiceID.ToString("D5") (@invoice.InvoiceDate.ToString("yyyy-MM-dd"))
-                                                    - @invoice.Description
-                                                    (Due: @invoice.AmountDue.ToString("C"), Paid: @invoice.AmountPaid.ToString("C"), Rem: @invoice.AmountRemaining.ToString("C"))
-                                                </label>
-                                            }
+                            @* Account Balance Summary *@
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3">Account Summary</h6>
+                                    <div class="row">
+                                        <div class="col-sm-4 text-center">
+                                            <div class="fs-4 fw-bold text-danger">@Model.TotalDue.ToString("C")</div>
+                                            <small class="text-muted">Total Due</small>
                                         </div>
-                                        <span asp-validation-for="Input.SelectedInvoiceID" class="text-danger"></span>
-                                    }
-                                    else
-                                    {
-                                        <p class="bg-info-subtle rounded-2 form-text py-2 ps-3 shadow">No open invoices found to apply payment towards.</p>
-                                    }
+                                        <div class="col-sm-4 text-center">
+                                            <div class="fs-4 fw-bold text-success">@Model.TotalAvailableUserCreditAmount.ToString("C")</div>
+                                            <small class="text-muted">Available Credits</small>
+                                        </div>
+                                        <div class="col-sm-4 text-center">
+                                            @{
+                                                var netDue = Model.TotalDue - Model.TotalAvailableUserCreditAmount;
+                                            }
+                                            <div class="fs-4 fw-bold @(netDue > 0 ? "text-danger" : "text-success")">
+                                                @Math.Abs(netDue).ToString("C")
+                                            </div>
+                                            <small class="text-muted">@(netDue > 0 ? "Net Amount Due" : "Net Credit")</small>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
 
-                                <p class="text-black mt-0">Apply Existing Credit to Selected Invoice</p>
-                                @if (Model.IsUserPreselected && Model.AvailableUserCredits.Any())
-                                {   
-                                    <div class="mb-3">
-                                        <label asp-for="Input.SelectedUserCreditID" class="form-label"></label>
-                                        <select asp-for="Input.SelectedUserCreditID" class="form-select shadow">
-                                            <option value="">-- Select a credit --</option>
-                                            @foreach (var credit in Model.AvailableUserCredits)
-                                            {
-                                                <option value="@credit.UserCreditID">
-                                                    ID: @credit.UserCreditID | Date: @credit.CreditDate.ToString("yyyy-MM-dd") | Avail: @credit.Amount.ToString("C") | @credit.Reason
-                                                </option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="Input.SelectedUserCreditID" class="text-danger"></span>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label asp-for="Input.AmountToApplyFromCredit" class="form-label"></label>
-                                        <input asp-for="Input.AmountToApplyFromCredit" type="text" class="form-control shadow" placeholder="Amount from credit" oninput="cleanCurrencyInputOnTheFly(this)" onblur="formatCurrencyInputOnBlur(this)" />
-                                        <span asp-validation-for="Input.AmountToApplyFromCredit" class="text-danger"></span>
-                                    </div>
-                                }
-                                else if (Model.IsUserPreselected)
+                            @* Simplified payment process - auto-selects oldest invoice *@
+                            <div class="mb-3">
+                                @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
                                 {
-                                    <p class="bg-info-subtle rounded-2 form-text py-2 ps-3 shadow">No available credits for this Member.</p>
+                                    <div class="alert alert-info">
+                                        <strong>Payment will be automatically applied to the oldest invoice first.</strong>
+                                        @if (Model.OpenInvoicesForUser.Count > 1)
+                                        {
+                                            <br />
+                                            <text>If payment amount exceeds the oldest invoice balance, remaining funds will automatically be applied to other open invoices.</text>
+                                        }
+                                    </div>
                                 }
-                            }
-                            else
-                            {
-                                @* Simplified view for DataEntry - just show summary *@
-                                <div class="mb-3">
-                                    @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
-                                    {
-                                        <div class="alert alert-info">
-                                            <strong>Payment will be automatically applied to the oldest invoice.</strong>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="alert alert-warning">No open invoices found for this member.</div>
-                                    }
-                                </div>
-                            }
+                                else
+                                {
+                                    <div class="alert alert-warning">No open invoices found for this member.</div>
+                                }
+                            </div>
                         }
                         else // User not preselected, show dropdown (fallback)
                         {
@@ -148,11 +122,27 @@
                                         <i class="bi bi-currency-dollar text-success"></i> @Html.DisplayNameFor(m => m.Input.Amount)
                                     </label>
                                     <input asp-for="Input.Amount" type="text" class="form-control shadow border-success border-2 fs-4 text-center fw-bold" 
+                                           id="paymentAmountInput"
                                            style="background-color: #f0f9ff;" 
                                            placeholder="0.00" 
                                            oninput="cleanCurrencyInputOnTheFly(this)" 
                                            onblur="formatCurrencyInputOnBlur(this)" />
                                     <span asp-validation-for="Input.Amount" class="text-danger"></span>
+                                    
+                                    @if (Model.TotalDue > 0)
+                                    {
+                                        <div class="mt-2 d-flex gap-2 justify-content-center">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="setPaymentAmount(@Model.TotalDue)">
+                                                Pay Full Balance (@Model.TotalDue.ToString("C"))
+                                            </button>
+                                            @if (Model.OpenInvoicesForUser != null && Model.OpenInvoicesForUser.Any())
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setPaymentAmount(@Model.OpenInvoicesForUser.First().AmountRemaining)">
+                                                    Pay Oldest Invoice (@Model.OpenInvoicesForUser.First().AmountRemaining.ToString("C"))
+                                                </button>
+                                            }
+                                        </div>
+                                    }
                                 </div>
 
                                 <!-- Payment Date -->
@@ -218,28 +208,11 @@
                             </div>
 
                             <div class="col-6 mb-2 text-center">
-                                @if (User.IsInRole("DataEntry"))
-                                {
-                                    <button type="submit" asp-page-handler="SimplePayment" class="px-3 btn btn-lg btn-success rounded-3 shadow-lg fs-4 fw-bold">
-                                        <i class="bi bi-cash-coin me-2"></i> Process Payment
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="submit" asp-page-handler="RecordNewPayment" class="px-3 btn btn-lg btn-success rounded-3 shadow-lg fs-4 fw-bold">
-                                        <i class="bi bi-cash-coin me-2"></i> Record Payment
-                                    </button>
-                                }
+                                <button type="submit" class="px-3 btn btn-lg btn-success rounded-3 shadow-lg fs-4 fw-bold">
+                                    <i class="bi bi-cash-coin me-2"></i> Process Payment
+                                </button>
                             </div>
 
-                            @if (!User.IsInRole("DataEntry") && Model.AvailableUserCredits.Any())
-                            {
-                                <div class="col-6 mb-2 text-center">
-                                    <button type="submit" asp-page-handler="ApplyCredit" class="btn btn-sm btn-success rounded-2 shadow">
-                                        <i class="bi bi-bookmark-check-fill"></i> Apply Selected Credit
-                                    </button>
-                                </div>
-                            }
 
                         </div>
                     </div>
@@ -254,4 +227,16 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function setPaymentAmount(amount) {
+            var input = document.getElementById('paymentAmountInput');
+            if (input) {
+                input.value = amount.toFixed(2);
+                // Trigger any validation or formatting
+                if (typeof cleanCurrencyInputOnTheFly === 'function') {
+                    cleanCurrencyInputOnTheFly(input);
+                }
+            }
+        }
+    </script>
 }

@@ -8,20 +8,26 @@
         <div class="col-12">
             <!-- Page Header -->
             <div class="mb-4">
-                <!-- Title Row -->
-                <h2><i class="bi bi-gear"></i> Manage Link Categories</h2>
+                <!-- 1. Page Title - Centered -->
+                <div class="text-center">
+                    <h2><i class="bi bi-gear"></i> Manage Link Categories</h2>
+                </div>
                 
-                <!-- Description Row -->
-                <p>Create and organize link categories for the More Links page</p>
+                <!-- 2. Description - Centered -->
+                <div class="text-center">
+                    <p>Create and organize link categories for the More Links page</p>
+                </div>
                 
-                <!-- Button Row -->
-                <div class="mt-3">
-                    <a href="@Url.Action("MoreLinks", "Links")" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to More Links
-                    </a>
-                    <a href="@Url.Action("ManageLinks", "Links")" class="btn btn-primary ms-2">
-                        <i class="bi bi-link-45deg"></i> Manage Links
-                    </a>
+                <!-- 3. Navigation Buttons - Mobile-friendly single row -->
+                <div class="text-center mt-3">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="@Url.Action("MoreLinks", "Links")" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to More Links
+                        </a>
+                        <a href="@Url.Action("ManageLinks", "Links")" class="btn btn-primary">
+                            <i class="bi bi-link-45deg"></i> Manage Links
+                        </a>
+                    </div>
                 </div>
             </div>
 

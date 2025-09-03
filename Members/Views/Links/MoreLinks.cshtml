@@ -19,7 +19,7 @@
 <!-- Banner Logo -->
 <partial name="_PartialBannerLogo" />
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4 mb-4">
     <div class="row">
         <div class="col-12">
             <!-- Page Header -->
@@ -34,10 +34,10 @@
                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                 {
                     <div class="mt-3 d-flex flex-wrap justify-content-center admin-buttons-container">
-                        <a href="@Url.Action("ManageCategories", "Links")" class="btn btn-primary btn-sm">
+                        <a href="@Url.Action("ManageCategories", "Links")" class="btn btn-primary btn-sm mb-2 mx-1">
                             <i class="bi bi-gear"></i> Manage Categories
                         </a>
-                        <a href="@Url.Action("ManageLinks", "Links")" class="btn btn-secondary btn-sm">
+                        <a href="@Url.Action("ManageLinks", "Links")" class="btn btn-secondary btn-sm mb-2 mx-1">
                             <i class="bi bi-link-45deg"></i> Manage Links
                         </a>
                     </div>
@@ -82,49 +82,128 @@
 
             @if (Model.Any())
             {
-                <!-- Links Display in Masonry Layout -->
+                <!-- Links Display in Column-Based Layout -->
                 <div class="masonry-container">
-                    @foreach (var category in Model)
-                    {
-                        <div class="masonry-item">
-                            <div class="card fish-smart-card">
-                                <div class="card-header fish-smart-card-header">
-                                    <h5 class="mb-0">
-                                        <i class="bi bi-folder2"></i> @category.CategoryName
-                                        @if (category.IsAdminOnly)
-                                        {
-                                            <small class="badge bg-warning text-dark ms-2">Admin Only</small>
-                                        }
-                                    </h5>
-                                </div>
-                                <div class="card-body fish-smart-card-body">
-                                    @if (category.CategoryLinks.Any())
-                                    {
-                                        <ul class="list-unstyled mb-0">
-                                            @foreach (var link in category.CategoryLinks)
+                    @{
+                        var sortedCategories = Model.OrderBy(c => c.SortOrder).ToList();
+                    }
+                    
+                    <!-- Desktop/Tablet: Column-based layout -->
+                    <div class="masonry-columns-desktop">
+                        @{
+                            // Distribute categories across columns based on content size and balance
+                            var columns = new List<List<LinkCategory>> { new(), new(), new() };
+                            
+                            // Smart distribution: assign categories to columns to balance content
+                            for (int i = 0; i < sortedCategories.Count; i++)
+                            {
+                                var category = sortedCategories[i];
+                                var columnIndex = i % 3; // Start with round-robin
+                                
+                                // For categories with many links (>10), try to balance better
+                                if (category.CategoryLinks.Count > 10)
+                                {
+                                    // Find the column with least content
+                                    var columnSizes = columns.Select((col, idx) => new { Index = idx, TotalLinks = col.Sum(c => Math.Max(1, c.CategoryLinks.Count)) }).OrderBy(x => x.TotalLinks).First();
+                                    columnIndex = columnSizes.Index;
+                                }
+                                
+                                columns[columnIndex].Add(category);
+                            }
+                        }
+                        
+                        @for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+                        {
+                            <div class="masonry-column">
+                                @foreach (var category in columns[colIndex])
+                                {
+                                    <div class="masonry-item">
+                                        <div class="card fish-smart-card">
+                                            <div class="card-header fish-smart-card-header">
+                                                <h5 class="mb-0">
+                                                    <i class="bi bi-folder2"></i> @category.CategoryName
+                                                    @if (category.IsAdminOnly)
+                                                    {
+                                                        <small class="badge bg-warning text-dark ms-2">Admin Only</small>
+                                                    }
+                                                </h5>
+                                            </div>
+                                            <div class="card-body fish-smart-card-body">
+                                                @if (category.CategoryLinks.Any())
+                                                {
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach (var link in category.CategoryLinks)
+                                                        {
+                                                            <li>
+                                                                <a href="@link.LinkUrl" 
+                                                                   target="_blank" 
+                                                                   rel="noopener noreferrer" 
+                                                                   class="link-item d-flex align-items-center text-decoration-none">
+                                                                    <i class="bi bi-eye text-primary me-2"></i>
+                                                                    <span>@link.LinkName</span>
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                                else
+                                                {
+                                                    <p class="mb-0">
+                                                        <i class="bi bi-info-circle"></i> No links in this category yet.
+                                                    </p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    
+                    <!-- Mobile: Linear sort order layout -->
+                    <div class="masonry-mobile-linear">
+                        @foreach (var category in sortedCategories)
+                        {
+                            <div class="masonry-item">
+                                <div class="card fish-smart-card">
+                                    <div class="card-header fish-smart-card-header">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-folder2"></i> @category.CategoryName
+                                            @if (category.IsAdminOnly)
                                             {
-                                                <li>
-                                                    <a href="@link.LinkUrl" 
-                                                       target="_blank" 
-                                                       rel="noopener noreferrer" 
-                                                       class="link-item d-flex align-items-center text-decoration-none">
-                                                        <i class="bi bi-eye text-primary me-2"></i>
-                                                        <span>@link.LinkName</span>
-                                                    </a>
-                                                </li>
+                                                <small class="badge bg-warning text-dark ms-2">Admin Only</small>
                                             }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <p class="mb-0">
-                                            <i class="bi bi-info-circle"></i> No links in this category yet.
-                                        </p>
-                                    }
+                                        </h5>
+                                    </div>
+                                    <div class="card-body fish-smart-card-body">
+                                        @if (category.CategoryLinks.Any())
+                                        {
+                                            <ul class="list-unstyled mb-0">
+                                                @foreach (var link in category.CategoryLinks)
+                                                {
+                                                    <li>
+                                                        <a href="@link.LinkUrl" 
+                                                           target="_blank" 
+                                                           rel="noopener noreferrer" 
+                                                           class="link-item d-flex align-items-center text-decoration-none">
+                                                            <i class="bi bi-eye text-primary me-2"></i>
+                                                            <span>@link.LinkName</span>
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-0">
+                                                <i class="bi bi-info-circle"></i> No links in this category yet.
+                                            </p>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             }
             else
@@ -147,4 +226,3 @@
         </div>
     </div>
 </div>
-
